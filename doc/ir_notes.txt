@@ -1,0 +1,50 @@
+IR Design Notes
+---------------
+
+Some basic notes about how the IR works and why.
+
+Basic IR nodes 
+-------------- 
+
+There are three basic node classes: Node, Expression and Statement.
+Expression and Statement derive indirectly from Node, making Node the
+root of the IR class hierarchy.
+
+There are two secondary node classes: Inner and Leaf.  An Inner node
+contains a sequence of child nodes, whose type is specified by the
+Child parameter to the Inner class.  Inner provides the raw interface
+to manage the sequence of children.  This interface is protected so
+that each higher-level class will tailor it to its own needs.
+
+A Leaf node has no children.  It's sole purpose is to make identifying
+leaf IR nodes simple using the visitor interface.
+
+IR Node Tags
+------------
+Higher ("user-level") IR nodes are provided through a tagging system.
+An Expression node by itself provides almost nothing.  It forwards
+a partial interface (still protected) from the Inner node base and
+extracts information from the higher-level IR type to correctly
+construct the inheritance tree.
+
+The higher-level IR information exists as a Node Tag.  In the case of
+Expression, this Tag is the "Op" parameter to the Expression class.
+The Tag provides the base type that Expression should inherit from.
+This will vary based on the needs of the higher-level type.  The Tag
+also provides a set of properties which are used a mix-ins to provide
+finer-grained matching for visitor walks.
+
+Use of semantics class
+----------------------
+
+Each IR node tag has an embedded "semantics" class that provides the
+public interface for the node type.  This is to keep the node type and
+interfaces in one place.  Because we want to reuse as much scaffolding
+as possible, the semantics class is usually specified as the base_type
+exported by the node tag.  The semantics class itself derives from a
+tag-specific class, often one of the intermediate facades.  The job of
+the semantics class is to massage the lower-level interfaces into
+something that makes sense for the higher-level IR concept.  This way
+all of the sequence-based foundation can be reused as-is without each
+IR node type having to re-specify sequences of different types of
+children.
