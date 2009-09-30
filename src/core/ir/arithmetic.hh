@@ -1,7 +1,7 @@
 #ifndef MIRVArithmetic_hh
 #define MIRVArithmetic_hh
 
-#include <mirv/expresison.hh>
+#include <mirv/ir/expression.hh>
 #include <boost/mpl/vector.hpp>
 
 namespace MIRV {

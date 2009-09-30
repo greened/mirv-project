@@ -2,13 +2,18 @@
 #define mirv_core_filter_visitor_hh
 
 #include <visitor.hh>
-#include <mirv/ir/statement.hh>
-#include <mirv/ir/exprfwd.hh>
+
+#include <mirv/ir/control.hh>
+
+#include <mirv/ir/arithmetic.hh>
+#include <mirv/ir/logical.hh>
+
+#include <boost/mpl/vector.hpp>
 
 namespace MIRV {
    typedef cyclic_visitor<void,
-      mpl::vector<
-      BaseStatemnet,
+      boost::mpl::vector<
+      BaseStatement,
       Statement<Block>,
       Statement<IfThen>,
       Statement<IfElse>,
@@ -24,7 +29,7 @@ namespace MIRV {
       > > StatementVisitor;
 
    typedef cyclic_visitor<void,
-      mpl::vector<
+      boost::mpl::vector<
       BaseExpression,
       Expression<Add>,
       Expression<Sub>,
