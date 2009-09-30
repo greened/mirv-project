@@ -22,7 +22,7 @@ namespace MIRV {
    template<typename Generator, typename Root, typename Sequence>
    class Properties {
    public:
-      typename boost::mpl::inherit_linearly<
+      typedef typename boost::mpl::inherit_linearly<
       Sequence,
       boost::mpl::apply2<Generator, boost::mpl::_2, boost::mpl::_1>,
       Root

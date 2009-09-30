@@ -64,6 +64,14 @@ namespace MIRV {
       typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
    };
 
+   class Label {
+   private:
+      typedef boost::mpl::vector<> sequence;
+
+   public:
+      typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
+   };
+
    class Call {
    private:
       typedef boost::mpl::vector<> sequence;

@@ -45,7 +45,7 @@ namespace MIRV {
    class GreaterThan;
 
    // Expression template
-   template<typename Op, typename Base = BaseType<Op>::type>
+   template<typename Op, typename Base>
    class Expression;
 }
 

@@ -1,17 +1,24 @@
 #ifndef MIRVCast_hh
 #define MIRVCast_hh
 
-template<typename To, typename From>
-inline To safe_ptr_cast(From val)
-{
-  typedef boost::add_ref<boost::remove_ptr<To>::type>::type ref_type;
+#include <mirv/util/debug.hh>
 
-  if (DebugManager::active && DebugManager::instance().safe_cast()) {
-    ref_type thisr(dynamic_cast<ref_type>(*val));
-    return(&thisr);
-  }
-  else {
-    return(static_cast<To>(this));
+#include <boost/type_traits.hpp>
+
+namespace MIRV {
+  template<typename To, typename From>
+  inline To safe_ptr_cast(From val)
+  {
+    typedef typename boost::add_reference<typename boost::remove_pointer<To>::type>::type ref_type;
+
+    if (DebugManager::Instance().IsActive()
+	&& DebugManager::Instance().Feature(DebugManager::SafeCast)) {
+      ref_type thisr(dynamic_cast<ref_type>(*val));
+      return &thisr;
+    }
+    else {
+      return static_cast<To>(val);
+    }
   }
 }
 
