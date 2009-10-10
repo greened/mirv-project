@@ -8,9 +8,9 @@ namespace MIRV {
 
   class LogicalAnd {
   private:
-    typedef boost::mpl::vector<LogicalSemantic, CommutativeSemantic,
-			       AssociativeSemantic, TransitiveSemantic,
-			       ReflexiveSemantic, LogAndSemantic> sequence;
+    typedef boost::mpl::vector<Logical, Commutative,
+			       Associative, Transitive,
+			       Reflexive> sequence;
 
   public:
     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -18,19 +18,19 @@ namespace MIRV {
 
   class LogicalOr {
   private:
-    typedef boost::mpl::vector<LogicalSemantic, CommutativeSemantic,
-			       AssociativeSemantic, TransitiveSemantic,
-			       ReflexiveSemantic, LogOrSemantic> sequence;
+    typedef boost::mpl::vector<Logical, Commutative,
+			       Associative, Transitive,
+			       Reflexive> sequence;
 
   public:
     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
   };
 
-  class Not {
+  class LogicalNot {
   private:
-    typedef boost::mpl::vector<LogicalSemantic, CommutativeSemantic,
-			       AssociativeSemantic, TransitiveSemantic,
-			       ReflexiveSemantic, LogNotSemantic> sequence;
+    typedef boost::mpl::vector<Logical, Commutative,
+			       Associative, Transitive,
+			       Reflexive> sequence;
 
   public:
     typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;

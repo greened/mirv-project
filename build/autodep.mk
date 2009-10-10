@@ -18,21 +18,21 @@ ifdef HAVE_GCC
   CXXMAKEDEPEND = $(CXX) -MM $(CPPFLAGS) -o $*.dd $<
 else
   CMAKEDEPEND = $(CPP) $(CPPFLAGS) $< \
-                      | $(SED) -n 's/^\# *[0-9][0-9]* *"\([^"]*\)".*/$*.o: \1/p' \
+                      | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' \
                       | $(SORT) | $(UNIQ) > $*.d
   CXXMAKEDEPEND = $(CPP) $(CPPFLAGS) $< \
-                        | $(SED) -n 's/^\# *[0-9][0-9]* *"\([^"]*\)".*/$*.o: \1/p' \
+                        | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' \
                         | $(SORT) | $(UNIQ) > $*.dd
 endif
 
 PROCESS_CDEPS := $(CP) $*.d $*.P; \
-                    $(SED) -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-                           -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $*.P; \
+                    $(SED) -e 's%#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
+                           -e '%^$$% d' -e 's%$$% :%' < $*.d >> $*.P; \
                  $(MV) -f $*.P $*.d
 
 PROCESS_CXXDEPS := $(CP) $*.dd $*.PP; \
-                      $(SED) -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-                             -e '/^$$/ d' -e 's/$$/ :/' < $*.dd >> $*.PP; \
+                      $(SED) -e 's%#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
+                             -e '%^$$% d' -e 's%$$% :%' < $*.dd >> $*.PP; \
                    $(MV) -f $*.PP $*.dd
 
 endif
