@@ -1,23 +1,23 @@
 #ifndef MIRV_Core_IR_Reference_hh
 #define MIRV_Core_IR_Reference_hh
 
+#include <mirv/ir/symbol.hh>
+
 namespace MIRV {
 
    template<typename SymbolType>
    class Ref {
    private:
-      typedef boost::mpl::vector<ReferenceSemantic> sequence;
-
-     typedef Inner<Symbol<SymbolType>, BaseExpression> >::type
-     interface_base_type;
+     typedef boost::mpl::vector<> sequence;
+     typedef InnerExpression interface_base_type;
 
    public:
      class interface 
             : public interface_base_type {
       public:
-         typedef Symbol<SymbolType> child_type;
-         typedef ptr<child_type>::type child_ptr
-         typedef ptr<child_type>::const_type const_child_ptr;
+       typedef Symbol<SymbolType> child_type;
+       typedef typename ptr<child_type>::type child_ptr;
+       typedef typename ptr<child_type>::const_type const_child_ptr;
         
          void set_symbol(child_ptr c) {
             if (empty()) {
@@ -37,8 +37,7 @@ namespace MIRV {
          };
       };
 
-      typedef ExpressionBaseGenerator<sequence, interface>::type base_type;
-   };
+     typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;   };
 
    class AddressOf {
    private:
@@ -50,7 +49,7 @@ namespace MIRV {
 
    class Dereference {
    private:
-      typedef boost::mpl::vector<ReferenceSemantic> sequence;
+      typedef boost::mpl::vector<Reference> sequence;
 
    public:
       typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
@@ -58,7 +57,7 @@ namespace MIRV {
 
    class ArrayRef {
    private:
-      typedef boost::mpl::vector<ReferenceSemantic> sequence;
+      typedef boost::mpl::vector<Reference> sequence;
 
    public:
       typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;

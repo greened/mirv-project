@@ -9,9 +9,9 @@ namespace MIRV {
   // Expression Ops
   class Add {
   private:
-    typedef boost::mpl::vector<ArithmeticSemantic, CommutativeSemantic, 
-			       AssociativeSemantic, TransitiveSemantic, 
-			       ReflexiveSemantic, AddSemantic> sequence;
+    typedef boost::mpl::vector<Arithmetic, Commutative, 
+			       Associative, Transitive, 
+			       Reflexive> sequence;
 
   public:
      typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -20,9 +20,9 @@ namespace MIRV {
 
   class Subtract {
   private:
-    typedef boost::mpl::vector<ArithmeticSemantic, AssociativeSemantic, 
-			       TransitiveSemantic, 
-			       ReflexiveSemantic, SubSemantic> sequence;
+    typedef boost::mpl::vector<Arithmetic, Associative, 
+			       Transitive, 
+			       Reflexive> sequence;
 
   public:
     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -31,9 +31,9 @@ namespace MIRV {
 
   class Multiply {
   private:
-    typedef boost::mpl::vector<ArithmeticSemantic, CommutativeSemantic, 
-			       AssociativeSemantic, TransitiveSemantic, 
-			       ReflexiveSemantic, MultSemantic> sequence;
+    typedef boost::mpl::vector<Arithmetic, Commutative, 
+			       Associative, Transitive, 
+			       Reflexive> sequence;
 
   public:
     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -41,9 +41,9 @@ namespace MIRV {
 
   class Divide {
   private:
-    typedef boost::mpl::vector<ArithmeticSemantic,
-			       AssociativeSemantic, TransitiveSemantic, 
-			       ReflexiveSemantic, DivSemantic> sequence;
+    typedef boost::mpl::vector<Arithmetic,
+			       Associative, Transitive, 
+			       Reflexive> sequence;
 
   public:
     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -51,9 +51,9 @@ namespace MIRV {
 
   class Modulus {
   private:
-    typedef boost::mpl::vector<ArithmeticSemantic, 
-			       TransitiveSemantic, 
-			       ReflexiveSemantic, ModSemantic> sequence;
+    typedef boost::mpl::vector<Arithmetic, 
+			       Transitive, 
+			       Reflexive> sequence;
 
   public:
     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -61,8 +61,8 @@ namespace MIRV {
 
   class Negate {
   private:
-    typedef boost::mpl::vector<ArithmeticSemantic, 
-			       ReflexiveSemantic, NegSemantic> sequence;
+    typedef boost::mpl::vector<Arithmetic, 
+			       Reflexive> sequence;
 
   public:
     typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;

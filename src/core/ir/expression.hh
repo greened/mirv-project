@@ -126,7 +126,9 @@ namespace MIRV {
    typedef Expression<Binary> BinaryExpression;
 
    // Expression property semantics
-
+   class Arithmetic {};
+   class Logical {};
+   class Bitwise {};
    class Commutative {};
    class NonCommutative {};
 
@@ -138,6 +140,8 @@ namespace MIRV {
 
    class Reflexive {};
    class NonReflexive {};
+ 
+   class Reference {};
 
    // A metafunction class to generate expression hierarchies.  This
    // makes sure that each property expression specifies Base as its

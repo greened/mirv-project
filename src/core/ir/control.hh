@@ -267,11 +267,11 @@ namespace MIRV {
          };
 
          expression_ptr get_label(void) {
-            return(get_expression());
+            return(this->get_expression());
          };
 
          const_expression_ptr get_label(void) const {
-            return(get_expression());
+            return(this->get_expression());
          };
       };
 
@@ -304,7 +304,7 @@ namespace MIRV {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-      typedef Statement<SingleLabel<LeafStatement> > > root;
+      typedef Statement<SingleLabel<LeafStatement> > root;
 
    public:
       typedef StatementBaseGenerator<sequence, root>::type base_type;

@@ -4,7 +4,7 @@
 namespace MIRV {
    template<
       typename Tag,
-      typename Base = typename BaseType<Op>::type>
+      typename Base = typename BaseType<Tag>::type>
    class Symbol 
          : public Base {
    public:
@@ -17,3 +17,4 @@ namespace MIRV {
 }
 
 #endif
+ 

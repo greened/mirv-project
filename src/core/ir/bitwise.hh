@@ -1,16 +1,16 @@
 #ifndef MIRVBitwise_hh
 #define MIRVBitwise_hh
 
-#include <mirv/expression.hh>
+#include <mirv/ir/expression.hh>
 #include <boost/mpl/vector.hpp>
 
 namespace MIRV {
    
    class BitwiseAnd {
    private:
-      typedef boost::mpl::vector<BitwiseSemantic, CommutativeSemantic,
-         AssociativeSemantic, TransitiveSemantic,
-         ReflexiveSemantic, BitAndSemantic> sequence;
+      typedef boost::mpl::vector<Bitwise, Commutative,
+         Associative, Transitive,
+         Reflexive> sequence;
       
    public:
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -18,17 +18,17 @@ namespace MIRV {
    
    class BitwiseOr {
    private:
-      typedef boost::mpl::vector<BitwiseSemantic, CommutativeSemantic,
-         AssociativeSemantic, TransitiveSemantic,
-         ReflexiveSemantic, BitOrSemantic> sequence;
+      typedef boost::mpl::vector<Bitwise, Commutative,
+         Associative, Transitive,
+         Reflexive> sequence;
       
    public:
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
    };
    
-   class Complement {
+   class BitwiseComplement {
    private:
-      typedef boost::mpl::vector<BitwiseSemantic> sequence;
+      typedef boost::mpl::vector<Bitwise> sequence;
       
    public:
       typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
@@ -37,7 +37,7 @@ namespace MIRV {
 
    class ShiftLeft {
    private:
-      typedef boost::mpl::vector<BitwiseSemantic> sequence;
+      typedef boost::mpl::vector<Bitwise> sequence;
       
    public:
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -45,7 +45,7 @@ namespace MIRV {
 
    class ArithmeticShiftRight {
    private:
-      typedef boost::mpl::vector<BitwiseSemantic> sequence;
+      typedef boost::mpl::vector<Bitwise> sequence;
       
    public:
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
@@ -53,7 +53,7 @@ namespace MIRV {
 
    class LogicalShiftRight {
    private:
-      typedef boost::mpl::vector<BitwiseSemantic> sequence;
+      typedef boost::mpl::vector<Bitwise> sequence;
       
    public:
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;

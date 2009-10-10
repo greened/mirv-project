@@ -7,11 +7,14 @@
 
 #include <mirv/ir/arithmetic.hh>
 #include <mirv/ir/logical.hh>
+#include <mirv/ir/bitwise.hh>
 
 #include <boost/mpl/vector.hpp>
 
 namespace MIRV {
-   typedef cyclic_visitor<void,
+  template<typename R>
+  struct StatementVisitor {
+    typedef cyclic_visitor<void,
       boost::mpl::vector<
       BaseStatement,
       Statement<Block>,
@@ -26,24 +29,29 @@ namespace MIRV {
       Statement<After>,
       Statement<Goto>,
       Statement<Return>
-      > > StatementVisitor;
+	> > type;
+  };
 
+  template<typename R>
+  struct ExpressionVisitor {
    typedef cyclic_visitor<void,
       boost::mpl::vector<
       BaseExpression,
       Expression<Add>,
-      Expression<Sub>,
-      Expression<Div>,
-      Expression<Mod>,
-      Expression<Mult>,
-      Expression<Neg>,
+      Expression<Subtract>,
+      Expression<Divide>,
+      Expression<Modulus>,
+      Expression<Multiply>,
+      Expression<Negate>,
       Expression<LogicalAnd>,
+
       Expression<LogicalOr>,
       Expression<LogicalNot>,
-      Expression<BitAnd>,
-      Expression<BitOr>,
-      Expression<BitNot>
-      > > ExpressionVisitor;
+      Expression<BitwiseAnd>,
+      Expression<BitwiseOr>,
+      Expression<BitwiseComplement>
+      > > type;
+  };
 
 #define DEFINE_STATEMENT_VISITABLE() \
    DEFINE_CYCLIC_VISITABLE(StatementVisitor);
