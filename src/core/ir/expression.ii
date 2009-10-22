@@ -1,0 +1,32 @@
+#ifndef mirv_core_ir_expression_ii
+#define mirv_core_ir_expression_ii
+
+namespace mirv {
+   template<typename Op, typename Base>
+   void Expression<Op, Base>::accept(ExpressionVisitor<void> &V)
+   {
+     V.visit(*this);
+   }
+
+   void InnerExpression::accept(ExpressionVisitor<void> &V)
+   {
+     V.visit(*this);
+   }
+
+   void LeafExpression::accept(ExpressionVisitor<void> &V)
+   {
+     V.visit(*this);
+   }
+
+  void Unary::interface::accept(ExpressionVisitor<void> &V)
+  {
+    V.visit(*this);
+  }
+
+  void Binary::interface::accept(ExpressionVisitor<void> &V)
+  {
+    V.visit(*this);
+  }
+}
+
+#endif

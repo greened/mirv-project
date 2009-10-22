@@ -1,7 +1,7 @@
-#ifndef MIRVType_hh
-#define MIRVType_hh
+#ifndef mirv_core_ir_type_hh
+#define mirv_core_ir_type_hh
 
-namespace MIRV {
+namespace mirv {
    template<
       typename Tag,
       typename Base = typename BaseType<Tag>::type>

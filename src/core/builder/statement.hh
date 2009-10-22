@@ -1,9 +1,9 @@
-#ifndef MIRVStatementBuilder_hh
-#define MIRVStatementBuilder_hh
+#ifndef mirv_core_builder_statement_hh
+#define mirv_core_builder_statement_hh
 
 #include "transform.hh"
 
-namespace MIRV {
+namespace mirv {
    namespace Builder {
       struct ExpressionGrammar;
       struct StatementGrammar;

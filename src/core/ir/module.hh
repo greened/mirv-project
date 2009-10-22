@@ -1,7 +1,7 @@
-#ifndef MIRVModule_hh
-#define MIRVModule_hh
+#ifndef mirv_core_ir_module_hh
+#define mirv_core_ir_module_hh
 
-namespace MIRV {
+namespace mirv {
    struct Module {
       typedef Inner<Symbol<Function>, BaseSymbol> base_type
    };

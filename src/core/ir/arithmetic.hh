@@ -1,11 +1,10 @@
-#ifndef MIRVArithmetic_hh
-#define MIRVArithmetic_hh
+#ifndef mirv_core_ir_arithmetic_hh
+#define mirv_core_ir_arithmetic_hh
 
 #include <mirv/ir/expression.hh>
 #include <boost/mpl/vector.hpp>
 
-namespace MIRV {
-
+namespace mirv {
   // Expression Ops
   class Add {
   private:

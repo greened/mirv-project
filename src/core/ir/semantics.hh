@@ -1,5 +1,5 @@
-#ifndef MIRVSemantics_hh
-#define MIRVSemantics_hh
+#ifndef mirv_core_ir_semantics_hh
+#define mirv_core_ir_semantics_hh
 
 #include <inherit.hh>
 
@@ -9,7 +9,7 @@
 // entirely new concepts be introduced?  Probably the latter,
 // but how?
 
-namespace MIRV {
+namespace mirv {
 
   template<typename Tag>
   class Semantic;

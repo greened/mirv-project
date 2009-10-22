@@ -1,5 +1,5 @@
-#ifndef MIRVNode_hh
-#define MIRVNode_hh
+#ifndef mirv_core_ir_node_hh
+#define mirv_core_ir_node_hh
 
 #include <mirv/ir/base.hh>
 #include <mirv/ir/property.hh>
@@ -8,7 +8,7 @@
 
 #include <list>
 
-namespace MIRV {
+namespace mirv {
    template<typename Tag>
    class Node;
 
@@ -19,7 +19,7 @@ namespace MIRV {
 
    // A node with children
    template<typename Child, typename BaseType = BaseNode>
-   class Inner : public BaseType {
+   class InnerImpl : public BaseType {
    protected:
       typedef typename ptr<Child>::type child_ptr;
       typedef typename ptr<Child>::const_type const_child_ptr;
@@ -29,15 +29,21 @@ namespace MIRV {
       child_list children;
 
    protected:
-      typedef typename child_list::iterator iterator;
-      typedef typename child_list::const_iterator const_iterator;
+     typedef typename child_list::iterator iterator;
+     typedef typename child_list::reverse_iterator reverse_iterator;
+     typedef typename child_list::const_iterator const_iterator;
+     typedef typename child_list::const_reverse_iterator const_reverse_iterator;
 
       iterator begin(void) { return(children.begin()); }
       const_iterator begin(void) const { return(children.begin()); }
+      reverse_iterator rbegin(void) { return(children.rbegin()); }
+      const_reverse_iterator rbegin(void) const { return(children.rbegin()); }
 
       iterator end(void) { return(children.end()); }
       const_iterator end(void) const { return(children.end()); }
-
+     reverse_iterator rend(void) { return(children.rend()); }
+     const_reverse_iterator rend(void) const { return(children.rend()); }
+ 
       void push_back(child_ptr c) {
          children.push_back(c);
       }
@@ -126,7 +132,8 @@ namespace MIRV {
 
        // A node without children
    template<typename Tag>
-   class Leaf : public Tag {
+   class LeafImpl : public Tag {
+   public:
    };
 
 }

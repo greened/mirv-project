@@ -1,11 +1,11 @@
-#ifndef MIRVCast_hh
-#define MIRVCast_hh
+#ifndef mirv_core_util_cast_hh
+#define mirv_core_util_cast_hh
 
 #include <mirv/util/debug.hh>
 
 #include <boost/type_traits.hpp>
 
-namespace MIRV {
+namespace mirv {
   template<typename To, typename From>
   inline To safe_ptr_cast(From val)
   {

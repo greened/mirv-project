@@ -1,5 +1,5 @@
-#ifndef MIRVExpression_hh
-#define MIRVExpression_hh
+#ifndef mirv_core_ir_expression_hh
+#define mirv_core_ir_expression_hh
 
 #include <mirv/ir/node.hh>
 #include <mirv/ir/property.hh>
@@ -11,21 +11,31 @@
 #include <boost/mpl/inherit.hpp>
 #include <boost/mpl/inherit_linearly.hpp>
 
-namespace MIRV {
+namespace mirv {
+  template<typename R>
+  struct ExpressionVisitor;
+
    template<
       typename Op,
       typename Base = typename BaseType<Op>::type>
-   class Expression : public Base {
+   class Expression : Base {
    public:
       typedef Base base_type;
       typedef typename base_type::child_type child_type;
+     virtual void accept(ExpressionVisitor<void> &V);
    };
 
    typedef Expression<Base> BaseExpression;
 
-   typedef Inner<BaseExpression> InnerExpression;
+  class InnerExpression : public InnerImpl<BaseExpression, BaseExpression> {
+  public:
+    virtual void accept(ExpressionVisitor<void> &V);
+  };
 
-   typedef Leaf<BaseExpression> LeafExpression;
+  class LeafExpression : public LeafImpl<BaseExpression> {
+  public:
+    virtual void accept(ExpressionVisitor<void> &V);
+  };
 
    class Unary {
    private:
@@ -36,7 +46,7 @@ namespace MIRV {
       typedef interface base_type;
 
       class interface
-            : public interface_base_type {
+            : public virtual interface_base_type {
       public:
          typedef BaseExpression child_type;
          typedef ptr<child_type>::type child_ptr;
@@ -58,6 +68,7 @@ namespace MIRV {
          const_child_ptr get_operand(void) const {
             return(front());
          };
+	virtual void accept(ExpressionVisitor<void> &V);
       };
    };
 
@@ -71,7 +82,7 @@ namespace MIRV {
       typedef interface base_type;
 
       class interface
-            : public interface_base_type {
+            : public virtual interface_base_type {
       public:
          typedef BaseExpression child_type;
          typedef ptr<child_type>::type child_ptr;
@@ -119,6 +130,7 @@ namespace MIRV {
                          "Attempt to get missing operand from expression");
             return(back());
          };
+	virtual void accept(ExpressionVisitor<void> &V);
       };
    };
 
@@ -143,25 +155,23 @@ namespace MIRV {
  
    class Reference {};
 
-   // A metafunction class to generate expression hierarchies.  This
-   // makes sure that each property expression specifies Base as its
-   // base type so that visit(Expreesion<>::base_type) works
-   // correctly.
-   class ExpressionGenerator {
-   public:
-      template<typename Property, typename Base>
-      struct apply {
-         typedef Expression<Property, Base> type;
-      };
-   };
+  template<typename Property>
+  class Expression<Property, void> : public virtual InnerExpression {};
 
-   template<typename Sequence, typename Root>
+  struct PropertyExpressionGenerator {
+    template<typename Property>
+    struct apply {
+      typedef Expression<Property, void> type;
+    };
+  };
+ 
+  template<typename Sequence, typename Root>
    class ExpressionBaseGenerator {
    public:
-      typedef typename Properties<ExpressionGenerator, Root, Sequence>::type
+    typedef typename Properties<PropertyExpressionGenerator, Root, Sequence>::type
       type;
 
    };
 }
-
+ 
 #endif

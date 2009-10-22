@@ -1,14 +1,18 @@
-#ifndef MIRV_Filter_Snapshot_Print_hh
-#define MIRV_filter_Snapshot_Print_hh
+#ifndef mirv_filter_snapshot_print_hh
+#define mirv_filter_snapshot_print_hh
 
 #include <mirv/filter/flow.hh>
+#include <mirv/filter/filter.hh>
+#include <mirv/filter/action.hh>
+#include <mirv/ir/node.hh>
 
-namespace MIRV {
+namespace mirv {
    class PrintFilter
          : public Filter<BaseNode> {
    private:
+     typedef std::ostream Stream;
       typedef int Indent;
-      const int IndentFactor = 3;
+      const int IndentFactor;
 
       class indent {
       private:
@@ -27,11 +31,11 @@ namespace MIRV {
       };
 
       indent ind;
-      std::ostream &out;
+      Stream &out;
 
       // Entering each statement
       class EnterAction
-            : public StatementAction<void> {
+            : public VisitStatementAction<void> {
       private:
          std::ostream &out;
          Indent &ind;
@@ -56,7 +60,7 @@ namespace MIRV {
 
       // After processing each statement's expression child
       class AfterStmtExprAction
-            : public StatementAction<void> {
+            : public VisitStatementAction<void> {
       private:
          Stream &out;
          Indent &ind;
@@ -87,7 +91,7 @@ namespace MIRV {
 
       // After each statement's child
       class AfterAction
-            : public StatementAction<void> {
+            : public VisitStatementAction<void> {
       private:
          Stream &out;
          Indent &ind;
@@ -95,14 +99,14 @@ namespace MIRV {
       public:
          AfterAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
-         void visit(BaseStmt &stmt) {
+         void visit(BaseStatement &stmt) {
             out << "\n";
          }
       };
 
       // Leaving each statement
       class LeaveAction
-            : public StatementAction<void> {
+            : public VisitStatementAction<void> {
       private:
          Stream &out;
          Indent &ind;
@@ -119,7 +123,7 @@ namespace MIRV {
 
       // Entering each expression
       class EnterExprAction
-            : public ExpressionAction<void> {
+            : public VisitExpressionAction<void> {
       private:
          Stream &out;
          Indent &ind;
@@ -129,22 +133,22 @@ namespace MIRV {
                : out(o), ind(i) {}
 
          void visit(Expression<Add> &expr);
-         void visit(Expression<Sub> &expr);
-         void visit(Expression<Mult> &expr);
-         void visit(Expression<Div> &expr);
-         void visit(Expression<Mod> &expr);
-         void visit(Expression<Neg> &expr);
+         void visit(Expression<Subtract> &expr);
+         void visit(Expression<Multiply> &expr);
+         void visit(Expression<Divide> &expr);
+         void visit(Expression<Modulus> &expr);
+         void visit(Expression<Negate> &expr);
          void visit(Expression<LogicalAnd> &expr);
          void visit(Expression<LogicalOr> &expr);
          void visit(Expression<LogicalNot> &expr);
          void visit(Expression<BitwiseAnd> &expr);
          void visit(Expression<BitwiseOr> &expr);
-         void visit(Expression<Complement> &expr);
+         void visit(Expression<BitwiseComplement> &expr);
       };
 
       // Leaving each expression
       class LeaveExprAction
-            : public ExpressionAction<void> {
+            : public VisitExpressionAction<void> {
       private:
          Stream &out;
          Indent &ind;
@@ -160,7 +164,7 @@ namespace MIRV {
 
       // After each expression's child
       class AfterExprAction
-            : public ExpressionAction<void> {
+            : public VisitExpressionAction<void> {
       private:
          Stream &out;
          Indent &ind;
@@ -178,20 +182,20 @@ namespace MIRV {
             : public ForwardExpressionFlow<
          EnterExprAction,
          LeaveExprAction,
-         BeforeExprAction,
+         NullAction,
          AfterExprAction
          > {};
 
       typedef ForwardFlow<
          EnterAction,
          LeaveAction,
-         BeforeAction,
+         NullAction,
          AfterAction
          PrintExpressionFlow> PrintFlow;
 
    public:
       PrintFilter(std::ostream &o)
-            : Filter<BaseNode>(), indent(), out(o) {}
+	: Filter<BaseNode>(), IndentFactor(3), indent(), out(o) {}
 
       void operator()(BaseNode &node);
    };

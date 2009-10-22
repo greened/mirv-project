@@ -1,14 +1,16 @@
-#ifndef MIRV_Filter_ForwardFlow_hh
-#define MIRV_Filter_ForwardFlow_hh
+#ifndef mirv_core_filter_forward_flow_hh
+#define mirv_core_filter_forward_flow_hh
 
 #include <mirv/filter/flow.hh>
 
-namespace MIRV {
+namespace mirv {
    template<
       typename EnterAction = NullAction,
       typename LeaveAction = NullAction,
-      typename BeforeAction = NullAction,
+      typename BeforeStmtAction = NullAction,
+      typename BeforeExprAction = NullAction,
       typename AfterAction = NullAction,
+      typename BetweenAction = NullAction,
       typename ExprFlow = NullExpressionFlow,
       typename Dataflow = NullDataflow,
       typename Confluence = Dataflow::Confluence>
@@ -16,20 +18,24 @@ namespace MIRV {
          : public StatementFlow<
       EnterAction,
       LeaveAction,
-      BeforeAction,
+      BeforeStmtAction,
+      BeforeExprAction,
       AfterAction,
+      BetweenAction,
       ExprFlow,
       Dataflow,
       Confluence> {
    public:
       ForwardFlow(EnterAction &e,
                   LeaveAction &l,
-                  BeforeAction &b,
+                  BeforeStmtAction &bs,
+                  BeforeExprAction &be,
                   AfterAction &a,
+                  BetweenAction &bt,
                   ExprFlow &expr,
                   Dataflow &d,
                   Confluence &c)
-            : StatementFlow(e, l, b, a, expr, d, c) {}
+	: StatementFlow(e, l, bs, be, a, bt, expr, d, c) {}
 
       void visit(Statement<Block> &stmt) {
          enter(stmt);

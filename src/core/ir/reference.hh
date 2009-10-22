@@ -1,10 +1,9 @@
-#ifndef MIRV_Core_IR_Reference_hh
-#define MIRV_Core_IR_Reference_hh
+#ifndef mirv_core_ir_reference_hh
+#define mirv_core_ir_reference_hh
 
 #include <mirv/ir/symbol.hh>
 
-namespace MIRV {
-
+namespace mirv {
    template<typename SymbolType>
    class Ref {
    private:

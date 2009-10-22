@@ -1,5 +1,5 @@
-#ifndef MIRVControl_hh
-#define MIRVControl_hh
+#ifndef mirv_core_ir_control_hh
+#define mirv_core_ir_control_hh
 
 #include <mirv/ir/statement.hh>
 #include <mirv/ir/reference.hh>
@@ -7,8 +7,7 @@
 
 #include <boost/mpl/vector.hpp>
 
-namespace MIRV {
-
+namespace mirv {
    class Block {
    private:
       typedef boost::mpl::vector<> sequence;
