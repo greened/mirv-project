@@ -1,7 +1,7 @@
-#ifndef MIRV_Core_Filter_Filter_hh
-#define MIRV_Core_Filter_Filter_hh
+#ifndef mirv_core_filter_filter_hh
+#define mirv_core_filter_filter_hh
 
-namespace MIRV {
+namespace mirv {
    template<typename Visited, typename Result = void>
    class Filter {
    public:

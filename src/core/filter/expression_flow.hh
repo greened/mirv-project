@@ -1,10 +1,10 @@
-#ifndef MIRV_Filter_ExpressionFlow_hh
-#define MIRV_Filter_ExpressionFlow_hh
+#ifndef mirv_core_filter_expression_flow_hh
+#define mirv_core_filter_expression_flow_hh
 
 #include <mirv/filter/visitor.hh>
 #include <mirv/filter/dataflow.hh>
 
-namespace MIRV {
+namespace mirv {
    template<
       typename EnterAction = NullAction,
       typename LeaveAction = NullAction,
@@ -85,23 +85,27 @@ namespace MIRV {
                             Dataflow &d)
 	: BaseType(e, l, b, a, d) {}
 
-      void visit(BaseExpression &expr) {
-         enter(expr);
+      void visit(InnerExpression &expr) {
+         this->enter(expr);
 
-         for(BaseExpression::iterator i = expr.begin(),
+         for(InnerExpression::iterator i = expr.begin(),
                 iend = expr.end();
              i != iend;
-             ;) {
-            before(expr, **i);
+             /* NULL */) {
+            this->before(expr, **i);
             (*i)->accept(*this);
-            after(expr, **i);
-            BaseExpression::iterator prev = i;
+            this->after(expr, **i);
+            InnerExpression::iterator prev = i;
             if (++i != iend) {
-               between(expr, **prev, **i);
+               this->between(expr, **prev, **i);
             }
          }
 
-         leave(expr);
+         this->leave(expr);
+      }
+      void visit(LeafExpression &expr) {
+         this->enter(expr);
+         this->leave(expr);
       }
    };
 
@@ -133,23 +137,28 @@ namespace MIRV {
                              Dataflow &d)
             : BaseType(e, l, b, a, d) {}
 
-      void visit(BaseExpression &expr) {
-         enter(expr);
+      void visit(InnerExpression &expr) {
+         this->enter(expr);
 
-         for(BaseExpression:reverse_:iterator i = expr.rbegin(),
+         for(InnerExpression::reverse_iterator i = expr.rbegin(),
                 iend = expr.rend();
              i != iend;
-             ;) {
-            before(expr, **i);
+             /* NULL */) {
+            this->before(expr, **i);
             (*i)->accept(*this);
-            after(expr, **i);
-            BaseExpression::iterator prev = i;
+            this->after(expr, **i);
+            InnerExpression::reverse_iterator prev = i;
             if (++i != iend) {
-               between(expr, **prev, **i);
+               this->between(expr, **prev, **i);
             }
          }
 
-         leave(expr);
+         this->leave(expr);
+      }
+
+      void visit(LeafExpression &expr) {
+         this->enter(expr);
+         this->leave(expr);
       }
    };
 }

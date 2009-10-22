@@ -1,11 +1,10 @@
-#ifndef MIRVLogical_hh
-#define MIRVLogical_hh
+#ifndef mirv_core_ir_logical_hh
+#define mirv_core_ir_logical_hh
 
 #include <mirv/ir/expression.hh>
 #include <boost/mpl/vector.hpp>
 
-namespace MIRV {
-
+namespace mirv {
   class LogicalAnd {
   private:
     typedef boost::mpl::vector<Logical, Commutative,

@@ -1,7 +1,7 @@
-#ifndef MIRVVariable_hh
-#define MIRVVariable_hh
+#ifndef mirv_core_ir_variable_hh
+#define mirv_core_ir_variable_hh
 
-namespace MIRV {
+namespace mirv {
    class Variable {
    private:
       typedef LeafSymbol interface_base_type

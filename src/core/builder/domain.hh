@@ -1,7 +1,7 @@
-#ifndef MIRVBuilderDomain_hh
-#define MIRVBuilderDomain_hh
+#ifndef mirv_core_builder_domain_hh
+#define mirv_core_builder_domain_hh
 
-namespace MIRV {
+namespace mirv {
    namespace Builder {
       struct Domain;
 

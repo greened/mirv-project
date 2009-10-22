@@ -1,9 +1,9 @@
-#ifndef MIRVExpressionBuilder_hh
-#define MIRVExpressionBuilder_hh
+#ifndef mirv_core_buildir_expression_hh
+#define mirv_core_builder_expression_hh
 
 #include "transform.hh"
 
-namespace MIRV {
+namespace mirv {
    namespace Builder {
       typedef proto::terminal<SymbolPtr>::type Symbol;
 

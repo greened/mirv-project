@@ -1,5 +1,5 @@
-#ifndef MIRVDebug_hh
-#define MIRVDebug_hh
+#ifndef mirv_core_util_debug_hh
+#define mirv_core_util_debug_hh
 
 #include <iostream>
 
@@ -10,7 +10,7 @@
    }
 
 // TODO: Make a proper singleton
-namespace MIRV {
+namespace mirv {
   class DebugManager {
   private:
     static DebugManager *instance;

@@ -1,9 +1,10 @@
-#ifndef MIRVInherit_hh
-#define MIRVInherit_hh
+#ifndef mirv_core_ir_inherit_hh
+#define mirv_core_ir_inherit_hh
 
 // Define inheritance mechanisms for extending the class hierarchy.
 
 #include <mirv/ir/base.hh>
+#include <boost/mpl/empty_base.hpp>
 
 namespace MIRV {
    // The default inheritance mechanism
@@ -16,7 +17,7 @@ namespace MIRV {
    template<>
    class BaseType<Base> {
    public:
-      typedef void type;
+     typedef boost::mpl::empty_base type;
    };
 }
 

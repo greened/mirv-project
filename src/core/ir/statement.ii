@@ -1,0 +1,19 @@
+#ifndef mirv_core_ir_statement_ii
+#define mirv_core_ir_statement_ii
+
+namespace mirv {
+  template<typename Tag, typename Base>
+  void Statement<Tag, Base>::accept(StatementVisitor<void> &V) {
+    V.visit(*this);
+  }
+
+  void InnerStatement::accept(StatementVisitor<void> &V) {
+    V.visit(*this);
+  }
+
+  void LeafStatement::accept(StatementVisitor<void> &V) {
+    V.visit(*this);
+  }
+}
+
+#endif

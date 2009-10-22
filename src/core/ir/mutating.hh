@@ -1,10 +1,10 @@
-#ifndef MIRV_Core_IR_Mutating_hh
-#define MIRV_Core_IR_Mutating_hh
+#ifndef mirv_core_ir_mutating_hh
+#define mirv_core_ir_mutating_hh
 
 #include <mirv/statement.hh>
 #include <boost/mpl/vector.hpp>
 
-namespace MIRV {
+namespace mirv {
    template<typename Stmt>
    class DualExpression {
    public:

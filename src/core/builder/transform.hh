@@ -1,7 +1,7 @@
-#ifndef MIRVBuilderTransform_hh
-#define MIRVBuilderTransform_hh
+#ifndef mirv_core_builder_transform_hh
+#define mirv_core_builder_transform_hh
 
-namespace MIRV {
+namespace mirv {
    namespace Builder {
       // Transform a one-operand node
       template<typename NodeType, typename Dummy = boost::proto::callable>

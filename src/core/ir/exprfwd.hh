@@ -1,7 +1,7 @@
-#ifndef MIRV_Core_IR_Exprfwd_hh
-#define MIRV_Core_IR_Exprhwd_hh
+#ifndef mirv_core_ir_exprfwd_hh
+#define mirv_core_ir_exprhwd_hh
 
-namespace MIRV {
+namespace mirv {
    // Tags
    class Unary;
    class Binary;

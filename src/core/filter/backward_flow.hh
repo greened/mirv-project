@@ -1,14 +1,16 @@
-#ifndef MIRV_Filter_ForwardFlow_hh
-#define MIRV_Filter_ForwardFlow_hh
+#ifndef mirv_core_filter_backward_flow_hh
+#define mirv_core_filter_backward_flow_hh
 
 #include <mirv/filter/flow.hh>
 
-namespace MIRV {
+namespace mirv {
    template<
       typename EnterAction = NullAction,
       typename LeaveAction = NullAction,
-      typename BeforeAction = NullAction,
+      typename BeforeStmtAction = NullAction,
+      typename BeforeExprAction = NullAction,
       typename AfterAction = NullAction,
+      typename BetweenAction = NullAction,
       typename ExprFlow = NullExpressionFlow,
       typename Dataflow = NullDataflow,
       typename Confluence = Dataflow::Confluence>
@@ -16,16 +18,20 @@ namespace MIRV {
          : public StatementFlow<
       EnterAction,
       LeaveAction,
-      BeforeAction,
+      BeforeStmtAction,
+      BeforeExprAction,
       AfterAction,
+      BetweenAction,
       ExprFlow,
       Dataflow,
       Confluence> {
    public:
       BackwardFlow(EnterAction &e,
                    LeaveAction &l,
-                   BeforeAction &b,
+                   BeforeStmtAction &bs,
+                   BeforeExprAction &be,
                    AfterAction &a,
+                   BetweenAction &a,
                    ExprFlow &expr,
                    Dataflow &d,
                    Confluence &c)
@@ -57,7 +63,7 @@ namespace MIRV {
          stmt.child()->accept(*this);
          after_statement(stmt, *stmt.child());
 
-         confluence()(dataflow(), dataflow(), denter);
+         confluence(dataflow(), dataflow(), denter);
 
          before_expression(stmt, *stmt.expression());
          stmt.expression()->accept(expression());

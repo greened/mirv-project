@@ -1,9 +1,9 @@
-#ifndef MIRVHeap_hh
-#define MIRVHeap_hh
+#ifndef mirv_core_mem_heap_hh
+#define mirv_core_mem_heap_hh
 
 #include <boost/shared_ptr.hpp>
 
-namespace MIRV {
+namespace mirv {
   template<typename Type>
   struct ptr {
     typedef boost::shared_ptr<Type> type;

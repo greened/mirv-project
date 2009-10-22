@@ -1,7 +1,7 @@
-#ifndef MIRV_Core_IR_Stmtfwd_hh
-#define MIRV_Core_IR_Stmtfwd_hh
+#ifndef mirv_core_ir_stmtfwd_hh
+#define mirv_core_ir_stmtfwd_hh
 
-namespace MIRV {
+namespace mirv {
    // Tags
    class Conditional;
    class Iterative;

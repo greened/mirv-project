@@ -1,9 +1,9 @@
-#ifndef MIRV_Core_Filter_Action_hh
-#define MIRV_Core_Filter_Action_hh
+#ifndef mirv_core_filter_action_hh
+#define mirv_core_filter_action_hh
 
 #include <mirv/filter/visitor.hh>
 
-namespace MIRV {
+namespace mirv {
    class NullAction {
    public:
       typedef void result_type;

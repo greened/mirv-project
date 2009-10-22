@@ -2,7 +2,7 @@
 #define mirv_core_filter_visitor_hh
 
 #include <visitor.hh>
-
+ 
 #include <mirv/ir/control.hh>
 
 #include <mirv/ir/arithmetic.hh>
@@ -11,7 +11,7 @@
 
 #include <boost/mpl/vector.hpp>
 
-namespace MIRV {
+namespace mirv {
   template<typename R>
   struct StatementVisitor {
     typedef cyclic_visitor<void,
@@ -37,6 +37,8 @@ namespace MIRV {
    typedef cyclic_visitor<void,
       boost::mpl::vector<
       BaseExpression,
+      InnerExpression,
+      LeafExpression,
       Expression<Add>,
       Expression<Subtract>,
       Expression<Divide>,
@@ -52,12 +54,6 @@ namespace MIRV {
       Expression<BitwiseComplement>
       > > type;
   };
-
-#define DEFINE_STATEMENT_VISITABLE() \
-   DEFINE_CYCLIC_VISITABLE(StatementVisitor);
-
-#define DEFINE_EXPRESSION_VISITABLE() \
-   DEFINE_CYCLIC_VISITABLE(ExpressionVisitor);
 }
 
 #endif

@@ -1,11 +1,10 @@
-#ifndef MIRV_Core_IR_Relational_hh
-#define MIRV_Core_IR_Relational_hh
+#ifndef mirv_core_ir_relational_hh
+#define mirv_core_ir_relational_hh
 
 #include <mirv/expression.hh>
 #include <boost/mpl/vector.hpp>
 
-namespace MIRV {
-
+namespace mirv {
   class LessThan {
   private:
     typedef boost::mpl::vector<RelationalSemantic, TransitiveSemantic> sequence;

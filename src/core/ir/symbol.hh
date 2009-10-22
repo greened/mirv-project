@@ -1,7 +1,10 @@
-#ifndef MIRVSymbol_hh
-#define MIRVSymbol_hh
+#ifndef mirv_core_ir_symbol_hh
+#define mirv_core_ir_symbol_hh
 
-namespace MIRV {
+#include <mirv/ir/base.hh>
+#include <mirv/ir/node.hh>
+
+namespace mirv {
    template<
       typename Tag,
       typename Base = typename BaseType<Tag>::type>
@@ -12,8 +15,10 @@ namespace MIRV {
    };
 
    typedef Symbol<Base> BaseSymbol;
-   typedef Inner<BaseSymbol> InnerSymbol;
-   typedef Leaf<BaseSymbol> LeafSymbol;
+  class InnerSymbol : public InnerImpl<BaseSymbol> {
+  };
+  class LeafSymbol : public LeafImpl<BaseSymbol> {
+  };
 }
 
 #endif

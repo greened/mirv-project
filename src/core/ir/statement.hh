@@ -1,12 +1,17 @@
-#ifndef MIRVStatement_hh
-#define MIRVStatement_hh
+#ifndef mirv_core_ir_statement_hh
+#define mirv_core_ir_statement_hh
 
 #include <mirv/ir/node.hh>
 #include <mirv/ir/expression.hh>
 
+#include <mirv/filter/visitor.hh>
+
 #include <boost/mpl/vector.hpp>
 
-namespace MIRV {
+namespace mirv {
+  template<typename R>
+  struct StatementVisitor;
+
    // Statement property semantics
 
    /// Not all child statements may be executed
@@ -22,6 +27,8 @@ namespace MIRV {
       typename Tag,
       typename Base = typename BaseType<Tag>::type>
    class Statement: public Base {
+   public:
+     virtual void accept(StatementVisitor<void> &V);
    };
 
    // A metafunction class to generate statement hierarchies.  This
@@ -45,8 +52,15 @@ namespace MIRV {
 
    typedef Statement<Base> BaseStatement;
 
-   typedef Inner<BaseStatement> InnerStatement;
-   typedef Leaf<BaseStatement> LeafStatement;
+  class InnerStatement : public InnerImpl<BaseStatement> {
+  public:
+    virtual void accept(StatementVisitor<void> &V);
+  };
+
+  class LeafStatement : public LeafImpl<BaseStatement> {
+  public:
+    virtual void accept(StatementVisitor<void> &V);
+  };
 
    /// Statement semantics are somehow affected by expressions
    template<typename Stmt>

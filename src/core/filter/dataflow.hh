@@ -1,7 +1,7 @@
-#ifndef MIRV_Filter_Dataflow_hh
-#define MIRV_Filter_Dataflow_hh
+#ifndef mirv_core_filter_dataflow_hh
+#define mirv_core_filter_dataflow_hh
 
-namespace MIRV {
+namespace mirv {
   struct NullDataflow {};
 }
 

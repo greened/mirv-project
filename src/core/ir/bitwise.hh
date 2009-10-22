@@ -1,11 +1,10 @@
-#ifndef MIRVBitwise_hh
-#define MIRVBitwise_hh
+#ifndef mirv_core_ir_bitwise_hh
+#define mirv_core_ir_bitwise_hh
 
 #include <mirv/ir/expression.hh>
 #include <boost/mpl/vector.hpp>
 
-namespace MIRV {
-   
+namespace mirv {
    class BitwiseAnd {
    private:
       typedef boost::mpl::vector<Bitwise, Commutative,
