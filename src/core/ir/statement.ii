@@ -3,15 +3,15 @@
 
 namespace mirv {
   template<typename Tag, typename Base>
-  void Statement<Tag, Base>::accept(StatementVisitor<void> &V) {
+  void Statement<Tag, Base>::accept(StatementVisitor &V) {
     V.visit(*this);
   }
 
-  void InnerStatement::accept(StatementVisitor<void> &V) {
+  void InnerStatement::accept(StatementVisitor &V) {
     V.visit(*this);
   }
 
-  void LeafStatement::accept(StatementVisitor<void> &V) {
+  void LeafStatement::accept(StatementVisitor &V) {
     V.visit(*this);
   }
 }
