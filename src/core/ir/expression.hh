@@ -10,31 +10,63 @@
 
 #include <boost/mpl/inherit.hpp>
 #include <boost/mpl/inherit_linearly.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/sort.hpp>
+#include <boost/mpl/placeholders.hpp>
+#include <boost/mpl/int.hpp>
 
 namespace mirv {
-  template<typename R>
   struct ExpressionVisitor;
+
+   // Expression property semantics
+   class Arithmetic { typedef boost::mpl::int_<0> order; };
+   class Logical { typedef boost::mpl::int_<1> order; };
+   class Bitwise { typedef boost::mpl::int_<2> order; };
+   class Commutative { typedef boost::mpl::int_<3> order; };
+   class NonCommutative { typedef boost::mpl::int_<4> order; };
+
+   class Associative { typedef boost::mpl::int_<5> order; };
+   class NonAssociative { typedef boost::mpl::int_<6> order; };
+
+   class Transitive { typedef boost::mpl::int_<7> order; };
+   class Intransitive { typedef boost::mpl::int_<8> order; };
+
+   class Reflexive { typedef boost::mpl::int_<9> order; };
+   class NonReflexive { typedef boost::mpl::int_<10> order; };
+ 
+   class Reference { typedef boost::mpl::int_<11> order; };
+
+  namespace detail {
+    // Provide an ordering for properties.
+    template<typename T1, typename T2>
+    struct ExpressionPropertyLess :
+      public boost::mpl::less<typename T1::order, typename T2::order> {};
+  }
 
    template<
       typename Op,
       typename Base = typename BaseType<Op>::type>
    class Expression : Base {
    public:
-      typedef Base base_type;
-      typedef typename base_type::child_type child_type;
-     virtual void accept(ExpressionVisitor<void> &V);
+     typedef Base base_type;
+     typedef typename Op::visitor_base_type visitor_base_type;
+     typedef typename boost::mpl::sort<
+       typename Op::properties,
+       detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
+       >::type properties;
+     virtual void accept(ExpressionVisitor &V);
    };
 
    typedef Expression<Base> BaseExpression;
 
   class InnerExpression : public InnerImpl<BaseExpression, BaseExpression> {
   public:
-    virtual void accept(ExpressionVisitor<void> &V);
+    virtual void accept(ExpressionVisitor &V);
   };
 
   class LeafExpression : public LeafImpl<BaseExpression> {
   public:
-    virtual void accept(ExpressionVisitor<void> &V);
+    virtual void accept(ExpressionVisitor &V);
   };
 
    class Unary {
@@ -44,6 +76,7 @@ namespace mirv {
    public:
       class interface;
       typedef interface base_type;
+     typedef InnerExpression visitor_base_type;
 
       class interface
             : public virtual interface_base_type {
@@ -68,7 +101,7 @@ namespace mirv {
          const_child_ptr get_operand(void) const {
             return(front());
          };
-	virtual void accept(ExpressionVisitor<void> &V);
+	virtual void accept(ExpressionVisitor &V);
       };
    };
 
@@ -80,6 +113,7 @@ namespace mirv {
    public:
       class interface;
       typedef interface base_type;
+     typedef InnerExpression visitor_base_type;
 
       class interface
             : public virtual interface_base_type {
@@ -130,30 +164,12 @@ namespace mirv {
                          "Attempt to get missing operand from expression");
             return(back());
          };
-	virtual void accept(ExpressionVisitor<void> &V);
+	virtual void accept(ExpressionVisitor &V);
       };
    };
 
    typedef Expression<Unary> UnaryExpression;
    typedef Expression<Binary> BinaryExpression;
-
-   // Expression property semantics
-   class Arithmetic {};
-   class Logical {};
-   class Bitwise {};
-   class Commutative {};
-   class NonCommutative {};
-
-   class Associative {};
-   class NonAssociative {};
-
-   class Transitive {};
-   class Intransitive {};
-
-   class Reflexive {};
-   class NonReflexive {};
- 
-   class Reference {};
 
   template<typename Property>
   class Expression<Property, void> : public virtual InnerExpression {};

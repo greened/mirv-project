@@ -12,6 +12,8 @@ namespace mirv {
          Reflexive> sequence;
       
    public:
+    typedef sequence properties;
+    typedef BinaryExpression visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
    };
    
@@ -22,6 +24,8 @@ namespace mirv {
          Reflexive> sequence;
       
    public:
+    typedef sequence properties;
+    typedef BinaryExpression visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
    };
    
@@ -30,6 +34,8 @@ namespace mirv {
       typedef boost::mpl::vector<Bitwise> sequence;
       
    public:
+    typedef sequence properties;
+    typedef UnaryExpression visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
    };
    
@@ -39,7 +45,9 @@ namespace mirv {
       typedef boost::mpl::vector<Bitwise> sequence;
       
    public:
-      typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+     typedef sequence properties;
+    typedef BinaryExpression visitor_base_type;
+     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
    };
 
    class ArithmeticShiftRight {
@@ -47,6 +55,8 @@ namespace mirv {
       typedef boost::mpl::vector<Bitwise> sequence;
       
    public:
+    typedef sequence properties;
+    typedef BinaryExpression visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
    };
 
@@ -55,6 +65,8 @@ namespace mirv {
       typedef boost::mpl::vector<Bitwise> sequence;
       
    public:
+    typedef sequence properties;
+    typedef BinaryExpression visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
    };
 };

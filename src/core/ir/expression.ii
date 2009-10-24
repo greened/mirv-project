@@ -3,27 +3,27 @@
 
 namespace mirv {
    template<typename Op, typename Base>
-   void Expression<Op, Base>::accept(ExpressionVisitor<void> &V)
+   void Expression<Op, Base>::accept(ExpressionVisitor &V)
    {
      V.visit(*this);
    }
 
-   void InnerExpression::accept(ExpressionVisitor<void> &V)
+   void InnerExpression::accept(ExpressionVisitor &V)
    {
      V.visit(*this);
    }
 
-   void LeafExpression::accept(ExpressionVisitor<void> &V)
+   void LeafExpression::accept(ExpressionVisitor &V)
    {
      V.visit(*this);
    }
 
-  void Unary::interface::accept(ExpressionVisitor<void> &V)
+  void Unary::interface::accept(ExpressionVisitor &V)
   {
     V.visit(*this);
   }
 
-  void Binary::interface::accept(ExpressionVisitor<void> &V)
+  void Binary::interface::accept(ExpressionVisitor &V)
   {
     V.visit(*this);
   }

@@ -6,7 +6,7 @@
 #include <mirv/ir/base.hh>
 #include <boost/mpl/empty_base.hpp>
 
-namespace MIRV {
+namespace mirv {
    // The default inheritance mechanism
    template<typename Tag>
    class BaseType {

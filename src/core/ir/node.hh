@@ -66,7 +66,7 @@ namespace mirv {
          return(children.back());
       }
 
-      const_child_ptr back(void) const {
+       const_child_ptr back(void) const {
          check_invariant(!empty(),
                          "Attempt to get operand from empty node");
          return(children.back());

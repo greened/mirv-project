@@ -12,6 +12,8 @@ namespace mirv {
 			       Reflexive> sequence;
 
   public:
+    typedef sequence properties;
+    typedef BinaryExpression visitor_base_type;
     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
   };
 
@@ -22,6 +24,8 @@ namespace mirv {
 			       Reflexive> sequence;
 
   public:
+    typedef sequence properties;
+    typedef BinaryExpression visitor_base_type;
     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
   };
 
@@ -32,6 +36,8 @@ namespace mirv {
 			       Reflexive> sequence;
 
   public:
+    typedef sequence properties;
+    typedef UnaryExpression visitor_base_type;
     typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
   };
 

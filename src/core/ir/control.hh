@@ -13,6 +13,9 @@ namespace mirv {
       typedef boost::mpl::vector<> sequence;
 
    public:
+     typedef InnerStatement visitor_base_type;
+     typedef sequence properties;
+
       typedef InnerStatement::publicize<InnerStatement> interface_base_type;
 
       class interface : public interface_base_type {};
@@ -70,8 +73,8 @@ namespace mirv {
       class interface : public interface_base_type {
          // Protected because these are probably bad names for subclasses
       protected:
-         typedef typename interface_base_type::statement_ptr child_ptr;
-         typedef typename interface_base_type::const_statement_ptr const_child_ptr;
+         typedef typename interface_base_type::child_ptr child_ptr;
+         typedef typename interface_base_type::const_child_ptr const_child_ptr;
          
          void set_left_statement(child_ptr s) {
             if (this->empty()) {

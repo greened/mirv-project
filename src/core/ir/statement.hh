@@ -7,29 +7,59 @@
 #include <mirv/filter/visitor.hh>
 
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/sort.hpp>
+#include <boost/mpl/placeholders.hpp>
+#include <boost/mpl/int.hpp>
 
 namespace mirv {
-  template<typename R>
   struct StatementVisitor;
 
    // Statement property semantics
 
    /// Not all child statements may be executed
-   class Conditional {};
+  class Conditional { typedef boost::mpl::int_<0> order; };
 
    /// Child statements may be executed multiple times
-   class Iterative {};
+   class Iterative { typedef boost::mpl::int_<1> order; };
 
    /// Modifies program state
-   class Mutating {};
+   class Mutating { typedef boost::mpl::int_<2> order; };
+
+  namespace detail {
+    // Provide an ordering for properties.
+    template<typename T1, typename T2>
+    struct StatementPropertyLess :
+      public boost::mpl::less<typename T1::order, typename T2::order> {};
+  }
 
    template<
       typename Tag,
       typename Base = typename BaseType<Tag>::type>
    class Statement: public Base {
    public:
-     virtual void accept(StatementVisitor<void> &V);
+     typedef typename Tag::visitor_base_type visitor_base_type;
+     typedef typename boost::mpl::sort<
+       typename Tag::properties,
+       detail::StatementPropertyLess<boost::mpl::_1, boost::mpl::_2>
+       >::type properties;
+     virtual void accept(StatementVisitor &V);
    };
+
+   typedef Statement<Base> BaseStatement;
+
+  class InnerStatement : public InnerImpl<BaseStatement> {
+  public:
+    virtual void accept(StatementVisitor &V);
+  };
+
+  class LeafStatement : public LeafImpl<BaseStatement> {
+  public:
+    virtual void accept(StatementVisitor &V);
+  };
+
+  template<typename Property>
+  class Statement<Property, void> : public virtual BaseStatement {};
 
    // A metafunction class to generate statement hierarchies.  This
    // makes sure that each property statement specifies Base as its
@@ -37,9 +67,9 @@ namespace mirv {
    // correctly.
    class StatementGenerator {
    public:
-      template<typename Property, typename Base>
+      template<typename Property>
       struct apply {
-         typedef Statement<Property, Base> type;
+         typedef Statement<Property, void> type;
       };
    };
 
@@ -50,18 +80,6 @@ namespace mirv {
       type;
    };
 
-   typedef Statement<Base> BaseStatement;
-
-  class InnerStatement : public InnerImpl<BaseStatement> {
-  public:
-    virtual void accept(StatementVisitor<void> &V);
-  };
-
-  class LeafStatement : public LeafImpl<BaseStatement> {
-  public:
-    virtual void accept(StatementVisitor<void> &V);
-  };
-
    /// Statement semantics are somehow affected by expressions
    template<typename Stmt>
    class Controlled {
@@ -71,6 +89,7 @@ namespace mirv {
    public:
       class interface;
       typedef Stmt interface_base_type;
+     typedef Stmt visitor_base_type;
 
       class interface
             : public interface_base_type {
@@ -144,6 +163,7 @@ namespace mirv {
 
    public:
       typedef Statement<Controlled<Stmt> > interface_base_type;
+     typedef Statement<Controlled<Stmt> > visitor_base_type;
 
       class interface
             : public interface_base_type {

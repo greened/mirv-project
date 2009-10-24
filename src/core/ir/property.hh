@@ -3,6 +3,7 @@
 
 #include <boost/mpl/inherit.hpp>
 #include <boost/mpl/transform.hpp>
+#include <inherit.hh>
 
 // A Property is a class that allows visitors and other objects that
 // query types to only operate on subclasses in which they are
@@ -20,8 +21,8 @@ namespace mirv {
   
   template<typename Generator, typename Base, typename Sequence>
   class Properties {   
-    typedef typename boost::mpl::inherit<
-      typename boost::mpl::transform<Properties, Generator>::type
+    typedef typename lib::InheritScattered<
+      typename boost::mpl::transform<Sequence, Generator>::type
       >::type properties_hierarchy_type;
   
 public:
