@@ -77,6 +77,7 @@ namespace mirv {
       class interface;
       typedef interface base_type;
      typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
 
       class interface
             : public virtual interface_base_type {
@@ -114,6 +115,7 @@ namespace mirv {
       class interface;
       typedef interface base_type;
      typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
 
       class interface
             : public virtual interface_base_type {

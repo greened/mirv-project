@@ -34,8 +34,7 @@ namespace mirv {
       Stream &out;
 
       // Entering each statement
-      class EnterAction
-            : public VisitStatementAction<void> {
+      class EnterAction : public VisitStatementAction {
       private:
          std::ostream &out;
          Indent &ind;
@@ -59,8 +58,7 @@ namespace mirv {
       };
 
       // After processing each statement's expression child
-      class AfterStmtExprAction
-            : public VisitStatementAction<void> {
+      class AfterStmtExprAction : public VisitStatementAction {
       private:
          Stream &out;
          Indent &ind;
@@ -90,8 +88,7 @@ namespace mirv {
       };
 
       // After each statement's child
-      class AfterAction
-            : public VisitStatementAction<void> {
+      class AfterAction : public VisitStatementAction {
       private:
          Stream &out;
          Indent &ind;
@@ -105,8 +102,7 @@ namespace mirv {
       };
 
       // Leaving each statement
-      class LeaveAction
-            : public VisitStatementAction<void> {
+      class LeaveAction : public VisitStatementAction {
       private:
          Stream &out;
          Indent &ind;
@@ -122,8 +118,7 @@ namespace mirv {
       };
 
       // Entering each expression
-      class EnterExprAction
-            : public VisitExpressionAction<void> {
+      class EnterExprAction : public VisitExpressionAction {
       private:
          Stream &out;
          Indent &ind;
@@ -147,8 +142,7 @@ namespace mirv {
       };
 
       // Leaving each expression
-      class LeaveExprAction
-            : public VisitExpressionAction<void> {
+      class LeaveExprAction : public VisitExpressionAction {
       private:
          Stream &out;
          Indent &ind;
@@ -163,8 +157,7 @@ namespace mirv {
       };
 
       // After each expression's child
-      class AfterExprAction
-            : public VisitExpressionAction<void> {
+      class AfterExprAction : public VisitExpressionAction {
       private:
          Stream &out;
          Indent &ind;

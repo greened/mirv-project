@@ -33,6 +33,8 @@ namespace mirv {
 
    public:
      typedef Base interface_base_type;
+     typedef Base visitor_base_type;
+     typedef sequence properties;
 
       class interface : public interface_base_type {
       public:
@@ -69,6 +71,8 @@ namespace mirv {
 
    public:
       typedef Base interface_base_type;
+     typedef Base visitor_base_type;
+     typedef sequence properties;
 
       class interface : public interface_base_type {
          // Protected because these are probably bad names for subclasses
@@ -131,6 +135,8 @@ namespace mirv {
 
    public:
       typedef Statement<SingleExpression<Stmt> > interface_base_type;
+     typedef Statement<SingleExpression<Stmt> > visitor_base_type;
+     typedef sequence properties;
       
       class interface 
             : public interface_base_type {
@@ -166,6 +172,8 @@ namespace mirv {
 			SingleBlock<InnerStatement> > > > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
@@ -177,6 +185,8 @@ namespace mirv {
          DualBlock<InnerStatement> > > > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
@@ -188,6 +198,8 @@ namespace mirv {
          SingleBlock<InnerStatement> > > > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
@@ -199,6 +211,8 @@ namespace mirv {
          SingleBlock<InnerStatement> > > > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
@@ -210,6 +224,8 @@ namespace mirv {
          SingleBlock<InnerStatement> > > > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
    
@@ -219,6 +235,9 @@ namespace mirv {
       typedef boost::mpl::vector<> sequence;
 
    public:
+     typedef InnerStatement visitor_base_type;
+     typedef sequence properties;
+
       typedef InnerStatement::publicize<InnerStatement> interface_base_type;
 
       class interface : public interface_base_type {
@@ -242,6 +261,8 @@ namespace mirv {
       typedef Statement<SingleCondition<Statement<CaseBlock> > > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
@@ -252,6 +273,8 @@ namespace mirv {
       typedef boost::mpl::vector<> sequence;
 
    public:
+     typedef Statement<SingleExpression<Stmt> > visitor_base_type;
+     typedef sequence properties;
       typedef Statement<SingleExpression<Stmt> > interface_base_type;
       
       class interface 
@@ -288,6 +311,8 @@ namespace mirv {
          SingleBlock<InnerStatement> > > > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
@@ -299,6 +324,8 @@ namespace mirv {
          SingleBlock<InnerStatement> > > > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
@@ -309,6 +336,8 @@ namespace mirv {
       typedef Statement<SingleLabel<LeafStatement> > root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
@@ -320,6 +349,8 @@ namespace mirv {
       typedef LeafStatement root;
 
    public:
+     typedef root visitor_base_type;
+     typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 

@@ -17,8 +17,7 @@ namespace mirv {
       typename ExprFlow = NullExpressionFlow,
       typename Dataflow = NullDataflow,
       typename Confluence = typename Dataflow::Confluence>
-   class StatementFlow
-     : public StatementVisitor<void>::type {
+   class StatementFlow : public StatementVisitor {
    private:
       EnterAction ent;
       LeaveAction lve;
