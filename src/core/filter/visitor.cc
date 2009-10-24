@@ -72,14 +72,10 @@ namespace mirv {
 	  >, void> &>(s));
   }
   virtual result_type StatementVisitor::visit(Statement<Case> &s) {
-    visit(static_cast<Statement<boost::mpl::deref<
-	  boost::mpl::begin<Statement<Case>::properties> 
-	  >, void> &>(s));
+    visit(static_cast<Statement<Case>::visitor_base_type &>(s));
   }
   virtual result_type StatementVisitor::visit(Statement<CaseBlock> &s) {
-    visit(static_cast<Statement<boost::mpl::deref<
-	  boost::mpl::begin<Statement<CaseBlock>::properties> 
-	  >, void> &>(s));
+    visit(static_cast<Statement<CaseBlock>::visitor_base_type &>(s));
   }
   virtual result_type StatementVisitor::visit(Statement<Before> &s) {
     visit(static_cast<Statement<boost::mpl::deref<
@@ -87,9 +83,7 @@ namespace mirv {
 	  >, void> &>(s));
   }
   virtual result_type StatementVisitor::visit(Statement<After> &s) {
-    visit(static_cast<Statement<boost::mpl::deref<
-	  boost::mpl::begin<Statement<After>::properties> 
-	  >, void> &>(s));
+    visit(static_cast<Statement<After>::visitor_base_type &>(s));
   }
   virtual result_type StatementVisitor::visit(Statement<Goto> &s) {
     visit(static_cast<Statement<boost::mpl::deref<
@@ -97,9 +91,7 @@ namespace mirv {
 	  >, void> &>(s));
   }
   virtual result_type StatementVisitor::visit(Statement<Return> &s) {
-    visit(static_cast<Statement<boost::mpl::deref<
-	  boost::mpl::begin<Statement<Return>::properties> 
-	  >, void> &>(s));
+    visit(static_cast<Statement<After>::visitor_base_type &>(s));
   }
 
   virtual result_type ExpressionVisitor::visit(BaseExpression &e) {}

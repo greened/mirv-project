@@ -90,6 +90,7 @@ namespace mirv {
       class interface;
       typedef Stmt interface_base_type;
      typedef Stmt visitor_base_type;
+     typedef sequence properties;
 
       class interface
             : public interface_base_type {
@@ -164,6 +165,7 @@ namespace mirv {
    public:
       typedef Statement<Controlled<Stmt> > interface_base_type;
      typedef Statement<Controlled<Stmt> > visitor_base_type;
+     typedef sequence properties;
 
       class interface
             : public interface_base_type {

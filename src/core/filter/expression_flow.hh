@@ -11,8 +11,7 @@ namespace mirv {
       typename BeforeAction = NullAction,
       typename AfterAction = NullAction,
       typename Dataflow = NullDataflow>
-   class ExpressionFlow
-     : public ExpressionVisitor<void>::type {
+   class ExpressionFlow : public ExpressionVisitor {
    private:
       EnterAction ent;
       LeaveAction lve;
