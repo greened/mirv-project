@@ -10,10 +10,11 @@ namespace mirv {
    template<
       typename EnterAction = NullAction,
       typename LeaveAction = NullAction,
-      typename BeforeStmtAction = NullAction,
-      typename BeforeExprAction = NullAction,
-      typename AfterAction = NullAction,
-      typename BetweenAction = NullAction,
+      typename BeforeStmtAction = NullAction, 
+      typename BetweenStmtAction = NullAction,
+     typename AfterStmtAction = NullAction,
+     typename BeforeExprAction = NullAction,
+      typename AfterExprAction = NullAction,
       typename ExprFlow = NullExpressionFlow,
       typename Dataflow = NullDataflow,
       typename Confluence = typename Dataflow::Confluence>
@@ -22,9 +23,10 @@ namespace mirv {
       EnterAction ent;
       LeaveAction lve;
       BeforeStmtAction bfrstmt;
+      AfterStmtAction aftstmt;
+      BetweenStmtAction betstmt;
       BeforeExprAction bfrexpr;
-      AfterAction aft;
-      BetweenAction bet;
+      AfterExprAction aftexpr;
       ExprFlow exp;
       Dataflow data;
       Confluence conf;
@@ -45,24 +47,28 @@ namespace mirv {
        return(bfrstmt(stmt));
       };
 
+     template<typename Stmt>
+     typename AfterStmtAction::result_type after_statement(Stmt &stmt) {
+       return(aftstmt(stmt));
+      };
+
+     template<typename Stmt>
+     typename BetweenStmtAction::result_type between_statement(Stmt &stmt) {
+       return(betstmt(stmt));
+      };
+
      template<typename Expr>
      typename BeforeExprAction::result_type before_expression(Expr &expr) {
        return(bfrexpr(expr));
       };
 
-     template<typename Stmt>
-     typename AfterAction::result_type after(Stmt &stmt) {
-       return(aft(stmt));
-      };
-
-     template<typename Stmt>
-     typename BetweenAction::result_type between(Stmt &stmt) {
-       return(bet(stmt));
-      };
-
      template<typename Expr>
-     void expression(Expr &expr) {
-       exp(expr);
+     typename AfterExprAction::result_type after_expression(Expr &expr) {
+       return(aftexpr(expr));
+      };
+
+     ExprFlow &expression_flow(void) {
+       return exp;
       };
 
       Dataflow &dataflow(void) {
@@ -77,14 +83,15 @@ namespace mirv {
       StatementFlow(EnterAction &e,
                     LeaveAction &l,
                     BeforeStmtAction &bs,
+                    AfterStmtAction &as, 
+		    BetweenStmtAction &bt,
                     BeforeExprAction &be,
-                    AfterAction &a, 
-                    BetweenAction &bt,
-                    ExprFlow &expr,
+                    AfterExprAction &ae, 
+		    ExprFlow &expr,
                     Dataflow &d,
                     Confluence &c)
-	: ent(e), lve(l), bfrstmt(bs), bfrexpr(be), aft(a), bet(bt), exp(expr),
-	  data(d), conf(c) {}
+	: ent(e), lve(l), bfrstmt(bs), aftstmt(as), betstmt(bt), bfrexpr(be),
+	  aftexpr(ae), exp(expr), data(d), conf(c) {}
    };
 }
 

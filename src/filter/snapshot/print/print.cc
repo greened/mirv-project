@@ -1,6 +1,8 @@
 #include "print.hh"
 
 namespace mirv {
+  const int PrintFilter::IndentFactor = 3;
+
    void PrintFilter::EnterAction::visit(Statement<Block> &stmt)
    {
       out << "{\n";
@@ -9,7 +11,7 @@ namespace mirv {
 
     void PrintFilter::EnterAction::visit(Statement<IfThen> &stmt)
     {
-       out << indent(ind) << "ifThen\n";
+      out << indent(ind) << "ifThen\n";
        ind += IndentFactor;
     }
 
@@ -62,37 +64,42 @@ namespace mirv {
        out << indent(ind) << "return\n";
     }
 
+   void PrintFilter::LeaveAction::visit(Statement<Block> &stmt) {
+     ind -= IndentFactor;
+     out << indent(ind) << "}";
+   }
+
     void PrintFilter::EnterExprAction::visit(Expression<Add> &expr)
     {
        out << indent(ind) << "+\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Sub> &expr)
+    void PrintFilter::EnterExprAction::visit(Expression<Subtract> &expr)
     {
        out << indent(ind) << "-\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Mult> &expr)
+    void PrintFilter::EnterExprAction::visit(Expression<Multiply> &expr)
     {
        out << indent(ind) << "*\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Div> &expr)
+    void PrintFilter::EnterExprAction::visit(Expression<Divide> &expr)
     {
        out << indent(ind) << "/\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Mod> &expr)
+    void PrintFilter::EnterExprAction::visit(Expression<Modulus> &expr)
     {
        out << indent(ind) << "%\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Neg> &expr)
+    void PrintFilter::EnterExprAction::visit(Expression<Negate> &expr)
     {
        out << indent(ind) << "-\n";
        ind += IndentFactor;
@@ -128,7 +135,7 @@ namespace mirv {
       ind += IndentFactor;
    }
 
-   void PrintFilter::EnterExprAction::visit(Expression<Complement> &expr)
+   void PrintFilter::EnterExprAction::visit(Expression<BitwiseComplement> &expr)
    {
       out << indent(ind) << "~\n";
       ind += IndentFactor;
@@ -136,12 +143,16 @@ namespace mirv {
 
    void PrintFilter::operator()(BaseNode &node)
    {
-      node->accept(make_forward_flow(EnterAction(out, ind),
-                                     LeaveAction(out, ind),
-                                     AfterStmtExprAction(out, ind),
-                                     AfterAction(out, ind),
-                                     EnterExprAction(out, ind),
-                                     LeaveExprAction(out, ind),
-                                     AfterExprAction(out, ind)));
+     if (BaseStatement *s = dynamic_cast<BaseStatement *>(&node)) {
+       s->accept(make_forward_flow(EnterAction(out, ind),
+				   LeaveAction(out, ind),
+				   AfterStmtExprAction(out, ind),
+				   AfterAction(out, ind),
+				   EnterExprAction(out, ind),
+				   LeaveExprAction(out, ind),
+				   AfterExprAction(out, ind)));
+     }
+     else {
+     }
    }
 }
