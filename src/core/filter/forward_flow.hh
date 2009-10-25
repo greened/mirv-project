@@ -4,6 +4,7 @@
 #include <mirv/filter/flow.hh>
 #include <mirv/filter/dataflow.hh>
 #include <mirv/ir/attribute.hh>
+#include <mirv/mem/heap.hh>
 
 namespace mirv {
    template<
@@ -33,24 +34,26 @@ namespace mirv {
       EnterAction,
       LeaveAction,
       BeforeStmtAction,
+      AfterStmtAction,
+      BetweenStmtAction,
       BeforeExprAction,
-      AfterAction,
-      BetweenAction,
+      AfterExprAction,
       ExprFlow,
       Dataflow,
        Confluence> BaseType;
 
    public:
-      ForwardFlow(EnterAction &e,
-                  LeaveAction &l,
-                  BeforeStmtAction &bs,
-                  BeforeExprAction &be,
-                  AfterAction &a,
-                  BetweenAction &bt,
-                  ExprFlow &expr,
-                  Dataflow &d,
-                  Confluence &c)
-	: BaseType(e, l, bs, be, a, bt, expr, d, c) {}
+      ForwardFlow(const EnterAction &e,
+                  const LeaveAction &l,
+                  const BeforeStmtAction &bs,
+                  const AfterStmtAction &as,
+                  const BetweenStmtAction &bts,
+                  const BeforeExprAction &be,
+                  const AfterExprAction &ae,
+                  const ExprFlow &expr,
+                  const Dataflow &d,
+                  const Confluence &c)
+	: BaseType(e, l, bs, as, bts, be, ae, expr, d, c) {}
 
       void visit(Statement<Block> &stmt) {
          this->enter(stmt);
@@ -318,27 +321,64 @@ namespace mirv {
       typename EnterAction,
       typename LeaveAction,
       typename BeforeStmtAction,
+      typename AfterStmtAction,
+      typename BetweenStmtAction,
       typename BeforeExprAction,
-      typename AfterAction,
-      typename BetweenAction,
+      typename AfterExprAction,
       typename ExprFlow,
       typename Dataflow,
       typename Confluence>
-   ForwardFlow<EnterAction, LeaveAction, BeforeStmtAction, BeforeExprAction,
-	       AfterAction, BetweenAction, ExprFlow, Dataflow, Confluence>
-   make_forward_flow(EnterAction &ent, LeaveAction &lv, BeforeStmtAction &bs,
-		     BeforeExprAction &be, AfterAction &aft, BetweenAction &bet,
-		     ExprFlow &ef, Dataflow &df, Confluence &cf) {
-     return ForwardFlow<
+   typename ptr<ForwardFlow<EnterAction, LeaveAction, BeforeStmtAction, AfterStmtAction,
+	       BetweenStmtAction, BeforeExprAction, AfterExprAction, ExprFlow,
+			    Dataflow, Confluence> >::type
+   make_forward_flow(const EnterAction &ent, const LeaveAction &lv,
+		     const BeforeStmtAction &bs,
+		     const AfterStmtAction &as, const BetweenStmtAction &bts,
+		     const BeforeExprAction &be, const AfterExprAction &ae,
+		     const ExprFlow &ef, const Dataflow &df = NullDataflow(),
+		     const Confluence &cf = Dataflow::Confluence()) {
+     return new ForwardFlow<
      EnterAction, 
        LeaveAction,
        BeforeStmtAction,
+       AfterStmtAction,
+       BetweenStmtAction,
        BeforeExprAction,
-       AfterAction,
-       BetweenAction,
+       AfterExprAction,
        ExprFlow,
        Dataflow,
-       Confluence>(ent, lv, bs, be, aft, bet, ef, df, cf);
+       Confluence>(ent, lv, bs, as, bts, be, ae, ef, df, cf);
+   }
+
+   template<
+      typename EnterAction,
+      typename LeaveAction,
+      typename BeforeStmtAction,
+      typename AfterStmtAction,
+      typename BetweenStmtAction,
+      typename BeforeExprAction,
+      typename AfterExprAction,
+     typename ExprFlow>
+   typename ptr<ForwardFlow<EnterAction, LeaveAction, BeforeStmtAction, AfterStmtAction,
+	       BetweenStmtAction, BeforeExprAction, AfterExprAction, ExprFlow,
+			    NullDataflow, NullDataflow::Confluence> >::type
+   make_forward_flow(const EnterAction &ent, const LeaveAction &lv,
+		     const BeforeStmtAction &bs,
+		     const AfterStmtAction &as, const BetweenStmtAction &bts,
+		     const BeforeExprAction &be, const AfterExprAction &ae,
+		     const ExprFlow &ef) {
+     return new ForwardFlow<
+     EnterAction, 
+       LeaveAction,
+       BeforeStmtAction,
+       AfterStmtAction,
+       BetweenStmtAction,
+       BeforeExprAction,
+       AfterExprAction,
+       ExprFlow,
+       NullDataflow,
+       NullDataflow::Confluence>(ent, lv, bs, as, bts, be, ae, ef,
+				 NullDataflow(), NullDataflow::Confluence());
    }
 }
 

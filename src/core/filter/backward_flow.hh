@@ -8,9 +8,10 @@ namespace mirv {
       typename EnterAction = NullAction,
       typename LeaveAction = NullAction,
       typename BeforeStmtAction = NullAction,
+      typename AfterStmtAction = NullAction,
+      typename BetweenStmtAction = NullAction,
       typename BeforeExprAction = NullAction,
-      typename AfterAction = NullAction,
-      typename BetweenAction = NullAction,
+      typename AfterExprAction = NullAction,
       typename ExprFlow = NullExpressionFlow,
       typename Dataflow = NullDataflow,
       typename Confluence = Dataflow::Confluence>
@@ -19,23 +20,25 @@ namespace mirv {
       EnterAction,
       LeaveAction,
       BeforeStmtAction,
+      AfterStmtAction,
+      BetweenStmtAction,
       BeforeExprAction,
-      AfterAction,
-      BetweenAction,
+      AfterExprAction,
       ExprFlow,
       Dataflow,
       Confluence> {
    public:
-      BackwardFlow(EnterAction &e,
-                   LeaveAction &l,
-                   BeforeStmtAction &bs,
-                   BeforeExprAction &be,
-                   AfterAction &a,
-                   BetweenAction &a,
-                   ExprFlow &expr,
-                   Dataflow &d,
-                   Confluence &c)
-            : StatementFlow(e, l, b, a, expr, d, c) {}
+      BackwardFlow(const EnterAction &e,
+                   const LeaveAction &l,
+                   const BeforeStmtAction &bs,
+                   const AfterStmtAction &as,
+                   const BetweenStmtAction &bts,
+                   const BeforeExprAction &be,
+                   const AfterExprAction &ae,
+                   const ExprFlow &expr,
+                   const Dataflow &d,
+                   const Confluence &c)
+	: StatementFlow(e, l, bs, as, bts, be, ae, expr, d, c) {}
 
       void visit(Statement<Block> &stmt) {
          enter(stmt);

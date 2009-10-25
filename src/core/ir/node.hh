@@ -5,6 +5,7 @@
 #include <mirv/ir/property.hh>
 #include <mirv/ir/inherit.hh>
 #include <mirv/mem/heap.hh>
+#include <mirv/util/debug.hh>
 
 #include <list>
 

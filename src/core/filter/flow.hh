@@ -80,16 +80,16 @@ namespace mirv {
       }
 
    public:
-      StatementFlow(EnterAction &e,
-                    LeaveAction &l,
-                    BeforeStmtAction &bs,
-                    AfterStmtAction &as, 
-		    BetweenStmtAction &bt,
-                    BeforeExprAction &be,
-                    AfterExprAction &ae, 
-		    ExprFlow &expr,
-                    Dataflow &d,
-                    Confluence &c)
+      StatementFlow(const EnterAction &e,
+                    const LeaveAction &l,
+                    const BeforeStmtAction &bs,
+                    const AfterStmtAction &as, 
+		    const BetweenStmtAction &bt,
+                    const BeforeExprAction &be,
+                    const AfterExprAction &ae, 
+		    const ExprFlow &expr,
+                    const Dataflow &d,
+                    const Confluence &c)
 	: ent(e), lve(l), bfrstmt(bs), aftstmt(as), betstmt(bt), bfrexpr(be),
 	  aftexpr(ae), exp(expr), data(d), conf(c) {}
    };

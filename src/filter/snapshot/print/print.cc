@@ -144,13 +144,18 @@ namespace mirv {
    void PrintFilter::operator()(BaseNode &node)
    {
      if (BaseStatement *s = dynamic_cast<BaseStatement *>(&node)) {
-       s->accept(make_forward_flow(EnterAction(out, ind),
-				   LeaveAction(out, ind),
-				   AfterStmtExprAction(out, ind),
-				   AfterAction(out, ind),
-				   EnterExprAction(out, ind),
-				   LeaveExprAction(out, ind),
-				   AfterExprAction(out, ind)));
+       ptr<StatementVisitor>::type flow =
+	 make_forward_flow(EnterAction(out, ind),
+			   LeaveAction(out, ind),
+			   NullAction(),
+			   AfterAction(out, ind),
+			   NullAction(),
+			   NullAction(),
+			   NullAction(),
+			   PrintExpressionFlow(EnterExprAction(out, ind),
+					       LeaveExprAction(out, ind),
+					       AfterExprAction(out, ind)));
+       s->accept(*flow);
      }
      else {
      }
