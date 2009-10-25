@@ -13,7 +13,9 @@ namespace mirv {
    class Node;
 
    template<>
-   class Node<Base> {};
+   class Node<Base> {
+     virtual ~Node(void);
+   };
 
    typedef Node<Base> BaseNode;
 

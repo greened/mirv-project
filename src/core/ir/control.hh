@@ -41,7 +41,7 @@ namespace mirv {
          typedef typename interface_base_type::child_ptr child_ptr;
          typedef typename interface_base_type::const_child_ptr const_child_ptr;
          
-         void set_statement(child_ptr s) {
+         void set_child_statement(child_ptr s) {
             if (this->empty()) {
                push_back(s);
             }
@@ -50,7 +50,7 @@ namespace mirv {
             }
          };
 
-         child_ptr get_statement(void) {
+         child_ptr get_child_statement(void) {
             check_invariant(!this->empty(), 
                             "Attempt to get statement from empty block");
             
@@ -80,7 +80,7 @@ namespace mirv {
          typedef typename interface_base_type::child_ptr child_ptr;
          typedef typename interface_base_type::const_child_ptr const_child_ptr;
          
-         void set_left_statement(child_ptr s) {
+         void set_left_child_statement(child_ptr s) {
             if (this->empty()) {
                push_back(s);
             }
@@ -89,7 +89,7 @@ namespace mirv {
             }
          };
 
-         void set_right_statement(child_ptr s) {
+         void set_right_child_statement(child_ptr s) {
             if (this->empty()) {
                push_back(child_ptr());  // Placeholder for left operand
                push_back(s);
@@ -99,25 +99,25 @@ namespace mirv {
             }
          };
 
-         child_ptr get_left_statement(void) {      
+         child_ptr get_left_child_statement(void) {      
             check_invariant(!this->empty(),
                             "Attempt to get statement from empty block");
             return(this->front());
          };
          
-         const_child_ptr get_left_statement(void) const {
+         const_child_ptr get_left_child_statement(void) const {
             check_invariant(!this->empty(),
                             "Attempt to get statement from empty block");
             return(this->front());
          };
          
-         child_ptr get_right_statement(void) {      
+         child_ptr get_right_child_statement(void) {      
             check_invariant(this->size() > 1 && this->back(),
                             "Attempt to get missing statement from block");
             return(this->back());
          };
          
-         const_child_ptr get_right_statement(void) const {
+         const_child_ptr get_right_child_statement(void) const {
             check_invariant(this->size() > 1 && this->back(),
                             "Attempt to get missing statement from block");
             return(this->back());

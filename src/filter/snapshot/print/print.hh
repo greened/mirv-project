@@ -1,7 +1,7 @@
 #ifndef mirv_filter_snapshot_print_hh
 #define mirv_filter_snapshot_print_hh
 
-#include <mirv/filter/flow.hh>
+#include <mirv/filter/forward_flow.hh>
 #include <mirv/filter/filter.hh>
 #include <mirv/filter/action.hh>
 #include <mirv/ir/node.hh>
@@ -12,25 +12,8 @@ namespace mirv {
    private:
      typedef std::ostream Stream;
       typedef int Indent;
-      const int IndentFactor;
-
-      class indent {
-      private:
-         int i;
-
-      public:
-         indent(int ind)
-               : i(ind) {};
-         template<typename Stream>
-         std::ostream &operator()(std::ostream &out) const {
-            while(i--) {
-               out << " ";
-            }
-            return(out);
-         }
-      };
-
-      indent ind;
+      const static int IndentFactor;
+     Indent ind;
       Stream &out;
 
       // Entering each statement
@@ -41,7 +24,7 @@ namespace mirv {
 
       public:
          EnterAction(Stream &o, Indent &i)
-               : out(o), indent(i) {}
+               : out(o), ind(i) {}
 
          void visit(Statement<Block> &stmt);
          void visit(Statement<IfThen> &stmt);
@@ -111,10 +94,7 @@ namespace mirv {
          LeaveAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
 
-         void visit(Statement<Block> &stmt) {
-            indent -= IndentFactor;
-            out << indent(ind) << "}";
-         }
+	void visit(Statement<Block> &stmt);
       };
 
       // Entering each expression
@@ -183,15 +163,37 @@ namespace mirv {
          EnterAction,
          LeaveAction,
          NullAction,
-         AfterAction
+	AfterAction,
          PrintExpressionFlow> PrintFlow;
 
    public:
-      PrintFilter(std::ostream &o)
-	: Filter<BaseNode>(), IndentFactor(3), indent(), out(o) {}
+      PrintFilter(Stream &o)
+	: Filter<BaseNode>(), ind(0), out(o) {}
+
+
+      class indent {
+      private:
+         int val;
+
+      public:
+         indent(int ind)
+               : val(ind) {};
+
+         Stream &operator()(Stream &out) const {
+	   int i = val;
+            while(i--) {
+               out << " ";
+            }
+            return(out);
+         }
+      };
 
       void operator()(BaseNode &node);
    };
+
+  std::ostream &operator<<(std::ostream &out, const PrintFilter::indent &ind) {
+    return ind(out);
+  }
 }
 
 #endif
