@@ -45,13 +45,13 @@ namespace mirv {
       }
 
    public:
-      ExpressionFlow(EnterAction &e,
-                     LeaveAction &l,
-                     BeforeAction &b,
-                     AfterAction &a,
-                     Dataflow &d)
-            : ent(e), lve(l), bfr(b), aft(a),
-                 data(d) {}
+      ExpressionFlow(const EnterAction &e,
+                     const LeaveAction &l,
+                     const BeforeAction &b,
+                     const AfterAction &a,
+                     const Dataflow &d)
+	: ent(e), lve(l), bfr(b), aft(a),
+	  data(d) {}
    };
 
   typedef ExpressionFlow<> NullExpressionFlow;
@@ -77,11 +77,11 @@ namespace mirv {
        Dataflow> BaseType;
 
    public:
-      ForwardExpressionFlow(EnterAction &e,
-                            LeaveAction &l,
-                            BeforeAction &b,
-                            AfterAction &a,
-                            Dataflow &d)
+      ForwardExpressionFlow(const EnterAction &e,
+                            const LeaveAction &l,
+                            const BeforeAction &b,
+                            const AfterAction &a,
+                            const Dataflow &d)
 	: BaseType(e, l, b, a, d) {}
 
       void visit(InnerExpression &expr) {
@@ -129,11 +129,11 @@ namespace mirv {
        Dataflow> BaseType;
 
    public:
-      BackwardExpressionFlow(EnterAction &e,
-                             LeaveAction &l,
-                             BeforeAction &b,
-                             AfterAction &a,
-                             Dataflow &d)
+      BackwardExpressionFlow(const EnterAction &e,
+                             const LeaveAction &l,
+                             const BeforeAction &b,
+                             const AfterAction &a,
+                             const Dataflow &d)
             : BaseType(e, l, b, a, d) {}
 
       void visit(InnerExpression &expr) {
@@ -150,7 +150,7 @@ namespace mirv {
             if (++i != iend) {
                this->between(expr, **prev, **i);
             }
-         }
+         } 
 
          this->leave(expr);
       }

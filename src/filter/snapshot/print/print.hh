@@ -157,14 +157,31 @@ namespace mirv {
          LeaveExprAction,
          NullAction,
          AfterExprAction
-         > {};
+         > {
+      private:
+	typedef ForwardExpressionFlow<
+         EnterExprAction,
+         LeaveExprAction,
+         NullAction,
+         AfterExprAction
+	> BaseType;
+
+      public:
+	PrintExpressionFlow(const EnterExprAction &e,
+			    const LeaveExprAction &l,
+			    const AfterExprAction &a)
+	  : BaseType(e, l, NullAction(), a, NullDataflow()) {}
+      };
 
       typedef ForwardFlow<
          EnterAction,
          LeaveAction,
          NullAction,
 	AfterAction,
-         PrintExpressionFlow> PrintFlow;
+	NullAction,
+	NullAction,
+	NullAction,
+	PrintExpressionFlow> PrintFlow;
 
    public:
       PrintFilter(Stream &o)
