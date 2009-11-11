@@ -11,13 +11,13 @@ namespace mirv {
       typename EnterAction = NullAction,
       typename LeaveAction = NullAction,
       typename BeforeStmtAction = NullAction, 
+      typename AfterStmtAction = NullAction,
       typename BetweenStmtAction = NullAction,
-     typename AfterStmtAction = NullAction,
-     typename BeforeExprAction = NullAction,
+      typename BeforeExprAction = NullAction,
       typename AfterExprAction = NullAction,
       typename ExprFlow = NullExpressionFlow,
       typename Dataflow = NullDataflow,
-      typename Confluence = typename Dataflow::Confluence>
+     typename Confluence = typename Dataflow::Confluence>
    class StatementFlow : public StatementVisitor {
    private:
       EnterAction ent;
@@ -31,6 +31,8 @@ namespace mirv {
       Dataflow data;
       Confluence conf;
 
+     bool hit_break;  // Have we seen a break statement?
+
    protected:
      template<typename Stmt>
      typename EnterAction::result_type enter(Stmt &stmt) {
@@ -42,29 +44,35 @@ namespace mirv {
        return(lve(stmt));
       };
 
-     template<typename Stmt>
-     typename BeforeStmtAction::result_type before_statement(Stmt &stmt) {
-       return(bfrstmt(stmt));
+     template<typename Stmt, typename Child>
+     typename BeforeStmtAction::result_type before_statement(Stmt &stmt,
+							     Child &child) {
+       return(bfrstmt(stmt, child));
       };
 
-     template<typename Stmt>
-     typename AfterStmtAction::result_type after_statement(Stmt &stmt) {
-       return(aftstmt(stmt));
+     template<typename Stmt, typename Child>
+     typename AfterStmtAction::result_type after_statement(Stmt &stmt,
+							   Child &child) {
+       return(aftstmt(stmt, child));
       };
 
-     template<typename Stmt>
-     typename BetweenStmtAction::result_type between_statement(Stmt &stmt) {
-       return(betstmt(stmt));
+     template<typename Stmt, typename Child>
+     typename BetweenStmtAction::result_type between_statement(Stmt &stmt,
+							       Child &child1,
+							       Child &child2) {
+       return(betstmt(stmt, child1, child2));
       };
 
-     template<typename Expr>
-     typename BeforeExprAction::result_type before_expression(Expr &expr) {
-       return(bfrexpr(expr));
+     template<typename Stmt, typename Expr>
+     typename BeforeExprAction::result_type before_expression(Stmt &stmt,
+							      Expr &expr) {
+       return(bfrexpr(stmt, expr));
       };
 
-     template<typename Expr>
-     typename AfterExprAction::result_type after_expression(Expr &expr) {
-       return(aftexpr(expr));
+     template<typename Stmt, typename Expr>
+     typename AfterExprAction::result_type after_expression(Stmt &stmt,
+							    Expr &expr) {
+       return(aftexpr(stmt, expr));
       };
 
      ExprFlow &expression_flow(void) {
@@ -78,6 +86,20 @@ namespace mirv {
 			    const Dataflow &in1, const Dataflow &in2) {
        conf(out, in1, in2);
       }
+
+     bool has_break(void) const {
+       return hit_break;
+     }
+
+     void set_no_break(void) {
+       hit_break = false;
+     }
+     void set_has_break(void) {
+       hit_break = true;
+     }
+     void set_break(bool v) {
+       hit_break = v;
+     }
 
    public:
       StatementFlow(const EnterAction &e,

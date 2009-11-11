@@ -10,6 +10,7 @@ namespace mirv {
       typename LeaveAction = NullAction,
       typename BeforeAction = NullAction,
       typename AfterAction = NullAction,
+      typename BetweenAction = NullAction,
       typename Dataflow = NullDataflow>
    class ExpressionFlow : public ExpressionVisitor {
    private:
@@ -17,6 +18,7 @@ namespace mirv {
       LeaveAction lve;
       BeforeAction bfr;
       AfterAction aft;
+      BetweenAction bet;
       Dataflow data;
 
    protected:
@@ -30,14 +32,20 @@ namespace mirv {
        return(lve(expr));
       };
 
-     template<typename Expr>
-     typename BeforeAction::result_type before(Expr &expr) {
-       return(bfr(expr));
+     template<typename Expr, typename Child>
+     typename BeforeAction::result_type before(Expr &expr, Child &child) {
+       return(bfr(expr, child));
       };
 
-     template<typename Expr>
-     typename AfterAction::result_type after(Expr &expr) {
-       return(aft(expr));
+     template<typename Expr, typename Child>
+     typename BeforeAction::result_type between(Expr &expr, Child &child1,
+						Child &child2) {
+       return(bfr(expr, child1, child2));
+      };
+
+     template<typename Expr, typename Child>
+     typename AfterAction::result_type after(Expr &expr, Child &child) {
+       return(aft(expr, child));
       };
 
       Dataflow &dataflow(void) {
@@ -49,8 +57,9 @@ namespace mirv {
                      const LeaveAction &l,
                      const BeforeAction &b,
                      const AfterAction &a,
+                     const BetweenAction &t,
                      const Dataflow &d)
-	: ent(e), lve(l), bfr(b), aft(a),
+	: ent(e), lve(l), bfr(b), aft(a), bet(t),
 	  data(d) {}
    };
 
@@ -61,6 +70,7 @@ namespace mirv {
       typename LeaveAction = NullAction,
       typename BeforeAction = NullAction,
       typename AfterAction = NullAction,
+      typename BetweenAction = NullAction,
       typename Dataflow = NullDataflow>
    class ForwardExpressionFlow
          : public ExpressionFlow<
@@ -68,12 +78,14 @@ namespace mirv {
       LeaveAction,
       BeforeAction,
       AfterAction,
+      BetweenAction,
       Dataflow> {
      typedef ExpressionFlow<
        EnterAction,
        LeaveAction,
        BeforeAction,
        AfterAction,
+       BetweenAction,
        Dataflow> BaseType;
 
    public:
@@ -81,8 +93,9 @@ namespace mirv {
                             const LeaveAction &l,
                             const BeforeAction &b,
                             const AfterAction &a,
+                            const BetweenAction &t,
                             const Dataflow &d)
-	: BaseType(e, l, b, a, d) {}
+	: BaseType(e, l, b, a, t, d) {}
 
       void visit(InnerExpression &expr) {
          this->enter(expr);
@@ -113,6 +126,7 @@ namespace mirv {
       typename LeaveAction = NullAction,
       typename BeforeAction = NullAction,
       typename AfterAction = NullAction,
+      typename BetweenAction = NullAction,
       typename Dataflow = NullDataflow>
    class BackwardExpressionFlow
          : public ExpressionFlow<
@@ -120,12 +134,14 @@ namespace mirv {
       LeaveAction,
       BeforeAction,
       AfterAction,
+      BetweenAction,
       Dataflow> {
      typedef ExpressionFlow<
        EnterAction,
        LeaveAction,
        BeforeAction,
        AfterAction,
+       BetweenAction,
        Dataflow> BaseType;
 
    public:
@@ -133,8 +149,9 @@ namespace mirv {
                              const LeaveAction &l,
                              const BeforeAction &b,
                              const AfterAction &a,
+                             const BetweenAction &t,
                              const Dataflow &d)
-            : BaseType(e, l, b, a, d) {}
+	: BaseType(e, l, b, a, t, d) {}
 
       void visit(InnerExpression &expr) {
          this->enter(expr);

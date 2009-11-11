@@ -69,7 +69,7 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Mutating> sequence;
 
-      typedef Statement<DualExpression<BaseStatement> > root;
+     typedef Statement<DualExpression<Virtual<BaseStatement> > > root;
 
    public:
       typedef StatementBaseGenerator<sequence, root>::type base_type;

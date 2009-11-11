@@ -16,9 +16,9 @@ namespace mirv {
      typedef InnerStatement visitor_base_type;
      typedef sequence properties;
 
-      typedef InnerStatement::publicize<InnerStatement> interface_base_type;
+      typedef InnerStatement interface_base_type;
 
-      class interface : public interface_base_type {};
+      class interface : public virtual interface_base_type {};
 
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
@@ -181,8 +181,10 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-      typedef Statement<SingleCondition<Statement<
-         DualBlock<InnerStatement> > > > root;
+      typedef Statement<
+	SingleCondition<
+	  Statement<
+	    DualBlock<Virtual<InnerStatement> > > > > root;
 
    public:
      typedef root visitor_base_type;
@@ -194,8 +196,10 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Conditional, Iterative> sequence;
 
-      typedef Statement<SingleCondition<Statement<
-         SingleBlock<InnerStatement> > > > root;
+      typedef Statement<
+	SingleCondition<
+	  Statement<
+	    SingleBlock<Virtual<InnerStatement> > > > > root;
 
    public:
      typedef root visitor_base_type;
@@ -207,8 +211,10 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-      typedef Statement<SingleCondition<Statement<
-         SingleBlock<InnerStatement> > > > root;
+      typedef Statement<
+	SingleCondition<
+	  Statement<
+	    SingleBlock<Virtual<InnerStatement> > > > > root;
 
    public:
      typedef root visitor_base_type;
@@ -220,8 +226,10 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<> sequence;
 
-      typedef Statement<SingleCondition<Statement<
-         SingleBlock<InnerStatement> > > > root;
+      typedef Statement<
+	SingleCondition<
+	  Statement<
+	    SingleBlock<Virtual<InnerStatement> > > > > root;
 
    public:
      typedef root visitor_base_type;
@@ -238,15 +246,15 @@ namespace mirv {
      typedef InnerStatement visitor_base_type;
      typedef sequence properties;
 
-      typedef InnerStatement::publicize<InnerStatement> interface_base_type;
+      typedef InnerStatement interface_base_type;
 
-      class interface : public interface_base_type {
+      class interface : public virtual interface_base_type {
          typedef interface_base_type::child_ptr child_ptr;
       public:
          // Override base methods
          void push_back(child_ptr c) {
- 	    check_invariant(safe_ptr_cast<Statement<Case> *>(c),
-                            "Attempt to insert non-case statement in case block");
+	   // check_invariant(safe_cast<Statement<Case> >(c),
+           //                  "Attempt to insert non-case statement in case block");
             interface_base_type::push_back(c);
          };
       };
@@ -285,7 +293,7 @@ namespace mirv {
 
       public:
          void set_label(expression_ptr e) {
- 	    check_invariant(safe_ptr_cast<Expression<Label> *>(e),
+	   check_invariant(safe_cast<Expression<Label> >(e),
                             "Attempt to set non-label as label");
             
             set_expression(e);
@@ -307,8 +315,10 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Iterative> sequence;  // Of a sort
 
-      typedef Statement<SingleLabel<Statement<
-         SingleBlock<InnerStatement> > > > root;
+      typedef Statement<
+	SingleLabel<
+	  Statement<
+	    SingleBlock<Virtual<InnerStatement> > > > > root;
 
    public:
      typedef root visitor_base_type;
@@ -316,12 +326,35 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
+  // mirv::Statement<
+  //   mirv::After, 
+  //   boost::mpl::inherit2<
+  //     mirv::Statement<
+  // 	mirv::SingleLabel<
+  // 	  mirv::Statement<
+  // 	    mirv::SingleBlock<mirv::InnerStatement>,
+  // 	    mirv::SingleBlock<mirv::InnerStatement>::interface
+  // 	  >
+  // 	>, 
+  // 	mirv::SingleLabel<
+  // 	  mirv::Statement<
+  // 	    mirv::SingleBlock<mirv::InnerStatement>,
+  // 	    mirv::SingleBlock<mirv::InnerStatement>::interface
+  // 	  >
+  // 	>::interface
+  //     >,
+  //     mirv::Statement<mirv::Conditional, void>
+  //   >
+  // >
+
    class After {
    private:
       typedef boost::mpl::vector<Conditional> sequence;  // Of a sort
 
-      typedef Statement<SingleLabel<Statement<
-         SingleBlock<InnerStatement> > > > root;
+      typedef Statement<
+	SingleLabel<
+	  Statement<
+	    SingleBlock<Virtual<InnerStatement> > > > > root;
 
    public:
      typedef root visitor_base_type;

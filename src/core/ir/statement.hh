@@ -48,24 +48,25 @@ namespace mirv {
 
    typedef Statement<Base> BaseStatement;
 
-  class InnerStatement : public InnerImpl<BaseStatement> {
+  class InnerStatement : public InnerImpl<Virtual<BaseStatement> > {
   public:
     virtual void accept(StatementVisitor &V);
   };
 
-  class LeafStatement : public LeafImpl<BaseStatement> {
+  class LeafStatement : public LeafImpl<Virtual<BaseStatement> > {
   public:
     virtual void accept(StatementVisitor &V);
+
   };
 
   template<typename Property>
-  class Statement<Property, void> : public virtual BaseStatement {};
+  class Statement<Property, void> : public virtual InnerStatement {};
 
    // A metafunction class to generate statement hierarchies.  This
    // makes sure that each property statement specifies Base as its
    // base type so that visit(Expreesion<>::base_type) works
    // correctly.
-   class StatementGenerator {
+   class PropertyStatementGenerator {
    public:
       template<typename Property>
       struct apply {
@@ -76,7 +77,7 @@ namespace mirv {
    template<typename Sequence, typename Root>
    class StatementBaseGenerator {
    public:
-      typedef typename Properties<StatementGenerator, Root, Sequence>::type
+      typedef typename Properties<PropertyStatementGenerator, Root, Sequence>::type
       type;
    };
 
@@ -169,8 +170,7 @@ namespace mirv {
 
       class interface
             : public interface_base_type {
-         // Protected because subclasses might want to rename
-      protected:
+      public:
          typedef typename interface_base_type::expression_ptr expression_ptr;
          typedef typename interface_base_type::const_expression_ptr
          const_expression_ptr;

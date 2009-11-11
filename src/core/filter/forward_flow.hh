@@ -34,9 +34,9 @@ namespace mirv {
       EnterAction,
       LeaveAction,
       BeforeStmtAction,
-      AfterStmtAction,
+      AfterStmtAction, 
       BetweenStmtAction,
-      BeforeExprAction,
+       BeforeExprAction,
       AfterExprAction,
       ExprFlow,
       Dataflow,
@@ -66,7 +66,7 @@ namespace mirv {
             this->after_statement(stmt, **s);
             Statement<Block>::iterator prev = s;
             if (++s != send) {
-               this->between(stmt, **prev, **s);
+               this->between_statement(stmt, **prev, **s);
             }
          }
          this->leave(stmt);
@@ -82,7 +82,7 @@ namespace mirv {
 
          Dataflow denter(this->dataflow());
 
-         this->has_break() = false;
+         this->set_no_break();
 
          this->before_statement(stmt, *stmt.get_child_statement());
          stmt.get_child_statement()->accept(*this);
@@ -93,8 +93,21 @@ namespace mirv {
          }
 
          this->leave(stmt);
-         this->has_break() = hit_break;
+         this->set_break(hit_break);
       }
+
+#if 0
+     Statement<IfElse> :
+       Statement<SingleCondition<Statement<DualBlock<InnerStatment> > > > :
+         interface :
+           Statement<SingleExpression<Statement<DualBlock<InnerStatement > > > > :
+             interface :
+               Statement<Controlled<Statement<DualBlock<InnerStatement> > > > :
+                 interface :
+                   Statement<DualBlock<InnerStatement> > :
+                     interface :
+                       InnerStatement
+#endif
 
       void visit(Statement<IfElse> &stmt) {
          bool hit_break = this->has_break();
@@ -106,7 +119,7 @@ namespace mirv {
 
          Dataflow denter(this->dataflow());
 
-         this->has_break() = false;
+         this->set_no_break();
          Statement<IfElse>::iterator s = stmt.begin();
 
          this->before_statement(stmt, **s);
@@ -116,7 +129,7 @@ namespace mirv {
          Dataflow then(this->dataflow());
 
          bool then_break = this->has_break();
-         this->has_break() = false;
+         this->set_no_break();
 
          Statement<IfElse>::iterator prev = s++;
 
@@ -142,7 +155,7 @@ namespace mirv {
          // Otherwise we pass through the else clause and don't need
          // to confluence.
          this->leave(stmt);
-         this->has_break() = hit_break;
+         this->set_break(hit_break);
       }
 
       void visit(Statement<While> &stmt) {
@@ -181,7 +194,7 @@ namespace mirv {
          }
 
          this->leave(stmt);
-         this->has_break() = hit_break;
+         this->set_break(hit_break);
       }
 
       void visit(Statement<DoWhile> &stmt) {
@@ -212,12 +225,12 @@ namespace mirv {
          // here
 
          this->leave(stmt);
-         this->has_break() = hit_break;
+         this->set_break(hit_break);
       }
 
       void visit(Statement<Switch> &stmt) {
          bool hit_break = this->has_break();
-         this->has_break() = false;
+         this->set_no_break();
 
          this->enter(stmt);
 
@@ -242,7 +255,7 @@ namespace mirv {
                   // Don't propagate dataflow from this block to the next
                   // one
                   this->dataflow() = denter;
-                  this->has_break() = false;
+                  this->set_no_break();
                   // Exit confluence handled at after statement
                }
                else {
@@ -253,7 +266,7 @@ namespace mirv {
          }
 
          this->leave(stmt);
-         this->has_break() = hit_break;
+         this->set_break(hit_break);
       }
 
       void visit(Statement<Case> &stmt) {
@@ -328,8 +341,9 @@ namespace mirv {
       typename ExprFlow,
       typename Dataflow,
       typename Confluence>
-   typename ptr<ForwardFlow<EnterAction, LeaveAction, BeforeStmtAction, AfterStmtAction,
-	       BetweenStmtAction, BeforeExprAction, AfterExprAction, ExprFlow,
+   typename ptr<ForwardFlow<EnterAction, LeaveAction, BeforeStmtAction, 
+			    AfterStmtAction, BetweenStmtAction,
+			    BeforeExprAction, AfterExprAction, ExprFlow,
 			    Dataflow, Confluence> >::type
    make_forward_flow(const EnterAction &ent, const LeaveAction &lv,
 		     const BeforeStmtAction &bs,
@@ -367,18 +381,11 @@ namespace mirv {
 		     const AfterStmtAction &as, const BetweenStmtAction &bts,
 		     const BeforeExprAction &be, const AfterExprAction &ae,
 		     const ExprFlow &ef) {
-     return new ForwardFlow<
-     EnterAction, 
-       LeaveAction,
-       BeforeStmtAction,
-       AfterStmtAction,
-       BetweenStmtAction,
-       BeforeExprAction,
-       AfterExprAction,
-       ExprFlow,
-       NullDataflow,
-       NullDataflow::Confluence>(ent, lv, bs, as, bts, be, ae, ef,
-				 NullDataflow(), NullDataflow::Confluence());
+     typedef ForwardFlow<EnterAction, LeaveAction, BeforeStmtAction, AfterStmtAction,
+       BetweenStmtAction, BeforeExprAction, AfterExprAction, ExprFlow,
+       NullDataflow, NullDataflow::Confluence> flow_type;
+     return typename ptr<flow_type>::type(new flow_type(ent, lv, bs, as, bts, be, ae, ef,
+							NullDataflow(), NullDataflow::Confluence()));
    }
 }
 
