@@ -19,6 +19,10 @@ namespace mirv {
    public:
      typedef boost::mpl::empty_base type;
    };
+
+  // Inherit virtually
+  template<typename Base>
+  struct Virtual : public virtual Base {};
 }
 
 #endif

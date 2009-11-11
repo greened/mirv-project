@@ -4,6 +4,9 @@
 namespace mirv {
   struct NullDataflow {
     struct Confluence {};
+    bool change(void) const {
+      return false;
+    }
   };
 }
 

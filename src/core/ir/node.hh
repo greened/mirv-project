@@ -31,7 +31,7 @@ namespace mirv {
    private:
       child_list children;
 
-   protected:
+   public:
      typedef typename child_list::iterator iterator;
      typedef typename child_list::reverse_iterator reverse_iterator;
      typedef typename child_list::const_iterator const_iterator;
@@ -79,58 +79,6 @@ namespace mirv {
       size_type size(void) const { return(children.size()); }
 
       bool empty(void) const { return(children.empty()); }
-
-   public:
-          // Allow some subclasses to make members accessible
-          // Do the pain of method forwarding in one place
-      template<typename Base>
-      class publicize : public Base {
-      public:
-         typedef typename Base::child_ptr child_ptr;
-         typedef typename Base::const_child_ptr const_child_ptr;
-
-         typedef typename Base::iterator iterator;
-         typedef typename Base::const_iterator const_iterator;
-
-         iterator begin(void) { return(Base::begin()); }
-         const_iterator begin(void) const { return(Base::begin()); }
-      
-         iterator end(void) { return(Base::end()); }
-         const_iterator end(void) const { return(Base::end()); }
-      
-         void push_back(child_ptr c) {
-            Base::push_back(c);
-         }
-
-         child_ptr front(void) {
-            check_invariant(!empty(),
-                            "Attempt to get operand from empty node");
-            return(Base::front());
-         }
-
-         const_child_ptr front(void) const {
-            check_invariant(!empty(),
-                            "Attempt to get operand from empty node");
-            return(Base::front());
-         }
-
-         child_ptr back(void) {
-            check_invariant(!empty(),
-                            "Attempt to get operand from empty node");
-            return(Base::back());
-         }
-
-         const_child_ptr back(void) const {
-            check_invariant(!empty(),
-                            "Attempt to get operand from empty node");
-            return(Base::back());
-         }
-
-         typedef typename Base::size_type size_type;
-         size_type size(void) const { return(Base::size()); }
-
-         bool empty(void) const { return(Base::empty()); }
-      };
    };
 
        // A node without children
