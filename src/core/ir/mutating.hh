@@ -5,12 +5,11 @@
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
-   template<typename Stmt>
    class DualExpression {
    public:
       class interface;
       typedef interface base_type;
-      typedef Statement<Controlled<Stmt> > interface_base_type;
+      typedef Statement<Controlled> interface_base_type;
       
       class interface 
             : public interface_base_type {
@@ -69,7 +68,9 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Mutating> sequence;
 
-     typedef Statement<DualExpression<Virtual<BaseStatement> > > root;
+     class Base : public Statement<DualExpression>,
+		  public LeafStatement {};
+     typedef Base root;
 
    public:
       typedef StatementBaseGenerator<sequence, root>::type base_type;

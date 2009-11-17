@@ -13,30 +13,17 @@
 #include <boost/mpl/int.hpp>
 
 namespace mirv {
-  struct StatementVisitor;
+   namespace detail {
+     // Provide an ordering for properties.
+     template<typename T1, typename T2>
+     struct StatementPropertyLess :
+       public boost::mpl::less<typename T1::order, typename T2::order> {};
+   }
 
-   // Statement property semantics
+   struct StatementVisitor;
 
-   /// Not all child statements may be executed
-  class Conditional { typedef boost::mpl::int_<0> order; };
-
-   /// Child statements may be executed multiple times
-   class Iterative { typedef boost::mpl::int_<1> order; };
-
-   /// Modifies program state
-   class Mutating { typedef boost::mpl::int_<2> order; };
-
-  namespace detail {
-    // Provide an ordering for properties.
-    template<typename T1, typename T2>
-    struct StatementPropertyLess :
-      public boost::mpl::less<typename T1::order, typename T2::order> {};
-  }
-
-   template<
-      typename Tag,
-      typename Base = typename BaseType<Tag>::type>
-   class Statement: public Base {
+   template<typename Tag>
+   class Statement: public Tag::base_type {
    public:
      typedef typename Tag::visitor_base_type visitor_base_type;
      typedef typename boost::mpl::sort<
@@ -46,133 +33,155 @@ namespace mirv {
      virtual void accept(StatementVisitor &V);
    };
 
-   typedef Statement<Base> BaseStatement;
-
-  class InnerStatement : public InnerImpl<Virtual<BaseStatement> > {
-  public:
-    virtual void accept(StatementVisitor &V);
-  };
-
-  class LeafStatement : public LeafImpl<Virtual<BaseStatement> > {
-  public:
-    virtual void accept(StatementVisitor &V);
-
-  };
-
-  template<typename Property>
-  class Statement<Property, void> : public virtual InnerStatement {};
-
-   // A metafunction class to generate statement hierarchies.  This
-   // makes sure that each property statement specifies Base as its
-   // base type so that visit(Expreesion<>::base_type) works
-   // correctly.
-   class PropertyStatementGenerator {
+   class InnerStatement : public InnerImpl<Statement<Base>, Virtual<Statement<Base> > > {
    public:
-      template<typename Property>
-      struct apply {
-         typedef Statement<Property, void> type;
-      };
+     virtual void accept(StatementVisitor &V);
    };
 
-   template<typename Sequence, typename Root>
-   class StatementBaseGenerator {
+   class LeafStatement : public LeafImpl<Virtual<Statement<Base> > > {
    public:
-      typedef typename Properties<PropertyStatementGenerator, Root, Sequence>::type
-      type;
+     virtual void accept(StatementVisitor &V);
+
    };
 
-   /// Statement semantics are somehow affected by expressions
-   template<typename Stmt>
-   class Controlled {
-   private:
-      typedef boost::mpl::vector<> sequence;
+   // Statement property semantics
 
-   public:
-      class interface;
-      typedef Stmt interface_base_type;
-     typedef Stmt visitor_base_type;
-     typedef sequence properties;
-
-      class interface
-            : public interface_base_type {
-      protected:
-         typedef ptr<BaseExpression>::type expression_ptr;
-         typedef ptr<BaseExpression>::const_type const_expression_ptr;
-         typedef std::list<expression_ptr> expression_list;
-
-      private:
-         expression_list expressions;
-
-      protected:
-         typedef expression_list::iterator expression_iterator;
-         typedef expression_list::const_iterator const_expression_iterator;
-
-         expression_iterator expression_begin(void) {
-            return(expressions.begin());
-         };
-         const_expression_iterator expression_begin(void) const {
-            return(expressions.begin());
-         };
-
-         expression_iterator expression_end(void) {
-            return(expressions.end());
-         };
-         const_expression_iterator expression_end(void) const {
-            return(expressions.end());
-         };
-
-         void expression_push_back(expression_ptr c) {
-            expressions.push_back(c);
-         };
-
-         expression_ptr expression_front(void) {
-            check_invariant(!expression_empty(),
-                            "Attempt to get operand from empty node");
-            return(expressions.front());
-         };
-
-         const_expression_ptr expression_front(void) const {
-            check_invariant(!expression_empty(),
-                            "Attempt to get operand from empty node");
-            return(expressions.front());
-         };
-
-         expression_ptr expression_back(void) {
-            check_invariant(!expression_empty(),
-                            "Attempt to get operand from empty node");
-            return(expressions.back());
-         };
-
-         const_expression_ptr expression_back(void) const {
-            check_invariant(!expression_empty(),
-                            "Attempt to get operand from empty node");
-            return(expressions.back());
-         };
-
- 	 typedef expression_list::size_type size_type;
-         size_type expression_size(void) const { return(expressions.size()); };
-
-         bool expression_empty(void) const { return(expressions.empty()); };
-      };
-
-      typedef typename StatementBaseGenerator<sequence, interface>::type base_type;
+    /// Not all child statements may be executed
+   class Conditional {
+     typedef boost::mpl::int_<0> order;
+    public:
+     typedef Virtual<Statement<Base> > base_type;
+     typedef Statement<Base> visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    };
 
-   template<typename Stmt>
-   class SingleExpression {
-   private:
-      typedef boost::mpl::vector<> sequence;
+    /// Child statements may be executed multiple times
+    class Iterative {
+      typedef boost::mpl::int_<1> order;
+    public:
+      typedef Virtual<Statement<Base> > base_type;
+     typedef Statement<Base> visitor_base_type;
+     typedef boost::mpl::vector<> properties;
+    };
 
-   public:
-      typedef Statement<Controlled<Stmt> > interface_base_type;
-     typedef Statement<Controlled<Stmt> > visitor_base_type;
-     typedef sequence properties;
+    /// Modifies program state
+    class Mutating {
+      typedef boost::mpl::int_<2> order;
+    public:
+      typedef Virtual<Statement<Base> > base_type;
+     typedef Statement<Base> visitor_base_type;
+     typedef boost::mpl::vector<> properties;
+    };
 
-      class interface
-            : public interface_base_type {
-      public:
-         typedef typename interface_base_type::expression_ptr expression_ptr;
-         typedef typename interface_base_type::const_expression_ptr
+    // A metafunction class to generate statement hierarchies.  This
+    // makes sure that each property statement specifies Base as its
+    // base type so that visit(Expreesion<>::base_type) works
+    // correctly.
+    class PropertyStatementGenerator {
+    public:
+       template<typename Property>
+       struct apply {
+	  typedef Statement<Property> type;
+       };
+    };
+
+    template<typename Sequence, typename Root>
+    class StatementBaseGenerator {
+    public:
+       typedef typename Properties<PropertyStatementGenerator, Root, Sequence>::type
+       type;
+    };
+
+    /// Statement semantics are somehow affected by expressions
+    class Controlled {
+    private:
+       typedef boost::mpl::vector<> sequence;
+
+    public:
+       class interface;
+      typedef Virtual<Statement<Base> > interface_base_type;
+      typedef Statement<Base> visitor_base_type;
+      typedef sequence properties;
+
+       class interface
+	     : public interface_base_type {
+       protected:
+	 typedef ptr<Expression<Base> >::type expression_ptr;
+	 typedef ptr<Expression<Base> >::const_type const_expression_ptr;
+	  typedef std::list<expression_ptr> expression_list;
+
+       private:
+	  expression_list expressions;
+
+       protected:
+	  typedef expression_list::iterator expression_iterator;
+	  typedef expression_list::const_iterator const_expression_iterator;
+
+	  expression_iterator expression_begin(void) {
+	     return(expressions.begin());
+	  };
+	  const_expression_iterator expression_begin(void) const {
+	     return(expressions.begin());
+	  };
+
+	  expression_iterator expression_end(void) {
+	     return(expressions.end());
+	  };
+	  const_expression_iterator expression_end(void) const {
+	     return(expressions.end());
+	  };
+
+	  void expression_push_back(expression_ptr c) {
+	     expressions.push_back(c);
+	  };
+
+	  expression_ptr expression_front(void) {
+	     check_invariant(!expression_empty(),
+			     "Attempt to get operand from empty node");
+	     return(expressions.front());
+	  };
+
+	  const_expression_ptr expression_front(void) const {
+	     check_invariant(!expression_empty(),
+			     "Attempt to get operand from empty node");
+	     return(expressions.front());
+	  };
+
+	  expression_ptr expression_back(void) {
+	     check_invariant(!expression_empty(),
+			     "Attempt to get operand from empty node");
+	     return(expressions.back());
+	  };
+
+	  const_expression_ptr expression_back(void) const {
+	     check_invariant(!expression_empty(),
+			     "Attempt to get operand from empty node");
+	     return(expressions.back());
+	  };
+
+	  typedef expression_list::size_type size_type;
+	  size_type expression_size(void) const { return(expressions.size()); };
+
+	  bool expression_empty(void) const { return(expressions.empty()); };
+       };
+
+       typedef StatementBaseGenerator<sequence, interface>::type base_type;
+    };
+
+    class SingleExpression {
+    private:
+       typedef boost::mpl::vector<> sequence;
+
+    public:
+       typedef Statement<Controlled> interface_base_type;
+      typedef Statement<Controlled> visitor_base_type;
+      typedef sequence properties;
+
+       class interface
+	     : public interface_base_type {
+       public:
+	  typedef interface_base_type::expression_ptr expression_ptr;
+	  typedef interface_base_type::const_expression_ptr
          const_expression_ptr;
 
          void set_expression(expression_ptr e) {
@@ -199,7 +208,7 @@ namespace mirv {
          };
       }; 
 
-      typedef typename StatementBaseGenerator<sequence, interface>::type base_type;
+      typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 }
 

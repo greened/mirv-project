@@ -5,19 +5,16 @@
 #include <mirv/ir/node.hh>
 
 namespace mirv {
-   template<
-      typename Tag,
-      typename Base = typename BaseType<Tag>::type>
+   template<typename Tag>
    class Symbol 
-         : public Base {
+     : public Tag::base_type {
    public:
-      typedef Base base_type;
+     typedef typename Tag::base_type base_type;
    };
 
-   typedef Symbol<Base> BaseSymbol;
-  class InnerSymbol : public InnerImpl<BaseSymbol> {
+  class InnerSymbol : public InnerImpl<Symbol<Base>, Virtual<Symbol<Base> > > {
   };
-  class LeafSymbol : public LeafImpl<BaseSymbol> {
+  class LeafSymbol : public LeafImpl<Virtual<Symbol<Base> > > {
   };
 }
 
