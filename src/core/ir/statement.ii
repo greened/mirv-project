@@ -2,8 +2,8 @@
 #define mirv_core_ir_statement_ii
 
 namespace mirv {
-  template<typename Tag, typename Base>
-  void Statement<Tag, Base>::accept(StatementVisitor &V) {
+  template<typename Tag>
+  void Statement<Tag>::accept(StatementVisitor &V) {
     V.visit(*this);
   }
 

@@ -8,66 +8,59 @@ namespace mirv {
    class Ref {
    private:
      typedef boost::mpl::vector<> sequence;
-     typedef InnerExpression interface_base_type;
-
+     typedef InnerImpl<Symbol<SymbolType>, LeafStatement> interface_base_type;
    public:
-     class interface 
-            : public interface_base_type {
+     class interface : public interface_base_type {
       public:
        typedef Symbol<SymbolType> child_type;
        typedef typename ptr<child_type>::type child_ptr;
        typedef typename ptr<child_type>::const_type const_child_ptr;
         
          void set_symbol(child_ptr c) {
-            if (empty()) {
+            if (this->empty()) {
                push_back(c);
             }
             else {
-               *begin() = c;
+               *this->begin() = c;
             }
          };
         
          child_ptr get_symbol(void) {
-            return(front());
+            return this->front();
          };
         
          const_child_ptr get_symbol(void) const {
-            return(front());
+            return this->front();
          };
       };
 
-     typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;   };
+     typedef typename ExpressionBaseGenerator<sequence, interface>::type base_type;
+   };
 
    class AddressOf {
    private:
       typedef boost::mpl::vector<> sequence;
 
+     // TODO: Interface that checks for lvalues.
    public:
-      typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
+      typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
    };
 
    class Dereference {
    private:
-      typedef boost::mpl::vector<Reference> sequence;
+      typedef boost::mpl::vector<> sequence;
 
    public:
-      typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
+      typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
    };
 
    class ArrayRef {
    private:
-      typedef boost::mpl::vector<Reference> sequence;
-
-   public:
-      typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
-   };
-
-   class Label {
-   private:
       typedef boost::mpl::vector<> sequence;
 
+     // TODO: Support multi-dimension arrays natively?
    public:
-      typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
+      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 
    class Call {

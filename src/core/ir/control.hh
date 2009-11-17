@@ -26,20 +26,19 @@ namespace mirv {
    // A statement with only one child statement.  The child should be
    // a block statement if more than one statement needs to be under
    // this control point.
-   template<typename Base>
    class SingleBlock {
    private:
       typedef boost::mpl::vector<> sequence;
 
    public:
-     typedef Base interface_base_type;
-     typedef Base visitor_base_type;
+     typedef InnerStatement interface_base_type;
+     typedef InnerStatement visitor_base_type;
      typedef sequence properties;
 
       class interface : public interface_base_type {
       public:
-         typedef typename interface_base_type::child_ptr child_ptr;
-         typedef typename interface_base_type::const_child_ptr const_child_ptr;
+         typedef interface_base_type::child_ptr child_ptr;
+         typedef interface_base_type::const_child_ptr const_child_ptr;
          
          void set_child_statement(child_ptr s) {
             if (this->empty()) {
@@ -47,7 +46,7 @@ namespace mirv {
             }
             else {
                *--this->end() = s;
-            }
+             }
          };
 
          child_ptr get_child_statement(void) {
@@ -58,27 +57,26 @@ namespace mirv {
          };
       };
 
-      typedef typename StatementBaseGenerator<sequence, interface>::type base_type;
+      typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
    // A statement with two child statements.  The children should be
    // block statements if more than one statement needs to be under
    // this control point.
-   template<typename Base>
    class DualBlock {
    private:
       typedef boost::mpl::vector<> sequence;
 
    public:
-      typedef Base interface_base_type;
+     typedef InnerStatement interface_base_type;
      typedef Base visitor_base_type;
      typedef sequence properties;
 
       class interface : public interface_base_type {
          // Protected because these are probably bad names for subclasses
       protected:
-         typedef typename interface_base_type::child_ptr child_ptr;
-         typedef typename interface_base_type::const_child_ptr const_child_ptr;
+         typedef interface_base_type::child_ptr child_ptr;
+         typedef interface_base_type::const_child_ptr const_child_ptr;
          
          void set_left_child_statement(child_ptr s) {
             if (this->empty()) {
@@ -124,24 +122,23 @@ namespace mirv {
          };
       };
 
-      typedef typename StatementBaseGenerator<sequence, interface>::type base_type;
+      typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
    // A statement with a single condition
-   template<typename Stmt>
    class SingleCondition {
    private:
       typedef boost::mpl::vector<> sequence;
 
    public:
-      typedef Statement<SingleExpression<Stmt> > interface_base_type;
-     typedef Statement<SingleExpression<Stmt> > visitor_base_type;
+      typedef Statement<SingleExpression> interface_base_type;
+     typedef Statement<SingleExpression> visitor_base_type;
      typedef sequence properties;
       
       class interface 
             : public interface_base_type {
-         typedef typename interface_base_type::expression_ptr expression_ptr;
-         typedef typename interface_base_type::const_expression_ptr 
+         typedef interface_base_type::expression_ptr expression_ptr;
+         typedef interface_base_type::const_expression_ptr 
          const_expression_ptr;
 
       public:
@@ -158,36 +155,36 @@ namespace mirv {
          };
       };
 
-      typedef typename StatementBaseGenerator<sequence, interface>::type base_type;
+      typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
    // IfThen doesn't inherit from the base_type, Statement<IfThen>
    // does.  Therefore we need a way to make base_type's protected
    // methods available.  That's why interface is set as the base_type.
-   class IfThen {
+  class IfThen {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-      typedef Statement<SingleCondition<Statement<
-			SingleBlock<InnerStatement> > > > root;
+     class Base : public Statement<SingleCondition>,
+		  public Statement<SingleBlock> {};
+     typedef Base root;
 
-   public:
-     typedef root visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
-   };
-
+  public:
+    typedef sequence properties;
+    typedef StatementBaseGenerator<sequence, root>::type base_type;
+    typedef Statement<SingleBlock> visitor_base_type;
+  };
+  
    class IfElse {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-      typedef Statement<
-	SingleCondition<
-	  Statement<
-	    DualBlock<Virtual<InnerStatement> > > > > root;
+     class Base : public Statement<SingleCondition>,
+		  public Statement<DualBlock> {};
+     typedef Base root;
 
    public:
-     typedef root visitor_base_type;
+     typedef Statement<DualBlock> visitor_base_type;
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
@@ -196,13 +193,12 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Conditional, Iterative> sequence;
 
-      typedef Statement<
-	SingleCondition<
-	  Statement<
-	    SingleBlock<Virtual<InnerStatement> > > > > root;
+     class Base : public Statement<SingleCondition>,
+		  public Statement<SingleBlock> {};
+     typedef Base root;
 
    public:
-     typedef root visitor_base_type;
+     typedef Statement<SingleBlock> visitor_base_type;
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
@@ -211,13 +207,12 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-      typedef Statement<
-	SingleCondition<
-	  Statement<
-	    SingleBlock<Virtual<InnerStatement> > > > > root;
+     class Base : public Statement<SingleCondition>,
+		  public Statement<SingleBlock> {};
+     typedef Base root;
 
    public:
-     typedef root visitor_base_type;
+     typedef Statement<SingleBlock> visitor_base_type;
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
@@ -226,13 +221,12 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<> sequence;
 
-      typedef Statement<
-	SingleCondition<
-	  Statement<
-	    SingleBlock<Virtual<InnerStatement> > > > > root;
+     class Base : public Statement<SingleCondition>,
+		  public Statement<SingleBlock> {};
+     typedef Base root;
 
    public:
-     typedef root visitor_base_type;
+     typedef Statement<SingleBlock> visitor_base_type;
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
@@ -243,10 +237,9 @@ namespace mirv {
       typedef boost::mpl::vector<> sequence;
 
    public:
-     typedef InnerStatement visitor_base_type;
+     typedef Statement<SingleBlock> visitor_base_type;
+     typedef Statement<SingleBlock> interface_base_type;
      typedef sequence properties;
-
-      typedef InnerStatement interface_base_type;
 
       class interface : public virtual interface_base_type {
          typedef interface_base_type::child_ptr child_ptr;
@@ -266,29 +259,30 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-      typedef Statement<SingleCondition<Statement<CaseBlock> > > root;
+     class Base : public Statement<SingleCondition>,
+		  public Statement<CaseBlock> {};
+     typedef Base root;
 
    public:
-     typedef root visitor_base_type;
+     typedef Statement<CaseBlock> visitor_base_type;
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
    // A statement with a single label
-   template<typename Stmt>
    class SingleLabel {
    private:
       typedef boost::mpl::vector<> sequence;
 
    public:
-     typedef Statement<SingleExpression<Stmt> > visitor_base_type;
+     typedef Statement<SingleExpression> visitor_base_type;
      typedef sequence properties;
-      typedef Statement<SingleExpression<Stmt> > interface_base_type;
+      typedef Statement<SingleExpression> interface_base_type;
       
       class interface 
             : public interface_base_type {
-         typedef typename interface_base_type::expression_ptr expression_ptr;
-         typedef typename interface_base_type::const_expression_ptr 
+         typedef interface_base_type::expression_ptr expression_ptr;
+         typedef interface_base_type::const_expression_ptr 
          const_expression_ptr;
 
       public:
@@ -308,56 +302,34 @@ namespace mirv {
          };
       };
 
-      typedef typename StatementBaseGenerator<sequence, interface>::type base_type;
+      typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
    class Before {
    private:
       typedef boost::mpl::vector<Iterative> sequence;  // Of a sort
 
-      typedef Statement<
-	SingleLabel<
-	  Statement<
-	    SingleBlock<Virtual<InnerStatement> > > > > root;
+     class Base : public Statement<SingleLabel>,
+		  public Statement<SingleBlock> {};
+     typedef Base root;
 
    public:
-     typedef root visitor_base_type;
+     typedef Statement<SingleBlock> visitor_base_type;
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
-  // mirv::Statement<
-  //   mirv::After, 
-  //   boost::mpl::inherit2<
-  //     mirv::Statement<
-  // 	mirv::SingleLabel<
-  // 	  mirv::Statement<
-  // 	    mirv::SingleBlock<mirv::InnerStatement>,
-  // 	    mirv::SingleBlock<mirv::InnerStatement>::interface
-  // 	  >
-  // 	>, 
-  // 	mirv::SingleLabel<
-  // 	  mirv::Statement<
-  // 	    mirv::SingleBlock<mirv::InnerStatement>,
-  // 	    mirv::SingleBlock<mirv::InnerStatement>::interface
-  // 	  >
-  // 	>::interface
-  //     >,
-  //     mirv::Statement<mirv::Conditional, void>
-  //   >
-  // >
 
    class After {
    private:
       typedef boost::mpl::vector<Conditional> sequence;  // Of a sort
 
-      typedef Statement<
-	SingleLabel<
-	  Statement<
-	    SingleBlock<Virtual<InnerStatement> > > > > root;
+     class Base : public Statement<SingleLabel>,
+		  public Statement<SingleBlock> {};
+     typedef Base root;
 
    public:
-     typedef root visitor_base_type;
+     typedef Statement<SingleBlock> visitor_base_type;
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
@@ -366,10 +338,12 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-      typedef Statement<SingleLabel<LeafStatement> > root;
+     typedef Base : public Statement<SingleLabel>,
+		    public LeafStatement {};
+     typedef Base root;
 
    public:
-     typedef root visitor_base_type;
+     typedef LeafStatement visitor_base_type;
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
@@ -377,7 +351,7 @@ namespace mirv {
    /// Does not return an expression, use explicit assignment
    class Return {
    private:
-      typedef boost::mpl::vector<Conditional> sequence;
+      typedef boost::mpl::vector<> sequence;
 
       typedef LeafStatement root;
 
@@ -386,7 +360,6 @@ namespace mirv {
      typedef sequence properties;
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
-
 };
 
 #endif

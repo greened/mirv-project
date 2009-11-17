@@ -21,7 +21,7 @@ namespace mirv {
    typedef Node<Base> BaseNode;
 
    // A node with children
-   template<typename Child, typename BaseType = BaseNode>
+   template<typename Child, typename BaseType>
    class InnerImpl : public BaseType {
    protected:
       typedef typename ptr<Child>::type child_ptr;

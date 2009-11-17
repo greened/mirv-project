@@ -16,55 +16,32 @@
 #include <boost/mpl/int.hpp>
 
 namespace mirv {
-  struct ExpressionVisitor;
+   namespace detail {
+     // Provide an ordering for properties.
+     template<typename T1, typename T2>
+     struct ExpressionPropertyLess :
+       public boost::mpl::less<typename T1::order, typename T2::order> {};
+   }
 
-   // Expression property semantics
-   class Arithmetic { typedef boost::mpl::int_<0> order; };
-   class Logical { typedef boost::mpl::int_<1> order; };
-   class Bitwise { typedef boost::mpl::int_<2> order; };
-   class Commutative { typedef boost::mpl::int_<3> order; };
-   class NonCommutative { typedef boost::mpl::int_<4> order; };
-
-   class Associative { typedef boost::mpl::int_<5> order; };
-   class NonAssociative { typedef boost::mpl::int_<6> order; };
-
-   class Transitive { typedef boost::mpl::int_<7> order; };
-   class Intransitive { typedef boost::mpl::int_<8> order; };
-
-   class Reflexive { typedef boost::mpl::int_<9> order; };
-   class NonReflexive { typedef boost::mpl::int_<10> order; };
- 
-   class Reference { typedef boost::mpl::int_<11> order; };
-
-  namespace detail {
-    // Provide an ordering for properties.
-    template<typename T1, typename T2>
-    struct ExpressionPropertyLess :
-      public boost::mpl::less<typename T1::order, typename T2::order> {};
-  }
-
-   template<
-      typename Op,
-      typename Base = typename BaseType<Op>::type>
-   class Expression : Base {
-   public:
-     typedef Base base_type;
-     typedef typename Op::visitor_base_type visitor_base_type;
-     typedef typename boost::mpl::sort<
-       typename Op::properties,
-       detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
-       >::type properties;
+   struct ExpressionVisitor;
+    template<typename Op>
+    class Expression : public Op::base_type {
+    public:
+      typedef typename Op::base_type base_type;
+      typedef typename Op::visitor_base_type visitor_base_type;
+      typedef typename boost::mpl::sort<
+	typename Op::properties,
+	detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
+	>::type properties;
      virtual void accept(ExpressionVisitor &V);
    };
 
-   typedef Expression<Base> BaseExpression;
-
-  class InnerExpression : public InnerImpl<BaseExpression, BaseExpression> {
+  class InnerExpression : public InnerImpl<Expression<Base>, Expression<Base> > {
   public:
     virtual void accept(ExpressionVisitor &V);
   };
 
-  class LeafExpression : public LeafImpl<BaseExpression> {
+  class LeafExpression : public LeafImpl<Expression<Base> > {
   public:
     virtual void accept(ExpressionVisitor &V);
   };
@@ -82,7 +59,7 @@ namespace mirv {
       class interface
             : public virtual interface_base_type {
       public:
-         typedef BaseExpression child_type;
+	typedef Expression<Base> child_type;
          typedef ptr<child_type>::type child_ptr;
          typedef ptr<child_type>::const_type const_child_ptr;
 
@@ -120,7 +97,7 @@ namespace mirv {
       class interface
             : public virtual interface_base_type {
       public:
-         typedef BaseExpression child_type;
+	typedef Expression<Base> child_type;
          typedef ptr<child_type>::type child_ptr;
          typedef ptr<child_type>::const_type const_child_ptr;
 
@@ -170,16 +147,53 @@ namespace mirv {
       };
    };
 
-   typedef Expression<Unary> UnaryExpression;
-   typedef Expression<Binary> BinaryExpression;
+   // Expression property semantics
+   class Arithmetic {
+     typedef boost::mpl::int_<0> order;
+   public:
+     typedef Virtual<InnerExpression> base_type;
+   };
+   class Logical {
+     typedef boost::mpl::int_<1> order;
+   public:
+     typedef Virtual<InnerExpression> base_type;
+   };
+   class Bitwise {
+     typedef boost::mpl::int_<2> order;
+   public:
+     typedef Virtual<InnerExpression> base_type;
+   };
+   class Reference {
+     typedef boost::mpl::int_<11> order;
+   public:
+     typedef Virtual<InnerExpression> base_type;
+   };
 
-  template<typename Property>
-  class Expression<Property, void> : public virtual InnerExpression {};
+   class Commutative {
+     typedef boost::mpl::int_<3> order;
+   public:
+     typedef Virtual<InnerExpression> base_type;
+   };
+   class Associative {
+     typedef boost::mpl::int_<5> order;
+   public:
+     typedef Virtual<InnerExpression> base_type;
+   };
+   class Transitive {
+     typedef boost::mpl::int_<7> order;
+   public:
+     typedef Virtual<InnerExpression> base_type;
+   };
+   class Reflexive {
+     typedef boost::mpl::int_<9> order;
+   public:
+     typedef Virtual<InnerExpression> base_type;
+   }; 
 
   struct PropertyExpressionGenerator {
     template<typename Property>
     struct apply {
-      typedef Expression<Property, void> type;
+      typedef Expression<Property> type;
     };
   };
  
