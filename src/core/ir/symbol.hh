@@ -12,6 +12,11 @@ namespace mirv {
      typedef typename Tag::base_type base_type;
    };
 
+   template<>
+   class Symbol<Base> { 
+   public:
+   };
+
   class InnerSymbol : public InnerImpl<Symbol<Base>, Virtual<Symbol<Base> > > {
   };
   class LeafSymbol : public LeafImpl<Virtual<Symbol<Base> > > {
