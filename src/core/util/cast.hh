@@ -26,6 +26,13 @@ namespace mirv {
   }
 
   template<typename To, typename From>
+  inline typename ptr<To>::type dyn_cast(const typename ptr<From>::type &val)
+  {
+    typename ptr<To>::type ret = boost::dynamic_pointer_cast<To>(val);
+    return ret;
+  }
+
+  template<typename To, typename From>
   inline To *fast_cast(From *val)
   {
     typedef typename boost::add_reference<typename boost::remove_pointer<To *>::type>::type ref_type;

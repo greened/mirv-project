@@ -317,8 +317,8 @@ namespace mirv {
 
       public:
          void set_label(expression_ptr e) {
-	   check_invariant(safe_cast<Expression<Label> >(e),
-                            "Attempt to set non-label as label");
+	   // check_invariant(safe_cast<Expression<Label> >(e),
+           //                  "Attempt to set non-label as label");
             
             set_expression(e);
          };
@@ -378,7 +378,7 @@ namespace mirv {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
 
-     typedef Base : public Statement<SingleLabel>,
+     class Base : public Statement<SingleLabel>,
 		    public LeafStatement {
      public:
        virtual void accept(mirv::StatementVisitor &) {

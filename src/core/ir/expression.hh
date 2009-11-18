@@ -37,7 +37,7 @@ namespace mirv {
    };
 
     template<>
-    class Expression<Base> {
+    class Expression<Base> : public Node<Base> {
     public:
      virtual void accept(ExpressionVisitor &V);
    };

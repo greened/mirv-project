@@ -1,149 +1,151 @@
 #include "print.hh"
 
+#include <mirv/util/cast.hh>
+
 namespace mirv {
   const int PrintFilter::IndentFactor = 3;
 
-   void PrintFilter::EnterAction::visit(Statement<Block> &stmt)
+   void PrintFilter::EnterAction::visit(ptr<Statement<Block> >::type stmt)
    {
       out << "{\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterAction::visit(Statement<IfThen> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<IfThen> >::type stmt)
     {
       out << indent(ind) << "ifThen\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterAction::visit(Statement<IfElse> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<IfElse> >::type stmt)
     {
        out << indent(ind) << "ifElse\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterAction::visit(Statement<While> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<While> >::type stmt)
     {
        out << indent(ind) << "while\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterAction::visit(Statement<DoWhile> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<DoWhile> >::type stmt)
     {
        out << indent(ind) << "doWhile\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterAction::visit(Statement<Switch> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<Switch> >::type stmt)
     {
        out << indent(ind) << "switch\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterAction::visit(Statement<Case> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<Case> >::type stmt)
     {
        out << indent(ind) << "case";
     }
 
-    void PrintFilter::EnterAction::visit(Statement<Before> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<Before> >::type stmt)
     {
        out << indent(ind) << "before ";
     }
 
-    void PrintFilter::EnterAction::visit(Statement<After> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<After> >::type stmt)
     {
        out << indent(ind) << "after ";
     }
 
-    void PrintFilter::EnterAction::visit(Statement<Goto> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<Goto> >::type stmt)
     {
        out << indent(ind) << "goto ";
     }
 
-    void PrintFilter::EnterAction::visit(Statement<Return> &stmt)
+    void PrintFilter::EnterAction::visit(ptr<Statement<Return> >::type stmt)
     {
        out << indent(ind) << "return\n";
     }
 
-   void PrintFilter::LeaveAction::visit(Statement<Block> &stmt) {
+   void PrintFilter::LeaveAction::visit(ptr<Statement<Block> >::type stmt) {
      ind -= IndentFactor;
      out << indent(ind) << "}";
    }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Add> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<Add> >::type expr)
     {
        out << indent(ind) << "+\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Subtract> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<Subtract> >::type expr)
     {
        out << indent(ind) << "-\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Multiply> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<Multiply> >::type expr)
     {
        out << indent(ind) << "*\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Divide> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<Divide> >::type expr)
     {
        out << indent(ind) << "/\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Modulus> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<Modulus> >::type expr)
     {
        out << indent(ind) << "%\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<Negate> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<Negate> >::type expr)
     {
        out << indent(ind) << "-\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<LogicalAnd> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalAnd> >::type expr)
     {
        out << indent(ind) << "&&\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<LogicalOr> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalOr> >::type expr)
     {
        out << indent(ind) << "||\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<LogicalNot> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalNot> >::type expr)
     {
        out << indent(ind) << "!\n";
        ind += IndentFactor;
     }
 
-    void PrintFilter::EnterExprAction::visit(Expression<BitwiseAnd> &expr)
+    void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseAnd> >::type expr)
     {
       out << indent(ind) << "&\n";
       ind += IndentFactor;
    }
 
-   void PrintFilter::EnterExprAction::visit(Expression<BitwiseOr> &expr)
+   void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseOr> >::type expr)
    {
       out << indent(ind) << "|\n";
       ind += IndentFactor;
    }
 
-   void PrintFilter::EnterExprAction::visit(Expression<BitwiseComplement> &expr)
+   void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseComplement> >::type expr)
    {
       out << indent(ind) << "~\n";
       ind += IndentFactor;
    }
 
-   void PrintFilter::operator()(BaseNode &node)
+  void PrintFilter::operator()(ptr<Node<Base> >::type node)
    {
-     if (BaseStatement *s = dynamic_cast<BaseStatement *>(&node)) {
+     if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
        ptr<StatementVisitor>::type flow =
 	 make_forward_flow(EnterAction(out, ind),
 			   LeaveAction(out, ind),

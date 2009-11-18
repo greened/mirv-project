@@ -15,12 +15,12 @@ namespace mirv {
   struct StatementVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<
-      BaseStatement,
+	Statement<Base>,
       LeafStatement,
       InnerStatement,
-	Statement<Conditional, void>,
-	Statement<Iterative, void>,
-	Statement<Mutating, void>,
+	Statement<Conditional>,
+	Statement<Iterative>,
+	Statement<Mutating>,
       Statement<Block>,
       Statement<IfThen>,
       Statement<IfElse>,
@@ -35,12 +35,12 @@ namespace mirv {
       Statement<Return>
 	> > {
   public:
-    virtual result_type visit(BaseStatement &);
+    virtual result_type visit(Statement<Base> &);
     virtual result_type visit(LeafStatement &s);
     virtual result_type visit(InnerStatement &s);
-    virtual result_type visit(Statement<Conditional, void> &s);
-    virtual result_type visit(Statement<Iterative, void> &s);
-    virtual result_type visit(Statement<Mutating, void> &s);
+    virtual result_type visit(Statement<Conditional> &s);
+    virtual result_type visit(Statement<Iterative> &s);
+    virtual result_type visit(Statement<Mutating> &s);
     virtual result_type visit(Statement<Block> &s);
     virtual result_type visit(Statement<IfThen> &s);
     virtual result_type visit(Statement<IfElse> &s);
@@ -58,21 +58,17 @@ namespace mirv {
   struct ExpressionVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<
-      BaseExpression,
+	Expression<Base>,
       InnerExpression,
       LeafExpression,
-	Expression<Arithmetic, void>,
-	Expression<Logical, void>,
-	Expression<Bitwise, void>,
-	Expression<Commutative, void>,
-	Expression<NonCommutative, void>,
-	Expression<Associative, void>,
-	Expression<NonAssociative, void>,
-	Expression<Transitive, void>,
-	Expression<Intransitive, void>,
-	Expression<Reflexive, void>,
-	Expression<NonReflexive, void>,
-	Expression<Reference, void>,
+	Expression<Arithmetic>,
+	Expression<Logical>,
+	Expression<Bitwise>,
+	Expression<Reference>,
+	Expression<Commutative>,
+	Expression<Associative>,
+	Expression<Transitive>,
+	Expression<Reflexive>,
       Expression<Add>,
       Expression<Subtract>,
       Expression<Divide>,
@@ -88,21 +84,17 @@ namespace mirv {
       Expression<BitwiseComplement>
 	> > {
   public:
-    virtual result_type visit(BaseExpression &);
+    virtual result_type visit(Expression<Base> &);
     virtual result_type visit(InnerExpression &);
     virtual result_type visit(LeafExpression &);
-    virtual result_type visit(Expression<Arithmetic, void> &);
-    virtual result_type visit(Expression<Logical, void> &);
-    virtual result_type visit(Expression<Bitwise, void> &);
-    virtual result_type visit(Expression<Commutative, void> &);
-    virtual result_type visit(Expression<NonCommutative, void> &);
-    virtual result_type visit(Expression<Associative, void> &);
-    virtual result_type visit(Expression<NonAssociative, void> &);
-    virtual result_type visit(Expression<Transitive, void> &);
-    virtual result_type visit(Expression<Intransitive, void> &);
-    virtual result_type visit(Expression<Reflexive, void> &);
-    virtual result_type visit(Expression<NonReflexive, void> &);
-    virtual result_type visit(Expression<Reference, void> &);
+    virtual result_type visit(Expression<Arithmetic> &);
+    virtual result_type visit(Expression<Logical> &);
+    virtual result_type visit(Expression<Bitwise> &);
+    virtual result_type visit(Expression<Reference> &);
+    virtual result_type visit(Expression<Commutative> &);
+    virtual result_type visit(Expression<Associative> &);
+    virtual result_type visit(Expression<Transitive> &);
+    virtual result_type visit(Expression<Reflexive> &);
     virtual result_type visit(Expression<Add> &);
     virtual result_type visit(Expression<Subtract> &);
     virtual result_type visit(Expression<Divide> &);

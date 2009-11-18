@@ -18,8 +18,6 @@ namespace mirv {
      virtual ~Node(void);
    };
 
-   typedef Node<Base> BaseNode;
-
    // A node with children
    template<typename Child, typename BaseType>
    class InnerImpl : public BaseType {

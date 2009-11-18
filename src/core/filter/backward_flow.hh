@@ -40,10 +40,10 @@ namespace mirv {
                    const Confluence &c)
 	: StatementFlow(e, l, bs, as, bts, be, ae, expr, d, c) {}
 
-      void visit(Statement<Block> &stmt) {
+      void visit(ptr<Statement<Block> >::type stmt) {
          enter(stmt);
-         for(Statement<Block>::reverse_iterator s = stmt.rbegin(),
-                send = stmt.rend();
+         for(Statement<Block>::reverse_iterator s = stmt->rbegin(),
+                send = stmt->rend();
              s != send;
              ;) {
             before_statement(stmt, *s);
@@ -57,30 +57,30 @@ namespace mirv {
          leave(stmt);
       }
 
-      void visit(Statement<IfThen> &stmt) {
+      void visit(ptr<Statement<IfThen> >::type stmt) {
          enter(stmt);
 
          Dataflow denter(dataflow());
 
-         before_statement(stmt, *stmt.child());
-         stmt.child()->accept(*this);
-         after_statement(stmt, *stmt.child());
+         before_statement(stmt, *stmt->child());
+         stmt->child()->accept(*this);
+         after_statement(stmt, *stmt->child());
 
          confluence(dataflow(), dataflow(), denter);
 
-         before_expression(stmt, *stmt.expression());
-         stmt.expression()->accept(expression());
-         after_expression(stmt, *stmt.expression());
+         before_expression(stmt, *stmt->expression());
+         stmt->expression()->accept(expression());
+         after_expression(stmt, *stmt->expression());
 
          leave(stmt);
       }
 
-      void visit(Statement<IfElse> &stmt) {
+      void visit(ptr<Statement<IfElse> >::type stmt) {
          enter(stmt);
 
          Dataflow denter(dataflow());
 
-         Statement<IfElse>::iterator s = stmt.begin();
+         Statement<IfElse>::iterator s = stmt->begin();
 
          before_statement(stmt, **s);
          (*s)->accept(*this);
@@ -100,57 +100,57 @@ namespace mirv {
 
          confluence(dataflow(), dataflow(), then);
 
-         before_expression(stmt, *stmt.expression());
-         stmt.expression()->accept(expression());
-         after_expression(stmt, *stmt.expression());
+         before_expression(stmt, *stmt->expression());
+         stmt->expression()->accept(expression());
+         after_expression(stmt, *stmt->expression());
 
          leave(stmt);
       }
 
-      void visit(Statement<While> &stmt) {
+      void visit(ptr<Statement<While> >::type stmt) {
          enter(stmt);
 
-         before_expression(stmt, *stmt.expression());
-         stmt.expression()->accept(expression());
-         after_expression(stmt, *stmt.expression());
+         before_expression(stmt, *stmt->expression());
+         stmt->expression()->accept(expression());
+         after_expression(stmt, *stmt->expression());
 
          Dataflow first_expr(dataflow());
 
          do {
-            before_statement(stmt, *stmt.child());
-            stmt.child()->accept(*this);
-            after_statement(stmt, *stmt.child());
+            before_statement(stmt, *stmt->child());
+            stmt->child()->accept(*this);
+            after_statement(stmt, *stmt->child());
 
             // Is denter right?
             confluence(dataflow(), dataflow(), denter);
 
-            before_expression(stmt, *stmt.expression());
-            stmt.expression()->accept(expression());
-            after_expression(stmt, *stmt.expression());
+            before_expression(stmt, *stmt->expression());
+            stmt->expression()->accept(expression());
+            after_expression(stmt, *stmt->expression());
          } while (dataflow().change());
 
-         // Iterating vs. never enter
+         // Iterating vs-> never enter
          confluence(dataflow(), dataflow(), first_expr);
 
          leave(stmt);
       }
 
-      void visit(Statement<DoWhile> &stmt) {
+      void visit(ptr<Statement<DoWhile> >::type stmt) {
          enter(stmt);
 
          Dataflow denter(dataflow());
 
          do {
-            before_statement(stmt, *stmt.child());
-            stmt.child()->accept(*this);
-            after_statement(stmt, *stmt.child());
+            before_statement(stmt, *stmt->child());
+            stmt->child()->accept(*this);
+            after_statement(stmt, *stmt->child());
 
-            before_expression(stmt, *stmt.expression());
-            stmt.expression()->accept(expression());
-            after_expression(stmt, *stmt.expression());
+            before_expression(stmt, *stmt->expression());
+            stmt->expression()->accept(expression());
+            after_expression(stmt, *stmt->expression());
 
             confluence(dataflow(), dataflow(), denter);
-         } while (dataflow().change());
+         } while (dataflow()->change());
 
          // Always at least one iteration so no need for confluence
          // here
@@ -158,13 +158,13 @@ namespace mirv {
          leave(stmt);
       }
 
-      void visit(Statement<Switch> &stmt) {
+      void visit(ptr<Statement<Switch> >::type stmt) {
          enter(stmt);
 
          Dataflow into_expr;
 
-         for(Statement<Switch>::reverse_iterator s = stmt.rbegin(),
-                send = stmt.rend();
+         for(Statement<Switch>::reverse_iterator s = stmt->rbegin(),
+                send = stmt->rend();
              s != send;
              ;) {
             before_statement(stmt, *s);
@@ -182,36 +182,36 @@ namespace mirv {
 
          dataflow() = into_expr;
 
-         before_expression(stmt, *stmt.expression());
-         stmt.expression()->accept(expression());
-         after_expression(stmt, *stmt.expression());
+         before_expression(stmt, *stmt->expression());
+         stmt->expression()->accept(expression());
+         after_expression(stmt, *stmt->expression());
 
          leave(stmt);
       }
 
-      void visit(Statement<Case> &stmt) {
+      void visit(ptr<Statement<Case> >::type stmt) {
          enter(stmt);
 
-         before_statement(stmt, *stmt.child());
-         stmt.child()->accept(*this);
-         after_statement(stmt, *stmt.child());
+         before_statement(stmt, *stmt->child());
+         stmt->child()->accept(*this);
+         after_statement(stmt, *stmt->child());
 
-         before_expression(stmt, *stmt.expression());
-         stmt.expression()->accept(expression());
-         after_expression(stmt, *stmt.expression());
+         before_expression(stmt, *stmt->expression());
+         stmt->expression()->accept(expression());
+         after_expression(stmt, *stmt->expression());
 
          leave(stmt);
       }
 
-      void visit(Statement<CaseBlock> &stmt);
+      void visit(ptr<Statement<CaseBlock> >::type stmt);
 
-      void visit(Statement<Before> &stmt) {
+      void visit(ptr<Statement<Before> >::type stmt) {
          enter(stmt);
 
          do {
-            before_statement(stmt, *stmt.child());
-            stmt.child()->accept(*this);
-            after_statement(stmt, *stmt.child());
+            before_statement(stmt, *stmt->child());
+            stmt->child()->accept(*this);
+            after_statement(stmt, *stmt->child());
 
             Dataflow &label = get_attribute<Dataflow>(stmt);
 
@@ -221,30 +221,30 @@ namespace mirv {
          leave(stmt);
       }
 
-      void visit(Statement<After> &stmt) {
+      void visit(ptr<Statement<After> >::type stmt) {
          enter(stmt);
 
          Dataflow &label = get_attribute<Dataflow>(stmt);
 
          confluence(dataflow(), dataflow(), label);
 
-         before_statement(stmt, *stmt.child());
-         stmt.child()->accept(*this);
-         after_statement(stmt, *stmt.child());
+         before_statement(stmt, *stmt->child());
+         stmt->child()->accept(*this);
+         after_statement(stmt, *stmt->child());
 
          leave(stmt);
       }
 
-      void visit(Statement<Goto> &stmt) {
+      void visit(ptr<Statement<Goto> >::type stmt) {
          enter(stmt);
 
-         Dataflow &label = get_attribute<Dataflow>(*stmt.target());
+         Dataflow &label = get_attribute<Dataflow>(*stmt->target());
          dataflow() = label;  // Pick up data from where I go to
 
          leave(stmt);
       }
 
-      void visit(Statement<Return> &stmt) {
+      void visit(ptr<Statement<Return> >::type stmt) {
          enter(stmt);
          leave(stmt);
       }

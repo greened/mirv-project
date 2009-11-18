@@ -23,28 +23,27 @@ namespace mirv {
 
    protected:
      template<typename Expr>
-     typename EnterAction::result_type enter(Expr &expr) {
+     typename EnterAction::result_type enter(typename ptr<Expr>::type expr) {
        return(ent(expr));
       };
 
      template<typename Expr>
-     typename LeaveAction::result_type leave(Expr &expr) {
+     typename LeaveAction::result_type leave(typename ptr<Expr>::type expr) {
        return(lve(expr));
       };
 
      template<typename Expr, typename Child>
-     typename BeforeAction::result_type before(Expr &expr, Child &child) {
+     typename BeforeAction::result_type before(typename ptr<Expr>::type expr, typename ptr<Child>::type child) {
        return(bfr(expr, child));
       };
 
      template<typename Expr, typename Child>
-     typename BeforeAction::result_type between(Expr &expr, Child &child1,
-						Child &child2) {
+     typename BeforeAction::result_type between(typename ptr<Expr>::type expr, typename ptr<Child>::type child1, typename ptr<Child>::type child2) {
        return(bfr(expr, child1, child2));
       };
 
      template<typename Expr, typename Child>
-     typename AfterAction::result_type after(Expr &expr, Child &child) {
+     typename AfterAction::result_type after(typename ptr<Expr>::type expr, typename ptr<Child>::type child) {
        return(aft(expr, child));
       };
 
@@ -97,11 +96,11 @@ namespace mirv {
                             const Dataflow &d)
 	: BaseType(e, l, b, a, t, d) {}
 
-      void visit(InnerExpression &expr) {
+      void visit(ptr<InnerExpression>::type expr) {
          this->enter(expr);
 
-         for(InnerExpression::iterator i = expr.begin(),
-                iend = expr.end();
+         for(InnerExpression::iterator i = expr->begin(),
+                iend = expr->end();
              i != iend;
              /* NULL */) {
             this->before(expr, **i);
@@ -115,7 +114,7 @@ namespace mirv {
 
          this->leave(expr);
       }
-      void visit(LeafExpression &expr) {
+      void visit(ptr<LeafExpression>::type expr) {
          this->enter(expr);
          this->leave(expr);
       }
@@ -153,11 +152,11 @@ namespace mirv {
                              const Dataflow &d)
 	: BaseType(e, l, b, a, t, d) {}
 
-      void visit(InnerExpression &expr) {
+      void visit(ptr<InnerExpression>::type expr) {
          this->enter(expr);
 
-         for(InnerExpression::reverse_iterator i = expr.rbegin(),
-                iend = expr.rend();
+         for(InnerExpression::reverse_iterator i = expr->rbegin(),
+                iend = expr->rend();
              i != iend;
              /* NULL */) {
             this->before(expr, **i);
@@ -172,7 +171,7 @@ namespace mirv {
          this->leave(expr);
       }
 
-      void visit(LeafExpression &expr) {
+      void visit(ptr<LeafExpression>::type expr) {
          this->enter(expr);
          this->leave(expr);
       }

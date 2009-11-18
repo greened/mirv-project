@@ -13,7 +13,7 @@ namespace mirv {
    };
 
    template<>
-   class Symbol<Base> { 
+   class Symbol<Base> : public Node<Base> { 
    public:
    };
 
