@@ -36,6 +36,12 @@ namespace mirv {
      virtual void accept(ExpressionVisitor &V);
    };
 
+    template<>
+    class Expression<Base> {
+    public:
+     virtual void accept(ExpressionVisitor &V);
+   };
+
   class InnerExpression : public InnerImpl<Expression<Base>, Expression<Base> > {
   public:
     virtual void accept(ExpressionVisitor &V);
