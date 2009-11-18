@@ -33,6 +33,12 @@ namespace mirv {
      virtual void accept(StatementVisitor &V);
    };
 
+   template<>
+   class Statement<Base> {
+   public:
+     virtual void accept(StatementVisitor &V);
+   };
+
    class InnerStatement : public InnerImpl<Statement<Base>, Virtual<Statement<Base> > > {
    public:
      virtual void accept(StatementVisitor &V);
