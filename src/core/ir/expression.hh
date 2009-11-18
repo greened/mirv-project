@@ -200,7 +200,8 @@ namespace mirv {
   template<typename Sequence, typename Root>
    class ExpressionBaseGenerator {
    public:
-    typedef typename Properties<PropertyExpressionGenerator, Root, Sequence>::type
+    typedef typename Properties<PropertyExpressionGenerator, Root, Sequence,
+				Inherit<ExpressionVisitor> >::type
       type;
 
    };

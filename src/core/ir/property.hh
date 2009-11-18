@@ -1,8 +1,9 @@
 #ifndef mirv_core_ir_property_hh
 #define mirv_core_ir_property_hh
 
-#include <boost/mpl/inherit.hpp>
 #include <boost/mpl/transform.hpp>
+#include <boost/mpl/empty_base.hpp>
+#include <mirv/ir/inherit.hh>
 #include <inherit.hh>
 
 // A Property is a class that allows visitors and other objects that
@@ -19,14 +20,17 @@ namespace mirv {
   // the expression node.  It may itself inherit from classes further
   // up the tree.
   
-  template<typename Generator, typename Base, typename Sequence>
+  template<typename Generator, typename Base, typename Sequence,
+	   typename Inherit>
   class Properties {   
     typedef typename lib::InheritScattered<
-      typename boost::mpl::transform<Sequence, Generator>::type
+      typename boost::mpl::transform<Sequence, Generator>::type,
+      Virtual<boost::mpl::empty_base>,
+      Inherit
       >::type properties_hierarchy_type;
   
 public:
-  typedef typename boost::mpl::inherit<
+  typedef typename Inherit::template apply<
   Base, 
   properties_hierarchy_type>::type type;
 };

@@ -5,12 +5,16 @@
 
 #define check_invariant(Check, Msg) \
    if (!(Check)) {                              \
-      std::cerr << "PANIC: " << Msg << "\n";    \
-      abort();                                  \
+      error(Msg);                               \
    }
 
 // TODO: Make a proper singleton
 namespace mirv {
+  inline void error(const std::string &msg) {
+    std::cerr << "ERROR: " << msg << "\n";
+    abort();
+  }
+
   class DebugManager {
   private:
     static DebugManager *instance;
