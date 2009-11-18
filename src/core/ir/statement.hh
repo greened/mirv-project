@@ -34,7 +34,7 @@ namespace mirv {
    };
 
    template<>
-   class Statement<Base> {
+   class Statement<Base> : public Node<Base> {
    public:
      virtual void accept(StatementVisitor &V);
    };

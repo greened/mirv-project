@@ -13,8 +13,8 @@ namespace mirv {
       
    public:
     typedef sequence properties;
-    typedef BinaryExpression visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+     typedef Expression<Binary> visitor_base_type;
+     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
    
    class BitwiseOr {
@@ -25,8 +25,8 @@ namespace mirv {
       
    public:
     typedef sequence properties;
-    typedef BinaryExpression visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+     typedef Expression<Binary> visitor_base_type;
+     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
    
    class BitwiseComplement {
@@ -35,8 +35,8 @@ namespace mirv {
       
    public:
     typedef sequence properties;
-    typedef UnaryExpression visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, UnaryExpression>::type base_type;
+     typedef Expression<Unary> visitor_base_type;
+     typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
    };
    
 
@@ -46,8 +46,8 @@ namespace mirv {
       
    public:
      typedef sequence properties;
-    typedef BinaryExpression visitor_base_type;
-     typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef Expression<Binary> visitor_base_type;
+     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 
    class ArithmeticShiftRight {
@@ -56,8 +56,8 @@ namespace mirv {
       
    public:
     typedef sequence properties;
-    typedef BinaryExpression visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef Expression<Binary> visitor_base_type;
+      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 
    class LogicalShiftRight {
@@ -66,8 +66,8 @@ namespace mirv {
       
    public:
     typedef sequence properties;
-    typedef BinaryExpression visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef Expression<Binary> visitor_base_type;
+      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 };
 

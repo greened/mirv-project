@@ -12,7 +12,7 @@ namespace mirv {
   private:
     static AttributeManager<T> *instance;
 
-    typedef std::map<ptr<BaseNode>::type, typename ptr<T>::type> AttributeMap;
+    typedef std::map<ptr<Node<Base> >::type, typename ptr<T>::type> AttributeMap;
     AttributeMap attributes;
 
   public:
@@ -20,10 +20,10 @@ namespace mirv {
       return *(instance ? instance : instance = new AttributeManager<T>);
     }
 
-    void set_attribute(ptr<BaseNode>::type node, typename ptr<T>::type attr) {
+    void set_attribute(ptr<Node<Base> >::type node, typename ptr<T>::type attr) {
       attributes[node] = attr;
     }
-    typename ptr<T>::type get_attribute(ptr<BaseNode>::type node) {
+    typename ptr<T>::type get_attribute(ptr<Node<Base> >::type node) {
       typename AttributeMap::iterator i = attributes.find(node);
       check_invariant(i != attributes.end(), "Could not find attribute");
       return i->second;
@@ -31,12 +31,12 @@ namespace mirv {
   };
 
   template<typename T>
-  void set_attribute(ptr<BaseNode>::type node, typename ptr<T>::type attr) {
+  void set_attribute(ptr<Node<Base> >::type node, typename ptr<T>::type attr) {
     return AttributeManager<T>::Instance().set_attribute(node, attr);
   }
 
   template<typename T>
-  typename ptr<T>::type get_attribute(ptr<BaseNode>::type node) {
+  typename ptr<T>::type get_attribute(ptr<Node<Base> >::type node) {
     return AttributeManager<T>::Instance().get_attribute(node);
   }
 }

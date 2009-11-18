@@ -5,6 +5,7 @@
 #include <mirv/filter/action.hh>
 #include <mirv/filter/expression_flow.hh>
 #include <mirv/filter/dataflow.hh>
+#include <mirv/mem/heap.hh>
 
 namespace mirv {
    template<
@@ -35,43 +36,43 @@ namespace mirv {
 
    protected:
      template<typename Stmt>
-     typename EnterAction::result_type enter(Stmt &stmt) {
+     typename EnterAction::result_type enter(typename ptr<Stmt>::type stmt) {
        return(ent(stmt));
       };
 
      template<typename Stmt>
-     typename LeaveAction::result_type leave(Stmt &stmt) {
+     typename LeaveAction::result_type leave(typename ptr<Stmt>::type stmt) {
        return(lve(stmt));
       };
 
      template<typename Stmt, typename Child>
-     typename BeforeStmtAction::result_type before_statement(Stmt &stmt,
-							     Child &child) {
+     typename BeforeStmtAction::result_type before_statement(typename ptr<Stmt>::type stmt,
+							     typename ptr<Child>::type child) {
        return(bfrstmt(stmt, child));
       };
 
      template<typename Stmt, typename Child>
-     typename AfterStmtAction::result_type after_statement(Stmt &stmt,
-							   Child &child) {
+     typename AfterStmtAction::result_type after_statement(typename ptr<Stmt>::type stmt,
+							   typename ptr<Child>::type child) {
        return(aftstmt(stmt, child));
       };
 
      template<typename Stmt, typename Child>
-     typename BetweenStmtAction::result_type between_statement(Stmt &stmt,
-							       Child &child1,
-							       Child &child2) {
+     typename BetweenStmtAction::result_type between_statement(typename ptr<Stmt>::type stmt,
+							       typename ptr<Child>::type child1,
+							       typename ptr<Child>::type child2) {
        return(betstmt(stmt, child1, child2));
       };
 
      template<typename Stmt, typename Expr>
-     typename BeforeExprAction::result_type before_expression(Stmt &stmt,
-							      Expr &expr) {
+     typename BeforeExprAction::result_type before_expression(typename ptr<Stmt>::type stmt,
+							      typename ptr<Expr>::type expr) {
        return(bfrexpr(stmt, expr));
       };
 
      template<typename Stmt, typename Expr>
-     typename AfterExprAction::result_type after_expression(Stmt &stmt,
-							    Expr &expr) {
+     typename AfterExprAction::result_type after_expression(typename ptr<Stmt>::type stmt,
+							    typename ptr<Expr>::type expr) {
        return(aftexpr(stmt, expr));
       };
 

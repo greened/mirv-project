@@ -8,7 +8,7 @@
 
 namespace mirv {
    class PrintFilter
-         : public Filter<BaseNode> {
+     : public Filter<Node<Base> > {
    private:
      typedef std::ostream Stream;
       typedef int Indent;
@@ -26,18 +26,18 @@ namespace mirv {
          EnterAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
 
-         void visit(Statement<Block> &stmt);
-         void visit(Statement<IfThen> &stmt);
-         void visit(Statement<IfElse> &stmt);
-         void visit(Statement<While> &stmt);
-         void visit(Statement<DoWhile> &stmt);
-         void visit(Statement<Switch> &stmt);
-         void visit(Statement<Case> &stmt);
-         void visit(Statement<CaseBlock> &stmt);
-         void visit(Statement<Before> &stmt);
-         void visit(Statement<After> &stmt);
-         void visit(Statement<Goto> &stmt);
-         void visit(Statement<Return> &stmt);
+         void visit(ptr<Statement<Block> >::type stmt);
+         void visit(ptr<Statement<IfThen> >::type stmt);
+         void visit(ptr<Statement<IfElse> >::type stmt);
+         void visit(ptr<Statement<While> >::type stmt);
+         void visit(ptr<Statement<DoWhile> >::type stmt);
+         void visit(ptr<Statement<Switch> >::type stmt);
+         void visit(ptr<Statement<Case> >::type stmt);
+         void visit(ptr<Statement<CaseBlock> >::type stmt);
+         void visit(ptr<Statement<Before> >::type stmt);
+         void visit(ptr<Statement<After> >::type stmt);
+         void visit(ptr<Statement<Goto> >::type stmt);
+         void visit(ptr<Statement<Return> >::type stmt);
       };
 
       // After processing each statement's expression child
@@ -49,23 +49,23 @@ namespace mirv {
       public:
          AfterStmtExprAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
-         void visit(Statement<IfThen> &stmt) {
+         void visit(ptr<Statement<IfThen> >::type stmt) {
             ind -= IndentFactor;
          }
 
-         void visit(Statement<IfElse> &stmt) {
+         void visit(ptr<Statement<IfElse> >::type stmt) {
             ind -= IndentFactor;
          }
 
-         void visit(Statement<While> &stmt) {
+         void visit(ptr<Statement<While> >::type stmt) {
             ind -= IndentFactor;
          }
 
-         void visit(Statement<DoWhile> &stmt) {
+         void visit(ptr<Statement<DoWhile> >::type stmt) {
             ind -= IndentFactor;
          }
 
-         void visit(Statement<Switch> &stmt) {
+         void visit(ptr<Statement<Switch> >::type stmt) {
             ind -= IndentFactor;
          }
       };
@@ -79,7 +79,7 @@ namespace mirv {
       public:
          AfterAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
-         void visit(BaseStatement &stmt) {
+	void visit(ptr<Statement<Base> >::type stmt) {
             out << "\n";
          }
       };
@@ -94,7 +94,7 @@ namespace mirv {
          LeaveAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
 
-	void visit(Statement<Block> &stmt);
+	void visit(ptr<Statement<Block> >::type stmt);
       };
 
       // Entering each expression
@@ -107,18 +107,18 @@ namespace mirv {
          EnterExprAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
 
-         void visit(Expression<Add> &expr);
-         void visit(Expression<Subtract> &expr);
-         void visit(Expression<Multiply> &expr);
-         void visit(Expression<Divide> &expr);
-         void visit(Expression<Modulus> &expr);
-         void visit(Expression<Negate> &expr);
-         void visit(Expression<LogicalAnd> &expr);
-         void visit(Expression<LogicalOr> &expr);
-         void visit(Expression<LogicalNot> &expr);
-         void visit(Expression<BitwiseAnd> &expr);
-         void visit(Expression<BitwiseOr> &expr);
-         void visit(Expression<BitwiseComplement> &expr);
+         void visit(ptr<Expression<Add> >::type expr);
+         void visit(ptr<Expression<Subtract> >::type expr);
+         void visit(ptr<Expression<Multiply> >::type expr);
+         void visit(ptr<Expression<Divide> >::type expr);
+         void visit(ptr<Expression<Modulus> >::type expr);
+         void visit(ptr<Expression<Negate> >::type expr);
+         void visit(ptr<Expression<LogicalAnd> >::type expr);
+         void visit(ptr<Expression<LogicalOr> >::type expr);
+         void visit(ptr<Expression<LogicalNot> >::type expr);
+         void visit(ptr<Expression<BitwiseAnd> >::type expr);
+         void visit(ptr<Expression<BitwiseOr> >::type expr);
+         void visit(ptr<Expression<BitwiseComplement> >::type expr);
       };
 
       // Leaving each expression
@@ -131,7 +131,7 @@ namespace mirv {
          LeaveExprAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
 
-         void visit(InnerExpression &expr) {
+         void visit(ptr<InnerExpression>::type expr) {
             ind -= IndentFactor;
          }
       };
@@ -146,7 +146,7 @@ namespace mirv {
          AfterExprAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
 
-         void visit(BaseExpression &expr) {
+	void visit(ptr<Expression<Base> >::type expr) {
             out << "\n";
          }
       };
@@ -187,7 +187,7 @@ namespace mirv {
 
    public:
       PrintFilter(Stream &o)
-	: Filter<BaseNode>(), ind(0), out(o) {}
+	: Filter<Node<Base> >(), ind(0), out(o) {}
 
 
       class indent {
@@ -207,7 +207,7 @@ namespace mirv {
          }
       };
 
-      void operator()(BaseNode &node);
+     void operator()(ptr<Node<Base> >::type node);
    };
 
   std::ostream &operator<<(std::ostream &out, const PrintFilter::indent &ind) {
