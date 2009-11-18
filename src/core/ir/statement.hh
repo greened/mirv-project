@@ -88,7 +88,8 @@ namespace mirv {
     template<typename Sequence, typename Root>
     class StatementBaseGenerator {
     public:
-       typedef typename Properties<PropertyStatementGenerator, Root, Sequence>::type
+      typedef typename Properties<PropertyStatementGenerator, Root, Sequence,
+				  Inherit<StatementVisitor> >::type
        type;
     };
 
@@ -99,12 +100,12 @@ namespace mirv {
 
     public:
        class interface;
-      typedef Virtual<Statement<Base> > interface_base_type;
+      typedef Statement<Base> interface_base_type;
       typedef Statement<Base> visitor_base_type;
       typedef sequence properties;
 
        class interface
-	     : public interface_base_type {
+	     : public virtual interface_base_type {
        protected:
 	 typedef ptr<Expression<Base> >::type expression_ptr;
 	 typedef ptr<Expression<Base> >::const_type const_expression_ptr;

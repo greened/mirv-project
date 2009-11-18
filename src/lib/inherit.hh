@@ -7,15 +7,14 @@
 
 namespace mirv {
   namespace lib {
-    namespace detail {
-    }
-
-    template<typename Sequence, typename Root = boost::mpl::empty_base>
+    template<typename Sequence,
+	     typename Base,
+	     typename Inherit = boost::mpl::quote2<boost::mpl::inherit2> >
     struct InheritScattered : 
       public boost::mpl::fold<
       Sequence, 
-      Root, 
-      boost::mpl::quote2<boost::mpl::inherit2>
+      Base, 
+      Inherit
       > {};
   }
 }

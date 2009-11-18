@@ -166,7 +166,12 @@ namespace mirv {
       typedef boost::mpl::vector<Conditional> sequence;
 
      class Base : public Statement<SingleCondition>,
-		  public Statement<SingleBlock> {};
+		  public Statement<SingleBlock> {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("IfThen::Base::accept called");
+       }
+     };
      typedef Base root;
 
   public:
@@ -180,7 +185,12 @@ namespace mirv {
       typedef boost::mpl::vector<Conditional> sequence;
 
      class Base : public Statement<SingleCondition>,
-		  public Statement<DualBlock> {};
+		  public Statement<DualBlock> {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("IfElse::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
@@ -194,7 +204,12 @@ namespace mirv {
       typedef boost::mpl::vector<Conditional, Iterative> sequence;
 
      class Base : public Statement<SingleCondition>,
-		  public Statement<SingleBlock> {};
+		  public Statement<SingleBlock> {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("While::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
@@ -208,7 +223,12 @@ namespace mirv {
       typedef boost::mpl::vector<Conditional> sequence;
 
      class Base : public Statement<SingleCondition>,
-		  public Statement<SingleBlock> {};
+		  public Statement<SingleBlock> {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("DoWhile::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
@@ -222,7 +242,12 @@ namespace mirv {
       typedef boost::mpl::vector<> sequence;
 
      class Base : public Statement<SingleCondition>,
-		  public Statement<SingleBlock> {};
+		  public Statement<SingleBlock> {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("Case::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
@@ -260,7 +285,12 @@ namespace mirv {
       typedef boost::mpl::vector<Conditional> sequence;
 
      class Base : public Statement<SingleCondition>,
-		  public Statement<CaseBlock> {};
+		  public Statement<CaseBlock> {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("Switch::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
@@ -310,7 +340,12 @@ namespace mirv {
       typedef boost::mpl::vector<Iterative> sequence;  // Of a sort
 
      class Base : public Statement<SingleLabel>,
-		  public Statement<SingleBlock> {};
+		  public Statement<SingleBlock> {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("Before::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
@@ -325,7 +360,12 @@ namespace mirv {
       typedef boost::mpl::vector<Conditional> sequence;  // Of a sort
 
      class Base : public Statement<SingleLabel>,
-		  public Statement<SingleBlock> {};
+		  public Statement<SingleBlock> {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("After::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
@@ -339,7 +379,12 @@ namespace mirv {
       typedef boost::mpl::vector<Conditional> sequence;
 
      typedef Base : public Statement<SingleLabel>,
-		    public LeafStatement {};
+		    public LeafStatement {
+     public:
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("Goto::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
