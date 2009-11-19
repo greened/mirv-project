@@ -11,41 +11,41 @@ include $(BUILDTOOLS)/cxxautodep.mk
 	$(QUIET)$(CXXMAKEDEPEND)
 	$(QUIET)$(PROCESS_CXXDEPS)
 	$(if $(QUIET),$(info [CXX] $<))
-	$(QUIET)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -o $@
+	$(QUIET)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -c -o $@
 
 %.o: %.cpp
 	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
 	$(QUIET)$(CXXMAKEDEPEND)
 	$(QUIET)$(PROCESS_CXXDEPS)
 	$(if $(QUIET),$(info [CXX] $<))
-	$(QUIET)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -o $@
+	$(QUIET)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -c -o $@
 
 %.o: %.C
 	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
 	$(QUIET)$(CXXMAKEDEPEND)
 	$(QUIET)$(PROCESS_CXXDEPS)
 	$(if $(QUIET),$(info [CXX] $<))
-	$(QUIET)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -o $@
+	$(QUIET)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -c -o $@
 
 %-pic.o: %.cc
 	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
 	$(QUIET)$(CXXMAKEDEPEND)
 	$(QUIET)$(PROCESS_CXXDEPS)
 	$(if $(QUIET),$(info [CXX] $<))
-	$(QUIET)$(CXX) $(CXXFLAGS) $(CXXPICFLAGS) $(CPPFLAGS) $< -o $@
+	$(QUIET)$(CXX) $(CXXFLAGS) $(CXXPICFLAGS) $(CPPFLAGS) $< -c -o $@
 
 %-pic.o: %.cpp	
 	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
 	$(QUIET)$(CXXMAKEDEPEND)
 	$(QUIET)$(PROCESS_CXXDEPS)
 	$(if $(QUIET),$(info [CXX] $<))
-	$(QUIET)$(CXX) $(CXXFLAGS) $(CXXPICFLAGS) $(CPPFLAGS) $< -o $@
+	$(QUIET)$(CXX) $(CXXFLAGS) $(CXXPICFLAGS) $(CPPFLAGS) $< -c -o $@
 
 %-pic.o: %.C
 	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
 	$(QUIET)$(CXXMAKEDEPEND)
 	$(QUIET)$(PROCESS_CXXDEPS)
 	$(if $(QUIET),$(info [CXX] $<))
-	$(QUIET)$(CXX) $(CXXFLAGS) $(CXXPICFLAGS) $(CPPFLAGS) $< -o $@
+	$(QUIET)$(CXX) $(CXXFLAGS) $(CXXPICFLAGS) $(CPPFLAGS) $< -c -o $@
 
 endif

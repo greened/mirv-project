@@ -145,7 +145,8 @@ namespace mirv {
 
   void PrintFilter::operator()(ptr<Node<Base> >::type node)
    {
-     if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
+     //if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
+     if (ptr<Statement<Base> >::type s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
        ptr<StatementVisitor>::type flow =
 	 make_forward_flow(EnterAction(out, ind),
 			   LeaveAction(out, ind),
