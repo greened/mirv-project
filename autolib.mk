@@ -3,6 +3,7 @@ AUTOLIB_MK := 1
 
 include $(BUILDTOOLS)/autoobj.mk
 include $(BUILDTOOLS)/configure/ar.mk
+include $(BUILDTOOLS)/configure/mkdir.mk
 include $(BUILDTOOLS)/configure/ranlib.mk
 include $(BUILDTOOLS)/configure/shlib.mk
 
@@ -13,11 +14,11 @@ $$(call make_objects,$(1),$(2))
 $(1)_LIBRARIES := $$($(1)_OBJDIR)/$(1).a $$($(1)_OBJDIR)/$(1).so
 
 $$($(1)_OBJDIR)/$(1).a: $$($(1)_OBJS)
-	$$(if $(QUIET),$$(info [AR] $$@))
-	$(QUIET)$$(AR) r $$@ $$^
-	+$(QUIET)[ -d $(@D) ] || $(MKDIR) -p $(@D)
-	$$(if $(QUIET),$$(info [RANLIB] $$@))
-	$(QUIET)$$(RANLIB) $$@
+	+$$(QUIET)[ -d $$(@D) ] || $$(MKDIR) -p $$(@D)
+	$$(if $$(QUIET),$$(info [AR] $$@))
+	$$(QUIET)$$(AR) r $$@ $$($(1)_OBJS)
+	$$(if $$(QUIET),$$(info [RANLIB] $$@))
+	$$(QUIET)$$(RANLIB) $$@
 
 $$(call debug,$$($(1)_OBJDIR)/$(1).a: $$($(1)_OBJS))
 

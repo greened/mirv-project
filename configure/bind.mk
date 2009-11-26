@@ -4,6 +4,7 @@ bind_mk := 1
 define bind1_impl
 
 $(1)_bind1 = $$(call $(2),$(3))
+$$(call debug,[bind1] $(1)_bind1 = call $(2) $(3))
 
 endef
 
@@ -24,5 +25,13 @@ $(1)_bind3 = $$(call $(2),$(3),$(4),$(5))
 endef
 
 bind3 = $(eval $(call bind3_impl,$(1),$(2),$(3),$(4),$(5)))$(1)_bind3
+
+define bind4_impl
+
+$(1)_bind4 = $$(call $(2),$(3),$(4),$(5),$(6))
+
+endef
+
+bind4 = $(eval $(call bind4_impl,$(1),$(2),$(3),$(4),$(5),$(6)))$(1)_bind4
 
 endif

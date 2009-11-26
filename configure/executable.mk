@@ -29,7 +29,7 @@ mc_try_executable_c = $(call mc_try_compile_c,$(1),$(2),$(3),$(6)) $(call mc_try
 # $3: Compile false action
 # $4: Link true action
 # $5: Link false action
-# $6: Compile include file to create (actions must create it) 
+# $6: Compile include file to create (actions must create it)
 # $7: Link include file to create (actions must create it)
 mc_try_executable_cxx = $(call mc_try_compile_cxx,$(1),$(2),$(3),$(6)) $(call mc_try_link_cxx,$(FINAL_BUILDDIR)/configure/CXX_compile_test.o,$(4),$(5),$(7))
 
