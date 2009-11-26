@@ -54,6 +54,10 @@ include $(CONFIGURE_INCLUDES)
 # TODO: Move this into another variable of conditional includes
 ifeq ($(CONFIG_HAVE_GXX),yes)
   include $(BUILDTOOLS)/configure/gxx.mk
+else
+  ifneq ($(wildcard $(FINAL_BUILDDIR)/configure/GXX_TRY.mk),)
+    $(call mc_error,Could not determine C++ compiler type))
+  endif
 endif
 
 
