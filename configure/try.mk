@@ -20,6 +20,8 @@ $$(call debug,[mc_try] $(1)_TRY_TRUE_ACTION = $$($(1)_TRY_TRUE_ACTION))
 
 $$(call debug,[mc_try] $(5): $(6))
 
+$$(if $(6),include $(6))
+
 # Set the variable value
 $(5): $(6)
 	$$(if $(6),$$(eval include $(6)))
