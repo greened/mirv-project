@@ -25,7 +25,7 @@ $(5): $(6)
 	$$(if $(6),$$(eval include $(6)))
 	$$(call debug,[mc_try] $$(if $$($(1)),$$($(3)),$$($(4))))
 	$$(call mc_create_start,$$@,$(6))
-	$(QUIET)echo "$$$$(if $$$$($(1)),$$$$($(3)),$$$$($(4)))" >> $$@
+	$(QUIET)echo "$$(if $$($(1)),$$($(3)),$$($(4)))" >> $$@
 	$$(call mc_create_end,$$@)
 
 CONFIGURE_INCLUDES += $(5)
