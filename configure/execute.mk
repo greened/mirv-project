@@ -15,7 +15,7 @@ include $(4)
 $(3): $(4)
 	$$(if $(4),$$(eval include $(4)))
 	$$(call debug,CXX = $$(CXX))
-	$(QUIET)$$(call mc_define,$(1),$$(shell $$($(2))),$$@,$(3))
+	$(QUIET)$$(call mc_define,$(1),$$(shell $$($(2))),$$@,$(4))
 
 CONFIGURE_INCLUDES += $(3)
 
