@@ -12,7 +12,7 @@ override $(1) := $$(call findfile,$(1))
 
 $(FINAL_BUILDDIR)/configure/$(1).mk:
 	+$(QUIET)[ -d $$(@D) ] || mkdir -p $$(@D)
-	$(QUIET)$$(call mc_define,$(1),$$($(1)),$$@,append)
+	$(QUIET)$$(call mc_define,$(1),$$($(1)),$$@)
 
 CONFIGURE_INCLUDES += $(FINAL_BUILDDIR)/configure/$(1).mk
 
