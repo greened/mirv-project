@@ -23,7 +23,7 @@ endef
 # $1: The name of the variable to set
 # $2: The list of tools to search for
 # $3: The message to output on error
-mc_tool = $(eval $(call mc_tool_impl,$(1),$(2),$(3))) $(FINAL_BUILDDIR)/configure/$(1).mk
+mc_tool = $(eval $(call mc_tool_impl,$(1),$(2),$(3)))
 
 # $1: The name of the variable to set
 # $2: The list of tools to search for
