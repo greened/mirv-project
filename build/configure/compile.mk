@@ -7,28 +7,28 @@ include $(BUILDTOOLS)/configure/bind.mk
 
 define mc_compile_text
 
-#$$(call debug,mc_compile_impl("$(1)" "$(2)" "$(3)"))
+$$(call debug,mc_compile_impl("$(1)" "$(2)" "$(3)"))
 
 $(1)_OSRCFILE := $(FINAL_BUILDDIR)/configure/$(1)_compile_test.$(3)
 $(1)_OFILE := $$(patsubst %.$(3),%.o,$$($(1)_OSRCFILE))
 
 $(1)_compile_source := $$($(2))
 
-#$$(call debug,$(1)_OSRCFILE = $$($(1)_OSRCFILE))
-#$$(call debug,$(1)_OFILE    = $$($(1)_OFILE))
+$$(call debug,[mc_compile_text] $(1)_OSRCFILE = $$($(1)_OSRCFILE))
+$$(call debug,[mc_compile_text] $(1)_OFILE    = $$($(1)_OFILE))
 
 .PRECIOUS: $$($(1)_OSRCFILE)
 $$($(1)_OSRCFILE):
 	$(QUIET)echo "$$($(1)_compile_source)" > $$@
 
-#$$(call debug,$$($(1)_OFILE): $$($(1)_OSRCFILE) $(FINAL_BUILDDIR)/configure/$$(firstword $(1)).mk)
+$$(call debug,[mc_compile_text] $$($(1)_OFILE): $$($(1)_OSRCFILE) $(FINAL_BUILDDIR)/configure/$$(firstword $(1)).mk)
 
 .PRECIOUS: $$($(1)_OFILE)
 .SECONDEXPANSION:
 $$($(1)_OFILE): $$($(1)_OSRCFILE) $(4)
 	-$(QUIET)$$($(1)) -c $$< -o $$@
 
-#$$(call debug,$(FINAL_BUILDDIR)/configure/$(1)_compile.mk: $$($(1)_OFILE))
+$$(call debug,[mc_compile_text] $(FINAL_BUILDDIR)/configure/$(1)_compile.mk: $$($(1)_OFILE))
 
 $(FINAL_BUILDDIR)/configure/$(1)_compile_target: $$($(1)_OFILE)
 	$(QUIET)$$(if $$(wildcard $$($(1)_OFILE)),$$(call mc_define,$(1)_compile,yes,$$@),$$(call mc_define,$(1)_compile,,$$@))
@@ -53,7 +53,7 @@ endef
 # $3: The source code file extension
 # $4: Dependency
 # Set $(1)_compile to yes or empty
-mc_compile = $(eval $(call mc_compile_impl,$(1),$(2),$(3),$(4))) $(FINAL_BUILDDIR)/configure/$(1)_compile.mk 
+mc_compile = $(eval $(call mc_compile_impl,$(1),$(2),$(3),$(4)))
 
 
 # $1: The source code to compile

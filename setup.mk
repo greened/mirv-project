@@ -1,3 +1,3 @@
 FLAVORS := debug opt
-VERBOSE := 1
+#VERBOSE := 1
 #MDEBUG=1

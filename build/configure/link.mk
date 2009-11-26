@@ -4,27 +4,33 @@ LINK_MK := 1
 include $(BUILDTOOLS)/configure/try.mk
 include $(BUILDTOOLS)/configure/define.mk
 include $(BUILDTOOLS)/configure/bind.mk
+include $(BUILDTOOLS)/configure/ls.mk
 
 define mc_link_text
 
-#$$(call debug,mc_link_impl("$(1)" "$(2)" "$(3)"))
+$$(call debug,[mc_link_text] mc_link_impl("$(1)" "$(2)" "$(3)"))
 
 $(1)_LDOBJFILE := $(2)
 $(1)_LDFILE := $$(patsubst %.o,%.exe,$$($(1)_LDOBJFILE))
 
-#$$(call debug,$(1)_LDOBJFILE = $$($(1)_LDOBJFILE))
-#$$(call debug,$(1)_LDFILE    = $$($(1)_LDFILE))
+$$(call debug,[mc_link_text] $(1)_LDOBJFILE = $$($(1)_LDOBJFILE))
+$$(call debug,[mc_link_text] $(1)_LDFILE    = $$($(1)_LDFILE))
 
-#$$(call debug,$$($(1)_LDFILE): $$($(1)_LDOBJFILE) $(FINAL_BUILDDIR)/configure/$$(firstword $(1)).mk)
+$$(call debug,[mc_link_text] $$($(1)_LDFILE): $$($(1)_LDOBJFILE) $(FINAL_BUILDDIR)/configure/$$(firstword $(1)).mk)
 
 .PRECIOUS: $$($(1)_LDFILE)
 .SECONDEXPANSION:
 $$($(1)_LDFILE): $$($(1)_LDOBJFILE) $(4)
 	-$(QUIET)$$($(1)) $$< $(3) -o $$@
 
-#$$(call debug,$(FINAL_BUILDDIR)/configure/$(1)_link.mk: $$($(1)_LDFILE))
+$$(call debug,[mc_link_text] $(FINAL_BUILDDIR)/configure/$(1)_link_target: $$($(1)_LDFILE))
+
 $(FINAL_BUILDDIR)/configure/$(1)_link_target: $$($(1)_LDFILE)
-	$(QUIET)$$(if $$(wildcard $$($(1)_LDFILE)),$$(call mc_define,$(1)_link,yes,$$@),$$(call mc_define,$(1)_link,,$$@))
+	$(QUIET)if $$(LS) $$(<); then \
+	$(QUIET)  $$(call mc_define,$(1)_link,yes,$$@); \
+	$(QUIET)else \
+	$(QUIET)  $$(call mc_define,$(1)_link,,$$@); \
+	$(QUIET)fi
 
 endef
 
@@ -46,7 +52,7 @@ endef
 # $3: Additional linker flags (libraries, etc.)
 # $4: Dependency
 # Set $(1)_link to yes or empty
-mc_link = $(eval $(call mc_link_impl,$(1),$(2),$(3),$(4))) $(FINAL_BUILDDIR)/configure/$(1)_link.mk 
+mc_link = $(eval $(call mc_link_impl,$(1),$(2),$(3),$(4)))
 
 
 # $1: The object file to link
