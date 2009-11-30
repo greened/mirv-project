@@ -10,14 +10,14 @@ include $(BUILDTOOLS)/cautodep.mk
 	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
 	$(QUIET)$(CMAKEDEPEND)
 	$(QUIET)$(PROCESS_CDEPS)
-	$(if $(QUIET),$(info [CC] $<))
+	$(if $(QUIET),$(info [CC] $@))
 	$(QUIET)$(CC) $(CFLAGS) $(CPPFLAGS) $< -c -o $@
 
 %-pic.o: %.c
 	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
 	$(QUIET)$(CMAKEDEPEND)
 	$(QUIET)$(PROCESS_CDEPS)
-	$(if $(QUIET),$(info [CC] $<))
+	$(if $(QUIET),$(info [CC] $@))
 	$(QUIET)$(CC) $(CFLAGS) $(CPICFLAGS) $(CPPFLAGS) -c $< -o $@
 
 endif
