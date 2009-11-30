@@ -20,15 +20,15 @@ $$(call debug,[mc_try] $(1)_TRY_TRUE_ACTION = $$($(1)_TRY_TRUE_ACTION))
 
 $$(call debug,[mc_try] $(5): $(6))
 
-$$(if $(6),include $(6))
+include $(6)
 
 # Set the variable value
 $(5): $(6)
 	$$(if $(6),$$(eval include $(6)))
 	$$(call debug,[mc_try] $$(if $$($(1)),$$($(3)),$$($(4))))
-	$$(call mc_create_start,$$@,$(6))
-	$(QUIET)echo "$$(if $$($(1)),$$($(3)),$$($(4)))" >> $$@
-	$$(call mc_create_end,$$@)
+	$(QUIET)$$(call mc_create_start,$$@,$(6))
+	$(QUIET)$$(if $$($(1)),$$($(3)),$$($(4)))
+	$(QUIET)$$(call mc_create_end,$$@)
 
 CONFIGURE_INCLUDES += $(5)
 endef
