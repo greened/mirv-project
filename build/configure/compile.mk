@@ -4,6 +4,7 @@ COMPILE_MK := 1
 include $(BUILDTOOLS)/configure/try.mk
 include $(BUILDTOOLS)/configure/define.mk
 include $(BUILDTOOLS)/configure/bind.mk
+include $(BUILDTOOLS)/configure/ls.mk
 
 define mc_compile_impl
 
@@ -23,7 +24,7 @@ $$($(1)_OSRCFILE):
 
 $$(call debug,[mc_compile_impl] $$($(1)_OFILE): $$($(1)_OSRCFILE) $(5))
 
-$$(if $(5),include $(5))
+include $(5)
 
 .PRECIOUS: $$($(1)_OFILE)
 .SECONDEXPANSION:
@@ -33,8 +34,14 @@ $$($(1)_OFILE): $$($(1)_OSRCFILE) $(5)
 
 $$(call debug,[mc_compile_impl] $(4): $$($(1)_OFILE))
 
+#	$(QUIET)$$(if $$(wildcard $$(<)),$$(call mc_define,$(1)_compile,yes,$$@),$$(call mc_define,$(1)_compile,,$$@))
+
 $(4): $$($(1)_OFILE)
-	$(QUIET)$$(if $$(wildcard $$(<),$$(call mc_define,$(1)_compile,yes,$$@),$$(call mc_define,$(1)_compile,,$$@))
+	$(QUIET)if [ -e $$(<) ]; then \
+	          $$(call mc_define_append,$(1)_compile,yes,$$@); \
+	        else \
+	          $$(call mc_define_append,$(1)_compile,,$$@); \
+	        fi
 
 CONFIGURE_INCLUDES += $(4)
 

@@ -34,6 +34,6 @@ mc_try_executable_c = $(call mc_try_compile_c,$(1),$(2),$(3),$(6),$(8))$(call mc
 # $6: Compile include file to create (actions must create it)
 # $7: Link include file to create (actions must create it)
 # $8: Dependence
-mc_try_executable_cxx = $(call mc_try_compile_cxx,$(1),$(2),$(3),$(6),$(8))$(call mc_try_link_cxx,$(FINAL_BUILDDIR)/configure/CXX_compile_test.o,$(4),$(5),$(7),$(8))
+mc_try_executable_cxx = $(call mc_try_compile_cxx,$(1),$(2),$(3),$(6),$(8))$(call mc_try_link_cxx,$(FINAL_BUILDDIR)/configure/CXX_compile_test.o,$(4),$(5),$(7),$(6))
 
 endif
