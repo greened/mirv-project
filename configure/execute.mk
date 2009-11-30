@@ -15,7 +15,7 @@ include $(4)
 $(3): $(4)
 	$$(if $(4),$$(eval include $(4)))
 	$$(call debug,CXX = $$(CXX))
-	$(QUIET)$$(call mc_define,$(1),$$(shell $$($(2))),$$@,$(4))
+	$(QUIET)$$(call mc_define_create,$(1),$$(shell $$($(2))),$$@,$(4))
 
 CONFIGURE_INCLUDES += $(3)
 
@@ -34,5 +34,4 @@ mc_execute = $(eval $(call mc_execute_impl,$(1),$(2),$(3),$(4)))
 # $5: Include file to create (actions must create it)
 # $6: Dependency
 mc_try_execute = $(call mc_try,$(1),$(call bind4,$(1)_try_execute_bind,mc_execute,$(1),$(2),$(patsubst %.mk,%_execute.mk,$(5)),$(6)),$(3),$(4),$(5),$(patsubst %.mk,%_execute.mk,$(5)))
-
 endif

@@ -13,8 +13,10 @@ $(1)_MC_FIND_INCLUDE := $$(strip $$(call mc_find,$(2)))
 
 $(FINAL_BUILDDIR)/configure/$(1).mk: $$($(1)_MC_FIND_INCLUDE)
 	+$(QUIET)[ -d $$(@D) ] || mkdir -p $$(@D)
-	$(QUIET)$$(call mc_define,$(1),$$(strip $$(firstword $(foreach var,$(2),$$($(var))))),$$@)
+	$(QUIET)$$(call mc_create_start,$$@)
+	$(QUIET)$$(call mc_define_append,$(1),$$(strip $$(firstword $(foreach var,$(2),$$($(var))))),$$@)
 	$(QUIET)echo '$$$$(if $$$$($(1)),,$$$$(error $$$$(if $(3),$(3),Could not find definition for $(1))))' >> $$@
+	$(QUIET)$$(call mc_create_end,$$@)
 
 CONFIGURE_INCLUDES += $(FINAL_BUILDDIR)/configure/$(1).mk
 
