@@ -18,7 +18,7 @@ $$(call debug,[mc_link_impl] $(1)_LDFILE    = $$($(1)_LDFILE))
 
 $$(call debug,[mc_link_impl] $$($(1)_LDFILE): $$($(1)_LDOBJFILE) $(5))
 
-$$(if $(5),include $(5))
+include $(5)
 
 .PRECIOUS: $$($(1)_LDFILE)
 .SECONDEXPANSION:
@@ -29,7 +29,13 @@ $$($(1)_LDFILE): $$($(1)_LDOBJFILE) $(5)
 $$(call debug,[mc_link_impl] $(4): $$($(1)_LDFILE))
 
 $(4): $$($(1)_LDFILE)
-	$(QUIET)$$(if $$(wildcard $$(<),$$(call mc_define,$(1)_compile,yes,$$@),$$(call mc_define,$(1)_compile,,$$@))
+	$(QUIET)if [ -x $$(<) ]; then \
+	          $$(call mc_define_append,$(1)_link,yes,$$@); \
+	        else \
+	          $$(call mc_define_append,$(1)_link,,$$@); \
+	        fi
+
+#	$(QUIET)$$(if $$(wildcard $$(<)),$$(call mc_define_append,$(1)_link,yes,$$@),$$(call mc_define_append,$(1)_link,,$$@))
 
 endef
 

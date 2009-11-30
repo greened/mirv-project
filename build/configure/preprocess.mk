@@ -24,7 +24,7 @@ $$($(1)_PPFILE): $$($(1)_PPSRCFILE) $(4)
 
 $(FINAL_BUILDDIR)/configure/$(1)_preprocess_target: $$($(1)_PPFILE)
 	echo wildcard $$< = $$(wildcard $$<)
-	$(QUIET)$$(if $$(wildcard $$($(1)_PPFILE)),$$(call mc_define,$(1)_preprocess,yes,$$@),$$(call mc_define,$(1)_preprocess,,$$@))
+	$(QUIET)$$(if $$(wildcard $$($(1)_PPFILE)),$$(call mc_define_append,$(1)_preprocess,yes,$$@),$$(call mc_define,$(1)_preprocess,,$$@))
 
 endef
 
