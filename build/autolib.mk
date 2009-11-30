@@ -26,8 +26,8 @@ $(1)_SOBJS := $$(patsubst %.o,%-pic.o,$$($(1)_OBJS))
 
 $$($(1)_OBJDIR)/$(1).so: $$($(1)_SOBJS)
 	$$(if $(QUIET),$$(info [SHLIB] $$@))
-	+$(QUIET)[ -d $(@D) ] || $(MKDIR) -p $(@D)
-	$$(call make_shlib,$$@,$$^,$$($(1)_SRCS))
+	+$(QUIET)[ -d $$(@D) ] || $(MKDIR) -p $$(@D)
+	$(QUIET)$$(call make_shlib,$$@,$$($(1)_SOBJS),$$($(1)_SRCS))
 
 $$(call debug,$$($(1)_OBJDIR)/$(1).so: $$($(1)_SOBJS))
 
