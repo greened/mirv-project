@@ -33,6 +33,19 @@ namespace mirv {
 	typename Op::properties,
 	detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
 	>::type properties;
+
+     template<typename A1>
+     static typename ptr<Expression<Op> >::type
+     make(A1 a1) {
+       return new Expression<Op>(typename Op::base_type(a1));
+     }
+
+     template<typename A1, typename A2>
+     static typename ptr<Expression<Op> >::type
+     make(A1 a1, A2 a2) {
+       return new Expression<Op>(typename Op::base_type(a1, a2));
+     }
+
      virtual void accept(ExpressionVisitor &V);
    };
 
