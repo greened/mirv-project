@@ -30,6 +30,19 @@ namespace mirv {
        typename Tag::properties,
        detail::StatementPropertyLess<boost::mpl::_1, boost::mpl::_2>
        >::type properties;
+
+     template<typename A1>
+     static typename ptr<Statement<Tag> >::type
+     make(A1 a1) {
+       return new Statement<Tag>(typename Tag::base_type(a1));
+     }
+
+     template<typename A1, typename A2>
+     static typename ptr<Statement<Tag> >::type
+     make(A1 a1, A2 a2) {
+       return new Statement<Tag>(typename Tag::base_type(a1, a2));
+     }
+
      virtual void accept(StatementVisitor &V);
    };
 

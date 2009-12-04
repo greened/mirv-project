@@ -3,7 +3,7 @@
 ifndef CPATTERNS_MK
 CPATTERNS_MK := 1
 
-include $(BUILDTOOLS)/configure/c.mk
+include $(BUILDTOOLS)/configure/cc.mk
 include $(BUILDTOOLS)/cautodep.mk
 
 %.o: %.c	
