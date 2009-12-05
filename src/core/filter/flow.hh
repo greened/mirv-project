@@ -1,11 +1,11 @@
 #ifndef mirv_core_filter_flow_hh
 #define mirv_core_filter_flow_hh
 
-#include <mirv/filter/visitor.hh>
-#include <mirv/filter/action.hh>
-#include <mirv/filter/expression_flow.hh>
-#include <mirv/filter/dataflow.hh>
-#include <mirv/mem/heap.hh>
+#include <mirv/core/filter/visitor.hh>
+#include <mirv/core/filter/action.hh>
+#include <mirv/core/filter/expression_flow.hh>
+#include <mirv/core/filter/dataflow.hh>
+#include <mirv/core/mem/heap.hh>
 
 namespace mirv {
    template<

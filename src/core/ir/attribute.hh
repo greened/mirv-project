@@ -1,8 +1,8 @@
 #ifndef mirv_core_filter_attribute_hh
 #define mirv_core_filter_attribute_hh
 
-#include <mirv/ir/node.hh>
-#include <mirv/mem/heap.hh>
+#include <mirv/core/ir/node.hh>
+#include <mirv/core/mem/heap.hh>
 
 #include <map>
 

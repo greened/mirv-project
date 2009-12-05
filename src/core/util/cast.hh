@@ -1,8 +1,8 @@
 #ifndef mirv_core_util_cast_hh
 #define mirv_core_util_cast_hh
 
-#include <mirv/util/debug.hh>
-#include <mirv/mem/heap.hh>
+#include <mirv/core/util/debug.hh>
+#include <mirv/core/mem/heap.hh>
 
 #include <boost/type_traits.hpp>
 

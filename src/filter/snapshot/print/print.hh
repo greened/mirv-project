@@ -1,10 +1,10 @@
 #ifndef mirv_filter_snapshot_print_hh
 #define mirv_filter_snapshot_print_hh
 
-#include <mirv/filter/forward_flow.hh>
-#include <mirv/filter/filter.hh>
-#include <mirv/filter/action.hh>
-#include <mirv/ir/node.hh>
+#include <mirv/core/filter/forward_flow.hh>
+#include <mirv/core/filter/filter.hh>
+#include <mirv/core/filter/action.hh>
+#include <mirv/core/ir/node.hh>
 
 namespace mirv {
    class PrintFilter

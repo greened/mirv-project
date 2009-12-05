@@ -1,7 +1,7 @@
 #ifndef mirv_core_ir_reference_hh
 #define mirv_core_ir_reference_hh
 
-#include <mirv/ir/symbol.hh>
+#include <mirv/core/ir/symbol.hh>
 
 namespace mirv {
    template<typename SymbolType>

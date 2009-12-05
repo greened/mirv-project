@@ -1,8 +1,8 @@
 #ifndef mirv_core_ir_symbol_hh
 #define mirv_core_ir_symbol_hh
 
-#include <mirv/ir/base.hh>
-#include <mirv/ir/node.hh>
+#include <mirv/core/ir/base.hh>
+#include <mirv/core/ir/node.hh>
 
 namespace mirv {
    template<typename Tag>

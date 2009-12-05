@@ -1,9 +1,9 @@
 #ifndef mirv_core_ir_control_hh
 #define mirv_core_ir_control_hh
 
-#include <mirv/ir/statement.hh>
-#include <mirv/ir/reference.hh>
-#include <mirv/util/cast.hh>
+#include <mirv/core/ir/statement.hh>
+#include <mirv/core/ir/reference.hh>
+#include <mirv/core/util/cast.hh>
 
 #include <boost/mpl/vector.hpp>
 

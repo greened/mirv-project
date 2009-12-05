@@ -1,11 +1,11 @@
 #ifndef mirv_core_ir_node_hh
 #define mirv_core_ir_node_hh
 
-#include <mirv/ir/base.hh>
-#include <mirv/ir/property.hh>
-#include <mirv/ir/inherit.hh>
-#include <mirv/mem/heap.hh>
-#include <mirv/util/debug.hh>
+#include <mirv/core/ir/base.hh>
+#include <mirv/core/ir/property.hh>
+#include <mirv/core/ir/inherit.hh>
+#include <mirv/core/mem/heap.hh>
+#include <mirv/core/util/debug.hh>
 
 #include <list>
 

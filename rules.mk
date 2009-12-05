@@ -24,6 +24,6 @@ $(info $(ALL_OBJS): $(INCLUDE_LINK))
 
 $(INCLUDE_LINK):
 	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
-	$(QUIET)$(LN) -sf $(SRCDIR)/src/core $@
+	$(QUIET)$(LN) -sf $(SRCDIR)/src $@
 
 include $(BUILDTOOLS)/cxxpatterns.mk
