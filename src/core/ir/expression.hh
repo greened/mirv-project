@@ -168,45 +168,61 @@ namespace mirv {
 
    // Expression property semantics
    class Arithmetic {
-     typedef boost::mpl::int_<0> order;
    public:
+     typedef boost::mpl::int_<0> order;
      typedef Virtual<InnerExpression> base_type;
+     typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    };
    class Logical {
-     typedef boost::mpl::int_<1> order;
    public:
+     typedef boost::mpl::int_<1> order;
      typedef Virtual<InnerExpression> base_type;
+     typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    };
    class Bitwise {
+   public:
      typedef boost::mpl::int_<2> order;
-   public:
      typedef Virtual<InnerExpression> base_type;
+     typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    };
-   class Reference {
-     typedef boost::mpl::int_<11> order;
+   class Ref {
    public:
+     typedef boost::mpl::int_<11> order;
      typedef Virtual<InnerExpression> base_type;
+     typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    };
 
    class Commutative {
-     typedef boost::mpl::int_<3> order;
    public:
+     typedef boost::mpl::int_<3> order;
      typedef Virtual<InnerExpression> base_type;
+     typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    };
    class Associative {
-     typedef boost::mpl::int_<5> order;
    public:
+     typedef boost::mpl::int_<5> order;
      typedef Virtual<InnerExpression> base_type;
+     typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    };
    class Transitive {
-     typedef boost::mpl::int_<7> order;
    public:
+     typedef boost::mpl::int_<7> order;
      typedef Virtual<InnerExpression> base_type;
+     typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    };
    class Reflexive {
-     typedef boost::mpl::int_<9> order;
    public:
+     typedef boost::mpl::int_<9> order;
      typedef Virtual<InnerExpression> base_type;
+     typedef InnerExpression visitor_base_type;
+     typedef boost::mpl::vector<> properties;
    }; 
 
   struct PropertyExpressionGenerator {

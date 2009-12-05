@@ -8,6 +8,9 @@
 #include <mirv/core/ir/arithmetic.hh>
 #include <mirv/core/ir/logical.hh>
 #include <mirv/core/ir/bitwise.hh>
+#include <mirv/core/ir/reference.hh>
+
+#include <mirv/core/ir/variable.hh>
 
 #include <boost/mpl/vector.hpp>
 
@@ -64,7 +67,7 @@ namespace mirv {
 	Expression<Arithmetic>,
 	Expression<Logical>,
 	Expression<Bitwise>,
-	Expression<Reference>,
+	Expression<Ref>,
 	Expression<Commutative>,
 	Expression<Associative>,
 	Expression<Transitive>,
@@ -81,7 +84,9 @@ namespace mirv {
       Expression<LogicalNot>,
       Expression<BitwiseAnd>,
       Expression<BitwiseOr>,
-      Expression<BitwiseComplement>
+	Expression<BitwiseComplement>,
+
+	Expression<Reference<Variable> >
 	> > {
   public:
     virtual result_type visit(Expression<Base> &);
@@ -90,7 +95,7 @@ namespace mirv {
     virtual result_type visit(Expression<Arithmetic> &);
     virtual result_type visit(Expression<Logical> &);
     virtual result_type visit(Expression<Bitwise> &);
-    virtual result_type visit(Expression<Reference> &);
+    virtual result_type visit(Expression<Ref> &);
     virtual result_type visit(Expression<Commutative> &);
     virtual result_type visit(Expression<Associative> &);
     virtual result_type visit(Expression<Transitive> &);
@@ -107,6 +112,7 @@ namespace mirv {
     virtual result_type visit(Expression<BitwiseAnd> &);
     virtual result_type visit(Expression<BitwiseOr> &);
     virtual result_type visit(Expression<BitwiseComplement> &);
+    virtual result_type visit(Expression<Reference<Variable> > &);
   };
 }
 

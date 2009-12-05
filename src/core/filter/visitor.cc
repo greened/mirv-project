@@ -471,4 +471,10 @@ namespace mirv {
 	  boost::mpl::begin<Expression<BitwiseComplement>::properties> 
 	  >, void> &>(s));
   }
+
+  virtual result_type ExpressionVisitor::visit(Expression<Reference<Variable> > &e) {
+    visit(static_cast<Expression<boost::mpl::deref<
+	  boost::mpl::begin<Expression<Reference<Variable> >::properties> 
+	  >, void> &>(s));
+  }
 }
