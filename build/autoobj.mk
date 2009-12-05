@@ -5,6 +5,8 @@ include $(BUILDTOOLS)/autosrc.mk
 
 define make_objects_impl
 
+$$(call debug,[obj] '$(1)' '$(2)' '$(3)' '$(4)' '$(5)')
+
 $$(call make_source,$(1),$(2))
 $(1)_OBJS := $$(patsubst %.c,%.o,$$(patsubst %.cc,%.o,$$(patsubst %.C,%.o,$$(patsubst %.cpp,%.o,$$($(1)_SRCS)))))
 
