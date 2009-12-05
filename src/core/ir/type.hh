@@ -39,8 +39,15 @@ namespace mirv {
 
   template<int Size>
    struct Integral {
+    typedef Symbol<Type<Simple> > interface_base_type;
    public:
-    typedef Symbol<Type<Simple> > base_type;
+
+      class interface : public interface_base_type {
+      public:
+	size_type bitsize(void) const { return Size; }
+      };
+
+      typedef interface base_type;
    };
 
    struct Floating {
