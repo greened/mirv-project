@@ -9,9 +9,11 @@ include $(BUILDTOOLS)/configure/cmp.mk
 
 define make_unittest_impl
 
+$$(call debug,[unit] '$(1)' '$(2)' '$(3)' '$(4)' '$(5)' '$(6)' '$(7)' '$(8)' '$(9)')
+
 $$(call make_objects,$(1),$(2),$(4),$(5),$(6))
 
-$$(foreach obj,$$($(1)_OBJS),$$(call make_simple_exe,$$(obj),$(3),$(7),$(8)))
+$$(foreach obj,$$($(1)_OBJS),$$(call make_simple_exe,$$(obj),$(3),$(7),$(8),$(9)))
 
 $(1)_UNITTESTS += $$(patsubst %.o,%.result,$$($(1)_OBJS))
 
@@ -25,7 +27,8 @@ endef
 # $6: Compiler flags
 # $7: The linker
 # $8: Linker flags
-make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8)))
+# $9: Dependency
+make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9)))
 
 %.out: %.exe
 	$(QUIET)$$(<) > $$(@)
