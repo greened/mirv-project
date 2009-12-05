@@ -1,7 +1,7 @@
 #ifndef mirv_core_filter_action_hh
 #define mirv_core_filter_action_hh
 
-#include <mirv/filter/visitor.hh>
+#include <mirv/core/filter/visitor.hh>
 
 namespace mirv {
    class NullAction {

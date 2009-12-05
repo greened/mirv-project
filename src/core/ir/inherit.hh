@@ -3,7 +3,7 @@
 
 // Define inheritance mechanisms for extending the class hierarchy.
 
-#include <mirv/util/debug.hh>
+#include <mirv/core/util/debug.hh>
 
 namespace mirv {
   // Inherit virtually.  Use for specialization.

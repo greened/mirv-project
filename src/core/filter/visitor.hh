@@ -3,11 +3,11 @@
 
 #include <visitor.hh>
  
-#include <mirv/ir/control.hh>
+#include <mirv/core/ir/control.hh>
 
-#include <mirv/ir/arithmetic.hh>
-#include <mirv/ir/logical.hh>
-#include <mirv/ir/bitwise.hh>
+#include <mirv/core/ir/arithmetic.hh>
+#include <mirv/core/ir/logical.hh>
+#include <mirv/core/ir/bitwise.hh>
 
 #include <boost/mpl/vector.hpp>
 

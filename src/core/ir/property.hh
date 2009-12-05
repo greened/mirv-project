@@ -3,7 +3,7 @@
 
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/empty_base.hpp>
-#include <mirv/ir/inherit.hh>
+#include <mirv/core/ir/inherit.hh>
 #include <inherit.hh>
 
 // A Property is a class that allows visitors and other objects that

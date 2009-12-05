@@ -1,7 +1,7 @@
 #ifndef mirv_core_ir_bitwise_hh
 #define mirv_core_ir_bitwise_hh
 
-#include <mirv/ir/expression.hh>
+#include <mirv/core/ir/expression.hh>
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {

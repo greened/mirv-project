@@ -1,6 +1,6 @@
 #include "print.hh"
 
-#include <mirv/util/cast.hh>
+#include <mirv/core/util/cast.hh>
 
 namespace mirv {
   const int PrintFilter::IndentFactor = 3;

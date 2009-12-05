@@ -1,8 +1,8 @@
 #ifndef mirv_core_filter_expression_flow_hh
 #define mirv_core_filter_expression_flow_hh
 
-#include <mirv/filter/visitor.hh>
-#include <mirv/filter/dataflow.hh>
+#include <mirv/core/filter/visitor.hh>
+#include <mirv/core/filter/dataflow.hh>
 
 namespace mirv {
    template<

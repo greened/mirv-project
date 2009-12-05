@@ -1,12 +1,12 @@
 #ifndef mirv_core_ir_expression_hh
 #define mirv_core_ir_expression_hh
 
-#include <mirv/ir/node.hh>
-#include <mirv/ir/property.hh>
+#include <mirv/core/ir/node.hh>
+#include <mirv/core/ir/property.hh>
 
-#include <mirv/mem/heap.hh>
+#include <mirv/core/mem/heap.hh>
 
-#include <mirv/util/debug.hh>
+#include <mirv/core/util/debug.hh>
 
 #include <boost/mpl/inherit.hpp>
 #include <boost/mpl/inherit_linearly.hpp>
