@@ -13,6 +13,8 @@ $$(call debug,[unit] '$(1)' '$(2)' '$(3)' '$(4)' '$(5)' '$(6)' '$(7)' '$(8)' '$(
 
 $$(call make_objects,$(1),$(2),$(4),$(5),$(6))
 
+$$(call debug,[unit] $(1)_OBJS = $$($(1)_OBJS))
+
 $$(foreach obj,$$($(1)_OBJS),$$(call make_simple_exe,$$(obj),$(3),$(7),$(8),$(9)))
 
 $(1)_UNITTESTS += $$(patsubst %.o,%.result,$$($(1)_OBJS))
