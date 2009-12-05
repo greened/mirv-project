@@ -119,6 +119,7 @@ namespace mirv {
          void visit(ptr<Expression<BitwiseAnd> >::type expr);
          void visit(ptr<Expression<BitwiseOr> >::type expr);
          void visit(ptr<Expression<BitwiseComplement> >::type expr);
+	void visit(ptr<Expression<Reference<Variable> > >::type expr);
       };
 
       // Leaving each expression

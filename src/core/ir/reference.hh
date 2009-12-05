@@ -5,11 +5,15 @@
 
 namespace mirv {
    template<typename SymbolType>
-   class Ref {
+   class Reference {
    private:
      typedef boost::mpl::vector<> sequence;
-     typedef InnerImpl<Symbol<SymbolType>, LeafStatement> interface_base_type;
+     typedef InnerImpl<Symbol<SymbolType>, LeafExpression> interface_base_type;
+
    public:
+     typedef sequence properties;
+     typedef LeafExpression visitor_base_type;
+
      class interface : public interface_base_type {
       public:
        typedef Symbol<SymbolType> child_type;
@@ -43,6 +47,8 @@ namespace mirv {
 
      // TODO: Interface that checks for lvalues.
    public:
+     typedef sequence properties;
+     typedef Expression<Unary> visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
    };
 
@@ -51,6 +57,8 @@ namespace mirv {
       typedef boost::mpl::vector<> sequence;
 
    public:
+     typedef sequence properties;
+     typedef Expression<Unary> visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
    };
 
@@ -60,6 +68,8 @@ namespace mirv {
 
      // TODO: Support multi-dimension arrays natively?
    public:
+     typedef sequence properties;
+     typedef Expression<Binary> visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 
@@ -68,6 +78,8 @@ namespace mirv {
       typedef boost::mpl::vector<> sequence;
 
    public:
+     typedef sequence properties;
+     typedef InnerExpression visitor_base_type;
       typedef ExpressionBaseGenerator<sequence, InnerExpression>::type base_type;
    };
 }

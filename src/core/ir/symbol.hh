@@ -6,8 +6,7 @@
 
 namespace mirv {
    template<typename Tag>
-   class Symbol 
-     : public Tag::base_type {
+   class Symbol : public Tag::base_type {
    public:
      Symbol(const typename Tag::base_type &base) :
        Tag::base_type(base) {}
@@ -31,9 +30,9 @@ namespace mirv {
    public:
    };
 
-  class InnerSymbol : public InnerImpl<Symbol<Base>, Virtual<Symbol<Base> > > {
+  class InnerSymbol : public InnerImpl<Symbol<Base>, Symbol<Base> > {
   };
-  class LeafSymbol : public LeafImpl<Virtual<Symbol<Base> > > {
+  class LeafSymbol : public LeafImpl<Symbol<Base> > {
   };
 }
 

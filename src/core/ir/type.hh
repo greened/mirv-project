@@ -1,65 +1,51 @@
 #ifndef mirv_core_ir_type_hh
 #define mirv_core_ir_type_hh
 
+#include <vector>
+#include <numeric>
+
 namespace mirv {
-   template<
-      typename Tag,
-      typename Base = typename BaseType<Tag>::type>
-   class Type
-         : public Base {
+   template<typename Tag>
+   class Type {
    public:
+     typedef typename Tag::base_type base_type;
    };
 
    class TypeBase {
    private:
-      typedef BaseSymbol interface_base_type;
+     typedef Symbol<Base> interface_base_type;
 
    public:
-      typedef int size_type;
 
-      class interface
-            : public interface_base_type {
+      class interface : public interface_base_type {
       public:
-         virtual size_type size(void) const = 0;
+	typedef int size_type;
+	virtual size_type bitsize(void) const = 0;
       };
 
       typedef interface base_type;
    };
 
-   typedef Type<TypeBase> BaseType;
-   typedef Leaf<BaseType> LeafType;
-   typedef Inner<BaseType> InnerType;
+  template<>
+  class Symbol<Type<TypeBase> > : public Type<TypeBase>::base_type {};
+
+  typedef LeafImpl<Symbol<Type<TypeBase> > > LeafType;
+  typedef InnerImpl<Symbol<Type<TypeBase> >, Symbol<Type<TypeBase> > > InnerType;
 
    class Simple {
-   private:
-      typedef LeafType interface_base_type;
-
    public:
-      class interface
-            : public interface_base_type {
-      private:
-         int sz;
-
-      public:
-         interface(int s)
-               : sz(s) {};
-
-         size_type size(void) const {
-            return(sz);
-         }
-      };
-
-      typedef interface base_type;
+      typedef LeafType base_type;
    };
 
+  template<int Size>
    struct Integral {
    public:
-      typedef Type<Simple> base_type;
+    typedef Symbol<Type<Simple> > base_type;
    };
 
    struct Floating {
    public:
-      typedef Type<Simple> base_type;
+     typedef Symbol<Type<Simple> > base_type;
    };
 
    struct Derived {
@@ -69,7 +55,7 @@ namespace mirv {
 
    struct Array {
    private:
-      typedef Type<Derived> interface_base_type;
+     typedef Symbol<Type<Derived> > interface_base_type;
 
    public:
       class interface
@@ -83,82 +69,84 @@ namespace mirv {
          dimension_vector dimensions;
 
       public:
-         typedef BaseType child_type;
-         typedef ptr<child_type>::type child_ptr
+	typedef Symbol<Type<TypeBase> > child_type;
+	typedef ptr<child_type>::type child_ptr;
          typedef ptr<child_type>::const_type const_child_ptr;
 
-         typedef dimension_vector::iterator iterator;
+         typedef dimension_vector::iterator dimensionIterator;
+         typedef dimension_vector::const_iterator constDimensionIterator;
 
-         void set_element_type(child_ptr c) {
+         void setElementType(child_ptr c) {
             if (empty()) {
                push_back(c);
             }
             else {
                *begin() = c;
             }
-         };
+         }
 
-         child_ptr get_element_type(void) {
+         child_ptr getElementType(void) {
             return(front());
-         };
+         }
 
-         const_child_ptr get_element_type(void) const {
+         const_child_ptr getElementType(void) const {
             return(front());
-         };
+         }
 
-         iterator begin(void) {
+         dimensionIterator dimensionBegin(void) {
             return(dimensions.begin());
-         };
-         const_iterator begin(void) const {
+         }
+         constDimensionIterator dimensionBegin(void) const {
             return(dimensions.begin());
-         };
+         }
 
-         iterator end(void) {
+         dimensionIterator dimensionEnd(void) {
             return(dimensions.end());
-         };
-         const_iterator end(void) const {
+         }
+         constDimensionIterator dimensionEnd(void) const {
             return(dimensions.end());
-         };
+         }
 
-         void push_back(dimension_type d) {
+         void dimensionPushBack(dimension_type d) {
             dimensions.push_back(d);
-         };
+         }
 
-         size_type size(void) const {
-            return(std::accumulate(begin(), end(),
-                                   get_element_type()->size(),
+         int bitsize(void) const {
+            return(std::accumulate(dimensionBegin(), dimensionEnd(),
+                                   getElementType()->bitsize(),
                                    std::multiplies<size_type>()));
+	 }
       };
    };
 
    struct Pointer {
    private:
-      typedef Type<Derived> interface_base_type;
+     typedef Symbol<Type<Derived> > interface_base_type;
 
    public:
       class interface
             : public interface_base_type {
       public:
-         typedef BaseType child_type;
-         typedef ptr<child_type>::type child_ptr
+	typedef Symbol<Type<TypeBase> > child_type;
+	typedef ptr<child_type>::type child_ptr;
          typedef ptr<child_type>::const_type const_child_ptr;
 
-         void set_base_type(child_ptr c) {
+         void setBaseType(child_ptr c) {
             if (empty()) {
                push_back(c);
             }
             else {
                *begin() = c;
             }
-         };
+         }
 
-         child_ptr get_base_type(void) {
+         child_ptr getBaseType(void) {
             return(front());
-         };
+         }
 
-         const_child_ptr get_base_type(void) const {
+         const_child_ptr getBaseType(void) const {
             return(front());
-         };
+         }
       };
    };
 }

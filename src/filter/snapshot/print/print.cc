@@ -143,6 +143,11 @@ namespace mirv {
       ind += IndentFactor;
    }
 
+  void PrintFilter::EnterExprAction::visit(ptr<Expression<Reference<Variable> > >::type expr)
+   {
+     out << indent(ind) << "vref " << expr->get_symbol()->name();
+   }
+
   void PrintFilter::operator()(ptr<Node<Base> >::type node)
    {
      //if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
