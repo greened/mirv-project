@@ -19,7 +19,9 @@ namespace mirv {
        typedef Symbol<SymbolType> child_type;
        typedef typename ptr<child_type>::type child_ptr;
        typedef typename ptr<child_type>::const_type const_child_ptr;
-        
+
+       interface(child_ptr Var) : interface_base_type(Var) {}
+
          void set_symbol(child_ptr c) {
             if (this->empty()) {
                push_back(c);

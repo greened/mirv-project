@@ -4,45 +4,49 @@
 //
 
 #include <mirv/core/ir/symbol.hh>
-#include <mirv/filter/snapshot/print.hh>
+#include <mirv/core/builder/make.hh>
+#include <mirv/filter/snapshot/print/print.hh>
 
 using mirv::Symbol;
 using mirv::Variable;
 using mirv::Type;
 using mirv::Integral;
 using mirv::Expression;
+using mirv::Base;
 using mirv::Add;
-using mirv::Sub;
+using mirv::Subtract;
 using mirv::Multiply;
 using mirv::Divide;
 using mirv::Negate;
 using mirv::Reference;
 using mirv::ptr;
 using mirv::PrintFilter;
+using mirv::make;
 
 int main(void)
 {
-  ptr<Symbol<Variable> >::type asym =
-    Symbol<Variable>::make("a", Symbol<Type<Integral<32> > >());
-   ptr<Symbol<Variable> >::type bsym =
-     Symbol<Variable>::make("b", Symbol<Type<Integral<32> > >());
-   ptr<Symbol<Variable> >::type csym =
-     Symbol<Variable>::make("c", Symbol<Type<Integral<32> > >());
-   ptr<Symbol<Variable> >::type dsym =
-     Symbol<Variable>::make("d", Symbol<Type<Integral<32> > >());
-   ptr<Symbol<Variable> >::type esym =
-     Symbol<Variable>::make("e", Symbol<Type<Integral<32> > >());
+  ptr<Symbol<Variable> >::type a =
+    Symbol<Variable>::make("a", make<Symbol<Type<Integral<32> > > >());
+   ptr<Symbol<Variable> >::type b =
+     Symbol<Variable>::make("b", make<Symbol<Type<Integral<32> > > >());
+   ptr<Symbol<Variable> >::type c =
+     Symbol<Variable>::make("c", make<Symbol<Type<Integral<32> > > >());
+   ptr<Symbol<Variable> >::type d =
+     Symbol<Variable>::make("d", make<Symbol<Type<Integral<32> > > >());
+   ptr<Symbol<Variable> >::type e =
+     Symbol<Variable>::make("e", make<Symbol<Type<Integral<32> > > >());
 
    // a + (b - c) * d / -e)
    ptr<Expression<Base> >::type expr =
      Expression<Add>::make(
-       Expression<Reference>::make(a),
+       Expression<Reference<Variable> >::make(a),
        Expression<Divide>::make(
          Expression<Multiply>::make(
-	   Expression<Sub>::make(Expression<Reference>::make(b),
-				 Expression<Reference>::make(c))
-	   Expresssion<Reference>::make(d)),
-	 Expression<Negate>::make(Expression<Reference>::make(e))));
+           Expression<Subtract>::make(
+	     Expression<Reference<Variable> >::make(b),
+	     Expression<Reference<Variable> >::make(c)),
+	   Expression<Reference<Variable> >::make(d)),
+	 Expression<Negate>::make(Expression<Reference<Variable> >::make(e))));
    
    PrintFilter print(std::cout);
 

@@ -31,6 +31,14 @@ namespace mirv {
       child_list children;
 
    public:
+     InnerImpl(child_ptr C) {
+       children.push_back(C);
+     }
+     InnerImpl(child_ptr C1, child_ptr C2) {
+       children.push_back(C1);
+       children.push_back(C2);
+     }
+ 
      typedef typename child_list::iterator iterator;
      typedef typename child_list::reverse_iterator reverse_iterator;
      typedef typename child_list::const_iterator const_iterator;

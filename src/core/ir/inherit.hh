@@ -19,6 +19,12 @@ namespace mirv {
     template<typename Visitor, typename T1, typename T2>
     class Type : public T1, public T2 {
     public:
+      template<typename A1>
+      Type(A1 a1) : T1(a1) {}
+
+      template<typename A1, typename A2>
+      Type(A1 a1, A2 a2) : T1(a1, a2) {}
+
       void accept(Visitor &V) {
 	error("Inherit::accept called");
       }
@@ -28,6 +34,12 @@ namespace mirv {
     class Type<Visitor, T1, Virtual<T2> > :
       public T1, public virtual T2 {
     public:
+      template<typename A1>
+      Type(A1 a1) : T1(a1) {}
+
+      template<typename A1, typename A2>
+      Type(A1 a1, A2 a2) : T1(a1, a2) {}
+
       void accept(Visitor &V) {
 	error("Inherit::accept called");
       }
