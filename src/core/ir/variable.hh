@@ -14,7 +14,7 @@ namespace mirv {
       private:
          std::string theName;
 
-	typedef ptr<Type<Base> >::const_type const_type_ptr;
+	typedef ptr<Symbol<Type<TypeBase> > >::const_type const_type_ptr;
          const_type_ptr the_type;
 
       public:

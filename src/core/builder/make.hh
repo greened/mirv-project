@@ -7,7 +7,7 @@ namespace mirv {
   template<typename Obj>
   typename mirv::ptr<Obj>::type
   make(void) {
-    return new Obj();
+    return Obj::make();
   }
 
   template<typename Obj, typename A1>

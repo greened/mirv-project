@@ -19,15 +19,15 @@ namespace mirv {
 
       class interface : public interface_base_type {
       public:
-	typedef int size_type;
-	virtual size_type bitsize(void) const = 0;
+	typedef int BitSizeType;
+	virtual BitSizeType bitsize(void) const = 0;
       };
 
       typedef interface base_type;
    };
 
-  template<>
-  class Symbol<Type<TypeBase> > : public Type<TypeBase>::base_type {};
+  //  template<>
+  //class Symbol<Type<TypeBase> > : public Type<TypeBase>::base_type {};
 
   typedef LeafImpl<Symbol<Type<TypeBase> > > LeafType;
   typedef InnerImpl<Symbol<Type<TypeBase> >, Symbol<Type<TypeBase> > > InnerType;
@@ -44,7 +44,7 @@ namespace mirv {
 
       class interface : public interface_base_type {
       public:
-	size_type bitsize(void) const { return Size; }
+	BitSizeType bitsize(void) const { return Size; }
       };
 
       typedef interface base_type;
@@ -118,7 +118,7 @@ namespace mirv {
             dimensions.push_back(d);
          }
 
-         int bitsize(void) const {
+         BitSizeType bitsize(void) const {
             return(std::accumulate(dimensionBegin(), dimensionEnd(),
                                    getElementType()->bitsize(),
                                    std::multiplies<size_type>()));

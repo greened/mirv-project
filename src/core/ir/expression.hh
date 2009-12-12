@@ -34,16 +34,23 @@ namespace mirv {
 	detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
 	>::type properties;
 
+    private:
+      template<typename A1>
+      Expression(A1 a1) : base_type(a1) {}
+      template<typename A1, typename A2>
+      Expression(A1 a1, A2 a2) : base_type(a1, a2) {}
+
+    public:
      template<typename A1>
      static typename ptr<Expression<Op> >::type
      make(A1 a1) {
-       return new Expression<Op>(typename Op::base_type(a1));
+       return typename ptr<Expression<Op> >::type(new Expression<Op>(a1));
      }
 
      template<typename A1, typename A2>
      static typename ptr<Expression<Op> >::type
      make(A1 a1, A2 a2) {
-       return new Expression<Op>(typename Op::base_type(a1, a2));
+       return typename ptr<Expression<Op> >::type(new Expression<Op>(a1, a2));
      }
 
      virtual void accept(ExpressionVisitor &V);
@@ -56,7 +63,12 @@ namespace mirv {
    };
 
   class InnerExpression : public InnerImpl<Expression<Base>, Expression<Base> > {
+  private:
+    typedef InnerImpl<Expression<Base>, Expression<Base> > BaseType;
   public:
+    InnerExpression(child_ptr Child) : BaseType(Child) {}
+    InnerExpression(child_ptr Child1,
+		    child_ptr Child2) : BaseType(Child1, Child2) {}
     virtual void accept(ExpressionVisitor &V);
   };
 
@@ -120,6 +132,9 @@ namespace mirv {
          typedef ptr<child_type>::type child_ptr;
          typedef ptr<child_type>::const_type const_child_ptr;
 
+	interface(child_ptr Child1,
+		  child_ptr Child2) : interface_base_type(Child1, Child2) {}
+
          void set_left_operand(child_ptr c) {
             if (empty()) {
                push_back(c);
@@ -127,7 +142,7 @@ namespace mirv {
             else {
                *begin() = c;
             }
-         };
+         }
 
          void set_right_operand(child_ptr c) {
             if (empty()) {
@@ -137,31 +152,31 @@ namespace mirv {
             else {
                *--end() = c;
             }
-         };
+         }
 
          child_ptr get_left_operand(void) {
             check_invariant(!empty(),
                             "Attempt to get operand from empty expression");
             return(front());
-         };
+         }
 
          const_child_ptr get_left_operand(void) const {
             check_invariant(!empty(),
                             "Attempt to get operand from empty expression");
             return(front());
-         };
+         }
 
          child_ptr get_right_operand(void) {
             check_invariant(size() > 1 && back(),
                             "Attempt to get missing operand from expression");
             return(back());
-         };
+         }
 
          const_child_ptr get_right_operand(void) const {
             check_invariant(size() > 1 && back(),
                          "Attempt to get missing operand from expression");
             return(back());
-         };
+         }
 	virtual void accept(ExpressionVisitor &V);
       };
    };
