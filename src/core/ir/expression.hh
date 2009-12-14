@@ -88,12 +88,14 @@ namespace mirv {
      virtual void accept(ExpressionVisitor &V);
    };
 
-   class InnerExpression : public InnerImpl<Expression<Base>, Inherit1<ExpressionVisitor>::apply<Virtual<Expression<Inner<detail::InnerExpressionTraits> > > >::type> {
+  typedef Expression<Inner<detail::InnerExpressionTraits> > InnerExpressionBase;
+  
+  class InnerExpression : public InnerImpl<Expression<Base>, Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type> {
    private:
      typedef InnerImpl<
        Expression<Base>,
       Inherit1<ExpressionVisitor>::apply<
-	Virtual<Expression<Inner<detail::InnerExpressionTraits> > >
+	Virtual<InnerExpressionBase>
       >::type> BaseType;
 
   public:
@@ -118,12 +120,13 @@ namespace mirv {
      typedef InnerExpression visitor_base_type;
      typedef boost::mpl::vector<> properties;
 
-      class interface
-            : public virtual interface_base_type {
+      class interface : public interface_base_type {
       public:
 	typedef Expression<Base> child_type;
          typedef ptr<child_type>::type child_ptr;
          typedef ptr<child_type>::const_type const_child_ptr;
+
+	interface(child_ptr Child) : interface_base_type(Child) {}
 
          void set_operand(child_ptr c) {
             if (empty()) {
@@ -151,18 +154,13 @@ namespace mirv {
       typedef InnerExpression interface_base_type;
 
    public:
-      class interface;
-      typedef interface base_type;
+     class interface;
+     typedef interface base_type;
      typedef InnerExpression visitor_base_type;
      typedef boost::mpl::vector<> properties;
 
-      class interface
-            : public virtual interface_base_type {
+      class interface : public interface_base_type {
       public:
-	typedef Expression<Base> child_type;
-         typedef ptr<child_type>::type child_ptr;
-         typedef ptr<child_type>::const_type const_child_ptr;
-
 	interface(child_ptr Child1,
 		  child_ptr Child2) : interface_base_type(Child1, Child2) {}
 
@@ -216,58 +214,58 @@ namespace mirv {
    class Arithmetic {
    public:
      typedef boost::mpl::int_<0> order;
-     typedef Virtual<InnerExpression> base_type;
-     typedef InnerExpression visitor_base_type;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Logical {
    public:
      typedef boost::mpl::int_<1> order;
-     typedef Virtual<InnerExpression> base_type;
-     typedef InnerExpression visitor_base_type;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Bitwise {
    public:
      typedef boost::mpl::int_<2> order;
-     typedef Virtual<InnerExpression> base_type;
-     typedef InnerExpression visitor_base_type;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Ref {
    public:
      typedef boost::mpl::int_<11> order;
-     typedef Virtual<InnerExpression> base_type;
-     typedef InnerExpression visitor_base_type;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
 
    class Commutative {
    public:
      typedef boost::mpl::int_<3> order;
-     typedef Virtual<InnerExpression> base_type;
-     typedef InnerExpression visitor_base_type;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Associative {
    public:
      typedef boost::mpl::int_<5> order;
-     typedef Virtual<InnerExpression> base_type;
-     typedef InnerExpression visitor_base_type;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Transitive {
    public:
      typedef boost::mpl::int_<7> order;
-     typedef Virtual<InnerExpression> base_type;
-     typedef InnerExpression visitor_base_type;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Reflexive {
    public:
      typedef boost::mpl::int_<9> order;
-     typedef Virtual<InnerExpression> base_type;
-     typedef InnerExpression visitor_base_type;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    }; 
 

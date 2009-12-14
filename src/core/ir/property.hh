@@ -21,16 +21,16 @@ namespace mirv {
   // up the tree.
   
   template<typename Generator, typename Base, typename Sequence,
-	   typename Inherit>
+	   typename InheritOp>
   class Properties {   
     typedef typename lib::InheritScattered<
       typename boost::mpl::transform<Sequence, Generator>::type,
       Virtual<boost::mpl::empty_base>,
-      Inherit
+      InheritOp
       >::type properties_hierarchy_type;
   
 public:
-  typedef typename Inherit::template apply<
+  typedef typename InheritOp::template apply<
   Base, 
   properties_hierarchy_type>::type type;
 };
