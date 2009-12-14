@@ -52,7 +52,27 @@ namespace mirv {
      virtual void accept(StatementVisitor &V);
    };
 
-   class InnerStatement : public InnerImpl<Statement<Base>, Virtual<Statement<Base> > > {
+  namespace detail {
+    class InnerStatementTraits {
+    public:
+      typedef Statement<Base> Child;
+      typedef Statement<Base> base_type;
+
+    private:
+      typedef ptr<Child>::type child_ptr;
+      typedef std::list<child_ptr> child_list;
+
+    public:
+      typedef child_list::iterator iterator;
+      typedef child_list::reverse_iterator reverse_iterator;
+      typedef child_list::const_iterator const_iterator;
+      typedef child_list::const_reverse_iterator const_reverse_iterator;
+
+      typedef child_list::size_type size_type;
+    };
+  }
+
+  class InnerStatement : public InnerImpl<Statement<Base>, Inherit1<StatementVisitor>::apply<Virtual<Statement<Inner<detail::InnerStatementTraits> > > >::type> {
    public:
      virtual void accept(StatementVisitor &V);
    };
@@ -108,7 +128,7 @@ namespace mirv {
     class StatementBaseGenerator {
     public:
       typedef typename Properties<PropertyStatementGenerator, Root, Sequence,
-				  Inherit<StatementVisitor> >::type
+				  Inherit2<StatementVisitor> >::type
        type;
     };
 
