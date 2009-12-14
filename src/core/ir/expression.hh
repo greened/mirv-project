@@ -62,9 +62,40 @@ namespace mirv {
      virtual void accept(ExpressionVisitor &V);
    };
 
-  class InnerExpression : public InnerImpl<Expression<Base>, Expression<Base> > {
-  private:
-    typedef InnerImpl<Expression<Base>, Expression<Base> > BaseType;
+   namespace detail {
+     class InnerExpressionTraits {
+     public:
+       typedef Expression<Base> Child;
+       typedef Expression<Base> base_type;
+
+     private:
+       typedef ptr<Child>::type child_ptr;
+       typedef std::list<child_ptr> child_list;
+
+     public:
+       typedef child_list::iterator iterator;
+       typedef child_list::reverse_iterator reverse_iterator;
+       typedef child_list::const_iterator const_iterator;
+       typedef child_list::const_reverse_iterator const_reverse_iterator;
+
+       typedef child_list::size_type size_type;
+     };
+   }
+
+    template<>
+    class Expression<Inner<detail::InnerExpressionTraits> > : public Inner<detail::InnerExpressionTraits>::base_type {
+    public:
+     virtual void accept(ExpressionVisitor &V);
+   };
+
+   class InnerExpression : public InnerImpl<Expression<Base>, Inherit1<ExpressionVisitor>::apply<Virtual<Expression<Inner<detail::InnerExpressionTraits> > > >::type> {
+   private:
+     typedef InnerImpl<
+       Expression<Base>,
+      Inherit1<ExpressionVisitor>::apply<
+	Virtual<Expression<Inner<detail::InnerExpressionTraits> > >
+      >::type> BaseType;
+
   public:
     InnerExpression(child_ptr Child) : BaseType(Child) {}
     InnerExpression(child_ptr Child1,
@@ -251,7 +282,7 @@ namespace mirv {
    class ExpressionBaseGenerator {
    public:
     typedef typename Properties<PropertyExpressionGenerator, Root, Sequence,
-				Inherit<ExpressionVisitor> >::type
+				Inherit2<ExpressionVisitor> >::type
       type;
 
    };
