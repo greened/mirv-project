@@ -1,4 +1,5 @@
-ifdef CORE_NO_SOURCES
+ifndef mirv_src_core
+mirv_src_core := 1
 
 libmirv_core_SRCDIR := $(dir $(lastword $(MAKEFILE_LIST)))
 libmirv_core_SUBDIRS := builder filter ir mem util

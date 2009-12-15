@@ -211,7 +211,7 @@ namespace mirv {
      void operator()(ptr<Node<Base> >::type node);
    };
 
-  std::ostream &operator<<(std::ostream &out, const PrintFilter::indent &ind) {
+  inline std::ostream &operator<<(std::ostream &out, const PrintFilter::indent &ind) {
     return ind(out);
   }
 }
