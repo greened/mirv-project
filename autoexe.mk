@@ -5,15 +5,15 @@ define make_exe_impl
 
 $$(call debug,[exe] '$(1)' '$(2)' '$(3)' '$(4)' '$(5)' '$(6)')
 $$(call debug,[exe] LIBS = $(3))
-$$(call debug,[exe] LIBS subst = $(subst /, ,$(3)))
-$$(call debug,[exe] LIBS last = $(lastword $(subst /, ,$(3))))
-$$(call debug,[exe] LIBS patsubst = $(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(3)))))
-$$(call debug,[exe] LIBPATH = -L$(subst /$(lastword $(subst /, ,$(3))),,$(3)))
-$$(call debug,[exe] LDFLAGS = $(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(3)))) -L$(subst /$(lastword $(subst /, ,$(3))),,$(3)) $(5))
+$$(call debug,[exe] LIBS subst = $(foreach lib,$(3),$(subst /, ,$(lib))))
+$$(call debug,[exe] LIBS last = $(foreach lib,$(3),$(lastword $(subst /, ,$(3)))))
+$$(call debug,[exe] LIBS patsubst = $(foreach lib,$(3),$(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(lib))))))
+$$(call debug,[exe] LIBPATH = $(foreach lib,$(3),-L$(subst /$(lastword $(subst /, ,$(lib))),,$(lib))))
+$$(call debug,[exe] LDFLAGS = $(foreach lib,$(3),$(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(lib))))) $(foreach lib,$(3),-L$(subst /$(lastword $(subst /, ,$(lib))),,$(lib))) $(5))
 
-$(1): LDFLAGS += $(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(3)))) -L$(subst /$(lastword $(subst /, ,$(3))),,$(3)) $(5)
+$(1): LDFLAGS += $(foreach lib,$(3),-L$(subst /$(lastword $(subst /, ,$(lib))),,$(lib))) $(foreach lib,$(3),$(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(lib))))) $(5)
 
-$$(call debug,[exe] $(1): LDFLAGS += $(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(3)))) -L$(subst /$(lastword $(subst /, ,$(3))),,$(3)) $(5))
+$$(call debug,[exe] $(1): LDFLAGS += $(foreach lib,$(3),$(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(lib))))) $(foreach lib,$(3),-L$(subst /$(lastword $(subst /, ,$(lib))),,$(lib))) $(5))
 
 $$(call debug,[exe] $(1): $(2) $(3) $(6))
 
