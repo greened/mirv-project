@@ -11,8 +11,13 @@ $$(call debug,[exe] $(1): LDFLAGS += $(foreach lib,$(3),$(patsubst lib%.a,-l%,$(
 
 $$(call debug,[exe] $(1): $(2) $(3) $(6))
 
+ifneq ($(4),)
+$$($(1)): LXX = $$($(4))
+$$($(1)): LCC = $$($(4))
+endif
+
 $(1): $(2) $(3) $(6)
-	$$($(4)) -o $$(@) $$(filter %.o,$$(^)) $$(LDFLAGS)
+	$$(LXX) -o $$(@) $$(filter %.o,$$(^)) $$(LDFLAGS)
 
 endef
 
