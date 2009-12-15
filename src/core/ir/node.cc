@@ -1,4 +1,6 @@
 #include <mirv/ir/node.hh>
 
-template<>
-void Node<Base>::~Node(void) {}
+namespace mirv {
+  template<>
+  void Node<Base>::~Node(void) {}
+}
