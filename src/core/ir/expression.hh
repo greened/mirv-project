@@ -34,7 +34,8 @@ namespace mirv {
 	detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
 	>::type properties;
 
-    private:
+    protected:
+      Expression(void) {}
       template<typename A1>
       Expression(A1 a1) : base_type(a1) {}
       template<typename A1, typename A2>
