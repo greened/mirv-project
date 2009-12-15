@@ -80,6 +80,23 @@ namespace mirv {
 	error("Inherit::accept called");
       }
     };
+
+    template<typename Visitor, typename T1, typename T2>
+    class Type2<Visitor, Virtual<T1>, T2> :
+      public virtual T1, public T2 {
+    public:
+      Type2(void) {}
+
+      template<typename A1>
+      Type2(A1 a1) : T1(a1) {}
+
+      template<typename A1, typename A2>
+      Type2(A1 a1, A2 a2) : T1(a1, a2) {}
+
+      void accept(Visitor &V) {
+	error("Inherit::accept called");
+      }
+    };
   }
 
   template<typename Visitor>

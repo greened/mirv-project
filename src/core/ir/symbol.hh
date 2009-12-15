@@ -10,7 +10,8 @@ namespace mirv {
    public:
      typedef typename Tag::base_type base_type;
 
-   private:
+   protected:
+     Symbol(void) {}
      template<typename A1>
      Symbol(A1 a1) : base_type(a1) {}
      template<typename A1, typename A2>
@@ -19,7 +20,7 @@ namespace mirv {
    public:
      static typename ptr<Symbol<Tag> >::type
      make(void) {
-       return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(Tag()));
+       return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>());
      }
 
      template<typename A1>
