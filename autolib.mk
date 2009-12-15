@@ -10,6 +10,8 @@ include $(BUILDTOOLS)/configure/shlib.mk
 define make_library_impl
 
 $$(call make_objects,$(1),$(2))
+$$(foreach srcdir,$(3),$$(call make_objects,$(1)_$$(subst /,_,$$(srcdir)),$$(srcdir)))
+$$(foreach srcdir,$(3),$$(eval $(1)_OBJS += $$($(1)_$$(subst /,_,$$(srcdir))_OBJS)))
 
 $(1)_LIBRARIES := $$($(1)_OBJDIR)/$(1).a $$($(1)_OBJDIR)/$(1).so
 
@@ -20,7 +22,7 @@ $$($(1)_OBJDIR)/$(1).a: $$($(1)_OBJS)
 	$$(if $$(QUIET),$$(info [RANLIB] $$@))
 	$$(QUIET)$$(RANLIB) $$@
 
-$$(call debug,$$($(1)_OBJDIR)/$(1).a: $$($(1)_OBJS))
+$$(call debug,[lib] $$($(1)_OBJDIR)/$(1).a: $$($(1)_OBJS))
 
 $(1)_SOBJS := $$(patsubst %.o,%-pic.o,$$($(1)_OBJS))
 
@@ -29,12 +31,16 @@ $$($(1)_OBJDIR)/$(1).so: $$($(1)_SOBJS)
 	+$(QUIET)[ -d $$(@D) ] || $(MKDIR) -p $$(@D)
 	$(QUIET)$$(call make_shlib,$$@,$$($(1)_SOBJS),$$($(1)_SRCS))
 
-$$(call debug,$$($(1)_OBJDIR)/$(1).so: $$($(1)_SOBJS))
+$$(call debug,[lib] $$($(1)_OBJDIR)/$(1).so: $$($(1)_SOBJS))
 
-$$(call debug,$(1)_LIBRARIES = $$($(1)_LIBRARIES))
+$$(call debug,[lib] $(1)_LIBRARIES = $$($(1)_LIBRARIES))
 
 endef
 
-make_library = $(eval $(call make_library_impl,$(1),$(2)))
+# $1: A unique prefix.
+# $2: Source dir for the library build.
+# $3: Additional source directories.
+# $4: Dependency.
+make_library = $(eval $(call make_library_impl,$(1),$(2),$(3),$(4)))
 
 endif
