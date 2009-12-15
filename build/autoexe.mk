@@ -4,16 +4,22 @@ AUTOEXE_MK := 1
 define make_exe_impl
 
 $$(call debug,[exe] '$(1)' '$(2)' '$(3)' '$(4)' '$(5)' '$(6)')
+$$(call debug,[exe] LIBS = $(3))
+$$(call debug,[exe] LIBS subst = $(subst /, ,$(3)))
+$$(call debug,[exe] LIBS last = $(lastword $(subst /, ,$(3))))
+$$(call debug,[exe] LIBS patsubst = $(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(3)))))
+$$(call debug,[exe] LIBPATH = -L$(subst /$(lastword $(subst /, ,$(3))),,$(3)))
+$$(call debug,[exe] LDFLAGS = $(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(3)))) -L$(subst /$(lastword $(subst /, ,$(3))),,$(3)) $(5))
 
-$(1): LDFLAGS += $(foreach lib,$(3),$(patsubst lib%.a,-l%,$(firstword $(patsubst /, ,$$(lib))))) $(5)
+$(1): LDFLAGS += $(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(3)))) -L$(subst /$(lastword $(subst /, ,$(3))),,$(3)) $(5)
 
-$$(call debug,[exe] $(1): LDFLAGS += $(foreach lib,$(3),$(patsubst lib%.a,-l%,$(firstword $(patsubst /, ,$$(lib))))) $(5)) 
+$$(call debug,[exe] $(1): LDFLAGS += $(patsubst lib%.a,-l%,$(lastword $(subst /, ,$(3)))) -L$(subst /$(lastword $(subst /, ,$(3))),,$(3)) $(5))
 
 $$(call debug,[exe] $(1): $(2) $(3) $(6))
 
 ifneq ($(4),)
-$$($(1)): LXX = $$($(4))
-$$($(1)): LCC = $$($(4))
+$(1): LXX = $$($(4))
+$(1): LCC = $$($(4))
 endif
 
 $(1): $(2) $(3) $(6)
