@@ -1,4 +1,4 @@
-#include <mirv/filter/visitor.hh>
+#include <mirv/core/filter/visitor.hh>
 
 namespace mirv {
   virtual result_type StatementVisitor::visit(BaseStatement &) {};

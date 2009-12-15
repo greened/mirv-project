@@ -9,7 +9,7 @@ $(call debug,[core] SRCDIRS = $(libmirv_core_SRCDIRS))
 
 include $(BUILDTOOLS)/autolib.mk
 
-$(call make_library,libmirv_core,$(libmirv_core_SRCDIRS))
+$(call make_library,libmirv_core,$(libmirv_core_SRCDIR),$(libmirv_core_SRCDIRS))
 
 TARGETS += $(libmirv_core_LIBRARIES)
 
