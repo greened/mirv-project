@@ -28,11 +28,17 @@ namespace mirv {
     class Expression : public Op::base_type {
     public:
       typedef typename Op::base_type base_type;
-      typedef typename Op::visitor_base_type visitor_base_type;
       typedef typename boost::mpl::sort<
 	typename Op::properties,
 	detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
 	>::type properties;
+      // If there are properties, visit those first, otherwise visit
+      // the specified visitor base type.
+      typedef typename boost::mpl::eval_if<
+	boost::mpl::empty<properties>,
+	boost::mpl::identity<typename Op::visitor_base_type>,
+	boost::mpl::deref<boost::mpl::begin<properties> >
+	>::type visitor_base_type;
 
     protected:
       Expression(void) {}

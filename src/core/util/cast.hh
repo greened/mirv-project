@@ -25,8 +25,16 @@ namespace mirv {
     return ret;
   }
 
-  template<typename From, typename To>
-  inline typename ptr<To>::type dyn_cast(typename ptr<From>::type val)
+  // For some reason this doesn't work.
+  // template<typename To, typename From>
+  // typename ptr<To>::type dyn_cast(typename ptr<From>::type const &val)
+  // {
+  //   typename ptr<To>::type ret = boost::dynamic_pointer_cast<To>(val);
+  //   return ret;
+  // }
+
+  template<typename To, typename From>
+  typename boost::shared_ptr<To> dyn_cast(typename boost::shared_ptr<From> const &val)
   {
     typename ptr<To>::type ret = boost::dynamic_pointer_cast<To>(val);
     return ret;
