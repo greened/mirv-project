@@ -17,7 +17,7 @@ namespace mirv {
    template<>
    class Node<Base> {
    public:
-     virtual ~Node(void);
+     virtual ~Node<Base>(void);
    };
 
   template<typename Traits>
