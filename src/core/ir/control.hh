@@ -69,7 +69,7 @@ namespace mirv {
 
    public:
      typedef InnerStatement interface_base_type;
-     typedef Base visitor_base_type;
+     typedef InnerStatement visitor_base_type;
      typedef sequence properties;
 
       class interface : public interface_base_type {

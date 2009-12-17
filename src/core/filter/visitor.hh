@@ -18,24 +18,26 @@ namespace mirv {
   struct StatementVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<
-	Statement<Base>,
-      LeafStatement,
-      InnerStatement,
-	Statement<Conditional>,
-	Statement<Iterative>,
-	Statement<Mutating>,
-      Statement<Block>,
-      Statement<IfThen>,
-      Statement<IfElse>,
-      Statement<While>,
-      Statement<DoWhile>,
-      Statement<Switch>,
-      Statement<Case>,
-      Statement<CaseBlock>,
-      Statement<Before>,
-      Statement<After>,
-      Statement<Goto>,
-      Statement<Return>
+	ptr<Statement<Base> >::type,
+	ptr<LeafStatement>::type,
+	ptr<InnerStatement>::type,
+	ptr<Statement<Conditional> >::type,
+	ptr<Statement<Iterative> >::type,
+	ptr<Statement<Mutating> >::type,
+	ptr<Statement<Block> >::type,
+	ptr<Statement<SingleBlock> >::type,
+	ptr<Statement<DualBlock> >::type,
+	ptr<Statement<IfThen> >::type,
+	ptr<Statement<IfElse> >::type,
+	ptr<Statement<While> >::type,
+	ptr<Statement<DoWhile> >::type,
+	ptr<Statement<Switch> >::type,
+	ptr<Statement<Case> >::type,
+	ptr<Statement<CaseBlock> >::type,
+	ptr<Statement<Before> >::type,
+	ptr<Statement<After> >::type,
+	ptr<Statement<Goto> >::type,
+	ptr<Statement<Return> >::type
 	> > {
   public:
     virtual result_type visit(ptr<Statement<Base> >::type);
@@ -45,6 +47,8 @@ namespace mirv {
     virtual result_type visit(ptr<Statement<Iterative> >::type);
     virtual result_type visit(ptr<Statement<Mutating> >::type);
     virtual result_type visit(ptr<Statement<Block> >::type);
+    virtual result_type visit(ptr<Statement<SingleBlock> >::type);
+    virtual result_type visit(ptr<Statement<DualBlock> >::type);
     virtual result_type visit(ptr<Statement<IfThen> >::type);
     virtual result_type visit(ptr<Statement<IfElse> >::type);
     virtual result_type visit(ptr<Statement<While> >::type);
@@ -61,36 +65,42 @@ namespace mirv {
   struct ExpressionVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<
-	Expression<Base>,
-      InnerExpression,
-      LeafExpression,
-	Expression<Arithmetic>,
-	Expression<Logical>,
-	Expression<Bitwise>,
-	Expression<Ref>,
-	Expression<Commutative>,
-	Expression<Associative>,
-	Expression<Transitive>,
-	Expression<Reflexive>,
-      Expression<Add>,
-      Expression<Subtract>,
-      Expression<Divide>,
-      Expression<Modulus>,
-      Expression<Multiply>,
-      Expression<Negate>,
-      Expression<LogicalAnd>,
+	ptr<Expression<Base> >::type,
+	ptr<InnerExpression>::type,
+	ptr<InnerExpressionBase>::type,
+	ptr<LeafExpression>::type,
+	ptr<Expression<Arithmetic> >::type,
+	ptr<Expression<Logical> >::type,
+	ptr<Expression<Bitwise> >::type,
+	ptr<Expression<Ref> >::type,
+	ptr<Expression<Commutative> >::type,
+	ptr<Expression<Associative> >::type,
+	ptr<Expression<Transitive> >::type,
+	ptr<Expression<Reflexive> >::type,
 
-      Expression<LogicalOr>,
-      Expression<LogicalNot>,
-      Expression<BitwiseAnd>,
-      Expression<BitwiseOr>,
-	Expression<BitwiseComplement>,
+	ptr<Expression<Unary> >::type,
+	ptr<Expression<Binary> >::type,
 
-	Expression<Reference<Variable> >
+	ptr<Expression<Add> >::type,
+	ptr<Expression<Subtract> >::type,
+	ptr<Expression<Divide> >::type,
+	ptr<Expression<Modulus> >::type,
+	ptr<Expression<Multiply> >::type,
+	ptr<Expression<Negate> >::type,
+	ptr<Expression<LogicalAnd> >::type,
+
+	ptr<Expression<LogicalOr> >::type,
+	ptr<Expression<LogicalNot> >::type,
+	ptr<Expression<BitwiseAnd> >::type,
+	ptr<Expression<BitwiseOr> >::type,
+	ptr<Expression<BitwiseComplement> >::type,
+
+	ptr<Expression<Reference<Variable> > >::type
 	> > {
   public:
     virtual result_type visit(ptr<Expression<Base> >::type);
     virtual result_type visit(ptr<InnerExpression>::type);
+    virtual result_type visit(ptr<InnerExpressionBase>::type);
     virtual result_type visit(ptr<LeafExpression>::type);
     virtual result_type visit(ptr<Expression<Arithmetic> >::type);
     virtual result_type visit(ptr<Expression<Logical> >::type);
@@ -100,6 +110,8 @@ namespace mirv {
     virtual result_type visit(ptr<Expression<Associative> >::type);
     virtual result_type visit(ptr<Expression<Transitive> >::type);
     virtual result_type visit(ptr<Expression<Reflexive> >::type);
+    virtual result_type visit(ptr<Expression<Unary> >::type);
+    virtual result_type visit(ptr<Expression<Binary> >::type);
     virtual result_type visit(ptr<Expression<Add> >::type);
     virtual result_type visit(ptr<Expression<Subtract> >::type);
     virtual result_type visit(ptr<Expression<Divide> >::type);

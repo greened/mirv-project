@@ -23,6 +23,14 @@ namespace mirv {
        public boost::mpl::less<typename T1::order, typename T2::order> {};
    }
 
+  template<typename Op> class Expression;
+  struct PropertyExpressionGenerator {
+    template<typename Property>
+    struct apply {
+      typedef Expression<Property> type;
+    };
+  };
+
    struct ExpressionVisitor;
     template<typename Op>
     class Expression : public Op::base_type {
@@ -32,12 +40,17 @@ namespace mirv {
 	typename Op::properties,
 	detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
 	>::type properties;
+
+    private:
+      typedef typename boost::mpl::transform<properties, PropertyExpressionGenerator>::type property_expressions;
+
+    public:
       // If there are properties, visit those first, otherwise visit
       // the specified visitor base type.
       typedef typename boost::mpl::eval_if<
 	boost::mpl::empty<properties>,
 	boost::mpl::identity<typename Op::visitor_base_type>,
-	boost::mpl::deref<boost::mpl::begin<properties> >
+	boost::mpl::deref<typename boost::mpl::begin<property_expressions>::type>
 	>::type visitor_base_type;
 
     protected:
@@ -92,6 +105,7 @@ namespace mirv {
     template<>
     class Expression<Inner<detail::InnerExpressionTraits> > : public Inner<detail::InnerExpressionTraits>::base_type {
     public:
+      typedef Expression<Base> visitor_base_type;
      virtual void accept(ExpressionVisitor &V);
    };
 
@@ -106,6 +120,8 @@ namespace mirv {
       >::type> BaseType;
 
   public:
+    typedef Expression<Base> visitor_base_type;
+
     InnerExpression(child_ptr Child) : BaseType(Child) {}
     InnerExpression(child_ptr Child1,
 		    child_ptr Child2) : BaseType(Child1, Child2) {}
@@ -114,6 +130,8 @@ namespace mirv {
 
   class LeafExpression : public LeafImpl<Expression<Base> > {
   public:
+    typedef Expression<Base> visitor_base_type;
+
     virtual void accept(ExpressionVisitor &V);
   };
 
@@ -275,13 +293,6 @@ namespace mirv {
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    }; 
-
-  struct PropertyExpressionGenerator {
-    template<typename Property>
-    struct apply {
-      typedef Expression<Property> type;
-    };
-  };
  
   template<typename Sequence, typename Root>
    class ExpressionBaseGenerator {
