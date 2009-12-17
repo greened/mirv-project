@@ -22,6 +22,19 @@ namespace mirv {
 
    struct StatementVisitor;
 
+  template<typename Tag> class Statement;
+
+    // A metafunction class to generate statement hierarchies.  This
+    // makes sure that each property statement specifies Base as its
+    // base type so that visit(Expreesion<>::base_type) works
+    // correctly.
+  struct PropertyStatementGenerator {
+    template<typename Property>
+    struct apply {
+      typedef Statement<Property> type;
+    };
+  };
+
    template<typename Tag>
    class Statement: public Tag::base_type {
    public:
@@ -29,12 +42,16 @@ namespace mirv {
        typename Tag::properties,
        detail::StatementPropertyLess<boost::mpl::_1, boost::mpl::_2>
        >::type properties;
+   private:
+      typedef typename boost::mpl::transform<properties, PropertyStatementGenerator>::type property_statements;
+
+   public:
       // If there are properties, visit those first, otherwise visit
       // the specified visitor base type.
       typedef typename boost::mpl::eval_if<
 	boost::mpl::empty<properties>,
-	boost::mpl::identity<typename Op::visitor_base_type>,
-	boost::mpl::deref<boost::mpl::begin<properties>::type>
+	boost::mpl::identity<typename Tag::visitor_base_type>,
+	boost::mpl::deref<typename boost::mpl::begin<property_statements>::type>
 	>::type visitor_base_type;
 
      template<typename A1>
@@ -116,18 +133,6 @@ namespace mirv {
       typedef Virtual<Statement<Base> > base_type;
      typedef Statement<Base> visitor_base_type;
      typedef boost::mpl::vector<> properties;
-    };
-
-    // A metafunction class to generate statement hierarchies.  This
-    // makes sure that each property statement specifies Base as its
-    // base type so that visit(Expreesion<>::base_type) works
-    // correctly.
-    class PropertyStatementGenerator {
-    public:
-       template<typename Property>
-       struct apply {
-	  typedef Statement<Property> type;
-       };
     };
 
     template<typename Sequence, typename Root>

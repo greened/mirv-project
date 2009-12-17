@@ -40,6 +40,12 @@ namespace mirv {
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Block> >::type s) {
     visit(static_cast<ptr<Statement<Block>::visitor_base_type>::type>(s));
   }
+  StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<SingleBlock> >::type s) {
+    visit(static_cast<ptr<Statement<SingleBlock>::visitor_base_type>::type>(s));
+  }
+  StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<DualBlock> >::type s) {
+    visit(static_cast<ptr<Statement<DualBlock>::visitor_base_type>::type>(s));
+  }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<IfThen> >::type s) {
     visit(static_cast<ptr<Statement<IfThen>::visitor_base_type>::type>(s));
   }
@@ -71,15 +77,18 @@ namespace mirv {
     visit(static_cast<ptr<Statement<Goto>::visitor_base_type>::type>(s));
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Return> >::type s) {
-    visit(static_cast<ptr<Statement<After>::visitor_base_type>::type>(s));
+    visit(static_cast<ptr<Statement<Return>::visitor_base_type>::type>(s));
   }
 
-  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<BaseExpression>::type e) {}
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Base> >::type e) {}
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<InnerExpression>::type e) {
-    visit(static_cast<ptr<Expression<Base> >::type>(e));
+    visit(static_cast<ptr<InnerExpression::visitor_base_type>::type>(e));
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<InnerExpressionBase>::type e) {
+    visit(static_cast<ptr<InnerExpressionBase::visitor_base_type>::type>(e));
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<LeafExpression>::type e) {
-    visit(static_cast<ptr<Expression<Base> >::type>(e));
+    visit(static_cast<ptr<LeafExpression::visitor_base_type>::type>(e));
   }
   // Establish an order for properties.  This coresponds to the
   // property tag ordering.
@@ -93,7 +102,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      visit(static_cast<ptr<InnerExpression>::type>(e));
+      visit(static_cast<ptr<InnerExpressionBase>::type>(e));
     }
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Logical> >::type e) {
@@ -106,7 +115,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      visit(static_cast<ptr<InnerExpression>::type>(e));
+      visit(static_cast<ptr<InnerExpressionBase>::type>(e));
     }
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Bitwise> >::type e) {
@@ -119,7 +128,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      visit(static_cast<ptr<InnerExpression>::type>(e));
+      visit(static_cast<ptr<InnerExpressionBase>::type>(e));
     }
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Commutative> >::type e) {
@@ -144,7 +153,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      visit(static_cast<ptr<InnerExpression>::type>(e));
+      visit(static_cast<ptr<InnerExpressionBase>::type>(e));
     }
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Associative> >::type e) {
@@ -173,7 +182,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      visit(static_cast<ptr<InnerExpression>::type>(e));
+      visit(static_cast<ptr<InnerExpressionBase>::type>(e));
     }
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Transitive> >::type e) {
@@ -195,7 +204,7 @@ namespace mirv {
     }
     else if (ptr<Expression<Arithmetic> >::type ae =
 	     dyn_cast<Expression<Arithmetic> >(e)) {
-      visit(*ae);
+      visit(ae);
     }
     else if (ptr<Expression<Unary> >::type ue =
 	     dyn_cast<Expression<Unary> >(e)) {
@@ -206,7 +215,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      visit(static_cast<ptr<InnerExpression>::type>(e));
+      visit(static_cast<ptr<InnerExpressionBase>::type>(e));
     }
   }
 
@@ -233,7 +242,7 @@ namespace mirv {
     }
     else if (ptr<Expression<Arithmetic> >::type ae =
 	     dyn_cast<Expression<Arithmetic> >(e)) {
-      visit(*ae);
+      visit(ae);
     }
     else if (ptr<Expression<Unary> >::type ue =
 	     dyn_cast<Expression<Unary> >(e)) {
@@ -244,10 +253,10 @@ namespace mirv {
       visit(be);
     }
     else {
-      visit(static_cast<ptr<InnerExpression>::type>(e));
+      visit(static_cast<ptr<InnerExpressionBase>::type>(e));
     }
   }
-  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Reference> >::type e) {
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Ref> >::type e) {
     if (ptr<Expression<Reflexive> >::type re =
 	dyn_cast<Expression<Reflexive> >(e)) {
       visit(re);
@@ -274,7 +283,7 @@ namespace mirv {
     }
     else if (ptr<Expression<Arithmetic> >::type ae =
 	     dyn_cast<Expression<Arithmetic> >(e)) {
-      visit(*ae);
+      visit(ae);
     }
     else if (ptr<Expression<Unary> >::type ue =
 	     dyn_cast<Expression<Unary> >(e)) {
@@ -285,19 +294,27 @@ namespace mirv {
       visit(be);
     }
     else {
-      visit(static_cast<ptr<InnerExpression>::type>(e));
+      visit(static_cast<ptr<InnerExpressionBase>::type>(e));
     }
   }
+
+ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Unary> >::type e) {
+  visit(static_cast<ptr<Expression<Unary>::visitor_base_type>::type>(e));
+  }
+ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Binary> >::type e) {
+  visit(static_cast<ptr<Expression<Binary>::visitor_base_type>::type>(e));
+  }
+
   // We always prefer to visit the properties because they give us
   // semantic information.
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Add> >::type e) {
-    visit(static_cast<ptr<Expression<Add>::vistor_base_type>::type>(e));
+    visit(static_cast<ptr<Expression<Add>::visitor_base_type>::type>(e));
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Subtract> >::type e) {
     visit(static_cast<ptr<Expression<Subtract>::visitor_base_type>::type>(e));
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Divide> >::type e) {
-    visit(static_cast<ptr<Expression<Divide>::visitor_base_type>::type>>(e));
+    visit(static_cast<ptr<Expression<Divide>::visitor_base_type>::type>(e));
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Multiply> >::type e) {
     visit(static_cast<ptr<Expression<Multiply>::visitor_base_type>::type>(e));
@@ -324,7 +341,7 @@ namespace mirv {
     visit(static_cast<ptr<Expression<BitwiseOr>::visitor_base_type>::type>(e));
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type e) {
-    visit(static_cast<ptr<Expression<BitwiseComplement>::type>(e));
+    visit(static_cast<ptr<Expression<BitwiseComplement> >::type>(e));
   }
 
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::type e) {
