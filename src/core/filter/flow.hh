@@ -36,49 +36,49 @@ namespace mirv {
 
    protected:
      template<typename Stmt>
-     typename EnterAction::result_type enter(typename ptr<Stmt>::type stmt) {
+     typename EnterAction::result_type enter(boost::shared_ptr<Stmt> stmt) {
        return(ent(stmt));
-      };
+      }
 
      template<typename Stmt>
-     typename LeaveAction::result_type leave(typename ptr<Stmt>::type stmt) {
+     typename LeaveAction::result_type leave(boost::shared_ptr<Stmt> stmt) {
        return(lve(stmt));
-      };
+      }
 
      template<typename Stmt, typename Child>
-     typename BeforeStmtAction::result_type before_statement(typename ptr<Stmt>::type stmt,
-							     typename ptr<Child>::type child) {
+     typename BeforeStmtAction::result_type before_statement(boost::shared_ptr<Stmt> stmt,
+							     boost::shared_ptr<Child> child) {
        return(bfrstmt(stmt, child));
-      };
+      }
 
      template<typename Stmt, typename Child>
-     typename AfterStmtAction::result_type after_statement(typename ptr<Stmt>::type stmt,
-							   typename ptr<Child>::type child) {
+     typename AfterStmtAction::result_type after_statement(boost::shared_ptr<Stmt> stmt,
+							   boost::shared_ptr<Child> child) {
        return(aftstmt(stmt, child));
-      };
+      }
 
      template<typename Stmt, typename Child>
-     typename BetweenStmtAction::result_type between_statement(typename ptr<Stmt>::type stmt,
-							       typename ptr<Child>::type child1,
-							       typename ptr<Child>::type child2) {
+     typename BetweenStmtAction::result_type between_statement(boost::shared_ptr<Stmt> stmt,
+							       boost::shared_ptr<Child> child1,
+							       boost::shared_ptr<Child> child2) {
        return(betstmt(stmt, child1, child2));
-      };
+      }
 
      template<typename Stmt, typename Expr>
-     typename BeforeExprAction::result_type before_expression(typename ptr<Stmt>::type stmt,
-							      typename ptr<Expr>::type expr) {
+     typename BeforeExprAction::result_type before_expression(boost::shared_ptr<Stmt> stmt,
+							      boost::shared_ptr<Expr> expr) {
        return(bfrexpr(stmt, expr));
-      };
+      }
 
      template<typename Stmt, typename Expr>
-     typename AfterExprAction::result_type after_expression(typename ptr<Stmt>::type stmt,
-							    typename ptr<Expr>::type expr) {
+     typename AfterExprAction::result_type after_expression(boost::shared_ptr<Stmt> stmt,
+							    boost::shared_ptr<Expr> expr) {
        return(aftexpr(stmt, expr));
-      };
+      }
 
      ExprFlow &expression_flow(void) {
        return exp;
-      };
+      }
 
       Dataflow &dataflow(void) {
          return(data);

@@ -14,7 +14,7 @@ namespace mirv {
     class visitor {
     public:
       typedef Result result_type;
-      virtual result_type visit(Visited &) = 0;
+      virtual result_type visit(Visited) = 0;
     };
     
     // An acyclic visitor.  All visitor classes must derive from this.
@@ -30,7 +30,7 @@ namespace mirv {
       template<typename Result, typename Visited>
       struct apply {
 	struct type {
-	  Result operator()(Visited &v) const {
+	  Result operator()(Visited v) const {
 	    throw bad_visitor();
 	  }
 	};
@@ -54,7 +54,7 @@ namespace mirv {
       virtual result_type accept(acyclic_visitor_base &visitor) = 0;
     protected:
       template<typename Visited>
-      static result_type accept_impl(Visited &target,
+      static result_type accept_impl(Visited target,
                                      acyclic_visitor_base &vtor) {
 	if (visitor<Visited, result_type> *p =
 	    dynamic_cast<visitor<Visited, result_type> *>(&vtor)) {
@@ -77,7 +77,7 @@ namespace mirv {
     public:
       typedef Result result_type;
       template<class Visited>
-      result_type visit(Visited &target) {
+      result_type visit(Visited target) {
 	visitor<Visited> &visitor = *this;
 	return(visitor.visit(target));
       }

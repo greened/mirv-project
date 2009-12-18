@@ -3,7 +3,11 @@
 
 namespace mirv {
   struct NullDataflow {
-    struct Confluence {};
+    struct Confluence {
+      void operator()(NullDataflow &,
+		      const NullDataflow &,
+		      const NullDataflow &) {}
+    };
     bool change(void) const {
       return false;
     }

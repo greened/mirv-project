@@ -23,27 +23,27 @@ namespace mirv {
 
    protected:
      template<typename Expr>
-     typename EnterAction::result_type enter(typename ptr<Expr>::type expr) {
+     typename EnterAction::result_type enter(boost::shared_ptr<Expr> expr) {
        return(ent(expr));
       };
 
      template<typename Expr>
-     typename LeaveAction::result_type leave(typename ptr<Expr>::type expr) {
+     typename LeaveAction::result_type leave(boost::shared_ptr<Expr> expr) {
        return(lve(expr));
       };
 
      template<typename Expr, typename Child>
-     typename BeforeAction::result_type before(typename ptr<Expr>::type expr, typename ptr<Child>::type child) {
+     typename BeforeAction::result_type before(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child) {
        return(bfr(expr, child));
       };
 
      template<typename Expr, typename Child>
-     typename BeforeAction::result_type between(typename ptr<Expr>::type expr, typename ptr<Child>::type child1, typename ptr<Child>::type child2) {
+     typename BeforeAction::result_type between(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child1, boost::shared_ptr<Child> child2) {
        return(bfr(expr, child1, child2));
       };
 
      template<typename Expr, typename Child>
-     typename AfterAction::result_type after(typename ptr<Expr>::type expr, typename ptr<Child>::type child) {
+     typename AfterAction::result_type after(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child) {
        return(aft(expr, child));
       };
 
@@ -103,12 +103,12 @@ namespace mirv {
                 iend = expr->end();
              i != iend;
              /* NULL */) {
-            this->before(expr, **i);
+            this->before(expr, *i);
             (*i)->accept(*this);
-            this->after(expr, **i);
+            this->after(expr, *i);
             InnerExpression::iterator prev = i;
             if (++i != iend) {
-               this->between(expr, **prev, **i);
+               this->between(expr, *prev, *i);
             }
          }
 
@@ -159,12 +159,12 @@ namespace mirv {
                 iend = expr->rend();
              i != iend;
              /* NULL */) {
-            this->before(expr, **i);
+            this->before(expr, *i);
             (*i)->accept(*this);
-            this->after(expr, **i);
+            this->after(expr, *i);
             InnerExpression::reverse_iterator prev = i;
             if (++i != iend) {
-               this->between(expr, **prev, **i);
+               this->between(expr, *prev, *i);
             }
          } 
 
