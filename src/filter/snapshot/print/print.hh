@@ -70,20 +70,6 @@ namespace mirv {
          }
       };
 
-      // After each statement's child
-      class AfterAction : public VisitStatementAction {
-      private:
-         Stream &out;
-         Indent &ind;
-
-      public:
-         AfterAction(Stream &o, Indent &i)
-               : out(o), ind(i) {}
-	void visit(ptr<Statement<Base> >::type stmt) {
-            out << "\n";
-         }
-      };
-
       // Leaving each statement
       class LeaveAction : public VisitStatementAction {
       private:
@@ -94,6 +80,9 @@ namespace mirv {
          LeaveAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
 
+	void visit(ptr<Statement<Base> >::type stmt) {
+	  out << "\n";
+	}
 	void visit(ptr<Statement<Block> >::type stmt);
       };
 
@@ -132,24 +121,13 @@ namespace mirv {
          LeaveExprAction(Stream &o, Indent &i)
                : out(o), ind(i) {}
 
-         void visit(ptr<InnerExpression>::type expr) {
-            ind -= IndentFactor;
-         }
-      };
-
-      // After each expression's child
-      class AfterExprAction : public VisitExpressionAction {
-      private:
-         Stream &out;
-         Indent &ind;
-
-      public:
-         AfterExprAction(Stream &o, Indent &i)
-               : out(o), ind(i) {}
-
 	void visit(ptr<Expression<Base> >::type expr) {
-            out << "\n";
-         }
+	  out << "\n";
+	}
+	void visit(ptr<InnerExpression>::type expr) {
+	  ind -= IndentFactor;
+	  out << "\n";
+	}
       };
 
       class PrintExpressionFlow
@@ -158,7 +136,7 @@ namespace mirv {
          LeaveExprAction,
          NullAction,
 	 NullAction,
-         AfterExprAction
+         NullAction
          > {
       private:
 	typedef ForwardExpressionFlow<
@@ -166,21 +144,20 @@ namespace mirv {
          LeaveExprAction,
          NullAction,
 	 NullAction,
-         AfterExprAction
+         NullAction
 	> BaseType;
 
       public:
 	PrintExpressionFlow(const EnterExprAction &e,
-			    const LeaveExprAction &l,
-			    const AfterExprAction &a)
-	  : BaseType(e, l, NullAction(), NullAction(), a, NullDataflow()) {}
+			    const LeaveExprAction &l)
+	  : BaseType(e, l, NullAction(), NullAction(), NullAction(), NullDataflow()) {}
       };
 
       typedef ForwardFlow<
          EnterAction,
          LeaveAction,
          NullAction,
-	AfterAction,
+	NullAction,
 	NullAction,
 	NullAction,
 	NullAction,

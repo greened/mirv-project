@@ -3,6 +3,7 @@
 
 #include <mirv/core/ir/node.hh>
 #include <mirv/core/ir/expression.hh>
+#include <mirv/core/ir/inherit.hh>
 
 #include <mirv/core/filter/visitor.hh>
 
@@ -79,7 +80,7 @@ namespace mirv {
     class InnerStatementTraits {
     public:
       typedef Statement<Base> Child;
-      typedef Statement<Base> base_type;
+      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >base_type;
 
     private:
       typedef ptr<Child>::type child_ptr;
@@ -150,7 +151,7 @@ namespace mirv {
 
     public:
        class interface;
-      typedef Statement<Base> interface_base_type;
+      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > > interface_base_type;
       typedef Statement<Base> visitor_base_type;
       typedef sequence properties;
 

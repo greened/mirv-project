@@ -11,6 +11,7 @@ define make_library_impl
 
 $$(call make_objects,$(1),$(2))
 $$(foreach srcdir,$(3),$$(call make_objects,$(1)_$$(subst /,_,$$(srcdir)),$$(srcdir)))
+$$(foreach srcdir,$(3),$$(eval $(1)_SRCS += $$($(1)_$$(subst /,_,$$(srcdir))_SRCS)))
 $$(foreach srcdir,$(3),$$(eval $(1)_OBJS += $$($(1)_$$(subst /,_,$$(srcdir))_OBJS)))
 
 $(1)_LIBRARIES := $$($(1)_OBJDIR)/$(1).a $$($(1)_OBJDIR)/$(1).so
@@ -31,6 +32,7 @@ $$($(1)_OBJDIR)/$(1).so: $$($(1)_SOBJS)
 	+$(QUIET)[ -d $$(@D) ] || $(MKDIR) -p $$(@D)
 	$(QUIET)$$(call make_shlib,$$@,$$($(1)_SOBJS),$$($(1)_SRCS))
 
+$$(call debug,[lib] $$($(1)_OBJDIR)/$(1).so: $$($(1)_SRCS))
 $$(call debug,[lib] $$($(1)_OBJDIR)/$(1).so: $$($(1)_SOBJS))
 
 $$(call debug,[lib] $(1)_LIBRARIES = $$($(1)_LIBRARIES))

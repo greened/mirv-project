@@ -68,7 +68,7 @@ namespace mirv {
 
    void PrintFilter::LeaveAction::visit(ptr<Statement<Block> >::type stmt) {
      ind -= IndentFactor;
-     out << indent(ind) << "}";
+     out << indent(ind) << "\n}\n";
    }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Add> >::type expr)
@@ -156,13 +156,12 @@ namespace mirv {
 	 make_forward_flow(EnterAction(out, ind),
 			   LeaveAction(out, ind),
 			   NullAction(),
-			   AfterAction(out, ind),
+			   NullAction(),
 			   NullAction(),
 			   NullAction(),
 			   NullAction(),
 			   PrintExpressionFlow(EnterExprAction(out, ind),
-					       LeaveExprAction(out, ind),
-					       AfterExprAction(out, ind)));
+					       LeaveExprAction(out, ind)));
        s->accept(*flow);
      }
      else {
