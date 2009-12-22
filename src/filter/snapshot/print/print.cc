@@ -56,6 +56,11 @@ namespace mirv {
        out << indent(ind) << "case";
     }
 
+    void PrintFilter::EnterAction::visit(ptr<Statement<CaseBlock> >::type stmt)
+    {
+       out << indent(ind) << "caseblock";
+    }
+
     void PrintFilter::EnterAction::visit(ptr<Statement<Before> >::type stmt)
     {
        out << indent(ind) << "before ";

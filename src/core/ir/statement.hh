@@ -264,4 +264,6 @@ namespace mirv {
    };
 }
 
+#include <mirv/core/ir/statement.ii>
+
 #endif
