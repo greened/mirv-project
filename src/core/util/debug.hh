@@ -2,6 +2,7 @@
 #define mirv_core_util_debug_hh
 
 #include <iostream>
+#include <cstdlib>
 
 #define check_invariant(Check, Msg) \
    if (!(Check)) {                              \

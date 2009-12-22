@@ -273,7 +273,8 @@ namespace mirv {
          this->leave(stmt);
       }
 
-      void visit(ptr<Statement<CaseBlock> >::type stmt);
+     void visit(ptr<Statement<CaseBlock> >::type stmt) {
+     }
 
       void visit(ptr<Statement<Before> >::type stmt) {
          this->enter(stmt);
