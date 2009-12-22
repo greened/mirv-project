@@ -1,6 +1,8 @@
 #ifndef mirv_core_ir_type_hh
 #define mirv_core_ir_type_hh
 
+#include <mirv/core/ir/symbol.hh>
+
 #include <vector>
 #include <numeric>
 
