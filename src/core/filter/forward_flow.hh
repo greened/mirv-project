@@ -4,6 +4,9 @@
 #include <mirv/core/filter/flow.hh>
 #include <mirv/core/filter/dataflow.hh>
 #include <mirv/core/ir/attribute.hh>
+#include <mirv/core/ir/statement.hh>
+#include <mirv/core/ir/control.hh>
+#include <mirv/core/ir/mutating.hh>
 #include <mirv/core/mem/heap.hh>
 
 namespace mirv {

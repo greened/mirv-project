@@ -3,6 +3,7 @@
 
 #include <mirv/core/filter/visitor.hh>
 #include <mirv/core/filter/dataflow.hh>
+#include <mirv/core/ir/expression.hh>
 
 namespace mirv {
    template<
