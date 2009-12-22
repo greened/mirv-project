@@ -1,7 +1,7 @@
 #ifndef mirv_core_ir_mutating_hh
 #define mirv_core_ir_mutating_hh
 
-#include <mirv/statement.hh>
+#include <mirv/core/ir/statement.hh>
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
@@ -10,7 +10,9 @@ namespace mirv {
       class interface;
       typedef interface base_type;
       typedef Statement<Controlled> interface_base_type;
-      
+     typedef boost::mpl::vector<> properties;
+     typedef Statement<Controlled> visitor_base_type;
+
       class interface 
             : public interface_base_type {
          // Protected because subclasses might want to rename
@@ -30,7 +32,7 @@ namespace mirv {
 
          void set_right(expression_ptr e) {
             if (expression_empty()) {
-               expression_push_back(chikd_ptr()); // Placeholder
+               expression_push_back(expression_ptr()); // Placeholder
                expression_push_back(e);
             }
             else {

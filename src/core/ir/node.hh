@@ -8,6 +8,7 @@
 #include <mirv/core/util/debug.hh>
 
 #include <boost/mpl/vector.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <list>
 
 namespace mirv {
@@ -15,7 +16,7 @@ namespace mirv {
    class Node;
 
    template<>
-   class Node<Base> {
+   class Node<Base> : public boost::enable_shared_from_this<Node<Base> > {
    public:
      virtual ~Node<Base>(void);
    };

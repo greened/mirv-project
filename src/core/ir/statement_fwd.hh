@@ -1,22 +1,18 @@
 #ifndef mirv_core_ir_statement_fwd_hh
 #define mirv_core_ir_statement_fwd_hh
 
-#include <mirv/ir/base.hh>
-#include <mirv/ir/inherit.hh>
-
 namespace mirv {
-   template<
-      typename Tag,
-     typename Base = typename BaseType<Tag>::type>
-   class Statement;
-   typedef Statement<Base> BaseStatement;
+  template<typename Tag> class Statement;
 
   class InnerStatement;
   class LeafStatement;
-   template<typename Stmt>
-   class Controlled;
-   template<typename Stmt>
-   class SingleExpression;
+
+  class Conditional;
+  class Iterative;
+  class Mutating;
+
+  class Controlled;
+  class SingleExpression;
 }
 
 #endif
