@@ -4,14 +4,20 @@
 namespace mirv {
   template<typename Tag>
   void Statement<Tag>::accept(StatementVisitor &V) {
+    ptr<Node<Base> >::type pn = this->shared_from_this();
+    typename ptr<Statement<Tag> >::type p = safe_cast<Statement<Tag> >(pn);
     V.visit(*this);
   }
 
   void InnerStatement::accept(StatementVisitor &V) {
+    ptr<Node<Base> >::type pn = shared_from_this();
+    ptr<InnerStatement>::type p = safe_cast<InnerStatement>(pn);
     V.visit(*this);
   }
 
   void LeafStatement::accept(StatementVisitor &V) {
+    ptr<Node<Base> >::type pn = shared_from_this();
+    ptr<LeafStatement>::type p = safe_cast<LeafStatement>(pn);
     V.visit(*this);
   }
 }

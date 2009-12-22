@@ -3,14 +3,16 @@
 
 #include <visitor.hh>
  
-#include <mirv/core/ir/control.hh>
+#include <mirv/core/ir/statement_fwd.hh>
+#include <mirv/core/ir/control_fwd.hh>
 
-#include <mirv/core/ir/arithmetic.hh>
-#include <mirv/core/ir/logical.hh>
-#include <mirv/core/ir/bitwise.hh>
-#include <mirv/core/ir/reference.hh>
+#include <mirv/core/ir/expression_fwd.hh>
+#include <mirv/core/ir/arithmetic_fwd.hh>
+#include <mirv/core/ir/logical_fwd.hh>
+#include <mirv/core/ir/bitwise_fwd.hh>
+#include <mirv/core/ir/reference_fwd.hh>
 
-#include <mirv/core/ir/variable.hh>
+#include <mirv/core/ir/variable_fwd.hh>
 
 #include <boost/mpl/vector.hpp>
 

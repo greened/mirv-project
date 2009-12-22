@@ -80,7 +80,7 @@ namespace mirv {
     class InnerStatementTraits {
     public:
       typedef Statement<Base> Child;
-      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >base_type;
+      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
 
     private:
       typedef ptr<Child>::type child_ptr;
@@ -101,7 +101,7 @@ namespace mirv {
      virtual void accept(StatementVisitor &V);
    };
 
-   class LeafStatement : public LeafImpl<Virtual<Statement<Base> > > {
+  class LeafStatement : public LeafImpl<Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type> {
    public:
      virtual void accept(StatementVisitor &V);
 

@@ -17,9 +17,9 @@ namespace mirv {
   }
 
   template<typename To, typename From>
-  inline typename ptr<To>::type safe_cast(const typename ptr<From>::type &val)
+  inline typename boost::shared_ptr<To> safe_cast(boost::shared_ptr<From> val)
   {
-    typename ptr<To>::type ret = boost::dynamic_pointer_cast<To>(val);
+    typename boost::shared_ptr<To> ret = boost::dynamic_pointer_cast<To>(val);
     check_invariant(ret, "Failed safe_cast");
 
     return ret;
@@ -52,6 +52,19 @@ namespace mirv {
     }
     else {
       return static_cast<To>(val);
+    }
+  }
+  template<typename To, typename From>
+  typename boost::shared_ptr<To> fast_cast(typename boost::shared_ptr<From> const &val)
+  {
+    if (DebugManager::Instance().IsActive()
+	&& DebugManager::Instance().Feature(DebugManager::SafeCast)) {
+      typename ptr<To>::type ret = dyn_cast<To>(val);
+      return ret;
+    }
+    else {
+      typename ptr<To>::type ret = boost::static_pointer_cast<To>(val);
+      return ret;
     }
   }
 }

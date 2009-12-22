@@ -109,7 +109,7 @@ namespace mirv {
      virtual void accept(ExpressionVisitor &V);
    };
 
-  typedef Expression<Inner<detail::InnerExpressionTraits> > InnerExpressionBase;
+  class InnerExpressionBase : public Expression<Inner<detail::InnerExpressionTraits> > {};
   
   class InnerExpression : public InnerImpl<Expression<Base>, Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type> {
    private:
@@ -303,5 +303,7 @@ namespace mirv {
 
    };
 }
- 
+
+#include <mirv/core/ir/expression.ii>
+
 #endif
