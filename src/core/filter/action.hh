@@ -23,7 +23,7 @@ namespace mirv {
    public:
       template<typename Stmt>
       result_type operator()(boost::shared_ptr<Stmt> stmt) {
-         return(visit(stmt));
+	return stmt->accept(*this);
       }
    };
  
@@ -31,7 +31,7 @@ namespace mirv {
    public:
       template<typename Expr>
       result_type operator()(boost::shared_ptr<Expr> expr) {
-         return(visit(expr));
+	return expr->accept(*this);
       }
    };
 }

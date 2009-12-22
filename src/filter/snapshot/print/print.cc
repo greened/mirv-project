@@ -1,4 +1,4 @@
-#include "print.hh"
+ #include "print.hh"
 
 #include <mirv/core/ir/symbol.hh>
 #include <mirv/core/ir/variable.hh>
@@ -179,7 +179,10 @@ namespace mirv {
 					       LeaveExprAction(out, ind)));
        s->accept(*flow);
      }
-     else {
+     else if (ptr<Expression<Base> >::type e = boost::dynamic_pointer_cast<Expression<Base> >(node)) {
+       ptr<ExpressionVisitor>::type flow(new PrintExpressionFlow(EnterExprAction(out, ind),
+								 LeaveExprAction(out, ind)));
+       e->accept(*flow);
      }
    }
 }
