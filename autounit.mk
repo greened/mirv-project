@@ -6,6 +6,7 @@ include $(BUILDTOOLS)/autoexe.mk
 include $(BUILDTOOLS)/configure/grep.mk
 include $(BUILDTOOLS)/configure/cut.mk
 include $(BUILDTOOLS)/configure/cmp.mk
+include $(BUILDTOOLS)/configure/tee.mk
 
 define make_unittest_impl
 
@@ -32,17 +33,19 @@ endef
 # $9: Dependency
 make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9)))
 
+.PRECIOUS: %.out %.cf
+
 %.out: %.exe
-	$(QUIET)$$(<) > $$(@)
+	$(QUIET)$(<) > $(@)
 
 %.cf: %.cc
-	$(QUIET)$(GREP) "STDOUT" $(<) | $(CUT) -d' ' -f2- > $$(@)
+	$(QUIET)$(GREP) "STDOUT" $(<) | $(CUT) -d' ' -f3- > $(@)
 
 %.result: %.out %.cf
-	$(QUIET)if $(CMP) $$(*).out $$(*).cf; then \
-	          $(QUIET)echo "PASS: $$(*).exe" | $(TEE) $$(@); \
+	$(QUIET)if $(CMP) -s $(*).out $(*).cf; then \
+	          echo "PASS: $(*).exe" | $(TEE) $(@); \
 	        else \
-	          $(QUIET)echo "FAIL: $$(*).exe" | $(TEE) $$(@); \
+	          echo "FAIL: $(*).exe" | $(TEE) $(@); \
 	        fi
 
 endif
