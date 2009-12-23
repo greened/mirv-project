@@ -21,7 +21,7 @@ CXXMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.dd $<,$(CPP
                         | $(SORT) | $(UNIQ) > $*.dd
 #endif
 
-PROCESS_CXXDEPS = $(CP) $*.dd $*.PP; \
+PROCESS_CXXDEPS = $(CP) -f $*.dd $*.PP; \
                       $(SED) -i -e 's%$(@F)%$@%' $*.PP; \
                       $(SED) -e 's%\#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
                              -e '\%^$$% d' -e 's%$$% :%' < $*.dd >> $*.PP; \
