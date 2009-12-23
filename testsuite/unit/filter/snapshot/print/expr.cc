@@ -1,6 +1,15 @@
 // Test printing of expressions.
 //
-// STDOUT:
+// STDOUT: +
+// STDOUT:    vref a
+// STDOUT:    /
+// STDOUT:       *
+// STDOUT:          -
+// STDOUT:             vref b
+// STDOUT:             vref c
+// STDOUT:          vref d
+// STDOUT:       neg
+// STDOUT:          vref e
 //
 
 #include <mirv/core/ir/symbol.hh>
