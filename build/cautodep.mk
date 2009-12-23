@@ -21,7 +21,7 @@ CMAKEDEPEND = $(if $(CONFIG_HAVE_GCC),$(CC) -MM $(CPPFLAGS) -o $*.d $<,$(CPP) $(
 #                      | $(SORT) | $(UNIQ) > $*.d
 #endif
 
-PROCESS_CDEPS = $(CP) $*.d $*.P; \
+PROCESS_CDEPS = $(CP) -f $*.d $*.P; \
                     $(SED) -i -e 's%$(@F)%$@%' $*.P; \
                     $(SED) -e 's%#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
                            -e '\%^$$% d' -e 's%$$% :%' < $*.d >> $*.P; \

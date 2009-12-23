@@ -91,10 +91,11 @@ namespace mirv {
       private:
          Stream &out;
          Indent &ind;
+	bool &JustLeft;
 
       public:
-         EnterExprAction(Stream &o, Indent &i)
-               : out(o), ind(i) {}
+	EnterExprAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
 
          void visit(ptr<Expression<Add> >::type expr);
          void visit(ptr<Expression<Subtract> >::type expr);
@@ -116,17 +117,24 @@ namespace mirv {
       private:
          Stream &out;
          Indent &ind;
+	bool &JustLeft;
 
       public:
-         LeaveExprAction(Stream &o, Indent &i)
-               : out(o), ind(i) {}
+	LeaveExprAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
 
 	void visit(ptr<Expression<Base> >::type expr) {
-	  out << "\n";
+	  if (!JustLeft) {
+	    out << "\n";
+	  }
+	  JustLeft = true;
 	}
 	void visit(ptr<InnerExpression>::type expr) {
 	  ind -= IndentFactor;
-	  out << "\n";
+	  if (!JustLeft) {
+	    out << "\n";
+	  }
+	  JustLeft = true;
 	}
       };
 

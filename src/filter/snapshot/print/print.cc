@@ -88,78 +88,91 @@ namespace mirv {
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Add> >::type expr)
     {
+      JustLeft = false;
        out << indent(ind) << "+\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Subtract> >::type expr)
     {
+      JustLeft = false;
        out << indent(ind) << "-\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Multiply> >::type expr)
     {
+      JustLeft = false;
        out << indent(ind) << "*\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Divide> >::type expr)
     {
+      JustLeft = false;
        out << indent(ind) << "/\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Modulus> >::type expr)
     {
+      JustLeft = false;
        out << indent(ind) << "%\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Negate> >::type expr)
     {
-       out << indent(ind) << "-\n";
+      JustLeft = false;
+       out << indent(ind) << "neg\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalAnd> >::type expr)
     {
+      JustLeft = false;
        out << indent(ind) << "&&\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalOr> >::type expr)
     {
+      JustLeft = false;
        out << indent(ind) << "||\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalNot> >::type expr)
     {
+      JustLeft = false;
        out << indent(ind) << "!\n";
        ind += IndentFactor;
     }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseAnd> >::type expr)
     {
+      JustLeft = false;
       out << indent(ind) << "&\n";
       ind += IndentFactor;
    }
 
    void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseOr> >::type expr)
    {
+      JustLeft = false;
       out << indent(ind) << "|\n";
       ind += IndentFactor;
    }
 
    void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseComplement> >::type expr)
    {
+      JustLeft = false;
       out << indent(ind) << "~\n";
       ind += IndentFactor;
    }
 
   void PrintFilter::EnterExprAction::visit(ptr<Expression<Reference<Variable> > >::type expr)
    {
+      JustLeft = false;
      out << indent(ind) << "vref " << expr->get_symbol()->name();
    }
 
@@ -167,6 +180,7 @@ namespace mirv {
    {
      //if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
      if (ptr<Statement<Base> >::type s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
+       bool JustLeft = false;
        ptr<StatementVisitor>::type flow =
 	 make_forward_flow(EnterAction(out, ind),
 			   LeaveAction(out, ind),
@@ -175,13 +189,14 @@ namespace mirv {
 			   NullAction(),
 			   NullAction(),
 			   NullAction(),
-			   PrintExpressionFlow(EnterExprAction(out, ind),
-					       LeaveExprAction(out, ind)));
+			   PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
+					       LeaveExprAction(out, ind, JustLeft)));
        s->accept(*flow);
      }
      else if (ptr<Expression<Base> >::type e = boost::dynamic_pointer_cast<Expression<Base> >(node)) {
-       ptr<ExpressionVisitor>::type flow(new PrintExpressionFlow(EnterExprAction(out, ind),
-								 LeaveExprAction(out, ind)));
+       bool JustLeft = false;
+       ptr<ExpressionVisitor>::type flow(new PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
+								 LeaveExprAction(out, ind, JustLeft)));
        e->accept(*flow);
      }
    }
