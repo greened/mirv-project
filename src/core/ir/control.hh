@@ -18,7 +18,13 @@ namespace mirv {
 
       typedef InnerStatement interface_base_type;
 
-      class interface : public virtual interface_base_type {};
+      class interface : public interface_base_type {
+      public:
+	 template<typename A1>
+	 interface(A1 a1) : interface_base_type(a1)  {}
+	 template<typename A1, typename A2>
+	 interface(A1 a1, A2 a2) : interface_base_type(a1, a2)  {}
+      };
 
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
@@ -37,6 +43,9 @@ namespace mirv {
 
       class interface : public interface_base_type {
       public:
+	 template<typename A1>
+	 interface(A1 a1) : interface_base_type(a1)  {}
+
          typedef interface_base_type::child_ptr child_ptr;
          typedef interface_base_type::const_child_ptr const_child_ptr;
          
@@ -75,6 +84,9 @@ namespace mirv {
       class interface : public interface_base_type {
          // Protected because these are probably bad names for subclasses
       protected:
+	 template<typename A1, typename A2>
+	 interface(A1 a1, A2 a2) : interface_base_type(a1, a2)  {}
+
          typedef interface_base_type::child_ptr child_ptr;
          typedef interface_base_type::const_child_ptr const_child_ptr;
          
@@ -142,6 +154,9 @@ namespace mirv {
          const_expression_ptr;
 
       public:
+	 template<typename A1>
+	 interface(A1 a1) : interface_base_type(a1)  {}
+
          void set_condition(expression_ptr e) {
             set_expression(e);
          };
@@ -168,6 +183,10 @@ namespace mirv {
      class Base : public Statement<SingleCondition>,
 		  public Statement<SingleBlock> {
      public:
+       template<typename S, typename E>
+       Base(E e, S s) : Statement<SingleCondition>(e),
+			Statement<SingleBlock>(s) {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("IfThen::Base::accept called");
        }
@@ -187,6 +206,10 @@ namespace mirv {
      class Base : public Statement<SingleCondition>,
 		  public Statement<DualBlock> {
      public:
+       template<typename S1, typename S2, typename E>
+       Base(E e, S1 s1, S2 s2) : Statement<SingleCondition>(e),
+				 Statement<DualBlock>(s1, s2) {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("IfElse::Base::accept called");
        }
@@ -206,6 +229,10 @@ namespace mirv {
      class Base : public Statement<SingleCondition>,
 		  public Statement<SingleBlock> {
      public:
+       template<typename S1, typename E>
+       Base(E e, S1 s1) : Statement<SingleCondition>(e),
+			  Statement<SingleBlock>(s1) {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("While::Base::accept called");
        }
@@ -225,6 +252,10 @@ namespace mirv {
      class Base : public Statement<SingleCondition>,
 		  public Statement<SingleBlock> {
      public:
+       template<typename S1, typename E>
+       Base(E e, S1 s1) : Statement<SingleCondition>(e),
+			  Statement<SingleBlock>(s1) {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("DoWhile::Base::accept called");
        }
@@ -244,6 +275,10 @@ namespace mirv {
      class Base : public Statement<SingleCondition>,
 		  public Statement<SingleBlock> {
      public:
+       template<typename S1, typename E>
+       Base(E e, S1 s1) : Statement<SingleCondition>(e),
+			  Statement<SingleBlock>(s1) {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Case::Base::accept called");
        }
@@ -269,6 +304,9 @@ namespace mirv {
       class interface : public virtual interface_base_type {
          typedef interface_base_type::child_ptr child_ptr;
       public:
+       template<typename S1>
+       interface(S1 s1) : Statement<SingleBlock>(s1) {}
+
          // Override base methods
          void push_back(child_ptr c) {
 	   // check_invariant(safe_cast<Statement<Case> >(c),
@@ -287,6 +325,10 @@ namespace mirv {
      class Base : public Statement<SingleCondition>,
 		  public Statement<CaseBlock> {
      public:
+       template<typename S1, typename E>
+       Base(E e, S1 s1) : Statement<SingleCondition>(e),
+			  Statement<CaseBlock>(s1) {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Switch::Base::accept called");
        }
@@ -316,6 +358,9 @@ namespace mirv {
          const_expression_ptr;
 
       public:
+	template<typename E>
+	interface(E e) : Statement<SingleExpression>(e) {}
+
          void set_label(expression_ptr e) {
 	   // check_invariant(safe_cast<Expression<Label> >(e),
            //                  "Attempt to set non-label as label");
@@ -342,6 +387,10 @@ namespace mirv {
      class Base : public Statement<SingleLabel>,
 		  public Statement<SingleBlock> {
      public:
+       template<typename S1, typename E>
+       Base(E e, S1 s1) : Statement<SingleLabel>(e),
+			  Statement<SingleBlock>(s1) {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Before::Base::accept called");
        }
@@ -362,6 +411,10 @@ namespace mirv {
      class Base : public Statement<SingleLabel>,
 		  public Statement<SingleBlock> {
      public:
+       template<typename S1, typename E>
+       Base(E e, S1 s1) : Statement<SingleLabel>(e),
+			  Statement<SingleBlock>(s1) {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("After::Base::accept called");
        }
@@ -381,6 +434,10 @@ namespace mirv {
      class Base : public Statement<SingleLabel>,
 		    public LeafStatement {
      public:
+       template<typename E>
+       Base(E e) : Statement<SingleLabel>(e),
+		   LeafStatement() {}
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Goto::Base::accept called");
        }

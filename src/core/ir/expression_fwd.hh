@@ -14,6 +14,7 @@ namespace mirv {
   class Arithmetic;
   class Logical;
   class Bitwise;
+  class Relational;
   class Ref;
 
   class Commutative;

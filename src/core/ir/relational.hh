@@ -7,50 +7,62 @@
 namespace mirv {
   class LessThan {
   private:
-    typedef boost::mpl::vector<RelationalSemantic, TransitiveSemantic> sequence;
+    typedef boost::mpl::vector<Relational, Transitive> sequence;
 
   public:
-    typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef sequence properties;
+    typedef Expression<Binary> visitor_base_type;
+    typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
   };
 
   class LessThanOrEqual {
   private:
-    typedef boost::mpl::vector<RelationalSemantic, TransitiveSemantic> sequence;
+    typedef boost::mpl::vector<Relational, Transitive> sequence;
 
   public:
-    typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef sequence properties;
+    typedef Expression<Binary> visitor_base_type;
+    typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
   };
 
   class Equal {
   private:
-    typedef boost::mpl::vector<RelationalSemantic, TransitiveSemantic> sequence;
+    typedef boost::mpl::vector<Relational, Transitive> sequence;
 
   public:
-    typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef sequence properties;
+    typedef Expression<Binary> visitor_base_type;
+    typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
   };
 
   class NotEqual {
   private:
-    typedef boost::mpl::vector<RelationalSemantic, TransitiveSemantic> sequence;
+    typedef boost::mpl::vector<Relational, Transitive> sequence;
 
   public:
-    typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef sequence properties;
+    typedef Expression<Binary> visitor_base_type;
+    typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
   };
 
   class GreaterThanOrEqual {
   private:
-    typedef boost::mpl::vector<RelationalSemantic, TransitiveSemantic> sequence;
+    typedef boost::mpl::vector<Relational, Transitive> sequence;
 
   public:
-    typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef sequence properties;
+    typedef Expression<Binary> visitor_base_type;
+    typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
   };
 
   class GreaterThan {
   private:
-    typedef boost::mpl::vector<RelationalSemantic, TransitiveSemantic> sequence;
+    typedef boost::mpl::vector<Relational, Transitive> sequence;
 
   public:
-    typedef ExpressionBaseGenerator<sequence, BinaryExpression>::type base_type;
+    typedef sequence properties;
+    typedef Expression<Binary> visitor_base_type;
+    typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
   };
 }
 

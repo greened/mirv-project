@@ -39,6 +39,8 @@ namespace mirv {
    template<typename Tag>
    class Statement: public Tag::base_type {
    public:
+     typedef typename Tag::base_type BaseType;
+
      typedef typename boost::mpl::sort<
        typename Tag::properties,
        detail::StatementPropertyLess<boost::mpl::_1, boost::mpl::_2>
@@ -55,16 +57,35 @@ namespace mirv {
 	boost::mpl::deref<typename boost::mpl::begin<property_statements>::type>
 	>::type visitor_base_type;
 
+   protected:
+     Statement(void) {}
+     template<typename A1>
+     Statement(A1 a1) : BaseType(a1) {}
+     template<typename A1, typename A2>
+     Statement(A1 a1, A2 a2) : BaseType(a1, a2) {}
+     template<typename A1, typename A2, typename A3>
+     Statement(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
+
+   public:
      template<typename A1>
      static typename ptr<Statement<Tag> >::type
      make(A1 a1) {
-       return new Statement<Tag>(typename Tag::base_type(a1));
+       typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1));
+       return p;
      }
 
      template<typename A1, typename A2>
      static typename ptr<Statement<Tag> >::type
      make(A1 a1, A2 a2) {
-       return new Statement<Tag>(typename Tag::base_type(a1, a2));
+       typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2));
+       return p;
+     }
+
+     template<typename A1, typename A2, typename A3>
+     static typename ptr<Statement<Tag> >::type
+     make(A1 a1, A2 a2, A3 a3) {
+       typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2, a3));
+	return p;
      }
 
      virtual void accept(StatementVisitor &V);
@@ -96,8 +117,18 @@ namespace mirv {
     };
   }
 
-  class InnerStatement : public InnerImpl<Statement<Base>, Inherit1<StatementVisitor>::apply<Virtual<Statement<Inner<detail::InnerStatementTraits> > > >::type> {
+  class InnerStatementBase : public Statement<Inner<detail::InnerStatementTraits> > {};
+
+  class InnerStatement : public InnerImpl<Statement<Base>, Inherit1<StatementVisitor>::apply<Virtual<InnerStatementBase> >::type> {
+     typedef InnerImpl<
+       Statement<Base>,
+      Inherit1<StatementVisitor>::apply<
+	Virtual<InnerStatementBase>
+      >::type> BaseType;
    public:
+    InnerStatement(child_ptr Child) : BaseType(Child) {}
+    InnerStatement(child_ptr Child1,
+		   child_ptr Child2) : BaseType(Child1, Child2) {}
      virtual void accept(StatementVisitor &V);
    };
 
@@ -113,7 +144,7 @@ namespace mirv {
    class Conditional {
     public:
      typedef boost::mpl::int_<0> order;
-     typedef Virtual<Statement<Base> > base_type;
+     typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
      typedef Statement<Base> visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
@@ -122,7 +153,7 @@ namespace mirv {
     class Iterative {
     public:
       typedef boost::mpl::int_<1> order;
-      typedef Virtual<Statement<Base> > base_type;
+      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
      typedef Statement<Base> visitor_base_type;
      typedef boost::mpl::vector<> properties;
     };
@@ -131,7 +162,7 @@ namespace mirv {
     class Mutating {
     public:
       typedef boost::mpl::int_<2> order;
-      typedef Virtual<Statement<Base> > base_type;
+      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
      typedef Statement<Base> visitor_base_type;
      typedef boost::mpl::vector<> properties;
     };
@@ -151,7 +182,7 @@ namespace mirv {
 
     public:
        class interface;
-      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > > interface_base_type;
+      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type interface_base_type;
       typedef Statement<Base> visitor_base_type;
       typedef sequence properties;
 
@@ -166,6 +197,16 @@ namespace mirv {
 	  expression_list expressions;
 
        protected:
+	 template<typename A1>
+	 interface(A1 a1) {
+	   expressions.push_back(a1);
+	 }
+	 template<typename A1, typename A2>
+	 interface(A1 a1, A2 a2) {
+	   expressions.push_back(a1);
+	   expressions.push_back(a2);
+	 }
+
 	  typedef expression_list::iterator expression_iterator;
 	  typedef expression_list::const_iterator const_expression_iterator;
 
@@ -232,6 +273,9 @@ namespace mirv {
        class interface
 	     : public interface_base_type {
        public:
+	 template<typename A1>
+	 interface(A1 a1) : interface_base_type(a1) {}
+
 	  typedef interface_base_type::expression_ptr expression_ptr;
 	  typedef interface_base_type::const_expression_ptr
          const_expression_ptr;

@@ -6,6 +6,7 @@
 #include <mirv/core/ir/arithmetic.hh>
 #include <mirv/core/ir/logical.hh>
 #include <mirv/core/ir/bitwise.hh>
+#include <mirv/core/ir/relational.hh>
 #include <mirv/core/ir/reference.hh>
 #include <mirv/core/util/cast.hh>
 
