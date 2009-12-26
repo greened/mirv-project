@@ -17,6 +17,9 @@ namespace mirv {
             : public interface_base_type {
          // Protected because subclasses might want to rename
       protected:
+	template<typename E1, typename E2>
+	interface(E1 e1, E2 e2) : Statement<Controlled>(e1, e2) {}
+
          typedef interface_base_type::expression_ptr expression_ptr;
          typedef interface_base_type::const_expression_ptr 
          const_expression_ptr;
@@ -71,11 +74,22 @@ namespace mirv {
       typedef boost::mpl::vector<Mutating> sequence;
 
      class Base : public Statement<DualExpression>,
-		  public LeafStatement {};
+		  public LeafStatement {
+     public:
+       template<typename E1, typename E2>
+       Base(E1 e1, E2 e2) : Statement<DualExpression>(e1, e2),
+			    LeafStatement() {}
+
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("Assignment::Base::accept called");
+       }
+     };
      typedef Base root;
 
    public:
       typedef StatementBaseGenerator<sequence, root>::type base_type;
+     typedef sequence properties;
+     typedef Statement<DualExpression> visitor_base_type;
    };
 }
 

@@ -257,6 +257,13 @@ namespace mirv {
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
+   class Relational {
+   public:
+     typedef boost::mpl::int_<0> order;
+     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef InnerExpressionBase visitor_base_type;
+     typedef boost::mpl::vector<> properties;
+   };
    class Ref {
    public:
      typedef boost::mpl::int_<11> order;

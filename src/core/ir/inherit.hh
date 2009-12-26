@@ -59,6 +59,9 @@ namespace mirv {
       template<typename A1, typename A2>
       Type2(A1 a1, A2 a2) : T1(a1, a2) {}
 
+      template<typename A1, typename A2, typename A3>
+      Type2(A1 a1, A2 a2, A3 a3) : T1(a1, a2, a3) {}
+
       void accept(Visitor &V) {
 	error("Inherit::accept called");
       }
@@ -76,6 +79,9 @@ namespace mirv {
       template<typename A1, typename A2>
       Type2(A1 a1, A2 a2) : T1(a1, a2) {}
 
+      template<typename A1, typename A2, typename A3>
+      Type2(A1 a1, A2 a2, A3 a3) : T1(a1, a2, a3) {}
+
       void accept(Visitor &V) {
 	error("Inherit::accept called");
       }
@@ -92,6 +98,9 @@ namespace mirv {
 
       template<typename A1, typename A2>
       Type2(A1 a1, A2 a2) : T1(a1, a2) {}
+
+      template<typename A1, typename A2, typename A3>
+      Type2(A1 a1, A2 a2, A3 a3) : T1(a1, a2, a3) {}
 
       void accept(Visitor &V) {
 	error("Inherit::accept called");

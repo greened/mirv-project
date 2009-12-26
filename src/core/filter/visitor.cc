@@ -166,6 +166,20 @@ namespace mirv {
       visit(p);
     }
   }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Relational> >::type e) {
+    if (ptr<Expression<Unary> >::type ue =
+	dyn_cast<Expression<Unary> >(e)) {
+      visit(ue);
+    }
+    else if (ptr<Expression<Binary> >::type be =
+	     dyn_cast<Expression<Binary> >(e)) {
+      visit(be);
+    }
+    else {
+      ptr<Expression<Relational>::visitor_base_type>::type p = fast_cast<Expression<Relational>::visitor_base_type>(e);
+      visit(p);
+    }
+  }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Commutative> >::type e) {
     if (ptr<Expression<Bitwise> >::type be =
 	dyn_cast<Expression<Bitwise> >(e)) {
@@ -395,6 +409,31 @@ ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Binary> >
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type e) {
     ptr<Expression<BitwiseComplement>::visitor_base_type>::type p = fast_cast<Expression<BitwiseComplement>::visitor_base_type>(e);
+    visit(p);
+  }
+
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<LessThan> >::type e) {
+    ptr<Expression<LessThan>::visitor_base_type>::type p = fast_cast<Expression<LessThan>::visitor_base_type>(e);
+    visit(p);
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::type e) {
+    ptr<Expression<LessThanOrEqual>::visitor_base_type>::type p = fast_cast<Expression<LessThanOrEqual>::visitor_base_type>(e);
+    visit(p);
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Equal> >::type e) {
+    ptr<Expression<Equal>::visitor_base_type>::type p = fast_cast<Expression<Equal>::visitor_base_type>(e);
+    visit(p);
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<NotEqual> >::type e) {
+    ptr<Expression<NotEqual>::visitor_base_type>::type p = fast_cast<Expression<NotEqual>::visitor_base_type>(e);
+    visit(p);
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<GreaterThan> >::type e) {
+    ptr<Expression<GreaterThan>::visitor_base_type>::type p = fast_cast<Expression<GreaterThan>::visitor_base_type>(e);
+    visit(p);
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::type e) {
+    ptr<Expression<GreaterThanOrEqual>::visitor_base_type>::type p = fast_cast<Expression<GreaterThanOrEqual>::visitor_base_type>(e);
     visit(p);
   }
 

@@ -170,6 +170,48 @@ namespace mirv {
       ind += IndentFactor;
    }
 
+   void PrintFilter::EnterExprAction::visit(ptr<Expression<LessThan> >::type expr)
+   {
+      JustLeft = false;
+      out << indent(ind) << "<\n";
+      ind += IndentFactor;
+   }
+
+   void PrintFilter::EnterExprAction::visit(ptr<Expression<LessThanOrEqual> >::type expr)
+   {
+      JustLeft = false;
+      out << indent(ind) << "<=\n";
+      ind += IndentFactor;
+   }
+
+   void PrintFilter::EnterExprAction::visit(ptr<Expression<Equal> >::type expr)
+   {
+      JustLeft = false;
+      out << indent(ind) << "==\n";
+      ind += IndentFactor;
+   }
+
+   void PrintFilter::EnterExprAction::visit(ptr<Expression<NotEqual> >::type expr)
+   {
+      JustLeft = false;
+      out << indent(ind) << "!=\n";
+      ind += IndentFactor;
+   }
+
+   void PrintFilter::EnterExprAction::visit(ptr<Expression<GreaterThan> >::type expr)
+   {
+      JustLeft = false;
+      out << indent(ind) << ">\n";
+      ind += IndentFactor;
+   }
+
+   void PrintFilter::EnterExprAction::visit(ptr<Expression<GreaterThanOrEqual> >::type expr)
+   {
+      JustLeft = false;
+      out << indent(ind) << ">=\n";
+      ind += IndentFactor;
+   }
+
   void PrintFilter::EnterExprAction::visit(ptr<Expression<Reference<Variable> > >::type expr)
    {
       JustLeft = false;

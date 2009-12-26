@@ -21,6 +21,12 @@ namespace mirv {
   make(A1 a1, A2 a2) {
     return Obj::make(a1, a2);
   }
+
+  template<typename Obj, typename A1, typename A2, typename A3>
+  typename mirv::ptr<Obj>::type
+  make(A1 a1, A2 a2, A3 a3) {
+    return Obj::make(a1, a2, a3);
+  }
 }
 
 #endif

@@ -10,6 +10,7 @@
 #include <mirv/core/ir/arithmetic_fwd.hh>
 #include <mirv/core/ir/logical_fwd.hh>
 #include <mirv/core/ir/bitwise_fwd.hh>
+#include <mirv/core/ir/relational_fwd.hh>
 #include <mirv/core/ir/reference_fwd.hh>
 
 #include <mirv/core/ir/variable_fwd.hh>
@@ -89,13 +90,21 @@ namespace mirv {
 	ptr<Expression<Modulus> >::type,
 	ptr<Expression<Multiply> >::type,
 	ptr<Expression<Negate> >::type,
-	ptr<Expression<LogicalAnd> >::type,
 
+	ptr<Expression<LogicalAnd> >::type,
 	ptr<Expression<LogicalOr> >::type,
 	ptr<Expression<LogicalNot> >::type,
+
 	ptr<Expression<BitwiseAnd> >::type,
 	ptr<Expression<BitwiseOr> >::type,
 	ptr<Expression<BitwiseComplement> >::type,
+
+	ptr<Expression<LessThan> >::type,
+	ptr<Expression<LessThanOrEqual> >::type,
+	ptr<Expression<Equal> >::type,
+	ptr<Expression<NotEqual> >::type,
+	ptr<Expression<GreaterThanOrEqual> >::type,
+	ptr<Expression<GreaterThan> >::type,
 
 	ptr<Expression<Reference<Variable> > >::type
 	> > {
@@ -107,6 +116,7 @@ namespace mirv {
     virtual result_type visit(ptr<Expression<Arithmetic> >::type);
     virtual result_type visit(ptr<Expression<Logical> >::type);
     virtual result_type visit(ptr<Expression<Bitwise> >::type);
+    virtual result_type visit(ptr<Expression<Relational> >::type);
     virtual result_type visit(ptr<Expression<Ref> >::type);
     virtual result_type visit(ptr<Expression<Commutative> >::type);
     virtual result_type visit(ptr<Expression<Associative> >::type);
@@ -126,6 +136,12 @@ namespace mirv {
     virtual result_type visit(ptr<Expression<BitwiseAnd> >::type);
     virtual result_type visit(ptr<Expression<BitwiseOr> >::type);
     virtual result_type visit(ptr<Expression<BitwiseComplement> >::type);
+    virtual result_type visit(ptr<Expression<LessThan> >::type);
+    virtual result_type visit(ptr<Expression<LessThanOrEqual> >::type);
+    virtual result_type visit(ptr<Expression<Equal> >::type);
+    virtual result_type visit(ptr<Expression<NotEqual> >::type);
+    virtual result_type visit(ptr<Expression<GreaterThanOrEqual> >::type);
+    virtual result_type visit(ptr<Expression<GreaterThan> >::type);
     virtual result_type visit(ptr<Expression<Reference<Variable> > >::type);
   };
 }

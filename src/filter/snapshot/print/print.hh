@@ -109,6 +109,12 @@ namespace mirv {
          void visit(ptr<Expression<BitwiseAnd> >::type expr);
          void visit(ptr<Expression<BitwiseOr> >::type expr);
          void visit(ptr<Expression<BitwiseComplement> >::type expr);
+         void visit(ptr<Expression<LessThan> >::type expr);
+         void visit(ptr<Expression<LessThanOrEqual> >::type expr);
+         void visit(ptr<Expression<Equal> >::type expr);
+         void visit(ptr<Expression<NotEqual> >::type expr);
+         void visit(ptr<Expression<GreaterThan> >::type expr);
+         void visit(ptr<Expression<GreaterThanOrEqual> >::type expr);
 	void visit(ptr<Expression<Reference<Variable> > >::type expr);
       };
 
