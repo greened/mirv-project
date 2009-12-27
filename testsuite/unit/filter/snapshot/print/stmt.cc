@@ -1,6 +1,30 @@
 // Test printing of satements.
 //
-//
+// STDOUT: doWhile
+// STDOUT:    {
+// STDOUT:       assign
+// STDOUT:          vref a
+// STDOUT:          +
+// STDOUT:             vref a
+// STDOUT:             vref b
+// STDOUT:       ifElse
+// STDOUT:          >
+// STDOUT:             vref b
+// STDOUT:             vref c
+// STDOUT:          assign
+// STDOUT:             vref a
+// STDOUT:             +
+// STDOUT:                vref a
+// STDOUT:                vref b
+// STDOUT:          assign
+// STDOUT:             vref a
+// STDOUT:             +
+// STDOUT:                vref a
+// STDOUT:                vref c
+// STDOUT:    }
+// STDOUT:    <
+// STDOUT:       vref a
+// STDOUT:       vref c
 
 #include <mirv/core/ir/symbol.hh>
 #include <mirv/core/ir/variable.hh>

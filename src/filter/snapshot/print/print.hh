@@ -176,15 +176,57 @@ namespace mirv {
 	  : BaseType(e, l, NullAction(), NullAction(), NullAction(), NullDataflow()) {}
       };
 
-      typedef ForwardFlow<
-         EnterAction,
-         LeaveAction,
-         NullAction,
+      class PrintFlow
+            : public ForwardFlow<
+	EnterAction,
+	LeaveAction,
 	NullAction,
 	NullAction,
 	NullAction,
 	NullAction,
-	PrintExpressionFlow> PrintFlow;
+	NullAction,
+	PrintExpressionFlow> {
+	typedef ForwardFlow<
+	  EnterAction,
+	  LeaveAction,
+	  NullAction,
+	  NullAction,
+	  NullAction,
+	  NullAction,
+	  NullAction,
+	  PrintExpressionFlow> BaseType;
+
+      public:
+	PrintFlow(const EnterAction &e,
+		 const LeaveAction &l,
+		 const PrintExpressionFlow &expr)
+	  : BaseType(e,
+		     l,
+		     NullAction(),
+		     NullAction(),
+		     NullAction(),
+		     NullAction(),
+		     NullAction(),
+		     expr,
+		     NullDataflow(),
+		     NullDataflow::Confluence()) {}
+
+	// We need to reverse the order in which we visit the
+	// assignment operands.
+	void visit(ptr<Statement<Assignment> >::type stmt) {
+	  this->enter(stmt);
+
+	  this->before_expression(stmt, stmt->get_left_expression());
+	  stmt->get_left_expression()->accept(this->expression_flow());
+	  this->after_expression(stmt, stmt->get_left_expression());
+
+	  this->before_expression(stmt, stmt->get_right_expression());
+	  stmt->get_right_expression()->accept(this->expression_flow());
+	  this->after_expression(stmt, stmt->get_right_expression());
+
+	  this->leave(stmt);
+	}
+      };
 
    public:
       PrintFilter(Stream &o)
