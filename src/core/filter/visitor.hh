@@ -5,6 +5,7 @@
  
 #include <mirv/core/ir/statement_fwd.hh>
 #include <mirv/core/ir/control_fwd.hh>
+#include <mirv/core/ir/mutating_fwd.hh>
 
 #include <mirv/core/ir/expression_fwd.hh>
 #include <mirv/core/ir/arithmetic_fwd.hh>
@@ -40,7 +41,8 @@ namespace mirv {
 	ptr<Statement<Before> >::type,
 	ptr<Statement<After> >::type,
 	ptr<Statement<Goto> >::type,
-	ptr<Statement<Return> >::type
+	ptr<Statement<Return> >::type,
+	ptr<Statement<Assignment> >::type
 	> > {
   public:
     virtual result_type visit(ptr<Statement<Base> >::type);
@@ -63,6 +65,7 @@ namespace mirv {
     virtual result_type visit(ptr<Statement<After> >::type);
     virtual result_type visit(ptr<Statement<Goto> >::type);
     virtual result_type visit(ptr<Statement<Return> >::type);
+    virtual result_type visit(ptr<Statement<Assignment> >::type);
   };
 
   struct ExpressionVisitor :

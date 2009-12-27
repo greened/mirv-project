@@ -198,6 +198,7 @@ namespace mirv {
 
          before_expression(stmt, *stmt->expression());
          stmt->expression()->accept(expression());
+
          after_expression(stmt, *stmt->expression());
 
          leave(stmt);
@@ -248,6 +249,21 @@ namespace mirv {
          enter(stmt);
          leave(stmt);
       }
+
+      void visit(ptr<Statement<Assignment> >::type stmt) {
+         this->enter(stmt);
+
+         this->before_expression(stmt, stmt->get_left_expression());
+         stmt->get_left_expression()->accept(this->expression_flow());
+         this->after_expression(stmt, stmt->get_left_expression());
+
+         this->before_expression(stmt, stmt->get_right_expression());
+         stmt->get_right_expression()->accept(this->expression_flow());
+         this->after_expression(stmt, stmt->get_right_expression());
+
+         this->leave(stmt);
+      }
+
    };
 }
 
