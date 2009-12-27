@@ -1,24 +1,23 @@
-#ifndef mirv_core_buildir_expression_hh
+#ifndef mirv_core_builder_expression_hh
 #define mirv_core_builder_expression_hh
 
-#include "transform.hh"
+#include <mirv/core/builder/transform.hh>
+#include <mirv/core/ir/variable.hh>
 
 namespace mirv {
    namespace Builder {
-      typedef proto::terminal<SymbolPtr>::type Symbol;
+     typedef boost::proto::terminal<Symbol<Variable> >::type Variable;
 
-      template<typename T>
-      struct Type
-            : boost::proto::terminal< convertible_to<T> >
-      {};
+     template<typename T>
+     struct Type
+       : boost::proto::terminal< convertible_to<T> >
+     {};
 
-      struct ExpressionGrammar;
+     struct ExpressionGrammar;
 
-      // Unary expressions
+     // Unary expressions
 
-      struct Posit
-            : boost::proto::posit<ExpressionGrammar> {};
-
+     // No Posit
       struct Negate
             : boost::proto::negate<ExpressionGrammar> {};
 
@@ -112,33 +111,32 @@ namespace mirv {
 
       struct ExpressionGrammar
             : boost::proto::or<
-         ConstructUnary<Symbol, MIRV::Ref>,
-         ConstructUnary<Posit, MIRV::Posit>,
-         ConstructUnary<Negate, MIRV::Negate>,
-         ConstructUnary<Complement, MIRV::Complement>,
-         ConstructUnary<Dereference, MIRV::Dereference>,
-         ConstructUnary<AddressOf, MIRV::AddressOf>,
-         ConstructUnary<Not, MIRV::Not>,
-         ConstructBinary<Add, MIRV::Add>,
-         ConstructBinary<Minus, MIRV::Subtract>,
-         ConstructBinary<Multiplies, MIRV::Multiply>,
-         ConstructBinary<Divides, MIRV::Divide>,
-         ConstructBinary<ShiftLeft, MIRV::ShiftLeft>,
-         ConstructBinary<ShiftRight, MIRV::ShiftRight>,
-         ConstructBinary<Modulus, MIRV::Modulus>,
-         ConstructBinary<Greater, MIRV::GreaterThan>,
-         ConstructBinary<Less, MIRV::LessThan>,
-         ConstructBinary<GreaterEqual, MIRV::GreaterThanOrEqual>,
-         ConstructBinary<LessEqual, MIRV::LessThanOrEqual>,
-         ConstructBinary<Equal, MIRV::Equal>,
-         ConstructBinary<NotEqual, MIRV::NotEqual>,
-         ConstructBinary<Or, MIRV::LogicalOr>,
-         ConstructBinary<And, MIRV::LogicalAnd>,
-         ConstructBinary<BitwiseOr, MIRV::BitwiseOr>,
-         ConstructBinary<BitwiseAnd, MIRV::BitwiseAnd>,
-         ConstructBinary<BitwiseXor, MIRV::BitwiseXor>,
-         ConstructBinary<Subscript, MIRV::ArrayRef>
-         //         ConstructNary<Call, MIRV::Call>
+         ConstructUnary<Symbol, mirv::Ref>,
+         ConstructUnary<Negate, mirv::Negate>,
+         ConstructUnary<Complement, mirv::Complement>,
+         ConstructUnary<Dereference, mirv::Dereference>,
+         ConstructUnary<AddressOf, mirv::AddressOf>,
+         ConstructUnary<Not, mirv::Not>,
+         ConstructBinary<Add, mirv::Add>,
+         ConstructBinary<Minus, mirv::Subtract>,
+         ConstructBinary<Multiplies, mirv::Multiply>,
+         ConstructBinary<Divides, mirv::Divide>,
+         ConstructBinary<ShiftLeft, mirv::ShiftLeft>,
+         ConstructBinary<ShiftRight, mirv::ShiftRight>,
+         ConstructBinary<Modulus, mirv::Modulus>,
+         ConstructBinary<Greater, mirv::GreaterThan>,
+         ConstructBinary<Less, mirv::LessThan>,
+         ConstructBinary<GreaterEqual, mirv::GreaterThanOrEqual>,
+         ConstructBinary<LessEqual, mirv::LessThanOrEqual>,
+         ConstructBinary<Equal, mirv::Equal>,
+         ConstructBinary<NotEqual, mirv::NotEqual>,
+         ConstructBinary<Or, mirv::LogicalOr>,
+         ConstructBinary<And, mirv::LogicalAnd>,
+         ConstructBinary<BitwiseOr, mirv::BitwiseOr>,
+         ConstructBinary<BitwiseAnd, mirv::BitwiseAnd>,
+         ConstructBinary<BitwiseXor, mirv::BitwiseXor>,
+         ConstructBinary<Subscript, mirv::ArrayRef>
+         //         ConstructNary<Call, mirv::Call>
          > {};
    }
 }
