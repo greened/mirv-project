@@ -17,85 +17,104 @@ namespace mirv {
 
    void PrintFilter::EnterAction::visit(ptr<Statement<Block> >::type stmt)
    {
-      out << "{\n";
-       ind += IndentFactor;
+     JustLeft = false;
+     out << indent(ind) << "{\n";
+     ind += IndentFactor;
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<IfThen> >::type stmt)
     {
+      JustLeft = false;
       out << indent(ind) << "ifThen\n";
-       ind += IndentFactor;
+      ind += IndentFactor;
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<IfElse> >::type stmt)
     {
-       out << indent(ind) << "ifElse\n";
-       ind += IndentFactor;
+      JustLeft = false;
+      out << indent(ind) << "ifElse\n";
+      ind += IndentFactor;
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<While> >::type stmt)
     {
-       out << indent(ind) << "while\n";
-       ind += IndentFactor;
+      JustLeft = false;
+      out << indent(ind) << "while\n";
+      ind += IndentFactor;
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<DoWhile> >::type stmt)
     {
-       out << indent(ind) << "doWhile\n";
-       ind += IndentFactor;
+      JustLeft = false;
+      out << indent(ind) << "doWhile\n";
+      ind += IndentFactor;
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<Switch> >::type stmt)
     {
-       out << indent(ind) << "switch\n";
-       ind += IndentFactor;
+      JustLeft = false;
+      out << indent(ind) << "switch\n";
+      ind += IndentFactor;
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<Case> >::type stmt)
     {
-       out << indent(ind) << "case";
+      JustLeft = false;
+      out << indent(ind) << "case";
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<CaseBlock> >::type stmt)
     {
-       out << indent(ind) << "caseblock";
+      JustLeft = false;
+      out << indent(ind) << "caseblock";
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<Before> >::type stmt)
     {
-       out << indent(ind) << "before ";
+      JustLeft = false;
+      out << indent(ind) << "before ";
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<After> >::type stmt)
     {
-       out << indent(ind) << "after ";
+      JustLeft = false;
+      out << indent(ind) << "after ";
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<Goto> >::type stmt)
     {
-       out << indent(ind) << "goto ";
+      JustLeft = false;
+      out << indent(ind) << "goto ";
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<Return> >::type stmt)
     {
-       out << indent(ind) << "return\n";
+      JustLeft = false;
+      out << indent(ind) << "return\n";
     }
 
     void PrintFilter::EnterAction::visit(ptr<Statement<Assignment> >::type stmt)
     {
-       out << indent(ind) << "assign\n";
-       ind += IndentFactor;
+      JustLeft = false;
+      out << indent(ind) << "assign\n";
+      ind += IndentFactor;
     }
 
    void PrintFilter::LeaveAction::visit(ptr<Statement<Block> >::type stmt) {
      ind -= IndentFactor;
-     out << indent(ind) << "\n}\n";
+     if (!JustLeft) {
+       out << "\n";
+     }
+     out << indent(ind) << "}\n";
+     JustLeft = true;
    }
 
-  void PrintFilter::LeaveAction::visit(ptr<Statement<Assignment> >::type stmt) {
-    ind -= IndentFactor;
-    out << "\n";
-   }
+  void PrintFilter::LeaveAction::visit(ptr<Statement<Return> >::type stmt) {
+    if (!JustLeft) {
+      out << "\n";
+    }
+    JustLeft = true;
+  }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Add> >::type expr)
     {
@@ -225,7 +244,7 @@ namespace mirv {
 
   void PrintFilter::EnterExprAction::visit(ptr<Expression<Reference<Variable> > >::type expr)
    {
-      JustLeft = false;
+     JustLeft = false;
      out << indent(ind) << "vref " << expr->get_symbol()->name();
    }
 
@@ -233,10 +252,10 @@ namespace mirv {
    {
      //if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
      if (ptr<Statement<Base> >::type s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
-       bool JustLeft = false;
+       JustLeft = false;
        ptr<StatementVisitor>::type flow =
-	 make_forward_flow(EnterAction(out, ind),
-			   LeaveAction(out, ind),
+	 make_forward_flow(EnterAction(out, ind, JustLeft),
+			   LeaveAction(out, ind, JustLeft),
 			   NullAction(),
 			   NullAction(),
 			   NullAction(),
@@ -247,7 +266,7 @@ namespace mirv {
        s->accept(*flow);
      }
      else if (ptr<Expression<Base> >::type e = boost::dynamic_pointer_cast<Expression<Base> >(node)) {
-       bool JustLeft = false;
+       JustLeft = false;
        ptr<ExpressionVisitor>::type flow(new PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
 								 LeaveExprAction(out, ind, JustLeft)));
        e->accept(*flow);

@@ -15,16 +15,18 @@ namespace mirv {
       const static int IndentFactor;
      Indent ind;
       Stream &out;
+     bool JustLeft;
 
       // Entering each statement
       class EnterAction : public VisitStatementAction {
       private:
          std::ostream &out;
          Indent &ind;
+	bool &JustLeft;
 
       public:
-         EnterAction(Stream &o, Indent &i)
-               : out(o), ind(i) {}
+	EnterAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
 
          void visit(ptr<Statement<Block> >::type stmt);
          void visit(ptr<Statement<IfThen> >::type stmt);
@@ -76,16 +78,21 @@ namespace mirv {
       private:
          Stream &out;
          Indent &ind;
+	bool &JustLeft;
 
       public:
-         LeaveAction(Stream &o, Indent &i)
-               : out(o), ind(i) {}
+	LeaveAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
 
 	void visit(ptr<Statement<Base> >::type stmt) {
-	  out << "\n";
+	  if (!JustLeft) {
+	    out << "\n";
+	  }
+	  ind -= IndentFactor;
+	  JustLeft = true;
 	}
 	void visit(ptr<Statement<Block> >::type stmt);
-	void visit(ptr<Statement<Assignment> >::type stmt);
+	void visit(ptr<Statement<Return> >::type stmt);
       };
 
       // Entering each expression
