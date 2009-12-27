@@ -11,16 +11,20 @@
 // STDOUT:          >
 // STDOUT:             vref b
 // STDOUT:             vref c
-// STDOUT:          assign
-// STDOUT:             vref a
-// STDOUT:             +
+// STDOUT:          {
+// STDOUT:             assign
 // STDOUT:                vref a
-// STDOUT:                vref b
-// STDOUT:          assign
-// STDOUT:             vref a
-// STDOUT:             +
+// STDOUT:                +
+// STDOUT:                   vref a
+// STDOUT:                   vref b
+// STDOUT:          }
+// STDOUT:          {
+// STDOUT:             assign
 // STDOUT:                vref a
-// STDOUT:                vref c
+// STDOUT:                +
+// STDOUT:                   vref a
+// STDOUT:                   vref c
+// STDOUT:          }
 // STDOUT:    }
 // STDOUT:    <
 // STDOUT:       vref a
@@ -84,16 +88,18 @@ int main(void)
           Expression<GreaterThan>::make(
             Expression<Reference<Variable> >::make(b),
 	    Expression<Reference<Variable> >::make(c)),
-        Statement<Assignment>::make(
-          Expression<Reference<Variable> >::make(a),
-	  Expression<Add>::make(
-	    Expression<Reference<Variable> >::make(a),
-	    Expression<Reference<Variable> >::make(b))),
-        Statement<Assignment>::make(
-          Expression<Reference<Variable> >::make(a),
-	  Expression<Add>::make(
-	    Expression<Reference<Variable> >::make(a),
-	    Expression<Reference<Variable> >::make(c))))));
+        Statement<Block>::make(
+          Statement<Assignment>::make(
+            Expression<Reference<Variable> >::make(a),
+  	    Expression<Add>::make(
+	      Expression<Reference<Variable> >::make(a),
+	      Expression<Reference<Variable> >::make(b)))),
+        Statement<Block>::make(
+          Statement<Assignment>::make(
+            Expression<Reference<Variable> >::make(a),
+  	    Expression<Add>::make(
+	      Expression<Reference<Variable> >::make(a),
+	      Expression<Reference<Variable> >::make(c)))))));
    
    PrintFilter print(std::cout);
 
