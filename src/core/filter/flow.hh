@@ -83,10 +83,10 @@ namespace mirv {
       Dataflow &dataflow(void) {
          return(data);
       }
-     Confluence &confluence(Dataflow &out,
-			    const Dataflow &in1, const Dataflow &in2) {
-       conf(out, in1, in2);
-      }
+     typename Confluence::result_type confluence(Dataflow &out,
+						  const Dataflow &in1, const Dataflow &in2) {
+       return conf(out, in1, in2);
+     }
 
      bool has_break(void) const {
        return hit_break;

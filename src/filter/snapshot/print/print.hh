@@ -38,6 +38,7 @@ namespace mirv {
          void visit(ptr<Statement<After> >::type stmt);
          void visit(ptr<Statement<Goto> >::type stmt);
          void visit(ptr<Statement<Return> >::type stmt);
+         void visit(ptr<Statement<Assignment> >::type stmt);
       };
 
       // After processing each statement's expression child
@@ -84,6 +85,7 @@ namespace mirv {
 	  out << "\n";
 	}
 	void visit(ptr<Statement<Block> >::type stmt);
+	void visit(ptr<Statement<Assignment> >::type stmt);
       };
 
       // Entering each expression

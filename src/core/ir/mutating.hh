@@ -15,8 +15,7 @@ namespace mirv {
 
       class interface 
             : public interface_base_type {
-         // Protected because subclasses might want to rename
-      protected:
+      public:
 	template<typename E1, typename E2>
 	interface(E1 e1, E2 e2) : Statement<Controlled>(e1, e2) {}
 

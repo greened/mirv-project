@@ -7,6 +7,7 @@ namespace mirv {
       void operator()(NullDataflow &,
 		      const NullDataflow &,
 		      const NullDataflow &) {}
+      typedef void result_type;
     };
     bool change(void) const {
       return false;
