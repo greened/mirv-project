@@ -81,9 +81,20 @@ namespace mirv {
        out << indent(ind) << "return\n";
     }
 
+    void PrintFilter::EnterAction::visit(ptr<Statement<Assignment> >::type stmt)
+    {
+       out << indent(ind) << "assign\n";
+       ind += IndentFactor;
+    }
+
    void PrintFilter::LeaveAction::visit(ptr<Statement<Block> >::type stmt) {
      ind -= IndentFactor;
      out << indent(ind) << "\n}\n";
+   }
+
+  void PrintFilter::LeaveAction::visit(ptr<Statement<Assignment> >::type stmt) {
+    ind -= IndentFactor;
+    out << "\n";
    }
 
     void PrintFilter::EnterExprAction::visit(ptr<Expression<Add> >::type expr)
