@@ -253,16 +253,10 @@ namespace mirv {
      //if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
      if (ptr<Statement<Base> >::type s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
        JustLeft = false;
-       ptr<StatementVisitor>::type flow =
-	 make_forward_flow(EnterAction(out, ind, JustLeft),
-			   LeaveAction(out, ind, JustLeft),
-			   NullAction(),
-			   NullAction(),
-			   NullAction(),
-			   NullAction(),
-			   NullAction(),
-			   PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
-					       LeaveExprAction(out, ind, JustLeft)));
+       ptr<StatementVisitor>::type flow(new PrintFlow(EnterAction(out, ind, JustLeft),
+						      LeaveAction(out, ind, JustLeft),
+						      PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
+									  LeaveExprAction(out, ind, JustLeft))));
        s->accept(*flow);
      }
      else if (ptr<Expression<Base> >::type e = boost::dynamic_pointer_cast<Expression<Base> >(node)) {
