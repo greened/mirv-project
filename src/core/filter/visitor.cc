@@ -108,6 +108,10 @@ namespace mirv {
     ptr<Statement<Return>::visitor_base_type>::type p = fast_cast<Statement<Return>::visitor_base_type>(s);
     visit(p);
   }
+  StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Assignment> >::type s) {
+    ptr<Statement<Assignment>::visitor_base_type>::type p = fast_cast<Statement<Assignment>::visitor_base_type>(s);
+    visit(p);
+  }
 
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Base> >::type e) {}
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<InnerExpression>::type e) {

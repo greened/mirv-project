@@ -24,7 +24,7 @@ namespace mirv {
          typedef interface_base_type::const_expression_ptr 
          const_expression_ptr;
          
-         void set_left(expression_ptr e) {
+         void set_left_expression(expression_ptr e) {
             if (expression_empty()) {
                expression_push_back(e);
             }
@@ -33,7 +33,7 @@ namespace mirv {
             }
          };
 
-         void set_right(expression_ptr e) {
+         void set_right_expression(expression_ptr e) {
             if (expression_empty()) {
                expression_push_back(expression_ptr()); // Placeholder
                expression_push_back(e);
@@ -43,25 +43,25 @@ namespace mirv {
             }
          };
          
-         expression_ptr get_left(void) {
+         expression_ptr get_left_expression(void) {
             check_invariant(!expression_empty() && *expression_begin(),
                             "Attempt to get non-existent expression");
             return(expression_front());
          };
 
-         const_expression_ptr get_left(void) const {
+         const_expression_ptr get_left_expression(void) const {
             check_invariant(!expression_empty() && *expression_begin(),
                             "Attempt to get non-existent expression");
             return(expression_front());
          };
 
-         expression_ptr get_right(void) {
+         expression_ptr get_right_expression(void) {
             check_invariant(expression_size() > 1 && expression_back(),
                             "Attempt to get non-existent expression");
             return(expression_back());
          };
 
-         const_expression_ptr get_right(void) const {
+         const_expression_ptr get_right_expression(void) const {
             check_invariant(expression_size() > 1 && expression_back(),
                             "Attempt to get non-existent expression");
             return(expression_back());
