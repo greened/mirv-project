@@ -1,26 +1,27 @@
 #ifndef mirv_core_builder_transform_hh
 #define mirv_core_builder_transform_hh
 
+#include <mirv/core/mem/heap.hh>
+
+#include <boost/proto/proto.hpp>
+
 namespace mirv {
    namespace Builder {
       // Transform a one-operand node
       template<typename NodeType, typename Dummy = boost::proto::callable>
-      struct ConstructUnary
-            : boost::proto::callable {
+      struct ConstructUnary : boost::proto::callable {
          template <typename Sig>
          struct result;
 
          template<typename This, typename Expr, typename State, typename Visitor>
          struct result<This(Expr, State, Visitor)> {
-            typedef typename Ptr<NodeType>::type type;
+            typedef typename ptr<NodeType>::type type;
          };
 
          template<typename Expr, typename State, typename Visitor>
-         typename result<ConstructUnary<NodeType, Dummy>, Expr, State, Visitor>::type
+         typename result<ConstructUnary<NodeType, Dummy>(Expr, State, Visitor)>::type
          operator()(Expr const &expr, State const &state, Visitor &visitor) {
-            return(typename result<ConstructUnary<NodeType, Dummy>, Expr, State, Visitor>::type(
-                      new NodeType(
-                         boost::proto::_arg)));
+	   return(typename result<ConstructUnary<NodeType, Dummy>(Expr, State, Visitor)>::type(new NodeType(boost::proto::_child0)));
          }
       };
 
@@ -37,9 +38,9 @@ namespace mirv {
          };
 
          template<typename Expr, typename State, typename Visitor>
-         typename result<ConstructBinary<NodeType, Dummy>, Expr, State, Visitor>::type
+         typename result<ConstructBinary<NodeType, Dummy>(Expr, State, Visitor)>::type
          operator()(Expr const &expr, State const &state, Visitor &visitor) {
-            return(typename result<ConstructBinary<NodeType, Dummy>, Expr, State, Visitor>::type(
+	   return(typename result<ConstructBinary<NodeType, Dummy>(Expr, State, Visitor)>::type(
                       new NodeType(boost::proto::_left, boost::proto::_right)));
          }
       };
@@ -94,13 +95,13 @@ namespace mirv {
          };
 
          template<typename Expr, typename State, typename Visitor>
-         typename result<ConstructTernary<NodeType, Dummy>, Expr, State, Visitor>::type
+         typename result<ConstructTernary<NodeType, Dummy>(Expr, State, Visitor)>::type
          operator()(Expr const &expr, State const &state, Visitor &visitor) {
-            return(typename result<ConstructTernary<NodeType, Dummy>, Expr, State, Visitor>::type(
+	   return(typename result<ConstructTernary<NodeType, Dummy>(Expr, State, Visitor)>::type(
                       new NodeType(
-                         boost::proto::_arg0,
-                         boost::proto::_arg1,
-                         boost::proto::_arg2)));
+                         boost::proto::_child0,
+                         boost::proto::_child1,
+                         boost::proto::_child2)));
          }
       };
 

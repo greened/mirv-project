@@ -107,37 +107,6 @@ namespace mirv {
       struct Call
             : boost::proto::function<ExpressionGrammar, 
                                      boost::proto::vararg<ExpressionGrammar> > {};
-
-
-      struct ExpressionGrammar
-            : boost::proto::or<
-         ConstructUnary<Symbol, mirv::Ref>,
-         ConstructUnary<Negate, mirv::Negate>,
-         ConstructUnary<Complement, mirv::Complement>,
-         ConstructUnary<Dereference, mirv::Dereference>,
-         ConstructUnary<AddressOf, mirv::AddressOf>,
-         ConstructUnary<Not, mirv::Not>,
-         ConstructBinary<Add, mirv::Add>,
-         ConstructBinary<Minus, mirv::Subtract>,
-         ConstructBinary<Multiplies, mirv::Multiply>,
-         ConstructBinary<Divides, mirv::Divide>,
-         ConstructBinary<ShiftLeft, mirv::ShiftLeft>,
-         ConstructBinary<ShiftRight, mirv::ShiftRight>,
-         ConstructBinary<Modulus, mirv::Modulus>,
-         ConstructBinary<Greater, mirv::GreaterThan>,
-         ConstructBinary<Less, mirv::LessThan>,
-         ConstructBinary<GreaterEqual, mirv::GreaterThanOrEqual>,
-         ConstructBinary<LessEqual, mirv::LessThanOrEqual>,
-         ConstructBinary<Equal, mirv::Equal>,
-         ConstructBinary<NotEqual, mirv::NotEqual>,
-         ConstructBinary<Or, mirv::LogicalOr>,
-         ConstructBinary<And, mirv::LogicalAnd>,
-         ConstructBinary<BitwiseOr, mirv::BitwiseOr>,
-         ConstructBinary<BitwiseAnd, mirv::BitwiseAnd>,
-         ConstructBinary<BitwiseXor, mirv::BitwiseXor>,
-         ConstructBinary<Subscript, mirv::ArrayRef>
-         //         ConstructNary<Call, mirv::Call>
-         > {};
    }
 }
 
