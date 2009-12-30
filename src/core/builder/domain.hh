@@ -1,6 +1,8 @@
 #ifndef mirv_core_builder_domain_hh
 #define mirv_core_builder_domain_hh
 
+#include <mirv/core/builder/grammar.hh>
+
 namespace mirv {
    namespace Builder {
       struct Domain;
@@ -17,7 +19,7 @@ namespace mirv {
       };
 
       struct Domain
-            : proto::domain< proto::generator< Expression > >
+	: proto::domain< proto::generator< Expression >, Grammar>
       {};
    }
 }

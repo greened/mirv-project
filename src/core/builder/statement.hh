@@ -131,15 +131,6 @@ namespace mirv {
 
 
       // TODO: Switch
-
-      struct StatementGrammar
-            : boost::proto::or<
-                 ConstructBinary<IfGrammar, MIRV::IfStatement>,
-//                  ConstructTernaryLeftNested<IfElseGrammar,
-//                                             MIRV::IfElseStatement>,
-                 ConstructBinary<WhileGrammar, MIRV::WhileStatement>,
-                 ConstructBinary<DoWhileGrammar, MIRV::DoWhileStatement>
-              > {};
    }
 }
 
