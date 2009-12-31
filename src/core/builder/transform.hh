@@ -2,46 +2,33 @@
 #define mirv_core_builder_transform_hh
 
 #include <mirv/core/mem/heap.hh>
+#include <mirv/core/builder/make.hh>
 
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
    namespace Builder {
       // Transform a one-operand node
-      template<typename NodeType, typename Dummy = boost::proto::callable>
+     template<typename NodeType,
+	      typename Child = typename NodeType::child_ptr,
+	      typename Dummy = boost::proto::callable>
       struct ConstructUnary : boost::proto::callable {
-         template <typename Sig>
-         struct result;
+	typedef typename ptr<NodeType>::type result_type;
 
-         template<typename This, typename Expr, typename State, typename Visitor>
-         struct result<This(Expr, State, Visitor)> {
-            typedef typename ptr<NodeType>::type type;
-         };
-
-         template<typename Expr, typename State, typename Visitor>
-         typename result<ConstructUnary<NodeType, Dummy>(Expr, State, Visitor)>::type
-         operator()(Expr const &expr, State const &state, Visitor &visitor) {
-	   return(typename result<ConstructUnary<NodeType, Dummy>(Expr, State, Visitor)>::type(new NodeType(boost::proto::_child0)));
-         }
+	result_type operator()(Child child) {
+	  return make<NodeType>(child);
+	}
       };
 
       // Transform a two-operand node
-      template<typename NodeType, typename Dummy = boost::proto::callable>
-      struct ConstructBinary 
-            : boost::proto::callable {
-         template <typename Sig>
-         struct result;
+      template<typename NodeType,
+	       typename Child = typename NodeType::child_ptr,
+	       typename Dummy = boost::proto::callable>
+      struct ConstructBinary : boost::proto::callable {
+	typedef typename ptr<NodeType>::type result_type;
 
-         template<typename This, typename Expr, typename State, typename Visitor>
-         struct result<This(Expr, State, Visitor)> {
-            typedef typename Ptr<NodeType>::type type;
-         };
-
-         template<typename Expr, typename State, typename Visitor>
-         typename result<ConstructBinary<NodeType, Dummy>(Expr, State, Visitor)>::type
-         operator()(Expr const &expr, State const &state, Visitor &visitor) {
-	   return(typename result<ConstructBinary<NodeType, Dummy>(Expr, State, Visitor)>::type(
-                      new NodeType(boost::proto::_left, boost::proto::_right)));
+	result_type operator()(Child left, Child right) {
+	  return make<NodeType>(left, right);
          }
       };
 
@@ -83,25 +70,14 @@ namespace mirv {
 #endif
 
       // Transform a three-operand node
-      template<typename NodeType, typename Dummy = boost::proto::callable>
-      struct ConstructTernary
-            : boost::proto::callable {
-         template <typename Sig>
-         struct result;
+      template<typename NodeType,
+	       typename Child = typename NodeType::child_ptr,
+	       typename Dummy = boost::proto::callable>
+      struct ConstructTernary : boost::proto::callable {
+	typedef typename ptr<NodeType>::type result_type;
 
-         template<typename This, typename Expr, typename State, typename Visitor>
-         struct result<This(Expr, State, Visitor)> {
-            typedef Ptr<NodeType>::type type;
-         };
-
-         template<typename Expr, typename State, typename Visitor>
-         typename result<ConstructTernary<NodeType, Dummy>(Expr, State, Visitor)>::type
-         operator()(Expr const &expr, State const &state, Visitor &visitor) {
-	   return(typename result<ConstructTernary<NodeType, Dummy>(Expr, State, Visitor)>::type(
-                      new NodeType(
-                         boost::proto::_child0,
-                         boost::proto::_child1,
-                         boost::proto::_child2)));
+	result_type operator()(Child child1, Child child2, Child child3) {
+	  return make<NodeType>(child1, child2, child3);
          }
       };
 
@@ -199,4 +175,3 @@ namespace mirv {
 }
 
 #endif
-

@@ -4,6 +4,8 @@
 #include <mirv/core/builder/expression.hh>
 //#include <mirv/core/builder/statement.hh>
 
+#include <boost/proto/proto.hpp>
+
 namespace mirv {
   namespace Builder {
     struct ConstructExpressionGrammar;
@@ -11,130 +13,181 @@ namespace mirv {
     struct ConstructExpressionGrammarCases {
       // The primary template matches nothing:
       template<typename Tag>
-      struct case_ : proto::not_<_> {};
+      struct case_ : boost::proto::not_<boost::proto::_> {};
     };
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::terminal>
-      : boost::proto::or<> {};
-
-    //ConstructUnary<Symbol, mirv::Ref>,
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::terminal>
+      : boost::proto::or_<
+      boost::proto::when<Variable,
+			 ConstructUnary<Expression<mirv::Reference<mirv::Variable> > >(boost::proto::_value)> > {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::negate>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::negate>
       :  boost::proto::when<Negate,
-			    ConstructUnary<mirv::Negate>(ConstructExpressionGrammar(boost::proto::_child))> {};
+			    ConstructUnary<Expression<mirv::Negate> >(ConstructExpressionGrammar(boost::proto::_child))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::complement>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::complement>
       : boost::proto::when<Complement,
-			   ConstructUnary<mirv::Complement>(ConstructExpressionGrammar(boost::proto::_child))> {};
+			   ConstructUnary<Expression<mirv::BitwiseComplement> >(ConstructExpressionGrammar(boost::proto::_child))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::dereference>
-      : boost::proto::while<Dereference,
-			    ConstructUnary<mirv::Dereference>(ConstructExpressionGrammar(boost::proto::_child))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::dereference>
+      : boost::proto::when<Dereference,
+			    ConstructUnary<Expression<mirv::Dereference> >(ConstructExpressionGrammar(boost::proto::_child))> {};
 
+#if 0
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::address_of>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::address_of>
       : boost::proto::when<AddressOf,
-			   ConstructUnary<mirv::AddressOf>(ConstructExpressionGrammar(boost::proto::_child))> {};
+			   ConstructUnary<Expression<mirv::AddressOf> >(ConstructExpressionGrammar(boost::proto::_child))> {};
+#endif
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::not>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_not>
       : boost::proto::when<Not,
-			    ConstructUnary<mirv::Not>(ConstructExpressionGrammar(boost::proto::_child))> {};
+			    ConstructUnary<Expression<mirv::LogicalNot> >(ConstructExpressionGrammar(boost::proto::_child))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::plus>
-      : boost::proto::when<Add,
-			   ConstructBinary<mirv::Add>(ConstructExpressionGrammmar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::plus>
+      : boost::proto::when<
+      Add,
+      ConstructBinary<Expression<mirv::Add> >(ConstructExpressionGrammar(boost::proto::_left),
+					      ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::minus>
-      : boost::proto::when<Minus,
-			   ConstructBinary<mirv::Subtract>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::minus>
+      : boost::proto::when<
+      Minus,
+      ConstructBinary<Expression<mirv::Subtract> >(ConstructExpressionGrammar(boost::proto::_left),
+						   ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::multiplies>
-      : boost::proto::when<Multiplies,
-			   ConstructBinary<mirv::Multiply>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::multiplies>
+      : boost::proto::when<
+      Multiplies,
+      ConstructBinary<Expression<mirv::Multiply> >(ConstructExpressionGrammar(boost::proto::_left),
+						   ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::divides>
-      : boost::proto::when<Divides, ConstructBinary<mirv::Divide>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::divides>
+      : boost::proto::when<
+      Divides,
+      ConstructBinary<Expression<mirv::Divide> >(ConstructExpressionGrammar(boost::proto::_left),
+						 ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::shift_left>
-      : boost::proto::when<ShiftLeft, ConstructBinary<mirv::ShiftLeft>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::shift_left>
+      : boost::proto::when<
+      ShiftLeft,
+      ConstructBinary<Expression<mirv::ShiftLeft> >(ConstructExpressionGrammar(boost::proto::_left),
+						    ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::shift_right>
-      : boost::proto::when<ShiftRight, ConstructBinary<mirv::ShiftRight>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::shift_right>
+      : boost::proto::when<
+      ShiftRight,
+      ConstructBinary<Expression<mirv::ArithmeticShiftRight> >(ConstructExpressionGrammar(boost::proto::_left),
+							       ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::modulus>
-      : boost::proto::when<Modulus, ConstructBinary<mirv::Modulus>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::modulus>
+      : boost::proto::when<
+      Modulus,
+      ConstructBinary<Expression<mirv::Modulus> >(ConstructExpressionGrammar(boost::proto::_left),
+						  ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::greater>
-      : boost::proto::when<Greater, ConstructBinary<mirv::GreaterThan>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::greater>
+      : boost::proto::when<
+      Greater,
+      ConstructBinary<Expression<mirv::GreaterThan> >(ConstructExpressionGrammar(boost::proto::_left),
+						      ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::less>
-      : boost::proto::when<Less, ConstructBinary<mirv::LessThan>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::less>
+      : boost::proto::when<
+      Less,
+      ConstructBinary<Expression<mirv::LessThan> >(ConstructExpressionGrammar(boost::proto::_left),
+						   ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::greater_equal>
-      : boost::proto::when<GreaterEqual, ConstructBinary<mirv::GreaterThanOrEqual>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::greater_equal>
+      : boost::proto::when<
+      GreaterEqual,
+      ConstructBinary<Expression<mirv::GreaterThanOrEqual> >(ConstructExpressionGrammar(boost::proto::_left),
+							     ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::less_equal>
-      : boost::proto::when<LessEqual, ConstructBinary<mirv::LessThanOrEqual>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::less_equal>
+      : boost::proto::when<
+      LessEqual,
+      ConstructBinary<Expression<mirv::LessThanOrEqual> >(ConstructExpressionGrammar(boost::proto::_left),
+							  ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::equal>
-      : boost::proto::when<Equal, ConstructBinary<mirv::Equal>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
+      : boost::proto::when<
+      Equal,
+      ConstructBinary<Expression<mirv::Equal> >(ConstructExpressionGrammar(boost::proto::_left),
+						ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::not_equal>
-      : boost::proto::when<NotEqual, ConstructBinary<mirv::NotEqual>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::not_equal_to>
+      : boost::proto::when<
+      NotEqual,
+      ConstructBinary<Expression<mirv::NotEqual> >(ConstructExpressionGrammar(boost::proto::_left),
+						   ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::or>
-      : boost::proto::when<Or, ConstructBinary<mirv::LogicalOr>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_or>
+      : boost::proto::when<
+      Or,
+      ConstructBinary<Expression<mirv::LogicalOr> >(ConstructExpressionGrammar(boost::proto::_left),
+						    ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::and>
-      : boost::proto::when<And, ConstructBinary<mirv::LogicalAnd>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
+      : boost::proto::when<
+      And,
+      ConstructBinary<Expression<mirv::LogicalAnd> >(ConstructExpressionGrammar(boost::proto::_left),
+						     ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::bitwise_or>
-      : boost::proto::when<BitwiseOr, ConstructBinary<mirv::BitwiseOr>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_or>
+      : boost::proto::when<
+      BitwiseOr,
+      ConstructBinary<Expression<mirv::BitwiseOr> >(ConstructExpressionGrammar(boost::proto::_left),
+						    ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::bitwise_and>
-      : boost::proto::when<BitwiseAnd, ConstructBinary<mirv::BitwiseAnd>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_and>
+      : boost::proto::when<
+      BitwiseAnd,
+      ConstructBinary<Expression<mirv::BitwiseAnd> >(ConstructExpressionGrammar(boost::proto::_left),
+						     ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::bitwise_xor>
-      : boost::proto::when<BitwiseXor, ConstructBinary<mirv::BitwiseXor>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
+      : boost::proto::when<
+      BitwiseXor,
+      ConstructBinary<Expression<mirv::BitwiseXor> >(ConstructExpressionGrammar(boost::proto::_left),
+						     ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
-    struct ConstructExpressionGrammarCases::case_<proto::tag::subscript>
-      : boost::proto::when<Subscript, ConstructBinary<mirv::ArrayRef>(ConstructExpressionGrammar(boost::proto::_left, boost::proto::_right))> {};
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::subscript>
+      : boost::proto::when<
+      Subscript,
+      ConstructBinary<Expression<mirv::ArrayRef> >(ConstructExpressionGrammar(boost::proto::_left),
+						   ConstructExpressionGrammar(boost::proto::_right))> {};
 
     //         ConstructNary<Call, mirv::Call>
 
-    struct ConstructExpressionGrammar : boost::proto::switch_<ConstructExpressionGrammarCases> {};
+    struct ConstructExpressionGrammar
+      : boost::proto::switch_<ConstructExpressionGrammarCases> {};
 
-    struct StatementGrammar;
-
-    struct ConstructExpressionGrammarCases {
-      // The primary template matches nothing:
-      template<typename Tag>
-      struct case_ : proto::not_<_> {};
-    };
+    //struct StatementGrammar;
 
     //ConstructBinary<IfGrammar, MIRV::IfStatement>,
 //                  ConstructTernaryLeftNested<IfElseGrammar,
@@ -142,10 +195,10 @@ namespace mirv {
     //ConstructBinary<WhileGrammar, MIRV::WhileStatement>,
     //ConstructBinary<DoWhileGrammar, MIRV::DoWhileStatement>
 
-    struct Grammar
-      : boost::proto::or<
-      ConstructExpressionGramar,
-      StatementGrammar> {};
+    // struct Grammar
+    //   : boost::proto::or_<
+    //   ConstructExpressionGramar,
+    //   StatementGrammar> {};
   }
 }
 

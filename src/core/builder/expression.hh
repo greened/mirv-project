@@ -4,109 +4,59 @@
 #include <mirv/core/builder/transform.hh>
 #include <mirv/core/ir/variable.hh>
 
+#include <boost/proto/proto.hpp>
+
 namespace mirv {
    namespace Builder {
-     typedef boost::proto::terminal<Symbol<Variable> >::type Variable;
+     typedef boost::proto::terminal<ptr<Symbol<Variable> >::type>::type Variable;
 
-     template<typename T>
-     struct Type
-       : boost::proto::terminal< convertible_to<T> >
-     {};
-
-     struct ExpressionGrammar;
+     struct ConstructExpressionGrammar;
 
      // Unary expressions
 
      // No Posit
-      struct Negate
-            : boost::proto::negate<ExpressionGrammar> {};
-
-      struct Complement
-            : boost::proto::complement<ExpressionGrammar> {};
-
-      struct Dereference
-            : boost::proto::dereference<ExpressionGrammar> {};
-
-      struct AddressOf
-            : boost::proto::address_of<ExpressionGrammar> {};
-
-      struct Not
-            : boost::proto::logical_not<ExpressionGrammar> {};
+     typedef boost::proto::negate<ConstructExpressionGrammar> Negate;
+     typedef boost::proto::complement<ConstructExpressionGrammar> Complement;
+     typedef boost::proto::dereference<ConstructExpressionGrammar> Dereference;
+     typedef boost::proto::address_of<ConstructExpressionGrammar> AddressOf;
+     typedef boost::proto::logical_not<ConstructExpressionGrammar> Not;
 
       // No increment or decrement
 
       // Binary expressions
-      struct Add
-            : boost::proto::plus<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct Minus
-            : boost::proto::minus<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct Multiplies
-            : boost::proto::multiplies<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct Divides
-            : boost::proto::divides<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct ShiftLeft
-            : boost::proto::shift_left<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct ShiftRight
-            : boost::proto::shift_right<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct Modulus
-            : boost::proto::modulus<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct Greater
-            : boost::proto::greater<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct Less
-            : boost::proto::less<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct GreaterEqual
-            : boost::proto::greater_equal<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct LessEqual
-            : boost::proto::less_equal<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct Equal
-            : boost::proto::equal_to<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct NotEqual
-            : boost::proto::not_equal_to<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct Or
-            : boost::proto::logical_or<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct And
-            : boost::proto::logical_and<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct BitwiseOr
-            : boost::proto::bitwise_or<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct BitwiseAnd
-            : boost::proto::bitwise_and<ExpressionGrammar, ExpressionGrammar> {};
-
-      struct BitwiseXor
-            : boost::proto::bitwise_xor<ExpressionGrammar, ExpressionGrammar> {};
+     typedef boost::proto::plus<ConstructExpressionGrammar, ConstructExpressionGrammar> Add;
+     typedef boost::proto::minus<ConstructExpressionGrammar, ConstructExpressionGrammar> Minus;
+     typedef boost::proto::multiplies<ConstructExpressionGrammar, ConstructExpressionGrammar> Multiplies;
+     typedef boost::proto::divides<ConstructExpressionGrammar, ConstructExpressionGrammar> Divides;
+     typedef boost::proto::shift_left<ConstructExpressionGrammar, ConstructExpressionGrammar> ShiftLeft;
+     typedef boost::proto::shift_right<ConstructExpressionGrammar, ConstructExpressionGrammar> ShiftRight;
+     typedef boost::proto::modulus<ConstructExpressionGrammar, ConstructExpressionGrammar> Modulus;
+     typedef boost::proto::greater<ConstructExpressionGrammar, ConstructExpressionGrammar> Greater;
+     typedef boost::proto::less<ConstructExpressionGrammar, ConstructExpressionGrammar> Less;
+     typedef boost::proto::greater_equal<ConstructExpressionGrammar, ConstructExpressionGrammar> GreaterEqual;
+     typedef boost::proto::less_equal<ConstructExpressionGrammar, ConstructExpressionGrammar> LessEqual;
+     typedef boost::proto::equal_to<ConstructExpressionGrammar, ConstructExpressionGrammar> Equal;
+     typedef boost::proto::not_equal_to<ConstructExpressionGrammar, ConstructExpressionGrammar> NotEqual;
+     typedef boost::proto::logical_or<ConstructExpressionGrammar, ConstructExpressionGrammar> Or;
+     typedef boost::proto::logical_and<ConstructExpressionGrammar, ConstructExpressionGrammar> And;
+     typedef boost::proto::bitwise_or<ConstructExpressionGrammar, ConstructExpressionGrammar> BitwiseOr;
+     typedef boost::proto::bitwise_and<ConstructExpressionGrammar, ConstructExpressionGrammar> BitwiseAnd;
+     typedef boost::proto::bitwise_xor<ConstructExpressionGrammar, ConstructExpressionGrammar> BitwiseXor;
 
       // No comma
 
-      struct MemPtr
-            : boost::proto::mem_ptr<ExpressionGrammar, ExpressionGrammar> {};
+     typedef boost::proto::mem_ptr<ConstructExpressionGrammar, ConstructExpressionGrammar> MemPtr;
 
       // No assign (statement)
       // No op-assign
 
-      struct Subscript
-            : boost::proto::subscript<ExpressionGrammar, ExpressionGrammar> {};
+     typedef boost::proto::subscript<ConstructExpressionGrammar, ConstructExpressionGrammar> Subscript;
 
       // No ?:
       // Nary expressions
 
-      struct Call
-            : boost::proto::function<ExpressionGrammar, 
-                                     boost::proto::vararg<ExpressionGrammar> > {};
+     typedef boost::proto::function<ConstructExpressionGrammar, 
+				    boost::proto::vararg<ConstructExpressionGrammar> > Call;
    }
 }
 
