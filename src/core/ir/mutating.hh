@@ -78,6 +78,8 @@ namespace mirv {
        template<typename E1, typename E2>
        Base(E1 e1, E2 e2) : Statement<DualExpression>(e1, e2),
 			    LeafStatement() {}
+       typedef expression_ptr child_ptr;
+       typedef const_expression_ptr const_child_ptr;
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Assignment::Base::accept called");

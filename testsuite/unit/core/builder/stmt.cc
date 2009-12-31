@@ -1,21 +1,40 @@
-// Test building of expressions.
+// Test printing of satements.
 //
-// STDOUT: +
-// STDOUT:    vref a
-// STDOUT:    /
-// STDOUT:       *
-// STDOUT:          -
+// STDOUT: doWhile
+// STDOUT:    {
+// STDOUT:       assign
+// STDOUT:          vref a
+// STDOUT:          +
+// STDOUT:             vref a
+// STDOUT:             vref b
+// STDOUT:       ifElse
+// STDOUT:          >
 // STDOUT:             vref b
 // STDOUT:             vref c
-// STDOUT:          vref d
-// STDOUT:       neg
-// STDOUT:          vref e
-//
+// STDOUT:          {
+// STDOUT:             assign
+// STDOUT:                vref a
+// STDOUT:                +
+// STDOUT:                   vref a
+// STDOUT:                   vref b
+// STDOUT:          }
+// STDOUT:          {
+// STDOUT:             assign
+// STDOUT:                vref a
+// STDOUT:                +
+// STDOUT:                   vref a
+// STDOUT:                   vref c
+// STDOUT:          }
+// STDOUT:    }
+// STDOUT:    <
+// STDOUT:       vref a
+// STDOUT:       vref c
 
 #include <mirv/core/ir/symbol.hh>
 #include <mirv/core/ir/variable.hh>
 #include <mirv/core/ir/expression.hh>
 #include <mirv/core/ir/arithmetic.hh>
+#include <mirv/core/ir/relational.hh>
 #include <mirv/core/ir/logical.hh>
 #include <mirv/core/ir/bitwise.hh>
 #include <mirv/core/ir/reference.hh>
@@ -36,10 +55,13 @@ using mirv::Integral;
 using mirv::Expression;
 using mirv::Base;
 using mirv::Add;
-using mirv::Subtract;
-using mirv::Multiply;
-using mirv::Divide;
-using mirv::Negate;
+using mirv::LessThan;
+using mirv::GreaterThan;
+using mirv::Statement;
+using mirv::Block;
+using mirv::IfElse;
+using mirv::DoWhile;
+using mirv::Assignment;
 using mirv::Reference;
 using mirv::ptr;
 using mirv::PrintFilter;
@@ -55,17 +77,14 @@ int main(void)
     {Symbol<Variable>::make("b", make<Symbol<Type<Integral<32> > > >())};
   Builder::Variable c =
     {Symbol<Variable>::make("c", make<Symbol<Type<Integral<32> > > >())};
-  Builder::Variable d =
-    {Symbol<Variable>::make("d", make<Symbol<Type<Integral<32> > > >())};
-  Builder::Variable e =
-    {Symbol<Variable>::make("e", make<Symbol<Type<Integral<32> > > >())};
 
-  ptr<Expression<Base> >::type expr =
-    Builder::translate_expression(a + (b - c) * d / -e);
+
+  ptr<Statement<Base> >::type stmt =
+    Builder::translate_statement(a = b + c);
 
   PrintFilter print(std::cout);
-
-  print(expr);
+  
+  print(stmt);
 
   return(0);
 }

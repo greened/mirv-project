@@ -15,12 +15,20 @@ namespace mirv {
        ConstructExpressionGrammar translate;
        return translate(expr);
      }
-#if 0
+
      template<typename Expr>
      ptr<Statement<Base> >::type 
      translate_statement(const Expr &expr) {
+       ConstructStatementGrammar translate;
+       return translate(expr);
      }
-#endif
+
+     template<typename Expr>
+     ptr<Node<Base> >::type
+     translate(const Expr &expr) {
+       ConstructGrammar trans;
+       return trans(expr);
+     }
    }
 }
 
