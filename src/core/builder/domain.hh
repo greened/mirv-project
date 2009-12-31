@@ -7,19 +7,14 @@ namespace mirv {
    namespace Builder {
       struct Domain;
 
-      template<typename Expr>
-      struct Expression
-            : proto::extends<Expr, Expression<Expr>, Domain> {
-         typedef proto::extends<Expr, Expression<Expr>, Domain>
-         base_type;
-
-         Expression(Expr const & expr = Expr())
-               : base_type( expr )
-         {}
-      };
+     template<typename Expr, typename Dummy = boost::proto::is_proto_expr>
+     struct Expression {
+       BOOST_PROTO_EXTENDS(Expr, Expression<Expr>, Domain)
+     };
 
       struct Domain
-	: proto::domain< proto::generator< Expression >, Grammar>
+	: boost::proto::domain<boost::proto::pod_generator<Expression>,
+			       ConstructGrammar>
       {};
    }
 }

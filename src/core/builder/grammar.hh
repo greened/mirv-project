@@ -2,7 +2,7 @@
 #define mirv_core_builder_grammar_hh
 
 #include <mirv/core/builder/expression.hh>
-//#include <mirv/core/builder/statement.hh>
+#include <mirv/core/builder/statement.hh>
 
 #include <boost/proto/proto.hpp>
 
@@ -187,18 +187,30 @@ namespace mirv {
     struct ConstructExpressionGrammar
       : boost::proto::switch_<ConstructExpressionGrammarCases> {};
 
-    //struct StatementGrammar;
+    // Define the statement grammar.
+    struct ConstructStatementGrammar;
 
-    //ConstructBinary<IfGrammar, MIRV::IfStatement>,
-//                  ConstructTernaryLeftNested<IfElseGrammar,
-//                                             MIRV::IfElseStatement>,
-    //ConstructBinary<WhileGrammar, MIRV::WhileStatement>,
-    //ConstructBinary<DoWhileGrammar, MIRV::DoWhileStatement>
+    struct ConstructStatementGrammarCases {
+      // The primary template matches nothing:
+      template<typename Tag>
+      struct case_ : boost::proto::not_<boost::proto::_> {};
+    };
 
-    // struct Grammar
-    //   : boost::proto::or_<
-    //   ConstructExpressionGramar,
-    //   StatementGrammar> {};
+    template<>
+    struct ConstructStatementGrammarCases::case_<boost::proto::tag::assign>
+      : boost::proto::when<
+      Assign,
+      ConstructBinary<Statement<mirv::Assignment> >(ConstructExpressionGrammar(boost::proto::_left),
+						    ConstructExpressionGrammar(boost::proto::_right))> {};
+
+    struct ConstructStatementGrammar
+      : boost::proto::switch_<ConstructStatementGrammarCases> {};
+
+    // General IR grammar.
+    struct ConstructGrammar
+      : boost::proto::or_<
+      ConstructExpressionGrammar,
+      ConstructStatementGrammar> {};
   }
 }
 

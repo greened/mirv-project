@@ -1,18 +1,25 @@
 #ifndef mirv_core_builder_statement_hh
 #define mirv_core_builder_statement_hh
 
-#include "transform.hh"
+#include <boost/proto/proto.hpp>
 
 namespace mirv {
    namespace Builder {
-      struct ExpressionGrammar;
-      struct StatementGrammar;
+      struct ConstructExpressionGrammar;
+      struct ConstructStatementGrammar;
 
-      struct If {};
+     typedef boost::proto::assign<ConstructExpressionGrammar, ConstructExpressionGrammar> Assign;
+
+      struct IfTag {};
       struct Else {};
       struct While {};
       struct Do {};
-
+#if 0
+      // An if_ "operator"
+     typedef boost::proto::terminal<IfTag>::type If;
+     If const if_ = {{}};
+#endif
+#if 0
       BOOST_PROTO_DEFINE_FUNCTION_TEMPLATE(
          1
          , if_
@@ -20,28 +27,22 @@ namespace mirv {
          , (MIRV::Builder::If)
          , BOOST_PP_SEQ_NIL
          );
-
-      BOOST_PROTO_DEFINE_FUNCTION_TEMPLATE(
-         1
-         , while_
-         , MIRV::Builder::Domain
-         , (MIRV::Builder::While)
-         , BOOST_PP_SEQ_NIL
-         );
-
+#endif
+#if 0
       // Here is the grammar for if_ statements
       // matches if_(e1)[e2]
       struct IfGrammar
             : boost::proto::subscript<
-                 boost::proto::arg<
-                    boost::proto::unary_expr<
-                       MIRV::Builder::If,
-                       ExpressionGrammar
-                    >,
+                 boost::proto::function<
+		   //                    boost::proto::unary_expr<
+                       If,
+		   ConstructExpressionGrammar
+		   //                    >,
                  >,
-                 StatementGrammar
+                 ConstructStatementGrammar
               > {};
-
+#endif
+#if 0
       // An else_ "operator"
       template<typename Expr>
       struct Expression<
@@ -59,6 +60,15 @@ namespace mirv {
          >::type const else_;
       };
 
+      BOOST_PROTO_DEFINE_FUNCTION_TEMPLATE(
+         1
+         , while_
+         , MIRV::Builder::Domain
+         , (MIRV::Builder::While)
+         , BOOST_PP_SEQ_NIL
+         );
+#endif
+
 #if 0
       // matches if_(e1)[e2].else_[e3]
       struct IfElseGrammar
@@ -72,7 +82,7 @@ namespace mirv {
                  StatementGrammar
               > {};
 #endif
-
+#if 0
       // Here is the grammar for while_ statements
       // matches while_(e1)[e2]
       struct WhileGrammar
@@ -129,7 +139,7 @@ namespace mirv {
                  StatementGrammar
               > {};
 
-
+#endif
       // TODO: Switch
    }
 }
