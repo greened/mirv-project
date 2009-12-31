@@ -28,6 +28,18 @@ namespace mirv {
      typedef Expression<Binary> visitor_base_type;
      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
+
+   class BitwiseXor {
+   private:
+      typedef boost::mpl::vector<Bitwise, Commutative,
+         Associative, Transitive,
+         Reflexive> sequence;
+      
+   public:
+    typedef sequence properties;
+     typedef Expression<Binary> visitor_base_type;
+     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+   };
    
    class BitwiseComplement {
    private:

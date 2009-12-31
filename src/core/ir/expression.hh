@@ -52,6 +52,7 @@ namespace mirv {
 	boost::mpl::identity<typename Op::visitor_base_type>,
 	boost::mpl::deref<typename boost::mpl::begin<property_expressions>::type>
 	>::type visitor_base_type;
+      typedef Expression<Base> RootType;
 
     protected:
       Expression(void) {}

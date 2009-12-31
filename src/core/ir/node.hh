@@ -67,9 +67,11 @@ namespace mirv {
    // A node with children
     template<typename Child, typename BaseType>
     class InnerImpl : public BaseType {
-   protected:
+    public:
       typedef typename ptr<Child>::type child_ptr;
       typedef typename ptr<Child>::const_type const_child_ptr;
+
+   protected:
       typedef std::list<child_ptr> child_list;
 
    private:
