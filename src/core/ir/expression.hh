@@ -112,11 +112,11 @@ namespace mirv {
 
   class InnerExpressionBase : public Expression<Inner<detail::InnerExpressionTraits> > {};
   
-  class InnerExpression : public InnerImpl<Expression<Base>, Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type> {
+  class InnerExpression : public InnerImpl<Expression<Base>, VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type> {
    private:
      typedef InnerImpl<
        Expression<Base>,
-      Inherit1<ExpressionVisitor>::apply<
+      VisitedInherit1<ExpressionVisitor>::apply<
 	Virtual<InnerExpressionBase>
       >::type> BaseType;
 
@@ -240,35 +240,35 @@ namespace mirv {
    class Arithmetic {
    public:
      typedef boost::mpl::int_<0> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Logical {
    public:
      typedef boost::mpl::int_<1> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Bitwise {
    public:
      typedef boost::mpl::int_<2> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Relational {
    public:
      typedef boost::mpl::int_<0> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Ref {
    public:
      typedef boost::mpl::int_<11> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
@@ -276,28 +276,28 @@ namespace mirv {
    class Commutative {
    public:
      typedef boost::mpl::int_<3> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Associative {
    public:
      typedef boost::mpl::int_<5> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Transitive {
    public:
      typedef boost::mpl::int_<7> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
    class Reflexive {
    public:
      typedef boost::mpl::int_<9> order;
-     typedef Inherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
+     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type base_type;
      typedef InnerExpressionBase visitor_base_type;
      typedef boost::mpl::vector<> properties;
    }; 
@@ -306,7 +306,7 @@ namespace mirv {
    class ExpressionBaseGenerator {
    public:
     typedef typename Properties<PropertyExpressionGenerator, Root, Sequence,
-				Inherit2<ExpressionVisitor> >::type
+				VisitedInherit2<ExpressionVisitor> >::type
       type;
 
    };

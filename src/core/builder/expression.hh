@@ -2,15 +2,16 @@
 #define mirv_core_builder_expression_hh
 
 #include <mirv/core/builder/transform.hh>
+#include <mirv/core/builder/domain_fwd.hh>
+#include <mirv/core/builder/grammar_fwd.hh>
+#include <mirv/core/builder/wrapper.hh>
 #include <mirv/core/ir/variable.hh>
 
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
    namespace Builder {
-     typedef boost::proto::terminal<ptr<Symbol<Variable> >::type>::type Variable;
-
-     struct ConstructExpressionGrammar;
+     typedef Wrapper<boost::proto::terminal<ptr<Symbol<Variable> >::type>::type > Variable;
 
      // Unary expressions
 
