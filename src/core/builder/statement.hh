@@ -1,47 +1,49 @@
 #ifndef mirv_core_builder_statement_hh
 #define mirv_core_builder_statement_hh
 
+#include <mirv/core/builder/wrapper.hh>
+#include <mirv/core/builder/domain_fwd.hh>
+#include <mirv/core/builder/grammar_fwd.hh>
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
    namespace Builder {
-      struct ConstructExpressionGrammar;
-      struct ConstructStatementGrammar;
-
      typedef boost::proto::assign<ConstructExpressionGrammar, ConstructExpressionGrammar> Assign;
 
-      struct IfTag {};
-      struct Else {};
-      struct While {};
-      struct Do {};
-#if 0
-      // An if_ "operator"
-     typedef boost::proto::terminal<IfTag>::type If;
-     If const if_ = {{}};
-#endif
-#if 0
-      BOOST_PROTO_DEFINE_FUNCTION_TEMPLATE(
-         1
-         , if_
-         , MIRV::Builder::Domain
-         , (MIRV::Builder::If)
-         , BOOST_PP_SEQ_NIL
-         );
-#endif
-#if 0
-      // Here is the grammar for if_ statements
-      // matches if_(e1)[e2]
-      struct IfGrammar
-            : boost::proto::subscript<
-                 boost::proto::function<
-		   //                    boost::proto::unary_expr<
-                       If,
-		   ConstructExpressionGrammar
-		   //                    >,
-                 >,
-                 ConstructStatementGrammar
-              > {};
-#endif
+     namespace keyword {
+       struct if_ {
+	 friend std::ostream& operator<<(std::ostream& sout, if_) {
+	   return sout << "if_";
+	 }
+       };
+       struct else_ { 
+	 friend std::ostream& operator<<(std::ostream& sout, else_) {
+	   return sout << "else_";
+	 }
+       };
+       struct do_ {
+	 friend std::ostream& operator<<(std::ostream& sout, do_) {
+	   return sout << "do_";
+	 }
+       };
+       struct while_ {
+	 friend std::ostream& operator<<(std::ostream& sout, while_) {
+	   return sout << "while_";
+	 }
+       };
+     }
+     // Here is the grammar for if_ statements
+     // matches if_(e1)[e2]
+     typedef Wrapper<boost::proto::terminal<keyword::if_>::type> IfTerminal;
+
+     typedef boost::proto::subscript<
+       boost::proto::function<
+	 IfTerminal,
+	 ConstructExpressionGrammar
+	 >,
+       ConstructStatementGrammar
+       > IfRule;
+
 #if 0
       // An else_ "operator"
       template<typename Expr>

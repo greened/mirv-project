@@ -22,12 +22,13 @@ namespace mirv {
 
       // Transform a two-operand node
       template<typename NodeType,
-	       typename Child = typename NodeType::child_ptr,
+	       typename Child1 = typename NodeType::child_ptr,
+	       typename Child2 = typename NodeType::child_ptr,
 	       typename Dummy = boost::proto::callable>
       struct ConstructBinary : boost::proto::callable {
 	typedef typename ptr<NodeType>::type result_type;
 
-	result_type operator()(Child left, Child right) {
+	result_type operator()(Child1 left, Child2 right) {
 	  return make<NodeType>(left, right);
          }
       };

@@ -3,6 +3,7 @@
 
 #include <mirv/core/ir/base.hh>
 #include <mirv/core/ir/node.hh>
+#include <mirv/core/ir/type_fwd.hh>
 
 namespace mirv {
    template<typename Tag>
@@ -44,6 +45,49 @@ namespace mirv {
   class InnerSymbol : public InnerImpl<Symbol<Base>, Symbol<Base> > {
   };
   class LeafSymbol : public LeafImpl<Symbol<Base> > {
+  };
+
+  class Typed {
+  private:
+    typedef Inherit1::apply<Virtual<LeafSymbol> >::type interface_base_type;
+
+  public:
+    class interface : public interface_base_type { 
+    public:
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type const_type_ptr;
+
+   private:
+      const_type_ptr the_type;
+
+    public:
+      interface(const_type_ptr t)
+	: the_type(t) {};
+
+      const_type_ptr type(void) const {
+	return(the_type);
+      }
+    };
+    typedef interface base_type;
+  };
+
+  class Named {
+  private:
+    typedef Inherit1::apply<Virtual<LeafSymbol> >::type interface_base_type;
+
+  public:
+    class interface : public interface_base_type { 
+    private:
+      std::string the_name;
+
+    public:
+      interface(const std::string &n)
+	: the_name(n) {};
+
+      const std::string &name(void) const {
+	return(the_name);
+      }
+    };
+    typedef interface base_type;
   };
 }
 

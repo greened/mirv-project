@@ -30,57 +30,45 @@
 // STDOUT:       vref a
 // STDOUT:       vref c
 
-#include <mirv/core/ir/symbol.hh>
-#include <mirv/core/ir/variable.hh>
-#include <mirv/core/ir/expression.hh>
-#include <mirv/core/ir/arithmetic.hh>
-#include <mirv/core/ir/relational.hh>
-#include <mirv/core/ir/logical.hh>
-#include <mirv/core/ir/bitwise.hh>
-#include <mirv/core/ir/reference.hh>
-#include <mirv/core/ir/statement.hh>
-#include <mirv/core/ir/control.hh>
-#include <mirv/core/ir/mutating.hh>
-
-#include <mirv/core/builder/expression.hh>
-#include <mirv/core/builder/grammar.hh>
-#include <mirv/core/builder/make.hh>
-#include <mirv/core/builder/translate.hh>
+#include <mirv/core/ir/ir.hh>
+#include <mirv/core/builder/builder.hh>
 #include <mirv/filter/snapshot/print/print.hh>
 
 using mirv::Symbol;
 using mirv::Variable;
 using mirv::Type;
 using mirv::Integral;
-using mirv::Expression;
-using mirv::Base;
-using mirv::Add;
-using mirv::LessThan;
-using mirv::GreaterThan;
 using mirv::Statement;
-using mirv::Block;
-using mirv::IfElse;
-using mirv::DoWhile;
-using mirv::Assignment;
-using mirv::Reference;
+using mirv::Base;
 using mirv::ptr;
 using mirv::PrintFilter;
 using mirv::make;
 
 namespace Builder = mirv::Builder;
 
+using Builder::if_;
+
 int main(void)
 {
   Builder::Variable a =
-    {Symbol<Variable>::make("a", make<Symbol<Type<Integral<32> > > >())};
+    {{Symbol<Variable>::make("a", make<Symbol<Type<Integral<32> > > >())}};
   Builder::Variable b =
-    {Symbol<Variable>::make("b", make<Symbol<Type<Integral<32> > > >())};
+    {{Symbol<Variable>::make("b", make<Symbol<Type<Integral<32> > > >())}};
   Builder::Variable c =
-    {Symbol<Variable>::make("c", make<Symbol<Type<Integral<32> > > >())};
+    {{Symbol<Variable>::make("c", make<Symbol<Type<Integral<32> > > >())}};
 
+  boost::proto::display_expr(
+      if_(a < b) [
+        a = a + c
+      ]
+  );
 
   ptr<Statement<Base> >::type stmt =
-    Builder::translate_statement(a = b + c);
+    Builder::translate_statement(
+      if_(a < b) [
+        a = a + c
+      ]
+    );
 
   PrintFilter print(std::cout);
   

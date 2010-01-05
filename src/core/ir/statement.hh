@@ -101,7 +101,7 @@ namespace mirv {
     class InnerStatementTraits {
     public:
       typedef Statement<Base> Child;
-      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
+      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
 
     private:
       typedef ptr<Child>::type child_ptr;
@@ -119,10 +119,10 @@ namespace mirv {
 
   class InnerStatementBase : public Statement<Inner<detail::InnerStatementTraits> > {};
 
-  class InnerStatement : public InnerImpl<Statement<Base>, Inherit1<StatementVisitor>::apply<Virtual<InnerStatementBase> >::type> {
+  class InnerStatement : public InnerImpl<Statement<Base>, VisitedInherit1<StatementVisitor>::apply<Virtual<InnerStatementBase> >::type> {
      typedef InnerImpl<
        Statement<Base>,
-      Inherit1<StatementVisitor>::apply<
+      VisitedInherit1<StatementVisitor>::apply<
 	Virtual<InnerStatementBase>
       >::type> BaseType;
    public:
@@ -132,7 +132,7 @@ namespace mirv {
      virtual void accept(StatementVisitor &V);
    };
 
-  class LeafStatement : public LeafImpl<Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type> {
+  class LeafStatement : public LeafImpl<VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type> {
    public:
      virtual void accept(StatementVisitor &V);
 
@@ -144,7 +144,7 @@ namespace mirv {
    class Conditional {
     public:
      typedef boost::mpl::int_<0> order;
-     typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
+     typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
      typedef Statement<Base> visitor_base_type;
      typedef boost::mpl::vector<> properties;
    };
@@ -153,7 +153,7 @@ namespace mirv {
     class Iterative {
     public:
       typedef boost::mpl::int_<1> order;
-      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
+      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
      typedef Statement<Base> visitor_base_type;
      typedef boost::mpl::vector<> properties;
     };
@@ -162,7 +162,7 @@ namespace mirv {
     class Mutating {
     public:
       typedef boost::mpl::int_<2> order;
-      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
+      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
      typedef Statement<Base> visitor_base_type;
      typedef boost::mpl::vector<> properties;
     };
@@ -171,7 +171,7 @@ namespace mirv {
     class StatementBaseGenerator {
     public:
       typedef typename Properties<PropertyStatementGenerator, Root, Sequence,
-				  Inherit2<StatementVisitor> >::type
+				  VisitedInherit2<StatementVisitor> >::type
        type;
     };
 
@@ -182,7 +182,7 @@ namespace mirv {
 
     public:
        class interface;
-      typedef Inherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type interface_base_type;
+      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type interface_base_type;
       typedef Statement<Base> visitor_base_type;
       typedef sequence properties;
 
