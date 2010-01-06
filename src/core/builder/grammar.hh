@@ -191,20 +191,9 @@ namespace mirv {
     struct ConstructStatementGrammar;
 
     struct ConstructStatementGrammarCases {
-#if 0
       // The primary template matches nothing:
       template<typename Tag>
       struct case_ : boost::proto::not_<boost::proto::_> {};
-#endif
-      template<typename Tag>
-      struct case_ : boost::proto::when<
-	IfRule,
-	ConstructBinary<
-	  Statement<mirv::IfThen>,
-	  ptr<Expression<Base> >::type,
-	  ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
-				       ConstructStatementGrammar(boost::proto::_right))
-	> {};
     };
 
     template<>
@@ -213,18 +202,29 @@ namespace mirv {
       Assign,
       ConstructBinary<Statement<mirv::Assignment> >(ConstructExpressionGrammar(boost::proto::_left),
 						    ConstructExpressionGrammar(boost::proto::_right))> {};
-#if 0
+
     template<>
-    struct ConstructStatementGrammarCases::case_<keyword::if_>
-      : boost::proto::when<
-      IfRule,
-      ConstructBinary<
-	Statement<mirv::IfThen>,
-	ptr<Expression<Base> >::type,
-	ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
-				     ConstructStatementGrammar(boost::proto::_right))
+    struct ConstructStatementGrammarCases::case_<boost::proto::tag::subscript>
+      : boost::proto::or_<
+      boost::proto::when<
+	IfRule,
+	ConstructBinary<
+	  Statement<mirv::IfThen>,
+	  ptr<Expression<Base> >::type,
+	  ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
+				       ConstructStatementGrammar(boost::proto::_right))
+	>,
+      boost::proto::when<
+	IfElseRule,
+	ConstructTernary<
+	  Statement<mirv::IfElse>,
+	  ptr<Expression<Base> >::type,
+	  ptr<Statement<Base> >::type,
+	  ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
+				       ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
+				       ConstructStatementGrammar(boost::proto::_right))
+	>
       > {};
-#endif
 
     struct ConstructStatementGrammar
       : boost::proto::switch_<ConstructStatementGrammarCases> {};

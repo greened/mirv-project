@@ -44,6 +44,22 @@ namespace mirv {
        ConstructStatementGrammar
        > IfRule;
 
+     typedef Wrapper<boost::proto::terminal<keyword::else_>::type> ElseTerminal;
+
+     typedef boost::proto::subscript<
+       boost::proto::member<
+	 boost::proto::subscript<
+	   boost::proto::function<
+	     IfTerminal,
+	     ConstructExpressionGrammar
+	     >,
+	   ConstructStatementGrammar
+	   >,
+	 ElseTerminal
+	 >,
+       ConstructStatementGrammar
+       > IfElseRule;
+
 #if 0
       // An else_ "operator"
       template<typename Expr>

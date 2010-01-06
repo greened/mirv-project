@@ -59,6 +59,8 @@ int main(void)
 
   boost::proto::display_expr(
       if_(a < b) [
+        a = a + b
+      ].else_[
         a = a + c
       ]
   );
@@ -66,6 +68,8 @@ int main(void)
   ptr<Statement<Base> >::type stmt =
     Builder::translate_statement(
       if_(a < b) [
+        a = a + b
+      ].else_[
         a = a + c
       ]
     );

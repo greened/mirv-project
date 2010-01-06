@@ -72,12 +72,14 @@ namespace mirv {
 
       // Transform a three-operand node
       template<typename NodeType,
-	       typename Child = typename NodeType::child_ptr,
+	       typename Child1 = typename NodeType::child_ptr,
+	       typename Child2 = typename NodeType::child_ptr,
+	       typename Child3 = typename NodeType::child_ptr,
 	       typename Dummy = boost::proto::callable>
       struct ConstructTernary : boost::proto::callable {
 	typedef typename ptr<NodeType>::type result_type;
 
-	result_type operator()(Child child1, Child child2, Child child3) {
+	result_type operator()(Child1 child1, Child2 child2, Child3 child3) {
 	  return make<NodeType>(child1, child2, child3);
          }
       };
