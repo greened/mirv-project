@@ -9,6 +9,7 @@
 namespace mirv {
    namespace Builder {
      typedef boost::proto::assign<ConstructExpressionGrammar, ConstructExpressionGrammar> Assign;
+     typedef boost::proto::comma<ConstructStatementGrammar, ConstructStatementGrammar> Comma;
 
      namespace keyword {
        struct if_ {

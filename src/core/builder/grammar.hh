@@ -204,6 +204,13 @@ namespace mirv {
 						    ConstructExpressionGrammar(boost::proto::_right))> {};
 
     template<>
+    struct ConstructStatementGrammarCases::case_<boost::proto::tag::comma>
+      : boost::proto::when<
+      Comma,
+      ConstructBinary<Statement<Block> >(ConstructStatementGrammar(boost::proto::_left),
+					 ConstructStatementGrammar(boost::proto::_right))> {};
+
+    template<>
     struct ConstructStatementGrammarCases::case_<boost::proto::tag::subscript>
       : boost::proto::or_<
       boost::proto::when<
