@@ -1,35 +1,40 @@
 // Test printing of satements.
 //
-// STDOUT: doWhile
-// STDOUT:    {
-// STDOUT:       assign
-// STDOUT:          vref a
-// STDOUT:          +
-// STDOUT:             vref a
-// STDOUT:             vref b
-// STDOUT:       ifElse
-// STDOUT:          >
-// STDOUT:             vref b
-// STDOUT:             vref c
-// STDOUT:          {
-// STDOUT:             assign
-// STDOUT:                vref a
-// STDOUT:                +
-// STDOUT:                   vref a
-// STDOUT:                   vref b
-// STDOUT:          }
-// STDOUT:          {
-// STDOUT:             assign
-// STDOUT:                vref a
-// STDOUT:                +
-// STDOUT:                   vref a
-// STDOUT:                   vref c
-// STDOUT:          }
-// STDOUT:    }
+// STDOUT: ifThen
 // STDOUT:    <
 // STDOUT:       vref a
 // STDOUT:       vref c
-
+// STDOUT:    {
+// STDOUT        doWhile
+// STDOUT:       {
+// STDOUT:          assign
+// STDOUT:             vref a
+// STDOUT:             +
+// STDOUT:                vref a
+// STDOUT:                vref b
+// STDOUT:          ifElse
+// STDOUT:             >
+// STDOUT:                vref b
+// STDOUT:                vref c
+// STDOUT:             {
+// STDOUT:                assign
+// STDOUT:                   vref a
+// STDOUT:                   +
+// STDOUT:                      vref a
+// STDOUT:                      vref b
+// STDOUT:             }
+// STDOUT:             {
+// STDOUT:                assign
+// STDOUT:                   vref a
+// STDOUT:                   +
+// STDOUT:                      vref a
+// STDOUT:                      vref c
+// STDOUT:             }
+// STDOUT:       }
+// STDOUT:       <
+// STDOUT:          vref a
+// STDOUT:          vref c
+// STDOUT:    }
 #include <mirv/core/ir/ir.hh>
 #include <mirv/core/builder/builder.hh>
 #include <mirv/filter/snapshot/print/print.hh>
@@ -58,15 +63,25 @@ int main(void)
   Builder::Variable c =
     {{Symbol<Variable>::make("c", make<Symbol<Type<Integral<32> > > >())}};
 
+  boost::proto::display_expr(
+    while_(a < c) [
+      if_(a < b) [
+        a = a + b
+      ].else_[
+        a = a + c
+      ]
+    ]
+  );
+
   ptr<Statement<Base> >::type stmt =
     Builder::translate_statement(
-      do_[
+      while_(a < c) [
         if_(a < b) [
           a = a + b
         ].else_[
           a = a + c
         ]
-      ].while_(a < c)
+      ]
     );
 
   PrintFilter print(std::cout);

@@ -223,6 +223,31 @@ namespace mirv {
 	  ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
 				       ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
 				       ConstructStatementGrammar(boost::proto::_right))
+	>,
+      boost::proto::when<
+	WhileRule,
+	ConstructBinary<
+	  Statement<mirv::IfThen>,
+	  ptr<Expression<Base> >::type,
+	  ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
+				       ConstructBinary<
+				       Statement<mirv::DoWhile>,
+				       ptr<Expression<Base> >::type,
+				       ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
+								    ConstructStatementGrammar(boost::proto::_right)))
+	>
+      > {};
+
+    template<>
+    struct ConstructStatementGrammarCases::case_<boost::proto::tag::function>
+      : boost::proto::or_<
+      boost::proto::when<
+	DoWhileRule,
+	ConstructBinary<
+	  Statement<mirv::DoWhile>,
+	  ptr<Expression<Base> >::type,
+	  ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right),
+				       ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left))))
 	>
       > {};
 
