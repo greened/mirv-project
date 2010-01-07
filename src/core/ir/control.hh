@@ -1,6 +1,7 @@
 #ifndef mirv_core_ir_control_hh
 #define mirv_core_ir_control_hh
 
+#include <mirv/core/builder/make.hh>
 #include <mirv/core/ir/statement.hh>
 #include <mirv/core/ir/reference.hh>
 #include <mirv/core/util/cast.hh>
@@ -44,26 +45,32 @@ namespace mirv {
       class interface : public interface_base_type {
       public:
 	 template<typename A1>
-	 interface(A1 a1) : interface_base_type(a1)  {}
+	 // If this isn't a block statement, make it one.
+	 interface(A1 a1) : 
+	   interface_base_type(dyn_cast<Statement<Block> >(a1) ?
+			       a1 : mirv::make<Statement<Block> >(a1))  {}
 
          typedef interface_base_type::child_ptr child_ptr;
          typedef interface_base_type::const_child_ptr const_child_ptr;
          
          void set_child_statement(child_ptr s) {
-            if (this->empty()) {
-               push_back(s);
-            }
-            else {
-               *--this->end() = s;
-             }
-         };
+	   if (!dyn_cast<Statement<Block> >(s)) {
+	     s = mirv::make<Statement<Block> >(s);
+	   }
+	   if (this->empty()) {
+	     push_back(s);
+	   }
+	   else {
+	     *--this->end() = s;
+	   }
+         }
 
-         child_ptr get_child_statement(void) {
-            check_invariant(!this->empty(), 
-                            "Attempt to get statement from empty block");
-            
-            return(this->front());
-         };
+	child_ptr get_child_statement(void) {
+	  check_invariant(!this->empty(), 
+			  "Attempt to get statement from empty block");
+	  
+	  return(this->front());
+	}
       };
 
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
@@ -84,30 +91,41 @@ namespace mirv {
       class interface : public interface_base_type {
          // Protected because these are probably bad names for subclasses
       protected:
-	 template<typename A1, typename A2>
-	 interface(A1 a1, A2 a2) : interface_base_type(a1, a2)  {}
+	// If these are not blocks, make them so.
+	template<typename A1, typename A2>
+	interface(A1 a1, A2 a2) :
+	  interface_base_type(dyn_cast<Statement<Block> >(a1)?
+			      a1 : mirv::make<Statement<Block> >(a1),
+			      dyn_cast<Statement<Block> >(a2) ?
+			      a2 : mirv::make<Statement<Block> >(a2))  {}
 
          typedef interface_base_type::child_ptr child_ptr;
          typedef interface_base_type::const_child_ptr const_child_ptr;
          
-         void set_left_child_statement(child_ptr s) {
-            if (this->empty()) {
-               push_back(s);
-            }
-            else {
-               *this->begin() = s;
-            }
-         };
+	void set_left_child_statement(child_ptr s) {
+	  if (!dyn_cast<Statement<Block> >(s)) {
+	    s = mirv::make<Statement<Block> >(s);
+	  }
+	  if (this->empty()) {
+	    push_back(s);
+	  }
+	  else {
+	    *this->begin() = s;
+	  }
+	}
 
-         void set_right_child_statement(child_ptr s) {
-            if (this->empty()) {
-               push_back(child_ptr());  // Placeholder for left operand
-               push_back(s);
-            }
-            else {
-               *--this->end() = s;
-            }
-         };
+	void set_right_child_statement(child_ptr s) {
+	  if (!dyn_cast<Statement<Block> >(s)) {
+	    s = mirv::make<Statement<Block> >(s);
+	  }
+	  if (this->empty()) {
+	    push_back(child_ptr());  // Placeholder for left operand
+	    push_back(s);
+	  }
+	  else {
+	    *--this->end() = s;
+	  }
+	}
 
          child_ptr get_left_child_statement(void) {      
             check_invariant(!this->empty(),
