@@ -1,6 +1,7 @@
 #ifndef mirv_core_ir_statement_hh
 #define mirv_core_ir_statement_hh
 
+#include <mirv/core/builder/make.hh>
 #include <mirv/core/ir/node.hh>
 #include <mirv/core/ir/expression.hh>
 #include <mirv/core/ir/inherit.hh>
