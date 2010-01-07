@@ -26,6 +26,25 @@ namespace mirv {
          keyword::if_(),
 	 expr);
      }
+    
+    // A while_ "operator"
+     template<typename Expr>
+     typename boost::proto::result_of::make_expr<
+       boost::proto::tag::function,
+       Domain,
+       keyword::while_,
+       Expr>::type
+     while_(Expr const &expr)
+     {
+       return boost::proto::make_expr<boost::proto::tag::function, Domain>(
+         keyword::while_(),
+	 expr);
+     }
+
+    // A do_ "operator."
+    namespace {
+       const DoTerminal do_ = {{}};
+    }
   }
 }
 
