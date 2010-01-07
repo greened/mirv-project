@@ -13,6 +13,7 @@
 
 namespace mirv {
   namespace Builder {
+#if 0
       // An if_ "operator"
      template<typename Expr>
      typename boost::proto::result_of::make_expr<
@@ -26,7 +27,7 @@ namespace mirv {
          keyword::if_(),
 	 expr);
      }
-    
+
     // A while_ "operator"
      template<typename Expr>
      typename boost::proto::result_of::make_expr<
@@ -40,6 +41,17 @@ namespace mirv {
          keyword::while_(),
 	 expr);
      }
+#endif
+
+    // An if_ "operator."
+    namespace {
+       const IfTerminal if_ = {{}};
+    }
+
+    // A while_ "operator."
+    namespace {
+       const WhileTerminal while_ = {{}};
+    }
 
     // A do_ "operator."
     namespace {

@@ -6,6 +6,9 @@
 
 #include <boost/proto/proto.hpp>
 
+#include <iterator>
+#include <algorithm>
+
 namespace mirv {
    namespace Builder {
       // Transform a one-operand node
@@ -32,6 +35,35 @@ namespace mirv {
 	  return make<NodeType>(left, right);
          }
       };
+
+     /// This is a specialization for block statements to add the
+     /// child to a block if it already exists.
+     template<>
+     struct ConstructBinary<Statement<Block>,
+			    Statement<Block>::child_ptr,
+			    Statement<Block>::child_ptr,
+			    boost::proto::callable> : boost::proto::callable {
+       typedef ptr<Statement<Block> >::type result_type;
+
+       result_type operator()(Statement<Block>::child_ptr left,
+			      Statement<Block>::child_ptr right) {
+	 if (ptr<Statement<Block> >::type lb =
+	     dyn_cast<Statement<Block> >(left)) {
+	   if (ptr<Statement<Block> >::type rb =
+	       dyn_cast<Statement<Block> >(right)) {
+	     std::copy(rb->begin(), rb->end(), std::back_inserter(*lb));
+       }
+       lb->push_back(right);
+       return lb;
+     }
+     else if (ptr<Statement<Block> >::type rb =
+	      dyn_cast<Statement<Block> >(right)) {
+       rb->push_front(left);
+       return rb;
+     }
+     return make<Statement<Block> >(left, right);
+   }
+};
 
 #if 0
       // Transform a two-operand temporary node

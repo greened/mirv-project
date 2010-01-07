@@ -26,6 +26,8 @@ namespace mirv {
   public:
     class interface : public Traits::base_type {
     public:
+      typedef typename Traits::const_reference const_reference;
+
       typedef typename ptr<typename Traits::Child>::type child_ptr;
       typedef typename ptr<typename Traits::Child>::const_type const_child_ptr;
 
@@ -46,6 +48,7 @@ namespace mirv {
       virtual reverse_iterator rend(void) = 0;
       virtual const_reverse_iterator rend(void) const = 0;
  
+      virtual void push_front(child_ptr c) = 0;
       virtual void push_back(child_ptr c) = 0;
 
       virtual child_ptr front(void) = 0;
@@ -101,6 +104,9 @@ namespace mirv {
      reverse_iterator rend(void) { return(children.rend()); }
      const_reverse_iterator rend(void) const { return(children.rend()); }
  
+      void push_front(child_ptr c) {
+         children.push_front(c);
+      }
       void push_back(child_ptr c) {
          children.push_back(c);
       }

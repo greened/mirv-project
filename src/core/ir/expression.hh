@@ -130,6 +130,9 @@ namespace mirv {
        typedef std::list<child_ptr> child_list;
 
      public:
+       /// Make this compatible with certain standard algorithms.
+       typedef const child_ptr & const_reference;
+
        typedef child_list::iterator iterator;
        typedef child_list::reverse_iterator reverse_iterator;
        typedef child_list::const_iterator const_iterator;

@@ -61,7 +61,8 @@ int main(void)
   ptr<Statement<Base> >::type stmt =
     Builder::translate_statement(
       do_[
-        if_(a < b) [
+	a = a + b,
+        if_(b > c) [
           a = a + b
         ].else_[
           a = a + c
