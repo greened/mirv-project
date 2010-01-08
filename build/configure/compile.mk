@@ -6,6 +6,14 @@ include $(BUILDTOOLS)/configure/define.mk
 include $(BUILDTOOLS)/configure/bind.mk
 include $(BUILDTOOLS)/configure/ls.mk
 
+nullstring :=
+space := $(nullstring) # end of the line
+
+define newline
+$(nullstring)
+
+endef
+
 define mc_compile_impl
 
 $$(call debug,[mc_compile_impl] mc_compile_impl("$(1)" "$(2)" "$(3)" "$(4)" "$(5)" "$(6)"))
@@ -13,14 +21,16 @@ $$(call debug,[mc_compile_impl] mc_compile_impl("$(1)" "$(2)" "$(3)" "$(4)" "$(5
 $(1)_OSRCFILE := $(FINAL_BUILDDIR)/configure/$(1)_compile_test.$(4)
 $(1)_OFILE := $$(patsubst %.$(4),%.o,$$($(1)_OSRCFILE))
 
-$(1)_compile_source := $$($(3))
+$(1)_compile_source := $$(subst $$(newline), ,$$(subst $$(space),_,$$($(3))))
 
+$$(call debug,[mc_compile_impl] $(1)_compile_source = $$($(1)_compile_source))
 $$(call debug,[mc_compile_impl] $(1)_OSRCFILE = $$($(1)_OSRCFILE))
 $$(call debug,[mc_compile_impl] $(1)_OFILE    = $$($(1)_OFILE))
 
 .PRECIOUS: $$($(1)_OSRCFILE)
 $$($(1)_OSRCFILE):
-	$(QUIET)echo "$$($(1)_compile_source)" > $$@
+	$(QUIET)cat /dev/null > $$@
+	$(QUIET)$$(foreach line,$$($(1)_compile_source),echo "$$(subst _, ,$$(line))" >> $$@; )
 
 $$(call debug,[mc_compile_impl] $$($(1)_OFILE): $$($(1)_OSRCFILE) $(6))
 

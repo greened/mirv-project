@@ -24,7 +24,7 @@ include $(5)
 .SECONDEXPANSION:
 $$($(1)_LDFILE): $$($(1)_LDOBJFILE) $(5)
 	$$(if $(5),$$(eval include $(5)))
-	-$(QUIET)$$($(2)) $(4) $$< -o $$@
+	-$(QUIET)$$($(2)) $$< -o $$@ $(4)
 
 $(1)_link_target = $(FINAL_BUILDDIR)/configure/$(1)_link_result.mk
 
