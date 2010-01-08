@@ -42,4 +42,12 @@ endef
 
 bind5 = $(eval $(call bind5_impl,$(1),$(2),$(3),$(4),$(5),$(6),$(7)))$(1)_bind5
 
+define bind6_impl
+
+$(1)_bind6 = $$(call $(2),$(3),$(4),$(5),$(6),$(7),$(8))
+
+endef
+
+bind6 = $(eval $(call bind6_impl,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8)))$(1)_bind6
+
 endif
