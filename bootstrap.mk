@@ -21,6 +21,7 @@ ifeq ($(strip $(filter $(CURDIR),$(FINAL_BUILDDIRS))),)
 # Not in any build directory
 include $(BUILDTOOLS)/builddir.mk
 else
+ifeq ($(strip $(filter clean,$(MAKECMDGOALS))),)
 # Run the build
 VPATH := $(SRCDIR)
 
@@ -60,5 +61,12 @@ else
   endif
 endif
 
+else
+
+.PHONY: clean
+clean:
+	rm -rf $(FINAL_BUILDDIR)
+
+endif  # MAKECMDGOALS
 
 endif
