@@ -1,7 +1,7 @@
 #ifndef mirv_core_ir_expression_ii
 #define mirv_core_ir_expression_ii
 
-#include <mirv/core/filter/visitor.hh>
+#include <mirv/core/filter/expression_visitor.hh>
 
 #include <mirv/core/ir/arithmetic.hh>
 #include <mirv/core/ir/logical.hh>

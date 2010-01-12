@@ -10,6 +10,7 @@ namespace mirv {
    class Symbol : public Tag::base_type {
    public:
      typedef typename Tag::base_type base_type;
+     typedef typename Tag::visitor_base_type visitor_base_type;
 
    protected:
      Symbol(void) {}
@@ -43,8 +44,12 @@ namespace mirv {
    };
 
   class InnerSymbol : public InnerImpl<Symbol<Base>, Symbol<Base> > {
+  public:
+    typedef Symbol<Base> visitor_base_type;
   };
   class LeafSymbol : public LeafImpl<Symbol<Base> > {
+  public:
+    typedef Symbol<Base> visitor_base_type;
   };
 
   class Typed {
@@ -68,6 +73,7 @@ namespace mirv {
       }
     };
     typedef interface base_type;
+    typedef LeafSymbol visitor_base_type;
   };
 
   class Named {
@@ -88,6 +94,7 @@ namespace mirv {
       }
     };
     typedef interface base_type;
+    typedef LeafSymbol visitor_base_type;
   };
 }
 

@@ -5,6 +5,8 @@
 #include <mirv/core/ir/control.hh>
 #include <mirv/core/ir/mutating.hh>
 
+#include <mirv/core/filter/statement_visitor.hh>
+
 namespace mirv {
   template<typename Tag>
   void Statement<Tag>::accept(StatementVisitor &V) {

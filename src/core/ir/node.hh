@@ -81,7 +81,8 @@ namespace mirv {
       child_list children;
 
    public:
-     InnerImpl(child_ptr C) {
+      InnerImpl(void) {}
+      InnerImpl(child_ptr C) {
        children.push_back(C);
      }
      InnerImpl(child_ptr C1, child_ptr C2) {

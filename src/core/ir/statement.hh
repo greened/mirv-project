@@ -6,8 +6,6 @@
 #include <mirv/core/ir/expression.hh>
 #include <mirv/core/ir/inherit.hh>
 
-#include <mirv/core/filter/visitor.hh>
-
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/sort.hpp>
