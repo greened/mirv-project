@@ -1,4 +1,4 @@
-#include <mirv/core/filter/visitor.hh>
+#include <mirv/core/filter/expression_visitor.hh>
 
 #include <mirv/core/ir/expression.hh>
 #include <mirv/core/ir/arithmetic.hh>

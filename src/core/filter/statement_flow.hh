@@ -1,7 +1,7 @@
-#ifndef mirv_core_filter_flow_hh
-#define mirv_core_filter_flow_hh
+#ifndef mirv_core_filter_statement_flow_hh
+#define mirv_core_filter_statement_flow_hh
 
-#include <mirv/core/filter/visitor.hh>
+#include <mirv/core/filter/statement_visitor.hh>
 #include <mirv/core/filter/action.hh>
 #include <mirv/core/filter/expression_flow.hh>
 #include <mirv/core/filter/dataflow.hh>

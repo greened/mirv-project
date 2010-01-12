@@ -7,10 +7,13 @@
 #include <numeric>
 
 namespace mirv {
+   struct SymbolVisitor;
+
    template<typename Tag>
    class Type {
    public:
      typedef typename Tag::base_type base_type;
+     typedef typename Tag::visitor_base_type visitor_base_type;
    };
 
    class TypeBase {
@@ -26,22 +29,36 @@ namespace mirv {
       };
 
       typedef interface base_type;
+     typedef Symbol<Base> visitor_base_type;
    };
 
   //  template<>
   //class Symbol<Type<TypeBase> > : public Type<TypeBase>::base_type {};
 
-  typedef LeafImpl<Symbol<Type<TypeBase> > > LeafType;
-  typedef InnerImpl<Symbol<Type<TypeBase> >, Symbol<Type<TypeBase> > > InnerType;
+  class LeafType : public LeafImpl<Symbol<Type<TypeBase> > > {
+  public:
+    typedef Symbol<Type<TypeBase> > visitor_base_type;
+  };
+  class InnerType : public InnerImpl<Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Symbol<Type<TypeBase> > >::type> {
+  public:
+    typedef Symbol<Type<TypeBase> > visitor_base_type;
+  };
 
    class Simple {
    public:
       typedef LeafType base_type;
+     typedef LeafType visitor_base_type;
    };
+
+  struct IntegralBase {
+  public:
+    typedef Symbol<Type<Simple> > base_type;
+    typedef Symbol<Type<Simple> > visitor_base_type;
+  };
 
   template<int Size>
    struct Integral {
-    typedef Symbol<Type<Simple> > interface_base_type;
+    typedef Symbol<Type<IntegralBase> > interface_base_type;
    public:
 
       class interface : public interface_base_type {
@@ -50,16 +67,33 @@ namespace mirv {
       };
 
       typedef interface base_type;
-   };
+    typedef Symbol<Type<IntegralBase> > visitor_base_type;
+  };
 
-   struct Floating {
+   struct FloatingBase {
    public:
      typedef Symbol<Type<Simple> > base_type;
+     typedef Symbol<Type<Simple> > visitor_base_type;
    };
+
+  template<int Size>
+   struct Floating {
+    typedef Symbol<Type<FloatingBase> > interface_base_type;
+   public:
+
+    class interface : public interface_base_type {
+    public:
+      BitSizeType bitsize(void) const { return Size; }
+    };
+
+    typedef interface base_type;
+    typedef Symbol<Type<FloatingBase> > visitor_base_type;
+  };
 
    struct Derived {
    public:
       typedef InnerType base_type;
+     typedef InnerType visitor_base_type;
    };
 
    struct Array {
@@ -126,6 +160,8 @@ namespace mirv {
                                    std::multiplies<size_type>()));
 	 }
       };
+     typedef interface base_type;
+     typedef Symbol<Type<Derived> > visitor_base_type;
    };
 
    struct Pointer {
@@ -157,6 +193,8 @@ namespace mirv {
             return(front());
          }
       };
+     typedef interface base_type;
+     typedef Symbol<Type<Derived> > visitor_base_type;
    };
 }
 

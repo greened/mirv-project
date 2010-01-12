@@ -1,7 +1,7 @@
 #ifndef mirv_core_filter_forward_flow_hh
 #define mirv_core_filter_forward_flow_hh
 
-#include <mirv/core/filter/flow.hh>
+#include <mirv/core/filter/statement_flow.hh>
 #include <mirv/core/filter/dataflow.hh>
 #include <mirv/core/ir/attribute.hh>
 #include <mirv/core/ir/statement.hh>

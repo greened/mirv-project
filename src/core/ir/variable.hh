@@ -15,6 +15,7 @@ namespace mirv {
 	   : Symbol<Typed>(t), Symbol<Named>(n){};
       };
      typedef interface base_type;
+     typedef Symbol<Typed> visitor_base_type;
    };
 }
 
