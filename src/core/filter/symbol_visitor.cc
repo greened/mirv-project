@@ -72,13 +72,13 @@ namespace mirv {
     ptr<Symbol<Type<Derived> >::visitor_base_type>::type p = fast_cast<Symbol<Type<Derived> >::visitor_base_type>(s);
     visit(p);
   }
-  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<IntegralBase> > >::type s) {
-    ptr<Symbol<Type<IntegralBase> >::visitor_base_type>::type p = fast_cast<Symbol<Type<IntegralBase> >::visitor_base_type>(s);
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<Integral> > >::type s) {
+    ptr<Symbol<Type<Integral> >::visitor_base_type>::type p = fast_cast<Symbol<Type<Integral> >::visitor_base_type>(s);
     visit(p);
   }
 
-  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<FloatingBase> > >::type s) {
-    ptr<Symbol<Type<FloatingBase> >::visitor_base_type>::type p = fast_cast<Symbol<Type<FloatingBase> >::visitor_base_type>(s);
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<Floating> > >::type s) {
+    ptr<Symbol<Type<Floating> >::visitor_base_type>::type p = fast_cast<Symbol<Type<Floating> >::visitor_base_type>(s);
     visit(p);
   }
 
@@ -89,6 +89,11 @@ namespace mirv {
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<Pointer> > >::type s) {
     ptr<Symbol<Type<Pointer> >::visitor_base_type>::type p = fast_cast<Symbol<Type<Pointer> >::visitor_base_type>(s);
+    visit(p);
+  }
+
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<FunctionType> > >::type s) {
+    ptr<Symbol<Type<FunctionType> >::visitor_base_type>::type p = fast_cast<Symbol<Type<FunctionType> >::visitor_base_type>(s);
     visit(p);
   }
 }

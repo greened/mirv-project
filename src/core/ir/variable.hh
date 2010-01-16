@@ -8,14 +8,19 @@ namespace mirv {
    public:
       class interface
 	: public Symbol<Typed>,
-	  public Symbol<Named> {
+	  public Symbol<Named>,
+	  public LeafSymbol {
       public:
          interface(const std::string &n,
                    const_type_ptr t)
 	   : Symbol<Typed>(t), Symbol<Named>(n){};
+
+	virtual void accept(mirv::SymbolVisitor &) {
+	  error("Variable::Base::accept called");
+	}
       };
      typedef interface base_type;
-     typedef Symbol<Typed> visitor_base_type;
+     typedef LeafSymbol visitor_base_type;
    };
 }
 

@@ -82,6 +82,7 @@ namespace mirv {
 
    public:
       InnerImpl(void) {}
+      InnerImpl(const std::string &name) : BaseType(name) {}
       InnerImpl(child_ptr C) {
        children.push_back(C);
      }
@@ -146,6 +147,9 @@ namespace mirv {
    template<typename Tag>
    class LeafImpl : public Tag {
    public:
+     LeafImpl(void) {}
+     template<typename A>
+     LeafImpl(A a) : Tag(a) {}
    };
 
 }

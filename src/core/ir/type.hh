@@ -14,16 +14,20 @@ namespace mirv {
    public:
      typedef typename Tag::base_type base_type;
      typedef typename Tag::visitor_base_type visitor_base_type;
+
+     Type() {}
+     Type(const std::string &name) : base_type(name) {}
    };
 
    class TypeBase {
    private:
-     typedef Symbol<Base> interface_base_type;
+     typedef Symbol<Named> interface_base_type;
 
    public:
 
       class interface : public interface_base_type {
       public:
+	interface(const std::string &name) : interface_base_type(name) {}
 	typedef int BitSizeType;
 	virtual BitSizeType bitsize(void) const = 0;
       };
@@ -37,57 +41,65 @@ namespace mirv {
 
   class LeafType : public LeafImpl<Symbol<Type<TypeBase> > > {
   public:
+    typedef LeafImpl<Symbol<Type<TypeBase> > > BaseType;
     typedef Symbol<Type<TypeBase> > visitor_base_type;
+    LeafType(const std::string &name) : BaseType(name) {}
   };
+
   class InnerType : public InnerImpl<Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Symbol<Type<TypeBase> > >::type> {
   public:
+    InnerType(const std::string &name) : BaseType(name) {}
+    typedef InnerImpl<Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Symbol<Type<TypeBase> > >::type> BaseType;
     typedef Symbol<Type<TypeBase> > visitor_base_type;
   };
 
    class Simple {
+   private:
+     typedef LeafType interface_base_type;
+
+     class interface : public interface_base_type {
+     private:
+       BitSizeType bsize;
+
+     public:
+       interface(const std::string &name, BitSizeType s)
+	 : interface_base_type(name), bsize(s) {};
+
+       BitSizeType bitsize(void) const {
+	 return bsize;
+       }
+     };
    public:
-      typedef LeafType base_type;
+     typedef interface base_type;
      typedef LeafType visitor_base_type;
    };
 
-  struct IntegralBase {
-  public:
-    typedef Symbol<Type<Simple> > base_type;
-    typedef Symbol<Type<Simple> > visitor_base_type;
-  };
-
-  template<int Size>
    struct Integral {
-    typedef Symbol<Type<IntegralBase> > interface_base_type;
+   private:
+    typedef Symbol<Type<Simple> > interface_base_type;
+
+     class interface : public interface_base_type {
+     public:
+       interface(const std::string &name, BitSizeType size) :
+	 interface_base_type(name, size) {}
+     };
+
    public:
-
-      class interface : public interface_base_type {
-      public:
-	BitSizeType bitsize(void) const { return Size; }
-      };
-
-      typedef interface base_type;
-    typedef Symbol<Type<IntegralBase> > visitor_base_type;
+     typedef interface base_type;
+     typedef Symbol<Type<Simple> > visitor_base_type;
   };
 
-   struct FloatingBase {
-   public:
-     typedef Symbol<Type<Simple> > base_type;
-     typedef Symbol<Type<Simple> > visitor_base_type;
-   };
-
-  template<int Size>
    struct Floating {
-    typedef Symbol<Type<FloatingBase> > interface_base_type;
+    typedef Symbol<Type<Simple> > interface_base_type;
+
+     class interface : public interface_base_type {
+     public:
+       interface(const std::string &name, BitSizeType size) :
+	 interface_base_type(name, size) {}
+     };
    public:
-
-    class interface : public interface_base_type {
-    public:
-      BitSizeType bitsize(void) const { return Size; }
-    };
-
-    typedef interface base_type;
-    typedef Symbol<Type<FloatingBase> > visitor_base_type;
+     typedef interface base_type;
+     typedef Symbol<Type<Simple> > visitor_base_type;
   };
 
    struct Derived {
@@ -112,6 +124,7 @@ namespace mirv {
          dimension_vector dimensions;
 
       public:
+	interface(const std::string &name) : interface_base_type(name) {}
 	typedef Symbol<Type<TypeBase> > child_type;
 	typedef ptr<child_type>::type child_ptr;
          typedef ptr<child_type>::const_type const_child_ptr;
@@ -131,7 +144,6 @@ namespace mirv {
          child_ptr getElementType(void) {
             return(front());
          }
-
          const_child_ptr getElementType(void) const {
             return(front());
          }
@@ -159,6 +171,9 @@ namespace mirv {
                                    getElementType()->bitsize(),
                                    std::multiplies<size_type>()));
 	 }
+	virtual void accept(mirv::SymbolVisitor &) {
+	  error("Array::accept called");
+	}
       };
      typedef interface base_type;
      typedef Symbol<Type<Derived> > visitor_base_type;
@@ -172,6 +187,7 @@ namespace mirv {
       class interface
             : public interface_base_type {
       public:
+	interface(const std::string &name) : interface_base_type(name) {}
 	typedef Symbol<Type<TypeBase> > child_type;
 	typedef ptr<child_type>::type child_ptr;
          typedef ptr<child_type>::const_type const_child_ptr;
@@ -192,6 +208,76 @@ namespace mirv {
          const_child_ptr getBaseType(void) const {
             return(front());
          }
+	virtual void accept(mirv::SymbolVisitor &) {
+	  error("Pointer::accept called");
+	}
+      };
+     typedef interface base_type;
+     typedef Symbol<Type<Derived> > visitor_base_type;
+   };
+
+   struct FunctionType {
+   private:
+     typedef Symbol<Type<Derived> > interface_base_type;
+
+   public:
+      class interface
+            : public interface_base_type {
+      public:
+	typedef Symbol<Type<TypeBase> > child_type;
+	typedef ptr<child_type>::type child_ptr;
+	typedef ptr<child_type>::const_type const_child_ptr;
+
+	interface(const std::string &name,
+		  child_ptr ReturnType = child_ptr())
+	  : interface_base_type(name) {
+	  setReturnType(ReturnType);
+	}
+
+	BitSizeType bitsize(void) const {
+	  return 0;
+	}
+
+	void setReturnType(child_ptr c) {
+	  if (empty()) {
+	    push_back(c);
+	  }
+	  else {
+	    *begin() = c;
+	  }
+	}
+
+	child_ptr getReturnType(void) {
+	  return(front());
+	}
+
+	const_child_ptr getReturnType(void) const {
+	  return(front());
+	}
+
+	void parametersPushBack(child_ptr Parameter) {
+	  push_back(Parameter);
+	}
+
+	bool parameters_empty(void) const {
+	  return empty();
+	}
+
+	iterator parameters_begin(void) {
+	  return ++begin();
+	}
+	const_iterator parameters_begin(void) const {
+	  return ++begin();
+	}
+	iterator parameters_end(void) {
+	  return end();
+	}
+	const_iterator parameters_end(void) const {
+	  return end();
+	}
+	virtual void accept(mirv::SymbolVisitor &) {
+	  error("FunctionType::accept called");
+	}
       };
      typedef interface base_type;
      typedef Symbol<Type<Derived> > visitor_base_type;

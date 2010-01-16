@@ -2,6 +2,8 @@
 #define mirv_core_ir_ir_hh
 
 #include <mirv/core/ir/symbol.hh>
+#include <mirv/core/ir/module.hh>
+#include <mirv/core/ir/function.hh>
 #include <mirv/core/ir/variable.hh>
 #include <mirv/core/ir/expression.hh>
 #include <mirv/core/ir/arithmetic.hh>
