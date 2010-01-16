@@ -6,7 +6,8 @@
 #include <mirv/core/filter/symbol_visitor.hh>
 
 namespace mirv {
-   class NullAction {
+  /// This is an action that does nothing.
+  class NullAction {
    public:
       typedef void result_type;
 
@@ -21,6 +22,8 @@ namespace mirv {
 			    boost::shared_ptr<Node3>) {}
    };
 
+  /// This action takes a statement visitor and sends it to the
+  /// statement for execution.
    class VisitStatementAction : public StatementVisitor {
    public:
       template<typename Stmt>
@@ -29,6 +32,8 @@ namespace mirv {
       }
    };
  
+  /// This action takes an expression visitor and sends it to the
+  /// expression for execution.
   class VisitExpressionAction : public ExpressionVisitor {
    public:
       template<typename Expr>
@@ -37,6 +42,8 @@ namespace mirv {
       }
    };
 
+  /// This action takes a symbol visitor and sends it to the symbol
+  /// for execution.
   class VisitSymbolAction : public SymbolVisitor {
    public:
       template<typename Expr>

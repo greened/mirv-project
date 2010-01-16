@@ -4,12 +4,14 @@
 #include <mirv/filter/flow.hh>
 
 namespace mirv {
+  /// This flow walks backward through statements, visiting rightmost
+  /// operands first.
    template<
       typename EnterAction = NullAction,
       typename LeaveAction = NullAction,
       typename BeforeStmtAction = NullAction,
       typename AfterStmtAction = NullAction,
-      typename BetweenStmtAction = NullAction,
+     typename BetweenStmtAction = NullAction,
       typename BeforeExprAction = NullAction,
       typename AfterExprAction = NullAction,
       typename ExprFlow = NullExpressionFlow,
@@ -40,6 +42,7 @@ namespace mirv {
                    const Confluence &c)
 	: StatementFlow(e, l, bs, as, bts, be, ae, expr, d, c) {}
 
+     /// Visit block statements from the last statement to the first.
       void visit(ptr<Statement<Block> >::type stmt) {
          enter(stmt);
          for(Statement<Block>::reverse_iterator s = stmt->rbegin(),
@@ -57,6 +60,8 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit IfThen statements, visiting the then-statement, then
+     /// the controlling expression.
       void visit(ptr<Statement<IfThen> >::type stmt) {
          enter(stmt);
 
@@ -75,6 +80,8 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit IfElse statements, visiting the then-statement, then
+     /// the else-statement, then the controlling expression.
       void visit(ptr<Statement<IfElse> >::type stmt) {
          enter(stmt);
 
@@ -107,6 +114,8 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit While statements, visiting the body, then the
+     /// controlling expression.
       void visit(ptr<Statement<While> >::type stmt) {
          enter(stmt);
 
@@ -135,6 +144,8 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit DoWhile statements, visiting the controlling
+     /// expression, then the body.
       void visit(ptr<Statement<DoWhile> >::type stmt) {
          enter(stmt);
 
@@ -158,6 +169,8 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit Switch statements, visiting the cases in reverse order,
+     /// then the controlling expression.
       void visit(ptr<Statement<Switch> >::type stmt) {
          enter(stmt);
 
@@ -189,6 +202,8 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit Case statements, visiting the body, then the
+     /// controlling expression.
       void visit(ptr<Statement<Case> >::type stmt) {
          enter(stmt);
 
@@ -206,6 +221,7 @@ namespace mirv {
 
       void visit(ptr<Statement<CaseBlock> >::type stmt);
 
+     /// Visit Before statements.
       void visit(ptr<Statement<Before> >::type stmt) {
          enter(stmt);
 
@@ -222,6 +238,7 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit After statements.
       void visit(ptr<Statement<After> >::type stmt) {
          enter(stmt);
 
@@ -236,6 +253,7 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit Goto statements.
       void visit(ptr<Statement<Goto> >::type stmt) {
          enter(stmt);
 
@@ -245,11 +263,14 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit Return statements.
       void visit(ptr<Statement<Return> >::type stmt) {
          enter(stmt);
          leave(stmt);
       }
 
+     /// Visit Assignment statements, visiting the left-hand side,
+     /// then the right-hand side.
       void visit(ptr<Statement<Assignment> >::type stmt) {
          this->enter(stmt);
 

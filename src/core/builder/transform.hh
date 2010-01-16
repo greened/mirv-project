@@ -11,7 +11,7 @@
 
 namespace mirv {
    namespace Builder {
-      // Transform a one-operand node
+      /// Transform a one-operand node into a single-child IR node.
      template<typename NodeType,
 	      typename Child = typename NodeType::child_ptr,
 	      typename Dummy = boost::proto::callable>
@@ -23,7 +23,7 @@ namespace mirv {
 	}
       };
 
-      // Transform a two-operand node
+     /// Transform a two-operand node to a two-child IR node.
       template<typename NodeType,
 	       typename Child1 = typename NodeType::child_ptr,
 	       typename Child2 = typename NodeType::child_ptr,
@@ -52,102 +52,32 @@ namespace mirv {
 	   if (ptr<Statement<Block> >::type rb =
 	       dyn_cast<Statement<Block> >(right)) {
 	     std::copy(rb->begin(), rb->end(), std::back_inserter(*lb));
+	   }
+	   lb->push_back(right);
+	   return lb;
+	 }
+	 else if (ptr<Statement<Block> >::type rb =
+		  dyn_cast<Statement<Block> >(right)) {
+	   rb->push_front(left);
+	   return rb;
+	 }
+	 return make<Statement<Block> >(left, right);
        }
-       lb->push_back(right);
-       return lb;
-     }
-     else if (ptr<Statement<Block> >::type rb =
-	      dyn_cast<Statement<Block> >(right)) {
-       rb->push_front(left);
-       return rb;
-     }
-     return make<Statement<Block> >(left, right);
-   }
-};
+     };
 
-#if 0
-      // Transform a two-operand temporary node
-      template<typename NodeType, typename Dummy = boost::proto::callable>
-      struct ConstructBinaryTemporary
-            : public boost::proto::callable {
-         template <typename Sig>
-         struct result;
-
-         template<typename This, typename Expr, typename State, typename Visitor>
-         struct result<This(Expr, State, Visitor)> {
-            typedef typename boost::proto::left<
-               typename Grammar::apply<Expr, State, Visitor>::type>::type
-            left_type;
-
-            typedef typename boost::proto::right<
-               typename Grammar::apply<Expr, State, Visitor>::type>::type
-            right_type;
-            typedef struct temp {
-               left_type left;
-               right_type right;
-
-               temp(const left_type &lft,
-                    const right_type &rgt)
-                     : left(lft), right(rgt) {};
-            } type;
-         };
-
-         template<typename Expr, typename State, typename Visitor>
-         static typename result<ConsructBinaryTemporary<NodeType, Dummy>, Expr, State, Visitor>::type
-         operator()(Expr const &expr, State const &state, Visitor &visitor) {
-            return(typename result<ConstructBinaryTemporary<NodeType, Dummy>, Expr, State, Visitor>::type(
-                      boost::proto::left(Grammar::call(expr,state,visitor)),
-                      boost::proto::right(Grammar::call(expr,state,visitor))));
-         }
-      };
-#endif
-
-      // Transform a three-operand node
-      template<typename NodeType,
-	       typename Child1 = typename NodeType::child_ptr,
-	       typename Child2 = typename NodeType::child_ptr,
-	       typename Child3 = typename NodeType::child_ptr,
-	       typename Dummy = boost::proto::callable>
-      struct ConstructTernary : boost::proto::callable {
-	typedef typename ptr<NodeType>::type result_type;
+     /// Transform a three-operand node to a three-child IR node.
+     template<typename NodeType,
+	      typename Child1 = typename NodeType::child_ptr,
+	      typename Child2 = typename NodeType::child_ptr,
+	      typename Child3 = typename NodeType::child_ptr,
+	      typename Dummy = boost::proto::callable>
+     struct ConstructTernary : boost::proto::callable {
+       typedef typename ptr<NodeType>::type result_type;
 
 	result_type operator()(Child1 child1, Child2 child2, Child3 child3) {
 	  return make<NodeType>(child1, child2, child3);
          }
       };
-
-#if 0
-      // Transform a three-operand node, where the left operand
-      // returns a temporary structure holding the first and second
-      // operands
-      template<typename NodeType, typename Dummy = boost::proto::callable>
-      struct ConstructTernaryLeftNested
-            : public boost::proto::callable {
-         template <typename Sig>
-         struct result;
-
-         template<typename This, typename Expr, typename State, typename Visitor>
-         struct result<This(Expr, State, Visitor)> {
-            typedef typename boost::proto::left<
-               typename Grammar::apply<Expr, State, Visitor>::type>::type
-            left_type;
-
-            typedef Ptr<NodeType>::type type;
-         };
-
-         template<typename Expr, typename State, typename Visitor>
-         static typename apply<Expr, State, Visitor>::type
-         call(Expr const &expr, State const &state, Visitor &visitor) {
-            left_type temp(boost::proto::left(Grammar::call(expr,state,visitor)));
-            return(typename apply<Expr, State, Visitor>::type(
-                      new NodeType(
-                         temp.left,
-                         temp.right,
-                         boost::proto::right(
-                            Grammar::call(expr,state,visitor)))));
-         }
-      };
-#endif
 
 #if 0
       // Transform for an n-ary expression
