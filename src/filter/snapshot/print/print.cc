@@ -1,4 +1,4 @@
- #include "print.hh"
+#include "print.hh"
 
 #include <mirv/core/ir/symbol.hh>
 #include <mirv/core/ir/variable.hh>
@@ -14,6 +14,111 @@
 
 namespace mirv {
   const int PrintFilter::IndentFactor = 3;
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Module> >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "mdef " << sym->name() << " {\n";
+    ind += IndentFactor;
+  }
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Function> >::type sym)
+  {
+    // Just declarations.
+    JustLeft = false;
+    out << indent(ind) << "fdecl " << sym->name();
+  }
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Variable> >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "vdecl " << sym->name() << " "
+	<< sym->type()->name();
+  }
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<Integral> > >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "tsdecl " << sym->name() << " integral "
+	<< sym->bitsize();
+  }
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<Floating> > >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "tsdecl " << sym->name() << " floating "
+	<< sym->bitsize();
+  }
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<Array> > >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "tadecl " << sym->name()
+	<< sym->getElementType()->name();
+    for(Symbol<Array>::constDimensionIterator d = sym->dimensionBegin(),
+	  dend = sym->dimensionEnd();
+	d != dend;
+	++d) {
+      out << "[" << *d << "]";
+    }
+  }
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<Pointer> > >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "tpdecl " << sym->name()
+	<< sym->getBaseType()->name();
+  }
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<FunctionType> > >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "tfdecl " << sym->name();
+    if (!sym->getReturnType() || sym->parameters_empty()) {
+      return;
+    }
+    out << "{\n";
+    out << indent(ind+IndentFactor) << "rtype " << sym->getReturnType()->name() << "\n";
+    for (Symbol<Type<FunctionType> >::iterator p =
+	   sym->parameters_begin(), pend = sym->parameters_end();
+	 p != pend;
+	 ++p) {
+      out << indent(ind+IndentFactor) << "ptype " << (*p)->name() << "\n";
+    }
+    out << "}";
+  }
+
+  void PrintFilter::EnterDefSymbolAction::visit(ptr<Symbol<Function> >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "fdef " << sym->name() << " {\n";
+    ind += IndentFactor;
+  }
+
+  void PrintFilter::EnterDefSymbolAction::visit(ptr<Symbol<Variable> >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "vdecl " << sym->name() << " "
+	<< sym->type()->name();
+  }
+
+   void PrintFilter::LeaveDefSymbolAction::visit(ptr<Symbol<Module> >::type sym) {
+     ind -= IndentFactor;
+     if (!JustLeft) {
+       out << "\n";
+     }
+     out << indent(ind) << "}\n";
+     JustLeft = true;
+   }
+
+   void PrintFilter::LeaveDefSymbolAction::visit(ptr<Symbol<Function> >::type sym) {
+     ind -= IndentFactor;
+     if (!JustLeft) {
+       out << "\n";
+     }
+     out << indent(ind) << "}\n";
+     JustLeft = true;
+   }
 
    void PrintFilter::EnterAction::visit(ptr<Statement<Block> >::type stmt)
    {
@@ -250,8 +355,33 @@ namespace mirv {
 
   void PrintFilter::operator()(ptr<Node<Base> >::type node)
    {
-     //if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
-     if (ptr<Statement<Base> >::type s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
+     if (ptr<Symbol<Module> >::type s = boost::dynamic_pointer_cast<Symbol<Module> >(node)) {
+       JustLeft = false;
+       ptr<SymbolVisitor>::type declflow(new PrintDeclSymbolFlow(EnterDeclSymbolAction(out, ind, JustLeft),
+								 LeaveDeclSymbolAction(out, ind, JustLeft)));
+       s->accept(*declflow);
+       ptr<SymbolVisitor>::type defflow(new PrintDefSymbolFlow(EnterDefSymbolAction(out, ind, JustLeft),
+							       LeaveDefSymbolAction(out, ind, JustLeft),
+							       PrintFlow(EnterAction(out, ind, JustLeft),
+									 LeaveAction(out, ind, JustLeft),
+									 PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
+											     LeaveExprAction(out, ind, JustLeft)))));
+       s->accept(*defflow);
+     }
+     else if (ptr<Symbol<Base> >::type s = boost::dynamic_pointer_cast<Symbol<Base> >(node)) {
+       JustLeft = false;
+       ptr<SymbolVisitor>::type defflow(makeSymbolFlow(EnterDefSymbolAction(out, ind, JustLeft),
+						       LeaveDefSymbolAction(out, ind, JustLeft),
+						       NullAction(),
+						       NullAction(),
+						       NullAction(),
+						       PrintFlow(EnterAction(out, ind, JustLeft),
+								 LeaveAction(out, ind, JustLeft),
+								 PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
+										     LeaveExprAction(out, ind, JustLeft)))));
+       s->accept(*defflow);
+     }
+     else if (ptr<Statement<Base> >::type s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
        JustLeft = false;
        ptr<StatementVisitor>::type flow(new PrintFlow(EnterAction(out, ind, JustLeft),
 						      LeaveAction(out, ind, JustLeft),

@@ -13,49 +13,24 @@
 
 namespace mirv {
   namespace Builder {
-#if 0
-      // An if_ "operator"
-     template<typename Expr>
-     typename boost::proto::result_of::make_expr<
-       boost::proto::tag::function,
-       Domain,
-       keyword::if_,
-       Expr>::type
-     if_(Expr const &expr)
-     {
-       return boost::proto::make_expr<boost::proto::tag::function, Domain>(
-         keyword::if_(),
-	 expr);
-     }
-
-    // A while_ "operator"
-     template<typename Expr>
-     typename boost::proto::result_of::make_expr<
-       boost::proto::tag::function,
-       Domain,
-       keyword::while_,
-       Expr>::type
-     while_(Expr const &expr)
-     {
-       return boost::proto::make_expr<boost::proto::tag::function, Domain>(
-         keyword::while_(),
-	 expr);
-     }
-#endif
-
-    // An if_ "operator."
     namespace {
+      /// An if_ "operator."  This is a protoized object that implements
+      /// the subscript operator to kick off if statement generation.
        const IfTerminal if_ = {{}};
     }
 
-    // A while_ "operator."
     namespace {
-       const WhileTerminal while_ = {{}};
+      /// A while_ "operator."  This is a protoized object that
+      /// implements the subscript operator to kick off dowhile
+      /// statement generation.
+      const WhileTerminal while_ = {{}};
     }
 
-    // A do_ "operator."
     namespace {
-       const DoTerminal do_ = {{}};
+      /// A do_ "operator."  This is a protoized object that
+      /// implements the subscript operator to kick off dowhile
+      /// statement generation.
+      const DoTerminal do_ = {{}};
     }
   }
 }

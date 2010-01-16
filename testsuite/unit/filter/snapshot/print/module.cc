@@ -1,54 +1,60 @@
-// Test printing of satements.
+// Test printing of modules.
 //
-// STDOUT: doWhile
-// STDOUT:    {
-// STDOUT:       assign
-// STDOUT:          vref a
-// STDOUT:          +
-// STDOUT:             vref a
-// STDOUT:             vref b
-// STDOUT:       ifElse
-// STDOUT:          >
-// STDOUT:             vref b
-// STDOUT:             vref c
-// STDOUT:          {
-// STDOUT:             assign
-// STDOUT:                vref a
-// STDOUT:                +
+// STDOUT: mdef Test {
+// STDOUT:    tsdecl int32 integral 32
+// STDOUT:    tfdecl ftype
+// STDOUT:    vdecl c int32
+// STDOUT:    fdecl foo
+// STDOUT:    fdef foo {
+// STDOUT:       vdecl a int32
+// STDOUT:       vdecl b int32
+// STDOUT:       {
+// STDOUT:          doWhile
+// STDOUT:             {
+// STDOUT:                assign
 // STDOUT:                   vref a
-// STDOUT:                   vref b
-// STDOUT:          }
-// STDOUT:          {
-// STDOUT:             assign
+// STDOUT:                   +
+// STDOUT:                      vref a
+// STDOUT:                      vref b
+// STDOUT:                ifElse
+// STDOUT:                   >
+// STDOUT:                      vref b
+// STDOUT:                      vref c
+// STDOUT:                   {
+// STDOUT:                      assign
+// STDOUT:                         vref a
+// STDOUT:                         +
+// STDOUT:                            vref a
+// STDOUT:                            vref b
+// STDOUT:                   }
+// STDOUT:                   {
+// STDOUT:                      assign
+// STDOUT:                         vref a
+// STDOUT:                         +
+// STDOUT:                            vref a
+// STDOUT:                            vref c
+// STDOUT:                   }
+// STDOUT:             }
+// STDOUT:             <
 // STDOUT:                vref a
-// STDOUT:                +
-// STDOUT:                   vref a
-// STDOUT:                   vref c
-// STDOUT:          }
+// STDOUT:                vref c
+// STDOUT:       }
 // STDOUT:    }
-// STDOUT:    <
-// STDOUT:       vref a
-// STDOUT:       vref c
+// STDOUT: }
 
-#include <mirv/core/ir/symbol.hh>
-#include <mirv/core/ir/variable.hh>
-#include <mirv/core/ir/expression.hh>
-#include <mirv/core/ir/arithmetic.hh>
-#include <mirv/core/ir/relational.hh>
-#include <mirv/core/ir/logical.hh>
-#include <mirv/core/ir/bitwise.hh>
-#include <mirv/core/ir/reference.hh>
-#include <mirv/core/ir/statement.hh>
-#include <mirv/core/ir/control.hh>
-#include <mirv/core/ir/mutating.hh>
+#include <mirv/core/ir/ir.hh>
 
 #include <mirv/core/builder/make.hh>
 #include <mirv/filter/snapshot/print/print.hh>
 
 using mirv::Symbol;
+using mirv::Module;
+using mirv::Function;
 using mirv::Variable;
 using mirv::Type;
+using mirv::TypeBase;
 using mirv::Integral;
+using mirv::FunctionType;
 using mirv::Expression;
 using mirv::Base;
 using mirv::Add;
@@ -100,10 +106,27 @@ int main(void)
   	    Expression<Add>::make(
 	      Expression<Reference<Variable> >::make(a),
 	      Expression<Reference<Variable> >::make(c)))))));
-   
-   PrintFilter print(std::cout);
 
-   print(dowhile);
+  ptr<Symbol<Type<TypeBase> > >::type ftype =
+    make<Symbol<Type<FunctionType> > >("ftype");
 
-   return(0);
+  ptr<Symbol<Function> >::type f =
+    make<Symbol<Function> >("foo", ftype, dowhile);
+
+  f->variablesPushBack(a);
+  f->variablesPushBack(b);
+
+  ptr<Symbol<Module> >::type m =
+    Symbol<Module>::make("Test");
+
+  m->typesPushBack(make<Symbol<Type<Integral> > >("int32", 32));
+  m->typesPushBack(ftype);
+  m->functionsPushBack(f);
+  m->variablesPushBack(c);
+
+  PrintFilter print(std::cout);
+
+  print(m);
+
+  return(0);
 }

@@ -30,10 +30,11 @@ namespace mirv {
 	ptr<InnerType>::type,
 	ptr<Symbol<Type<Simple> > >::type,
 	ptr<Symbol<Type<Derived> > >::type,
-	ptr<Symbol<Type<IntegralBase> > >::type,
-	ptr<Symbol<Type<FloatingBase> > >::type,
+	ptr<Symbol<Type<Integral> > >::type,
+	ptr<Symbol<Type<Floating> > >::type,
 	ptr<Symbol<Type<Array> > >::type,
-	ptr<Symbol<Type<Pointer> > >::type
+	ptr<Symbol<Type<Pointer> > >::type,
+	ptr<Symbol<Type<FunctionType> > >::type
 	> > {
   public:
     virtual void visit(ptr<Symbol<Base> >::type);
@@ -49,10 +50,11 @@ namespace mirv {
     virtual void visit(ptr<InnerType>::type);
     virtual void visit(ptr<Symbol<Type<Simple> > >::type);
     virtual void visit(ptr<Symbol<Type<Derived> > >::type);
-    virtual void visit(ptr<Symbol<Type<IntegralBase> > >::type);
-    virtual void visit(ptr<Symbol<Type<FloatingBase> > >::type);
+    virtual void visit(ptr<Symbol<Type<Integral> > >::type);
+    virtual void visit(ptr<Symbol<Type<Floating> > >::type);
     virtual void visit(ptr<Symbol<Type<Array> > >::type);
     virtual void visit(ptr<Symbol<Type<Pointer> > >::type);
+    virtual void visit(ptr<Symbol<Type<FunctionType> > >::type);
   };
 }
 

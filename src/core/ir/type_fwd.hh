@@ -8,15 +8,12 @@ namespace mirv {
   class LeafType;
   class InnerType;
   class Simple;
-  template<int Size>
   struct Integral;
-  struct IntegralBase;
-  template<int Size>
   struct Floating;
-  struct FloatingBase;
   struct Derived;
   struct Array;
   struct Pointer;
+  struct FunctionType;
 }
 
 #endif

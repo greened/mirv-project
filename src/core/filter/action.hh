@@ -3,6 +3,7 @@
 
 #include <mirv/core/filter/expression_visitor.hh>
 #include <mirv/core/filter/statement_visitor.hh>
+#include <mirv/core/filter/symbol_visitor.hh>
 
 namespace mirv {
    class NullAction {
@@ -33,6 +34,14 @@ namespace mirv {
       template<typename Expr>
       result_type operator()(boost::shared_ptr<Expr> expr) {
 	return expr->accept(*this);
+      }
+   };
+
+  class VisitSymbolAction : public SymbolVisitor {
+   public:
+      template<typename Expr>
+      result_type operator()(boost::shared_ptr<Expr> sym) {
+	return sym->accept(*this);
       }
    };
 }

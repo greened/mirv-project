@@ -103,19 +103,21 @@ namespace mirv {
      }
 
    public:
-      StatementFlow(const EnterAction &e,
-                    const LeaveAction &l,
-                    const BeforeStmtAction &bs,
-                    const AfterStmtAction &as, 
-		    const BetweenStmtAction &bt,
-                    const BeforeExprAction &be,
-                    const AfterExprAction &ae, 
-		    const ExprFlow &expr,
-                    const Dataflow &d,
-                    const Confluence &c)
+     StatementFlow(const EnterAction &e = NullAction(),
+		   const LeaveAction &l = NullAction(),
+		   const BeforeStmtAction &bs = NullAction(),
+		   const AfterStmtAction &as = NullAction(), 
+		   const BetweenStmtAction &bt = NullAction(),
+		   const BeforeExprAction &be = NullAction(),
+		   const AfterExprAction &ae = NullAction(), 
+		   const ExprFlow &expr = NullExpressionFlow(),
+		   const Dataflow &d = NullDataflow(),
+		   const Confluence &c = typename Dataflow::Confluence())
 	: ent(e), lve(l), bfrstmt(bs), aftstmt(as), betstmt(bt), bfrexpr(be),
 	  aftexpr(ae), exp(expr), data(d), conf(c) {}
    };
+
+  typedef StatementFlow<> NullStatementFlow;
 }
 
 #endif

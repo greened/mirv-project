@@ -37,15 +37,15 @@ namespace Builder = mirv::Builder;
 int main(void)
 {
   Builder::Variable a =
-    {{Symbol<Variable>::make("a", make<Symbol<Type<Integral<32> > > >())}};
+    {{Symbol<Variable>::make("a", make<Symbol<Type<Integral> > >("int32", 32))}};
   Builder::Variable b =
-    {{Symbol<Variable>::make("b", make<Symbol<Type<Integral<32> > > >())}};
+    {{Symbol<Variable>::make("b", make<Symbol<Type<Integral> > >("int32", 32))}};
   Builder::Variable c =
-    {{Symbol<Variable>::make("c", make<Symbol<Type<Integral<32> > > >())}};
+    {{Symbol<Variable>::make("c", make<Symbol<Type<Integral> > >("int32", 32))}};
   Builder::Variable d =
-    {{Symbol<Variable>::make("d", make<Symbol<Type<Integral<32> > > >())}};
+    {{Symbol<Variable>::make("d", make<Symbol<Type<Integral> > >("int32", 32))}};
   Builder::Variable e =
-    {{Symbol<Variable>::make("e", make<Symbol<Type<Integral<32> > > >())}};
+    {{Symbol<Variable>::make("e", make<Symbol<Type<Integral> > >("int32", 32))}};
 
   ptr<Expression<Base> >::type expr =
     Builder::translate_expression(a + (b - c) * d / -e);

@@ -11,6 +11,8 @@
 
 namespace mirv {
    namespace Builder {
+     /// Define a convenient way to talk about variable reference
+     /// expressions.
      typedef Wrapper<boost::proto::terminal<ptr<Symbol<Variable> >::type>::type > Variable;
 
      // Unary expressions

@@ -6,6 +6,8 @@
 #include <mirv/core/ir/type_fwd.hh>
 
 namespace mirv {
+  struct SymbolVisitor;
+
    template<typename Tag>
    class Symbol : public Tag::base_type {
    public:
@@ -18,6 +20,8 @@ namespace mirv {
      Symbol(A1 a1) : base_type(a1) {}
      template<typename A1, typename A2>
      Symbol(A1 a1, A2 a2) : base_type(a1, a2) {}
+     template<typename A1, typename A2, typename A3>
+     Symbol(A1 a1, A2 a2, A3 a3) : base_type(a1, a2, a3) {}
 
    public:
      static typename ptr<Symbol<Tag> >::type
@@ -36,25 +40,37 @@ namespace mirv {
      make(A1 a1, A2 a2) {
        return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1, a2));
      }
+
+     template<typename A1, typename A2, typename A3>
+     static typename ptr<Symbol<Tag> >::type
+     make(A1 a1, A2 a2, A3 a3) {
+       return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1, a2, a3));
+     }
+
+     virtual void accept(SymbolVisitor &V);
    };
 
    template<>
    class Symbol<Base> : public Node<Base> { 
    public:
+     virtual void accept(SymbolVisitor &V);
    };
 
-  class InnerSymbol : public InnerImpl<Symbol<Base>, Symbol<Base> > {
+  class InnerSymbol : public InnerImpl<Symbol<Base>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
   public:
     typedef Symbol<Base> visitor_base_type;
+    virtual void accept(SymbolVisitor &V);
   };
-  class LeafSymbol : public LeafImpl<Symbol<Base> > {
+
+  class LeafSymbol : public LeafImpl<VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
   public:
     typedef Symbol<Base> visitor_base_type;
+    virtual void accept(SymbolVisitor &V);
   };
 
   class Typed {
   private:
-    typedef Inherit1::apply<Virtual<LeafSymbol> >::type interface_base_type;
+    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type interface_base_type;
 
   public:
     class interface : public interface_base_type { 
@@ -71,14 +87,17 @@ namespace mirv {
       const_type_ptr type(void) const {
 	return(the_type);
       }
+      virtual void accept(mirv::SymbolVisitor &) {
+	error("Typed::accept called");
+      }
     };
     typedef interface base_type;
-    typedef LeafSymbol visitor_base_type;
+    typedef Symbol<Base> visitor_base_type;
   };
 
   class Named {
   private:
-    typedef Inherit1::apply<Virtual<LeafSymbol> >::type interface_base_type;
+    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type interface_base_type;
 
   public:
     class interface : public interface_base_type { 
@@ -92,10 +111,15 @@ namespace mirv {
       const std::string &name(void) const {
 	return(the_name);
       }
+      virtual void accept(mirv::SymbolVisitor &) {
+	error("Named::accept called");
+      }
     };
     typedef interface base_type;
-    typedef LeafSymbol visitor_base_type;
+    typedef Symbol<Base> visitor_base_type;
   };
 }
+
+#include <mirv/core/ir/symbol.ii>
 
 #endif

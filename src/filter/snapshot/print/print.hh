@@ -2,9 +2,11 @@
 #define mirv_filter_snapshot_print_hh
 
 #include <mirv/core/filter/forward_flow.hh>
+#include <mirv/core/filter/symbol_flow.hh>
 #include <mirv/core/filter/filter.hh>
 #include <mirv/core/filter/action.hh>
 #include <mirv/core/ir/node.hh>
+#include <mirv/core/util/debug.hh>
 
 namespace mirv {
    class PrintFilter
@@ -16,6 +18,80 @@ namespace mirv {
      Indent ind;
       Stream &out;
      bool JustLeft;
+
+      // Entering each symbol
+      class EnterDeclSymbolAction : public VisitSymbolAction {
+      private:
+         std::ostream &out;
+         Indent &ind;
+	bool &JustLeft;
+
+      public:
+	EnterDeclSymbolAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
+
+	void visit(ptr<Symbol<Module> >::type sym);
+	void visit(ptr<Symbol<Function> >::type sym);
+	void visit(ptr<Symbol<Variable> >::type sym);
+	void visit(ptr<Symbol<Type<Integral> > >::type sym);
+	void visit(ptr<Symbol<Type<Floating> > >::type sym);
+	void visit(ptr<Symbol<Type<Array> > >::type sym);
+	void visit(ptr<Symbol<Type<Pointer> > >::type sym);
+	void visit(ptr<Symbol<Type<FunctionType> > >::type sym);
+      };
+
+      class EnterDefSymbolAction : public VisitSymbolAction {
+      private:
+         std::ostream &out;
+         Indent &ind;
+	bool &JustLeft;
+
+      public:
+	EnterDefSymbolAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
+
+         void visit(ptr<Symbol<Function> >::type sym);
+         void visit(ptr<Symbol<Variable> >::type sym);
+      };
+
+      // Leaving each symbol
+      class LeaveDeclSymbolAction : public VisitSymbolAction {
+      private:
+         Stream &out;
+         Indent &ind;
+	bool &JustLeft;
+
+      public:
+	LeaveDeclSymbolAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
+
+	void visit(ptr<Symbol<Base> >::type sym) {
+	  if (!JustLeft) {
+	    out << "\n";
+	  }
+	  JustLeft = true;
+	}
+      };
+
+      class LeaveDefSymbolAction : public VisitSymbolAction {
+      private:
+         Stream &out;
+         Indent &ind;
+	bool &JustLeft;
+
+      public:
+	LeaveDefSymbolAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
+
+	void visit(ptr<Symbol<Variable> >::type sym) {
+	  if (!JustLeft) {
+	    out << "\n";
+	  }
+	  JustLeft = true;
+	}
+	void visit(ptr<Symbol<Module> >::type sym);
+	void visit(ptr<Symbol<Function> >::type sym);
+      };
 
       // Entering each statement
       class EnterAction : public VisitStatementAction {
@@ -228,6 +304,75 @@ namespace mirv {
 	}
       };
 
+     class PrintDeclSymbolFlow : public SymbolFlow<
+       EnterDeclSymbolAction,
+       LeaveDeclSymbolAction,
+       NullAction,
+       NullAction,
+       NullAction,
+       NullStatementFlow> {
+     private:
+       typedef SymbolFlow<
+       EnterDeclSymbolAction,
+       LeaveDeclSymbolAction,
+       NullAction,
+       NullAction,
+       NullAction,
+       NullStatementFlow> BaseType;
+
+     public:
+       PrintDeclSymbolFlow(const EnterDeclSymbolAction &e,
+			   const LeaveDeclSymbolAction &l)
+	 : BaseType(e, l, NullAction(), NullAction(), NullAction(),
+		    NullStatementFlow()) {}
+
+       void visit(ptr<Symbol<Function> >::type sym) {
+         this->enter(sym);
+         this->leave(sym);
+       }
+     };
+
+     class PrintDefSymbolFlow : public SymbolFlow<
+       EnterDefSymbolAction,
+       LeaveDefSymbolAction,
+       NullAction,
+       NullAction,
+       NullAction,
+       PrintFlow> {
+     private:
+       typedef SymbolFlow<
+       EnterDefSymbolAction,
+       LeaveDefSymbolAction,
+       NullAction,
+       NullAction,
+       NullAction,
+       PrintFlow> BaseType;
+
+     public:
+       PrintDefSymbolFlow(const EnterDefSymbolAction &e,
+			  const LeaveDefSymbolAction &l,
+			  const PrintFlow &p)
+	 : BaseType(e, l, NullAction(), NullAction(), NullAction(), p) {}
+
+       void visit(ptr<Symbol<Module> >::type sym) {
+         this->enter(sym);
+	 // Visit functions
+         for(Symbol<Module>::function_iterator f = sym->function_begin(),
+	       fend = sym->function_end();
+             f != fend;
+             /* NULL */) {
+            this->before(sym, *f);
+            (*f)->accept(*this);
+            this->after(sym, *f);
+            Symbol<Module>::function_iterator prev = f;
+            if (++f != fend) {
+	      this->between(sym, *prev, *f);
+            }
+         }
+         this->leave(sym);
+       }
+     };
+
    public:
       PrintFilter(Stream &o)
 	: Filter<Node<Base> >(), ind(0), out(o) {}
@@ -242,6 +387,7 @@ namespace mirv {
                : val(ind) {};
 
          Stream &operator()(Stream &out) const {
+	   check_invariant(val >= 0, "Indent underflow");
 	   int i = val;
             while(i--) {
                out << " ";

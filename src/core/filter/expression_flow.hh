@@ -53,12 +53,12 @@ namespace mirv {
       }
 
    public:
-      ExpressionFlow(const EnterAction &e,
-                     const LeaveAction &l,
-                     const BeforeAction &b,
-                     const AfterAction &a,
-                     const BetweenAction &t,
-                     const Dataflow &d)
+      ExpressionFlow(const EnterAction &e = NullAction(),
+                     const LeaveAction &l = NullAction(),
+                     const BeforeAction &b = NullAction(),
+                     const AfterAction &a = NullAction(),
+                     const BetweenAction &t = NullAction(),
+                     const Dataflow &d = NullDataflow())
 	: ent(e), lve(l), bfr(b), aft(a), bet(t),
 	  data(d) {}
    };
