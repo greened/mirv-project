@@ -5,6 +5,7 @@
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
+  /// Specify the interface for the logical and expression.
   class LogicalAnd {
   private:
     typedef boost::mpl::vector<Logical, Commutative,
@@ -17,6 +18,7 @@ namespace mirv {
     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
   };
 
+  /// Specify the interface for the logical or expression.
   class LogicalOr {
   private:
     typedef boost::mpl::vector<Logical, Commutative,
@@ -29,6 +31,7 @@ namespace mirv {
     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
   };
 
+  /// Specify the interface for the logical not expression.
   class LogicalNot {
   private:
     typedef boost::mpl::vector<Logical, Commutative,

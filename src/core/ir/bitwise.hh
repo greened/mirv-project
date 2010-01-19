@@ -5,6 +5,7 @@
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
+  /// Specify the bitwise and interface.
    class BitwiseAnd {
    private:
       typedef boost::mpl::vector<Bitwise, Commutative,
@@ -17,6 +18,7 @@ namespace mirv {
      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
    
+  /// Specify the bitwise or interface.
    class BitwiseOr {
    private:
       typedef boost::mpl::vector<Bitwise, Commutative,
@@ -29,6 +31,7 @@ namespace mirv {
      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 
+  /// Specify the bitwise xor interface.
    class BitwiseXor {
    private:
       typedef boost::mpl::vector<Bitwise, Commutative,
@@ -41,6 +44,7 @@ namespace mirv {
      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
    
+  /// Specify the bitwise complement interface.
    class BitwiseComplement {
    private:
       typedef boost::mpl::vector<Bitwise> sequence;
@@ -52,6 +56,7 @@ namespace mirv {
    };
    
 
+  /// Specify the bitwise left shift interface.
    class ShiftLeft {
    private:
       typedef boost::mpl::vector<Bitwise> sequence;
@@ -62,6 +67,7 @@ namespace mirv {
      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 
+  /// Specify the bitwise arithmetic right shift interface.
    class ArithmeticShiftRight {
    private:
       typedef boost::mpl::vector<Bitwise> sequence;
@@ -72,6 +78,7 @@ namespace mirv {
       typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 
+  /// Specify the bitwise logical right shift interface.
    class LogicalShiftRight {
    private:
       typedef boost::mpl::vector<Bitwise> sequence;

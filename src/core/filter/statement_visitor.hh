@@ -19,6 +19,7 @@
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
+  /// This is the base class for all visitors of statements.
   struct StatementVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<

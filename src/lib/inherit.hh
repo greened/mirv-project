@@ -7,6 +7,8 @@
 
 namespace mirv {
   namespace lib {
+    /// This is an implementation of Loki's InheritScattered using the
+    /// Boost MPL library.
     template<typename Sequence,
 	     typename Base,
 	     typename Inherit = boost::mpl::quote2<boost::mpl::inherit2> >

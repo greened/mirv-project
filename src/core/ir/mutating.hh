@@ -5,6 +5,8 @@
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
+  /// This is the interface to statements that have two child
+  /// expressions.
    class DualExpression {
    public:
       class interface;
@@ -68,6 +70,11 @@ namespace mirv {
       };
    };
 
+  /// Specify the interface to assignment statements.  Assignments are
+  /// statements only, not expressions.  This is to cleanly separate
+  /// changes in program state from general computation.  Expression
+  /// trees imply assignmnets to temporary variables at some level of
+  /// translate, but we are not concerned about those.
    class Assignment {
    private:
       typedef boost::mpl::vector<Mutating> sequence;

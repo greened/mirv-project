@@ -6,7 +6,9 @@
 #include <mirv/core/util/debug.hh>
 
 namespace mirv {
-  // Inherit virtually.  Use for specialization.
+  /// This is a utility class to specify virtual inheritance.
+  /// Specializations of low-level utiltiy classes use this to
+  /// determine how to inherit their template arguments.
   template<typename Base>
   class Virtual : public virtual Base {
   private:
@@ -16,6 +18,7 @@ namespace mirv {
   };
 
   namespace detail {
+    /// This is a low-level class to inherit from a single type.
     template<typename T1>
     class Type1 : public T1 {
     public:
@@ -28,6 +31,8 @@ namespace mirv {
       Type1(A1 a1, A2 a2) : T1(a1, a2) {}
     };
 
+    /// This is a specialization to inherit virtually from a single
+    /// type.
     template<typename T1>
     class Type1<Virtual<T1> > : public virtual T1 {
     public:
@@ -40,6 +45,7 @@ namespace mirv {
       Type1(A1 a1, A2 a2) : T1(a1, a2) {}
     };
 
+    /// This is a low-level class to inherit from two types.
     template<typename T1, typename T2>
     class Type2 : public T1, public T2 {
     public:
@@ -55,6 +61,8 @@ namespace mirv {
       Type2(A1 a1, A2 a2, A3 a3) : T1(a1, a2, a3) {}
     };
 
+    /// This is a specialzation to inherit virtually from one of two
+    /// types.
     template<typename T1, typename T2>
     class Type2<T1, Virtual<T2> > :
       public T1, public virtual T2 {
@@ -71,6 +79,8 @@ namespace mirv {
       Type2(A1 a1, A2 a2, A3 a3) : T1(a1, a2, a3) {}
     };
 
+    /// This is a specialzation to inherit virtually from one of two
+    /// types.
     template<typename T1, typename T2>
     class Type2<Virtual<T1>, T2> :
       public virtual T1, public T2 {
@@ -87,7 +97,10 @@ namespace mirv {
       Type2(A1 a1, A2 a2, A3 a3) : T1(a1, a2, a3) {}
     };
 
-    // Types that accept visitors.
+    /// This is a low-level type to inherit from a single type and
+    /// provide a dummy implementation of the visitor accept function
+    /// to avoid issues with multiple inheritance and ambiguous
+    /// virtual function overrides.
     template<typename Visitor, typename T1>
     class VisitedType1 : public T1 {
     public:
@@ -104,6 +117,7 @@ namespace mirv {
       }
     };
 
+    /// This is a specilaization to inherit virtually from one type.
     template<typename Visitor, typename T1>
     class VisitedType1<Visitor, Virtual<T1> > : public virtual T1 {
     public:
@@ -120,6 +134,10 @@ namespace mirv {
       }
     };
 
+    /// This is a low-level type to inherit from two types and provide
+    /// a dummy implementation of the visitor accept function to avoid
+    /// issues with multiple inheritance and ambiguous virtual
+    /// function overrides.
     template<typename Visitor, typename T1, typename T2>
     class VisitedType2 : public T1, public T2 {
     public:
@@ -139,6 +157,8 @@ namespace mirv {
       }
     };
 
+    /// This is a specialization to inherit virtually from one of two
+    /// types.
     template<typename Visitor, typename T1, typename T2>
     class VisitedType2<Visitor, T1, Virtual<T2> > :
       public T1, public virtual T2 {
@@ -159,6 +179,8 @@ namespace mirv {
       }
     };
 
+    /// This is a specialization to inherit virtually from one of two
+    /// types.
     template<typename Visitor, typename T1, typename T2>
     class VisitedType2<Visitor, Virtual<T1>, T2> :
       public virtual T1, public T2 {
@@ -180,6 +202,7 @@ namespace mirv {
     };
   }
 
+  /// This is a metafunction class to inherit from two types.
   class Inherit2 {
   public:
     template<typename T1, typename T2>
@@ -188,6 +211,7 @@ namespace mirv {
     };
   };
 
+  /// This is a metafunction class to inherit from one type.
   class Inherit1 {
   public:
     template<typename T1>
@@ -196,7 +220,10 @@ namespace mirv {
     };
   };
 
-  // Inhertance for visited types.
+  /// This is a metafunction class to inherit from two types and
+  /// provide a dummy override for the visitor accept function in
+  /// order to avoid issues with multiple inheritance and ambiguous
+  /// virtual function overrides.
   template<typename Visitor>
   class VisitedInherit2 {
   public:
@@ -206,6 +233,10 @@ namespace mirv {
     };
   };
 
+  /// This is a metafunction class to inherit a single type and
+  /// provide a dummy override for the visitor accept function in
+  /// order to avoid issues with multiple inheritance and ambiguous
+  /// virtual function overrides.
   template<typename Visitor>
   class VisitedInherit1 {
   public:

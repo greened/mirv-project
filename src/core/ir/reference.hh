@@ -4,6 +4,7 @@
 #include <mirv/core/ir/symbol.hh>
 
 namespace mirv {
+  /// Specify the interface for nodes that reference symbols.
    template<typename SymbolType>
    class Reference {
    private:
@@ -43,6 +44,7 @@ namespace mirv {
      typedef typename ExpressionBaseGenerator<sequence, interface>::type base_type;
    };
 
+  /// Take the address of an lvalue expression.
    class AddressOf {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -54,7 +56,8 @@ namespace mirv {
       typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
    };
 
-   class Dereference {
+  /// Dereference the address provided by some expression.
+  class Dereference {
    private:
       typedef boost::mpl::vector<> sequence;
 
@@ -64,6 +67,7 @@ namespace mirv {
       typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
    };
 
+  /// Specify the interface for array index expressions.
    class ArrayRef {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -75,6 +79,7 @@ namespace mirv {
       typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
    };
 
+  /// Specify the interface for function call expressions.
    class Call {
    private:
       typedef boost::mpl::vector<> sequence;

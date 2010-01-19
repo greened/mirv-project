@@ -8,6 +8,8 @@
 #include <mirv/core/ir/module.hh>
 
 namespace mirv {
+  /// This is a visitor for symbols.  It follows children of inner
+  /// symbols such as functions and modules.
    template<
      typename EnterAction = NullAction,
      typename LeaveAction = NullAction,
@@ -17,39 +19,51 @@ namespace mirv {
      typename StmtFlow = NullStatementFlow>
    class SymbolFlow : public SymbolVisitor {
    private:
+     /// The acion to invoke upon entry to a symbol.
       EnterAction ent;
+     /// The acion to invoke upon leaving a symbol.
       LeaveAction lve;
+     /// The action to invoke before visiting a child symbol.
       BeforeAction bfr;
+     /// The action to invoke after visiting a child symbol.
       AfterAction aft;
-      BetweenAction bet;
+     /// The action to invoke between visits of child symbols.
+     BetweenAction bet;
+     /// The flow to send down child statements.
       StmtFlow stmt;
 
    protected:
+     /// Apply the enter action.
      template<typename Expr>
      typename EnterAction::result_type enter(boost::shared_ptr<Expr> expr) {
        return(ent(expr));
       };
 
+     /// Apply the leave action.
      template<typename Expr>
      typename LeaveAction::result_type leave(boost::shared_ptr<Expr> expr) {
        return(lve(expr));
       };
 
+     /// Apply the before action.
      template<typename Expr, typename Child>
      typename BeforeAction::result_type before(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child) {
        return(bfr(expr, child));
       };
 
+     /// Apply the between action.
      template<typename Expr, typename Child>
      typename BeforeAction::result_type between(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child1, boost::shared_ptr<Child> child2) {
        return(bfr(expr, child1, child2));
       };
 
+     /// Apply the after action.
      template<typename Expr, typename Child>
      typename AfterAction::result_type after(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child) {
        return(aft(expr, child));
       };
 
+     /// Get the statement flow.
      StmtFlow &statement_flow(void) {
        return stmt;
      }
@@ -63,6 +77,7 @@ namespace mirv {
 		const StmtFlow &smt = NullStatementFlow())
 	: ent(e), lve(l), bfr(b), aft(a), bet(t), stmt(smt) {}
 
+     /// Visit an inner symbol, visiting all children.
      void visit(ptr<InnerSymbol>::type sym) {
          this->enter(sym);
          for(InnerSymbol::iterator s = sym->begin(),
@@ -90,6 +105,8 @@ namespace mirv {
          this->leave(sym);
       }
 
+     /// Visit a module, visiting contained types, variables and
+     /// functions.
      void visit(ptr<Symbol<Module> >::type sym) {
          this->enter(sym);
 
@@ -137,6 +154,8 @@ namespace mirv {
          this->leave(sym);
       }
 
+     /// Visit a function, visiting contained variables and
+     /// statements.
      void visit(ptr<Symbol<Function> >::type sym) {
          this->enter(sym);
 	 // Visit variables
@@ -162,6 +181,9 @@ namespace mirv {
 
   typedef SymbolFlow<> NullSymbolFlow;
 
+  /// This is an object generator for symbol flows.  It uses function
+  /// argument type deduction to relieve the user of thhe burden of
+  /// specifying all of the template types of a symbol flow.
   template<
     typename EnterAction,
     typename LeaveAction,

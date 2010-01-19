@@ -4,6 +4,8 @@
 #include <mirv/core/ir/type.hh>
 
 namespace mirv {
+  /// This is a symbol tag for variable symbols.  Variables have a
+  /// type and a name.
    class Variable {
    public:
       class interface

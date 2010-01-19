@@ -14,7 +14,9 @@
 
 namespace mirv {
    namespace detail {
-     // Provide an ordering for properties.
+     /// Provide an ordering for properties.  This ensures that class
+     /// hierarchies are the same everywhere and thus that a
+     /// particular property always has the same superclass tree.
      template<typename T1, typename T2>
      struct StatementPropertyLess :
        public boost::mpl::less<typename T1::order, typename T2::order> {};
@@ -24,32 +26,53 @@ namespace mirv {
 
   template<typename Tag> class Statement;
 
-    // A metafunction class to generate statement hierarchies.  This
-    // makes sure that each property statement specifies Base as its
-    // base type so that visit(Expreesion<>::base_type) works
-    // correctly.
+  /// This is a metafunction class (generator) to transform a property
+  /// tag into a property statement.  It is more convenient to reason
+  /// about property tags and this is the glue that makes that
+  /// possible.
   struct PropertyStatementGenerator {
+    /// A metafunction to produce a property statement given a
+    /// property tag.
     template<typename Property>
     struct apply {
       typedef Statement<Property> type;
     };
   };
 
+  /// This is the statement implementation for all statement types.
+  /// Each statement type is an instance of this template
+  /// (Statement<IfThen>, Statement<DoWhile>, etc.).  It keeps all of
+  /// the property and visitor logic in one place, hiding the gory
+  /// details from the statement type tags and specific statement type
+  /// interfaces.
    template<typename Tag>
    class Statement: public Tag::base_type {
    public:
+      /// The immediate base type of this statement, distinct from
+      /// the base type that will be visited by a StatementVisitor.
      typedef typename Tag::base_type BaseType;
 
+      /// A list of sorted property tags.
      typedef typename boost::mpl::sort<
        typename Tag::properties,
        detail::StatementPropertyLess<boost::mpl::_1, boost::mpl::_2>
        >::type properties;
    private:
+      /// A list of property statements generated from the list of
+      /// property tags.  This defines the visitation order for
+      /// property statements.
       typedef typename boost::mpl::transform<properties, PropertyStatementGenerator>::type property_statements;
 
    public:
       // If there are properties, visit those first, otherwise visit
       // the specified visitor base type.
+
+      /// The base type visited if the visit action for this
+      /// statement is not implemented.  This is distinct from the
+      /// statement's base type because there may be various
+      /// intermediate glue base types (scattered inheritance
+      /// generators, etc.) used to implement the statement class
+      /// hierarchy.
       typedef typename boost::mpl::eval_if<
 	boost::mpl::empty<properties>,
 	boost::mpl::identity<typename Tag::visitor_base_type>,
@@ -90,6 +113,8 @@ namespace mirv {
      virtual void accept(StatementVisitor &V);
    };
 
+  /// A specialization for base statements.  No property information
+  /// is available.
    template<>
    class Statement<Base> : public Node<Base> {
    public:
@@ -97,6 +122,9 @@ namespace mirv {
    };
 
   namespace detail {
+     /// A traits class to define various properties of inner
+     /// statements such as child type, iterator types and other
+     /// things.
     class InnerStatementTraits {
     public:
       typedef Statement<Base> Child;
@@ -120,8 +148,18 @@ namespace mirv {
     };
   }
 
+  /// This is an inner statement abstract interface.  It exists
+  /// because we need to be able to inherit virtually from inner
+  /// statements (to allow property statement visitors to manipulate
+  /// operands) but we do not want to force subclasses to explicitly
+  /// initialize the inner statement object.  Separating the
+  /// interface from the implementation solves that problem.
   class InnerStatementBase : public Statement<Inner<detail::InnerStatementTraits> > {};
 
+  /// This is the implementation of inner statements.  It is
+  /// inherited from once in the hierarchy for any inner statements.
+  /// This holds the child pointers and other data necessary for inner
+  /// statements.
   class InnerStatement : public InnerImpl<Statement<Base>, VisitedInherit1<StatementVisitor>::apply<Virtual<InnerStatementBase> >::type> {
      typedef InnerImpl<
        Statement<Base>,
@@ -134,7 +172,8 @@ namespace mirv {
 		   child_ptr Child2) : BaseType(Child1, Child2) {}
      virtual void accept(StatementVisitor &V);
    };
-
+ 
+  /// This is a statement with no children.
   class LeafStatement : public LeafImpl<VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type> {
    public:
      virtual void accept(StatementVisitor &V);
@@ -170,6 +209,10 @@ namespace mirv {
      typedef boost::mpl::vector<> properties;
     };
 
+  /// This is a metafunction to generate a scattered base class
+  /// hierarchy of property statements.  The Sequence is a sorted
+  /// list of property tags and Root is the base type of the whole
+  /// hierarchy.
     template<typename Sequence, typename Root>
     class StatementBaseGenerator {
     public:
@@ -264,6 +307,8 @@ namespace mirv {
        typedef StatementBaseGenerator<sequence, interface>::type base_type;
     };
 
+  /// A statement with a single expression child.  It may have one of
+  /// more children of other types.
     class SingleExpression {
     private:
        typedef boost::mpl::vector<> sequence;

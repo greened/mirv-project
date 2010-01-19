@@ -14,6 +14,7 @@
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
+  /// This is the base class for all types that visit symbols.
   struct SymbolVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<

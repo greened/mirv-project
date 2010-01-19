@@ -31,7 +31,7 @@ namespace mirv {
   /// possible.
   template<typename Op> class Expression;
   struct PropertyExpressionGenerator {
-    /// A metafunction to produce a property esxpression given a
+    /// A metafunction to produce a property expression given a
     /// property tag.
     template<typename Property>
     struct apply {

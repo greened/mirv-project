@@ -5,8 +5,8 @@
 #include <boost/mpl/empty_base.hpp>
 
 namespace mirv {
-   // Signifies the root of some IR class subtree,
-   // e.g. Expression<Base>, Statement<Base>, etc.
+   /// This signifies the root of some IR class subtree,
+   /// e.g. Expression<Base>, Statement<Base>, etc.
    struct Base {};
 }
 
