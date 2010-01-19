@@ -7,6 +7,9 @@
 #include <boost/type_traits.hpp>
 
 namespace mirv {
+  /// Safely case from pointer to From to pointer to To, taking
+  /// downcasts into proper consideration.  This assumes the cast is
+  /// legal and aborts if it is not.
   template<typename To, typename From>
   inline To *safe_cast(From *val)
   {
@@ -16,6 +19,7 @@ namespace mirv {
     return &thisr;
   }
 
+  /// This is a safe_cast overload for boost::shared_ptr.
   template<typename To, typename From>
   inline typename boost::shared_ptr<To> safe_cast(boost::shared_ptr<From> val)
   {
@@ -33,6 +37,8 @@ namespace mirv {
   //   return ret;
   // }
 
+  /// Implement a dynamic cast from pointer to From to pointer to To.
+  /// We need this to handle smart pointers properly.
   template<typename To, typename From>
   typename boost::shared_ptr<To> dyn_cast(typename boost::shared_ptr<From> const &val)
   {
@@ -40,6 +46,10 @@ namespace mirv {
     return ret;
   }
 
+  /// Do a non-checking cast from pointer to From to pointer to To.
+  /// This assumes the cast is legal.  Performing an illegal cast
+  /// results in undefined behavior.  This cast is checked in debug
+  /// mode.
   template<typename To, typename From>
   inline To *fast_cast(From *val)
   {
@@ -54,6 +64,8 @@ namespace mirv {
       return static_cast<To>(val);
     }
   }
+
+  /// A fast_cast specialization for boost::shared_ptr.
   template<typename To, typename From>
   typename boost::shared_ptr<To> fast_cast(typename boost::shared_ptr<From> const &val)
   {

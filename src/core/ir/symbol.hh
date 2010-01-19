@@ -8,6 +8,11 @@
 namespace mirv {
   struct SymbolVisitor;
 
+  /// This is the symbol implementation for all symbol types.  Each
+  /// symbol type is an instance of this template (Symbol<Variable>,
+  /// Symbol<Function>, etc.).  It keeps all of the property and
+  /// visitor logic in one place, hiding the gory details from the
+  /// symbol type tags and specific symbol type interfaces.
    template<typename Tag>
    class Symbol : public Tag::base_type {
    public:
@@ -50,24 +55,31 @@ namespace mirv {
      virtual void accept(SymbolVisitor &V);
    };
 
+  /// A specialization for base symbols.
    template<>
    class Symbol<Base> : public Node<Base> { 
    public:
      virtual void accept(SymbolVisitor &V);
    };
 
+  /// This is the implementation of inner symbols.  It is
+  /// inherited from once in the hierarchy for any inner symbols.
+  /// This holds the child pointers and other data necessary for inner
+  /// symbols.
   class InnerSymbol : public InnerImpl<Symbol<Base>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
   public:
     typedef Symbol<Base> visitor_base_type;
     virtual void accept(SymbolVisitor &V);
   };
 
+  /// This is a symbol with no children.
   class LeafSymbol : public LeafImpl<VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
   public:
     typedef Symbol<Base> visitor_base_type;
     virtual void accept(SymbolVisitor &V);
   };
 
+  /// A symbol that has a type associated with it.
   class Typed {
   private:
     typedef Inherit1::apply<Virtual<Symbol<Base> > >::type interface_base_type;
@@ -95,6 +107,7 @@ namespace mirv {
     typedef Symbol<Base> visitor_base_type;
   };
 
+  /// A symbol that has a name associated with it.
   class Named {
   private:
     typedef Inherit1::apply<Virtual<Symbol<Base> > >::type interface_base_type;

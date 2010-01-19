@@ -7,10 +7,11 @@
 #include <mirv/core/ir/node.hh>
 
 namespace mirv {
+  /// This is a filter to translate from MIRV IR to LLVM IR.
   class LLVMCodegenFilter
     : public Filter<Node<Base> > {
   private:
-    // Entering each statement
+    /// Entering each statement
     class EnterAction : public VisitStatementAction {
     private:
 
@@ -32,7 +33,7 @@ namespace mirv {
       void visit(ptr<Statement<Assignment> >::type stmt);
     };
 
-    // Entering each expression
+    /// Entering each expression
     class EnterExprAction : public VisitExpressionAction {
     private:
 
@@ -60,6 +61,7 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Variable> > >::type expr);
     };
 
+    /// This is the flow for translating expressions.
     class LLVMCodegenExpressionFlow
       : public ForwardExpressionFlow<
       EnterExprAction,
@@ -83,6 +85,7 @@ namespace mirv {
 		   NullAction(), NullDataflow()) {}
     };
 
+    /// This is the flow for translating statements.
     class LLVMCodegenFlow : public ForwardFlow<
       EnterAction,
       NullAction,
@@ -120,6 +123,7 @@ namespace mirv {
   public:
     LLVMCodegenFilter(void) : Filter<Node<Base> >() {}
 
+    /// Translate an IR tree.
     void operator()(ptr<Node<Base> >::type node);
   };
 }

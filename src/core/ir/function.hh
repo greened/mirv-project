@@ -6,6 +6,7 @@
 #include <mirv/core/ir/statement.hh>
 
 namespace mirv {
+  /// This is a symbol tag for function symbols.
    class Function {
    private:
      typedef Symbol<Named> NamedBaseType;
@@ -32,25 +33,31 @@ namespace mirv {
 	   StatementBaseType(dyn_cast<Statement<Block> >(s) ?
 			     s : mirv::make<Statement<Block> >(s)) {};
 
+       /// Add a local variable to this function.
        void variablesPushBack(VariablePtr v) {
 	 VariableBaseType::push_back(v);
        }
 
        typedef VariableBaseType::iterator variable_iterator;
        typedef VariableBaseType::const_iterator const_variable_iterator;
+       /// Get the start of the local variable sequence.
        variable_iterator variable_begin(void) {
 	 return VariableBaseType::begin();
        }
+       /// Get the end of the local variable sequence.
        variable_iterator variable_end(void) {
 	 return VariableBaseType::end();
        }
+       /// Get the start of the local variable sequence.
        const_variable_iterator variable_begin(void) const {
 	 return VariableBaseType::begin();
        }
+       /// Get the end of the local variable sequence.
        const_variable_iterator variable_end(void) const {
 	 return VariableBaseType::end();
        }
 
+       /// Get the single block statement child.
        statement_ptr getStatement(void) {
 	 return *StatementBaseType::begin();
        }

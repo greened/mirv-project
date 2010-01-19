@@ -9,21 +9,33 @@
 #include <mirv/core/util/debug.hh>
 
 namespace mirv {
+  /// This is a filter to print MIRV IR in textual form.
    class PrintFilter
      : public Filter<Node<Base> > {
    private:
      typedef std::ostream Stream;
+     /// The current indent level.
       typedef int Indent;
+     /// The factor by which to increase the indent at deeper nesting
+     /// levels.
       const static int IndentFactor;
+     /// The indent manipulator.
      Indent ind;
-      Stream &out;
+     /// The stream to dump to.
+     Stream &out;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
      bool JustLeft;
 
-      // Entering each symbol
+      /// Entering each symbol
       class EnterDeclSymbolAction : public VisitSymbolAction {
       private:
+     /// The stream to dump to.
          std::ostream &out;
+	/// The indent manipulator.
          Indent &ind;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
 	bool &JustLeft;
 
       public:
@@ -42,8 +54,12 @@ namespace mirv {
 
       class EnterDefSymbolAction : public VisitSymbolAction {
       private:
+	/// The stream to dump to.
          std::ostream &out;
+	/// The indent manipulator.
          Indent &ind;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
 	bool &JustLeft;
 
       public:
@@ -54,17 +70,22 @@ namespace mirv {
          void visit(ptr<Symbol<Variable> >::type sym);
       };
 
-      // Leaving each symbol
+      /// Leaving each symbol declaration.
       class LeaveDeclSymbolAction : public VisitSymbolAction {
       private:
-         Stream &out;
+	/// The stream to dump to.
+	Stream &out;
+	/// The indent manipulator.
          Indent &ind;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
 	bool &JustLeft;
 
       public:
 	LeaveDeclSymbolAction(Stream &o, Indent &i, bool &j)
 	  : out(o), ind(i), JustLeft(j) {}
 
+	/// Print the final newline after each symbol declaration.
 	void visit(ptr<Symbol<Base> >::type sym) {
 	  if (!JustLeft) {
 	    out << "\n";
@@ -73,16 +94,22 @@ namespace mirv {
 	}
       };
 
+     /// Leaving each symbol definition.
       class LeaveDefSymbolAction : public VisitSymbolAction {
       private:
+	/// The stream to dump to.
          Stream &out;
+	/// The indent manipulator.
          Indent &ind;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
 	bool &JustLeft;
 
       public:
 	LeaveDefSymbolAction(Stream &o, Indent &i, bool &j)
 	  : out(o), ind(i), JustLeft(j) {}
 
+	/// Print the final newline after each symbol definition.
 	void visit(ptr<Symbol<Variable> >::type sym) {
 	  if (!JustLeft) {
 	    out << "\n";
@@ -93,11 +120,15 @@ namespace mirv {
 	void visit(ptr<Symbol<Function> >::type sym);
       };
 
-      // Entering each statement
+     /// Entering each statement
       class EnterAction : public VisitStatementAction {
       private:
+	/// The stream to dump to.
          std::ostream &out;
+	/// The indent manipulator.
          Indent &ind;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
 	bool &JustLeft;
 
       public:
@@ -119,10 +150,12 @@ namespace mirv {
          void visit(ptr<Statement<Assignment> >::type stmt);
       };
 
-      // After processing each statement's expression child
+     /// After processing each statement's expression child
       class AfterStmtExprAction : public VisitStatementAction {
       private:
+	/// The stream to dump to.
          Stream &out;
+	/// The indent manipulator.
          Indent &ind;
 
       public:
@@ -149,11 +182,15 @@ namespace mirv {
          }
       };
 
-      // Leaving each statement
+     /// Leaving each statement
       class LeaveAction : public VisitStatementAction {
       private:
+	/// The stream to dump to.
          Stream &out;
+	/// The indent manipulator.
          Indent &ind;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
 	bool &JustLeft;
 
       public:
@@ -171,11 +208,15 @@ namespace mirv {
 	void visit(ptr<Statement<Return> >::type stmt);
       };
 
-      // Entering each expression
+     /// Entering each expression
       class EnterExprAction : public VisitExpressionAction {
       private:
+	/// The stream to dump to.
          Stream &out;
+	/// The indent manipulator.
          Indent &ind;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
 	bool &JustLeft;
 
       public:
@@ -203,11 +244,15 @@ namespace mirv {
 	void visit(ptr<Expression<Reference<Variable> > >::type expr);
       };
 
-      // Leaving each expression
+     /// Leaving each expression
       class LeaveExprAction : public VisitExpressionAction {
       private:
-         Stream &out;
+	/// The stream to dump to.
+	Stream &out;
+	/// The indent manipulator.
          Indent &ind;
+     /// This indicates whether we just left an IR subtree.  If so, we
+     /// want to suppress printing of a newline.
 	bool &JustLeft;
 
       public:
@@ -229,6 +274,7 @@ namespace mirv {
 	}
       };
 
+     /// This is the flow to print expressions.
       class PrintExpressionFlow
             : public ForwardExpressionFlow<
          EnterExprAction,
@@ -252,6 +298,7 @@ namespace mirv {
 	  : BaseType(e, l, NullAction(), NullAction(), NullAction(), NullDataflow()) {}
       };
 
+     /// This is the flow to print statements.
       class PrintFlow
             : public ForwardFlow<
 	EnterAction,
@@ -304,6 +351,7 @@ namespace mirv {
 	}
       };
 
+     /// This is the flow to print symbol declarations.  It prints the module definition since there is no such thing as a module declaration.
      class PrintDeclSymbolFlow : public SymbolFlow<
        EnterDeclSymbolAction,
        LeaveDeclSymbolAction,
@@ -326,12 +374,15 @@ namespace mirv {
 	 : BaseType(e, l, NullAction(), NullAction(), NullAction(),
 		    NullStatementFlow()) {}
 
+       // We just want the function declaration at this point so don't
+       // visit children.
        void visit(ptr<Symbol<Function> >::type sym) {
          this->enter(sym);
          this->leave(sym);
        }
      };
 
+     /// This is the flow to print symbol defintions.
      class PrintDefSymbolFlow : public SymbolFlow<
        EnterDefSymbolAction,
        LeaveDefSymbolAction,
@@ -354,6 +405,8 @@ namespace mirv {
 			  const PrintFlow &p)
 	 : BaseType(e, l, NullAction(), NullAction(), NullAction(), p) {}
 
+       /// We only want to visit functions here since we already
+       /// declared module-level types and variables.
        void visit(ptr<Symbol<Module> >::type sym) {
          this->enter(sym);
 	 // Visit functions
@@ -377,15 +430,18 @@ namespace mirv {
       PrintFilter(Stream &o)
 	: Filter<Node<Base> >(), ind(0), out(o) {}
 
-
-      class indent {
+     /// This is an iostream manipulator to print a specified number
+     /// of spaces for indentation.
+     class indent {
       private:
+       /// The number of spaces to print.
          int val;
 
       public:
          indent(int ind)
                : val(ind) {};
 
+       /// Print the spafces specified by val.
          Stream &operator()(Stream &out) const {
 	   check_invariant(val >= 0, "Indent underflow");
 	   int i = val;
@@ -399,6 +455,7 @@ namespace mirv {
      void operator()(ptr<Node<Base> >::type node);
    };
 
+  /// This is the stream operator for the indent iostream manipulator.
   inline std::ostream &operator<<(std::ostream &out, const PrintFilter::indent &ind) {
     return ind(out);
   }

@@ -9,6 +9,7 @@
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
+  /// Specify the interface for block/sequence statements.
    class Block {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -30,9 +31,9 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
-   // A statement with only one child statement.  The child should be
-   // a block statement if more than one statement needs to be under
-   // this control point.
+   /// This is a statement with only one child statement.  The child
+   /// should be a block statement if more than one statement needs to
+   /// be under this control point.
    class SingleBlock {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -76,9 +77,9 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
-   // A statement with two child statements.  The children should be
-   // block statements if more than one statement needs to be under
-   // this control point.
+  /// This is a statement with two child statements.  The children
+  /// should be block statements if more than one statement needs to
+  /// be under this control point.
    class DualBlock {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -155,7 +156,7 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
-   // A statement with a single condition
+  /// This is a statement with a single controlling condition
    class SingleCondition {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -191,9 +192,7 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
-   // IfThen doesn't inherit from the base_type, Statement<IfThen>
-   // does.  Therefore we need a way to make base_type's protected
-   // methods available.  That's why interface is set as the base_type.
+  /// Specify the if-then statement interface.
   class IfThen {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
@@ -217,6 +216,7 @@ namespace mirv {
     typedef Statement<SingleBlock> visitor_base_type;
   };
   
+  /// Specify the if-then-else statement interface.
    class IfElse {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
@@ -240,6 +240,7 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
+  /// Specify the while statement interface.
    class While {
    private:
       typedef boost::mpl::vector<Conditional, Iterative> sequence;
@@ -263,6 +264,7 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
+  /// Specify the do-while statement interface.
    class DoWhile {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
@@ -286,6 +288,7 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
+  /// Specify the case statement interface.
    class Case {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -309,7 +312,8 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
    
-   // A list of case statements
+  /// This is a list of case statements.  It is the statement type
+  /// that appears under a switch statement.
    class CaseBlock {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -336,6 +340,7 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
+  /// Specify the switch statement interface.
    class Switch {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
@@ -359,7 +364,7 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
-   // A statement with a single label
+  /// This is a statement with a single label
    class SingleLabel {
    private:
       typedef boost::mpl::vector<> sequence;
@@ -398,7 +403,11 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, interface>::type base_type;
    };
 
-   class Before {
+  /// A before statement specifies a block statement with an entry
+  /// label.  A goto-dest statement may transfer control to this
+  /// label.  This provides a structured way to return to the top of a
+  /// deeply nested set of loops.
+  class Before {
    private:
       typedef boost::mpl::vector<Iterative> sequence;  // Of a sort
 
@@ -422,6 +431,10 @@ namespace mirv {
    };
 
 
+  /// An after statement specifies a block with a label at the end.  A
+  /// goto-dest statement may transfer control to this label.  This
+  /// provides a structured way to implement break- and continue-type
+  /// statements.
    class After {
    private:
       typedef boost::mpl::vector<Conditional> sequence;  // Of a sort
@@ -445,6 +458,10 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
+  /// This is an arbitrary goto statement.  It should not appear in
+  /// normalized IR but is necessary to handle translation from
+  /// hitgher level languages.  A filter will eliminate gotos and
+  /// restructure the IR to be fully structured.
    class Goto {
    private:
       typedef boost::mpl::vector<Conditional> sequence;
@@ -468,7 +485,9 @@ namespace mirv {
       typedef StatementBaseGenerator<sequence, root>::type base_type;
    };
 
-   /// Does not return an expression, use explicit assignment
+   /// A return does not return an expression.  Instead, assignment to
+   /// a special location determines the return value.  This separates
+   /// changes in data state from changes in control state.
    class Return {
    private:
       typedef boost::mpl::vector<> sequence;
