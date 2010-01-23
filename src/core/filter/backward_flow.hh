@@ -49,12 +49,12 @@ namespace mirv {
                 send = stmt->rend();
              s != send;
              ;) {
-            before_statement(stmt, *s);
+            beforeStatement(stmt, *s);
             (*s)->accept(*this);
-            after_statement(stmt, **s);
+            afterStatement(stmt, **s);
             Statement<Block>::iterator prev = s;
             if (++s != send) {
-               between_statement(stmt, **prev, **s);
+               betweenStatement(stmt, **prev, **s);
             }
          }
          leave(stmt);
@@ -67,15 +67,15 @@ namespace mirv {
 
          Dataflow denter(dataflow());
 
-         before_statement(stmt, *stmt->child());
+         beforeStatement(stmt, *stmt->child());
          stmt->child()->accept(*this);
-         after_statement(stmt, *stmt->child());
+         afterStatement(stmt, *stmt->child());
 
          confluence(dataflow(), dataflow(), denter);
 
-         before_expression(stmt, *stmt->expression());
+         beforeExpression(stmt, *stmt->expression());
          stmt->expression()->accept(expression());
-         after_expression(stmt, *stmt->expression());
+         afterExpression(stmt, *stmt->expression());
 
          leave(stmt);
       }
@@ -89,27 +89,27 @@ namespace mirv {
 
          Statement<IfElse>::iterator s = stmt->begin();
 
-         before_statement(stmt, **s);
+         beforeStatement(stmt, **s);
          (*s)->accept(*this);
-         after_statement(stmt, **s);
+         afterStatement(stmt, **s);
 
          Dataflow then(dataflow());
 
          Statement<IfElse>::iterator prev = s++;
 
-         between_statement(stmt, **prev, **s);
+         betweenStatement(stmt, **prev, **s);
 
          dataflow() = denter;
 
-         before_statement(stmt, **s);
+         beforeStatement(stmt, **s);
          (*s)->accept(*this);
-         after_statement(stmt, **s);
+         afterStatement(stmt, **s);
 
          confluence(dataflow(), dataflow(), then);
 
-         before_expression(stmt, *stmt->expression());
+         beforeExpression(stmt, *stmt->expression());
          stmt->expression()->accept(expression());
-         after_expression(stmt, *stmt->expression());
+         afterExpression(stmt, *stmt->expression());
 
          leave(stmt);
       }
@@ -119,27 +119,27 @@ namespace mirv {
       void visit(ptr<Statement<While> >::type stmt) {
          enter(stmt);
 
-         before_expression(stmt, *stmt->expression());
+         beforeExpression(stmt, *stmt->expression());
          stmt->expression()->accept(expression());
-         after_expression(stmt, *stmt->expression());
+         afterExpression(stmt, *stmt->expression());
 
-         Dataflow first_expr(dataflow());
+         Dataflow firstExpr(dataflow());
 
          do {
-            before_statement(stmt, *stmt->child());
+            beforeStatement(stmt, *stmt->child());
             stmt->child()->accept(*this);
-            after_statement(stmt, *stmt->child());
+            afterStatement(stmt, *stmt->child());
 
             // Is denter right?
             confluence(dataflow(), dataflow(), denter);
 
-            before_expression(stmt, *stmt->expression());
+            beforeExpression(stmt, *stmt->expression());
             stmt->expression()->accept(expression());
-            after_expression(stmt, *stmt->expression());
+            afterExpression(stmt, *stmt->expression());
          } while (dataflow().change());
 
          // Iterating vs-> never enter
-         confluence(dataflow(), dataflow(), first_expr);
+         confluence(dataflow(), dataflow(), firstExpr);
 
          leave(stmt);
       }
@@ -152,13 +152,13 @@ namespace mirv {
          Dataflow denter(dataflow());
 
          do {
-            before_statement(stmt, *stmt->child());
+            beforeStatement(stmt, *stmt->child());
             stmt->child()->accept(*this);
-            after_statement(stmt, *stmt->child());
+            afterStatement(stmt, *stmt->child());
 
-            before_expression(stmt, *stmt->expression());
+            beforeExpression(stmt, *stmt->expression());
             stmt->expression()->accept(expression());
-            after_expression(stmt, *stmt->expression());
+            afterExpression(stmt, *stmt->expression());
 
             confluence(dataflow(), dataflow(), denter);
          } while (dataflow()->change());
@@ -174,30 +174,30 @@ namespace mirv {
       void visit(ptr<Statement<Switch> >::type stmt) {
          enter(stmt);
 
-         Dataflow into_expr;
+         Dataflow intoExpr;
 
          for(Statement<Switch>::reverse_iterator s = stmt->rbegin(),
                 send = stmt->rend();
              s != send;
              ;) {
-            before_statement(stmt, *s);
+            beforeStatement(stmt, *s);
             (*s)->accept(*this);
-            after_statement(stmt, **s);
+            afterStatement(stmt, **s);
             Statement<Block>::iterator prev = s;
 
             // Fall-through vs. direct jump
-            confluence(into_expr, into_expr, dataflow());
+            confluence(intoExpr, intoExpr, dataflow());
 
             if (++s != send) {
-               between_statement(stmt, **prev, **s);
+               betweenStatement(stmt, **prev, **s);
             }
          }
 
-         dataflow() = into_expr;
+         dataflow() = intoExpr;
 
-         before_expression(stmt, *stmt->expression());
+         beforeExpression(stmt, *stmt->expression());
          stmt->expression()->accept(expression());
-         after_expression(stmt, *stmt->expression());
+         afterExpression(stmt, *stmt->expression());
 
          leave(stmt);
       }
@@ -207,14 +207,14 @@ namespace mirv {
       void visit(ptr<Statement<Case> >::type stmt) {
          enter(stmt);
 
-         before_statement(stmt, *stmt->child());
+         beforeStatement(stmt, *stmt->child());
          stmt->child()->accept(*this);
-         after_statement(stmt, *stmt->child());
+         afterStatement(stmt, *stmt->child());
 
-         before_expression(stmt, *stmt->expression());
+         beforeExpression(stmt, *stmt->expression());
          stmt->expression()->accept(expression());
 
-         after_expression(stmt, *stmt->expression());
+         afterExpression(stmt, *stmt->expression());
 
          leave(stmt);
       }
@@ -226,9 +226,9 @@ namespace mirv {
          enter(stmt);
 
          do {
-            before_statement(stmt, *stmt->child());
+            beforeStatement(stmt, *stmt->child());
             stmt->child()->accept(*this);
-            after_statement(stmt, *stmt->child());
+            afterStatement(stmt, *stmt->child());
 
             Dataflow &label = get_attribute<Dataflow>(stmt);
 
@@ -246,9 +246,9 @@ namespace mirv {
 
          confluence(dataflow(), dataflow(), label);
 
-         before_statement(stmt, *stmt->child());
+         beforeStatement(stmt, *stmt->child());
          stmt->child()->accept(*this);
-         after_statement(stmt, *stmt->child());
+         afterStatement(stmt, *stmt->child());
 
          leave(stmt);
       }
@@ -274,13 +274,13 @@ namespace mirv {
       void visit(ptr<Statement<Assignment> >::type stmt) {
          this->enter(stmt);
 
-         this->before_expression(stmt, stmt->get_left_expression());
-         stmt->get_left_expression()->accept(this->expression_flow());
-         this->after_expression(stmt, stmt->get_left_expression());
+         this->beforeExpression(stmt, stmt->getLeftExpression());
+         stmt->getLeftExpression()->accept(this->expressionFlow());
+         this->afterExpression(stmt, stmt->getLeftExpression());
 
-         this->before_expression(stmt, stmt->get_right_expression());
-         stmt->get_right_expression()->accept(this->expression_flow());
-         this->after_expression(stmt, stmt->get_right_expression());
+         this->beforeExpression(stmt, stmt->getRightExpression());
+         stmt->getRightExpression()->accept(this->expressionFlow());
+         this->afterExpression(stmt, stmt->getRightExpression());
 
          this->leave(stmt);
       }

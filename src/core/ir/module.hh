@@ -14,91 +14,91 @@ namespace mirv {
      typedef InnerImpl<Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> TypeBaseType;
      typedef InnerImpl<Symbol<Variable>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> VariableBaseType;
 
-     class interface : public Symbol<Named>,
+     class Interface : public Symbol<Named>,
                        public FunctionBaseType,
 		       public TypeBaseType,
 		       public VariableBaseType {
      public:
-       interface(const std::string &n) : Symbol<Named>(n) {}
+       Interface(const std::string &n) : Symbol<Named>(n) {}
 
        // Access function information
-       typedef FunctionBaseType::child_ptr FunctionPointer;
+       typedef FunctionBaseType::ChildPtr FunctionPointer;
 
        /// Add a function.
-       void functionsPushBack(FunctionPointer f) {
+       void functionPushBack(FunctionPointer f) {
 	 FunctionBaseType::push_back(f);
        }
  
-       typedef FunctionBaseType::iterator function_iterator;
-       typedef FunctionBaseType::const_iterator const_function_iterator;
+       typedef FunctionBaseType::iterator FunctionIterator;
+       typedef FunctionBaseType::const_iterator ConstFunctionIterator;
        /// Return the start of the function sequence.
-       function_iterator function_begin(void) {
+       FunctionIterator functionBegin(void) {
 	 return FunctionBaseType::begin();
        }
        /// Return the end of the function sequence.
-       function_iterator function_end(void) {
+       FunctionIterator functionEnd(void) {
 	 return FunctionBaseType::end();
        }
        /// Return the start of the function sequence.
-       const_function_iterator function_begin(void) const {
+       ConstFunctionIterator functionBegin(void) const {
 	 return FunctionBaseType::begin();
        }
        /// Return the end of the function sequence.
-       const_function_iterator function_end(void) const {
+       ConstFunctionIterator functionEnd(void) const {
 	 return FunctionBaseType::end();
        }
 
        // Access variable information
-       typedef VariableBaseType::child_ptr VariablePointer;
+       typedef VariableBaseType::ChildPtr VariablePointer;
 
        /// Add a global variable.
-       void variablesPushBack(VariablePointer v) {
+       void variablePushBack(VariablePointer v) {
 	 VariableBaseType::push_back(v);
        }
 
-       typedef VariableBaseType::iterator variable_iterator;
-       typedef VariableBaseType::const_iterator const_variable_iterator;
+       typedef VariableBaseType::iterator VariableIterator;
+       typedef VariableBaseType::const_iterator ConstVariableIterator;
        /// Return the start of the variable sequence.
-       variable_iterator variable_begin(void) {
+       VariableIterator variableBegin(void) {
 	 return VariableBaseType::begin();
        }
        /// Return the end of the variable sequence.
-       variable_iterator variable_end(void) {
+       VariableIterator variableEnd(void) {
 	 return VariableBaseType::end();
        }
        /// Return the start of the variable sequence.
-       const_variable_iterator variable_begin(void) const {
+       ConstVariableIterator variableBegin(void) const {
 	 return VariableBaseType::begin();
        }
        /// Return the end of the variable sequence.
-       const_variable_iterator variable_end(void) const {
+       ConstVariableIterator variableEnd(void) const {
 	 return VariableBaseType::end();
        }
 
        // Access type information
-       typedef TypeBaseType::child_ptr TypePointer;
+       typedef TypeBaseType::ChildPtr TypePointer;
 
        /// Add a type.
-       void typesPushBack(TypePointer t) {
+       void typePushBack(TypePointer t) {
 	 TypeBaseType::push_back(t);
        }
 
-       typedef TypeBaseType::iterator type_iterator;
-       typedef TypeBaseType::const_iterator const_type_iterator;
+       typedef TypeBaseType::iterator TypeIterator;
+       typedef TypeBaseType::const_iterator ConstTypeIterator;
        /// Return the start of the type sequence.
-       type_iterator type_begin(void) {
+       TypeIterator typeBegin(void) {
 	 return TypeBaseType::begin();
        }
        /// Return the end of the type sequence.
-       type_iterator type_end(void) {
+       TypeIterator typeEnd(void) {
 	 return TypeBaseType::end();
        }
        /// Return the start of the type sequence.
-       const_type_iterator type_begin(void) const {
+       ConstTypeIterator typeBegin(void) const {
 	 return TypeBaseType::begin();
        }
        /// Return the end of the type sequence.
-       const_type_iterator type_end(void) const {
+       ConstTypeIterator typeEnd(void) const {
 	 return TypeBaseType::end();
        }
 
@@ -107,8 +107,8 @@ namespace mirv {
        }
      };
    public:
-     typedef interface base_type;
-     typedef FunctionBaseType visitor_base_type;
+     typedef Interface BaseType;
+     typedef FunctionBaseType VisitorBaseType;
    };
 }
 

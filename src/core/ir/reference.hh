@@ -6,88 +6,74 @@
 namespace mirv {
   /// Specify the interface for nodes that reference symbols.
    template<typename SymbolType>
-   class Reference {
+   class Reference { 
    private:
-     typedef boost::mpl::vector<> sequence;
-     typedef InnerImpl<Symbol<SymbolType>, LeafExpression> interface_base_type;
+     typedef InnerImpl<Symbol<SymbolType>, LeafExpression> InterfaceBaseType;
+     class Interface : public InterfaceBaseType {
+      public:
+       typedef Symbol<SymbolType> ChildType;
+       typedef typename ptr<ChildType>::type ChildPtr;
+       typedef typename ptr<ChildType>::const_type ConstChildPtr;
+
+       Interface(ChildPtr Var) : InterfaceBaseType(Var) {}
+
+       void setSymbol(ChildPtr c) {
+	 if (this->empty()) {
+	   push_back(c);
+	 }
+	 else {
+	   *this->begin() = c;
+	 }
+       }
+        
+       ChildPtr getSymbol(void) {
+	 return this->front();
+       }
+        
+       ConstChildPtr getSymbol(void) const {
+	 return this->front();
+       }
+     };
 
    public:
-     typedef sequence properties;
-     typedef LeafExpression visitor_base_type;
-
-     class interface : public interface_base_type {
-      public:
-       typedef Symbol<SymbolType> child_type;
-       typedef typename ptr<child_type>::type child_ptr;
-       typedef typename ptr<child_type>::const_type const_child_ptr;
-
-       interface(child_ptr Var) : interface_base_type(Var) {}
-
-         void set_symbol(child_ptr c) {
-            if (this->empty()) {
-               push_back(c);
-            }
-            else {
-               *this->begin() = c;
-            }
-         };
-        
-         child_ptr get_symbol(void) {
-            return this->front();
-         };
-        
-         const_child_ptr get_symbol(void) const {
-            return this->front();
-         };
-      };
-
-     typedef typename ExpressionBaseGenerator<sequence, interface>::type base_type;
+     typedef boost::mpl::vector<> Properties;
+     typedef LeafExpression VisitorBaseType;
+     typedef typename ExpressionBaseGenerator<Properties, Interface>::type BaseType;
    };
 
   /// Take the address of an lvalue expression.
-   class AddressOf {
-   private:
-      typedef boost::mpl::vector<> sequence;
+  class AddressOf { 
+  public:
+    typedef boost::mpl::vector<> Properties;
 
-     // TODO: Interface that checks for lvalues.
-   public:
-     typedef sequence properties;
-     typedef Expression<Unary> visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
-   };
+    // TODO: Interface that checks for lvalues.
+    typedef Expression<Unary> VisitorBaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
+  };
 
   /// Dereference the address provided by some expression.
-  class Dereference {
-   private:
-      typedef boost::mpl::vector<> sequence;
-
-   public:
-     typedef sequence properties;
-     typedef Expression<Unary> visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
-   };
+  class Dereference { 
+  public:
+    typedef boost::mpl::vector<> Properties;
+    typedef Expression<Unary> VisitorBaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
+  };
 
   /// Specify the interface for array index expressions.
-   class ArrayRef {
-   private:
-      typedef boost::mpl::vector<> sequence;
-
-     // TODO: Support multi-dimension arrays natively?
-   public:
-     typedef sequence properties;
-     typedef Expression<Binary> visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
-   };
+  class ArrayRef { 
+  public:
+    typedef boost::mpl::vector<> Properties;
+    // TODO: Support multi-dimension arrays natively?
+    typedef Expression<Binary> VisitorBaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+  };
 
   /// Specify the interface for function call expressions.
-   class Call {
-   private:
-      typedef boost::mpl::vector<> sequence;
-
-   public:
-     typedef sequence properties;
-     typedef InnerExpression visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, InnerExpression>::type base_type;
+  class Call {
+  public:
+    typedef boost::mpl::vector<> Properties;
+    typedef InnerExpression VisitorBaseType;
+    typedef ExpressionBaseGenerator<Properties, InnerExpression>::type BaseType;
    };
 }
 

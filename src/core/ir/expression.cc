@@ -36,14 +36,14 @@ namespace mirv {
     V.visit(p);
   }
 
-  void Unary::interface::accept(ExpressionVisitor &V)
+  void Unary::Interface::accept(ExpressionVisitor &V)
   {
     ptr<Node<Base> >::type pn = shared_from_this();
     ptr<Expression<Unary> >::type p = safe_cast<Expression<Unary> >(pn);
     V.visit(p);
   }
 
-  void Binary::interface::accept(ExpressionVisitor &V)
+  void Binary::Interface::accept(ExpressionVisitor &V)
   {
     ptr<Node<Base> >::type pn = shared_from_this();
     ptr<Expression<Binary> >::type p = safe_cast<Expression<Binary> >(pn);

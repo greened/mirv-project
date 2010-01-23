@@ -43,7 +43,7 @@ namespace mirv {
      /// The dataflow confluence operation.
      Confluence conf;
 
-     bool hit_break;  /// Have we seen a break statement?
+     bool hitBreak;  /// Have we seen a break statement?
 
    protected:
      /// Apply the enter action.
@@ -60,42 +60,42 @@ namespace mirv {
 
      /// Apply the before action.
      template<typename Stmt, typename Child>
-     typename BeforeStmtAction::result_type before_statement(boost::shared_ptr<Stmt> stmt,
+     typename BeforeStmtAction::result_type beforeStatement(boost::shared_ptr<Stmt> stmt,
 							     boost::shared_ptr<Child> child) {
        return(bfrstmt(stmt, child));
       }
 
      /// Apply the after action.
      template<typename Stmt, typename Child>
-     typename AfterStmtAction::result_type after_statement(boost::shared_ptr<Stmt> stmt,
+     typename AfterStmtAction::result_type afterStatement(boost::shared_ptr<Stmt> stmt,
 							   boost::shared_ptr<Child> child) {
        return(aftstmt(stmt, child));
       }
 
      /// Apply the between action.
      template<typename Stmt, typename Child>
-     typename BetweenStmtAction::result_type between_statement(boost::shared_ptr<Stmt> stmt,
-							       boost::shared_ptr<Child> child1,
-							       boost::shared_ptr<Child> child2) {
+     typename BetweenStmtAction::result_type betweenStatement(boost::shared_ptr<Stmt> stmt,
+							      boost::shared_ptr<Child> child1,
+							      boost::shared_ptr<Child> child2) {
        return(betstmt(stmt, child1, child2));
       }
 
      /// Apply the before expression action.
      template<typename Stmt, typename Expr>
-     typename BeforeExprAction::result_type before_expression(boost::shared_ptr<Stmt> stmt,
+     typename BeforeExprAction::result_type beforeExpression(boost::shared_ptr<Stmt> stmt,
 							      boost::shared_ptr<Expr> expr) {
        return(bfrexpr(stmt, expr));
       }
 
      /// Apply the after expression action.
      template<typename Stmt, typename Expr>
-     typename AfterExprAction::result_type after_expression(boost::shared_ptr<Stmt> stmt,
+     typename AfterExprAction::result_type afterExpression(boost::shared_ptr<Stmt> stmt,
 							    boost::shared_ptr<Expr> expr) {
        return(aftexpr(stmt, expr));
       }
 
      /// Get the expression flow.
-     ExprFlow &expression_flow(void) {
+     ExprFlow &expressionFlow(void) {
        return exp;
       }
 
@@ -111,21 +111,21 @@ namespace mirv {
      }
 
      /// Return whether we saw a break in a child tree.
-     bool has_break(void) const {
-       return hit_break;
+     bool hasBreak(void) const {
+       return hitBreak;
      }
 
-     /// Clear the hit_break flag.
-     void set_no_break(void) {
-       hit_break = false;
+     /// Clear the hitBreak flag.
+     void setNoBreak(void) {
+       hitBreak = false;
      }
-     /// Set the hit_break flag.
-     void set_has_break(void) {
-       hit_break = true;
+     /// Set the hitBreak flag.
+     void setHasBreak(void) {
+       hitBreak = true;
      }
-     /// Set the hit_break flag to a given value.
-     void set_break(bool v) {
-       hit_break = v;
+     /// Set the hitBreak flag to a given value.
+     void setBreak(bool v) {
+       hitBreak = v;
      }
 
    public:

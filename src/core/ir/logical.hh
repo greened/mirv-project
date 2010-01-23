@@ -6,42 +6,33 @@
 
 namespace mirv {
   /// Specify the interface for the logical and expression.
-  class LogicalAnd {
-  private:
+  class LogicalAnd { 
+  public:
     typedef boost::mpl::vector<Logical, Commutative,
 			       Associative, Transitive,
-			       Reflexive> sequence;
-
-  public:
-    typedef sequence properties;
-    typedef Expression<Binary> visitor_base_type;
-    typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+			       Reflexive> Properties;
+    typedef Expression<Binary> VisitorBaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
   };
 
   /// Specify the interface for the logical or expression.
   class LogicalOr {
-  private:
+  public:
     typedef boost::mpl::vector<Logical, Commutative,
 			       Associative, Transitive,
-			       Reflexive> sequence;
-
-  public:
-    typedef sequence properties;
-    typedef Expression<Binary> visitor_base_type;
-    typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+			       Reflexive> Properties;
+    typedef Expression<Binary> VisitorBaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
   };
 
   /// Specify the interface for the logical not expression.
   class LogicalNot {
-  private:
+  public:
     typedef boost::mpl::vector<Logical, Commutative,
 			       Associative, Transitive,
-			       Reflexive> sequence;
-
-  public:
-    typedef sequence properties;
-    typedef Expression<Unary> visitor_base_type;
-    typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
+			       Reflexive> Properties;
+    typedef Expression<Unary> VisitorBaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
   };
 
 };

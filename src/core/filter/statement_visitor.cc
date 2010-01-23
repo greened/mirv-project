@@ -47,63 +47,63 @@ namespace mirv {
     }
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Block> >::type s) {
-    ptr<Statement<Block>::visitor_base_type>::type p = fast_cast<Statement<Block>::visitor_base_type>(s);
+    ptr<Statement<Block>::VisitorBaseType>::type p = fast_cast<Statement<Block>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<SingleBlock> >::type s) {
-    ptr<Statement<SingleBlock>::visitor_base_type>::type p = fast_cast<Statement<SingleBlock>::visitor_base_type>(s);
+    ptr<Statement<SingleBlock>::VisitorBaseType>::type p = fast_cast<Statement<SingleBlock>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<DualBlock> >::type s) {
-    ptr<Statement<DualBlock>::visitor_base_type>::type p = fast_cast<Statement<DualBlock>::visitor_base_type>(s);
+    ptr<Statement<DualBlock>::VisitorBaseType>::type p = fast_cast<Statement<DualBlock>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<IfThen> >::type s) {
-    ptr<Statement<IfThen>::visitor_base_type>::type p = fast_cast<Statement<IfThen>::visitor_base_type>(s);
+    ptr<Statement<IfThen>::VisitorBaseType>::type p = fast_cast<Statement<IfThen>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<IfElse> >::type s) {
-    ptr<Statement<IfElse>::visitor_base_type>::type p = fast_cast<Statement<IfElse>::visitor_base_type>(s);
+    ptr<Statement<IfElse>::VisitorBaseType>::type p = fast_cast<Statement<IfElse>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<While> >::type s) {
-    ptr<Statement<While>::visitor_base_type>::type p = fast_cast<Statement<While>::visitor_base_type>(s);
+    ptr<Statement<While>::VisitorBaseType>::type p = fast_cast<Statement<While>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<DoWhile> >::type s) {
-    ptr<Statement<DoWhile>::visitor_base_type>::type p = fast_cast<Statement<DoWhile>::visitor_base_type>(s);
+    ptr<Statement<DoWhile>::VisitorBaseType>::type p = fast_cast<Statement<DoWhile>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Switch> >::type s) {
-    ptr<Statement<Switch>::visitor_base_type>::type p = fast_cast<Statement<Switch>::visitor_base_type>(s);
+    ptr<Statement<Switch>::VisitorBaseType>::type p = fast_cast<Statement<Switch>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Case> >::type s) {
-    ptr<Statement<Case>::visitor_base_type>::type p = fast_cast<Statement<Case>::visitor_base_type>(s);
+    ptr<Statement<Case>::VisitorBaseType>::type p = fast_cast<Statement<Case>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<CaseBlock> >::type s) {
-    ptr<Statement<CaseBlock>::visitor_base_type>::type p = fast_cast<Statement<CaseBlock>::visitor_base_type>(s);
+    ptr<Statement<CaseBlock>::VisitorBaseType>::type p = fast_cast<Statement<CaseBlock>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Before> >::type s) {
-    ptr<Statement<Before>::visitor_base_type>::type p = fast_cast<Statement<Before>::visitor_base_type>(s);
+    ptr<Statement<Before>::VisitorBaseType>::type p = fast_cast<Statement<Before>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<After> >::type s) {
-    ptr<Statement<After>::visitor_base_type>::type p = fast_cast<Statement<After>::visitor_base_type>(s);
+    ptr<Statement<After>::VisitorBaseType>::type p = fast_cast<Statement<After>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Goto> >::type s) {
-    ptr<Statement<Goto>::visitor_base_type>::type p = fast_cast<Statement<Goto>::visitor_base_type>(s);
+    ptr<Statement<Goto>::VisitorBaseType>::type p = fast_cast<Statement<Goto>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Return> >::type s) {
-    ptr<Statement<Return>::visitor_base_type>::type p = fast_cast<Statement<Return>::visitor_base_type>(s);
+    ptr<Statement<Return>::VisitorBaseType>::type p = fast_cast<Statement<Return>::VisitorBaseType>(s);
     visit(p);
   }
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Assignment> >::type s) {
-    ptr<Statement<Assignment>::visitor_base_type>::type p = fast_cast<Statement<Assignment>::visitor_base_type>(s);
+    ptr<Statement<Assignment>::VisitorBaseType>::type p = fast_cast<Statement<Assignment>::VisitorBaseType>(s);
     visit(p);
   }
 }

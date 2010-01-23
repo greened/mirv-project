@@ -7,86 +7,65 @@
 namespace mirv {
   /// Specify the bitwise and interface.
    class BitwiseAnd {
-   private:
+   public:
       typedef boost::mpl::vector<Bitwise, Commutative,
          Associative, Transitive,
-         Reflexive> sequence;
-      
-   public:
-    typedef sequence properties;
-     typedef Expression<Binary> visitor_base_type;
-     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+         Reflexive> Properties;
+     typedef Expression<Binary> VisitorBaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
    };
    
   /// Specify the bitwise or interface.
    class BitwiseOr {
-   private:
+   public:
       typedef boost::mpl::vector<Bitwise, Commutative,
          Associative, Transitive,
-         Reflexive> sequence;
-      
-   public:
-    typedef sequence properties;
-     typedef Expression<Binary> visitor_base_type;
-     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+         Reflexive> Properties;
+     typedef Expression<Binary> VisitorBaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
    };
 
   /// Specify the bitwise xor interface.
    class BitwiseXor {
-   private:
+   public:
       typedef boost::mpl::vector<Bitwise, Commutative,
          Associative, Transitive,
-         Reflexive> sequence;
-      
-   public:
-    typedef sequence properties;
-     typedef Expression<Binary> visitor_base_type;
-     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+         Reflexive> Properties;
+     typedef Expression<Binary> VisitorBaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
    };
    
   /// Specify the bitwise complement interface.
    class BitwiseComplement {
-   private:
-      typedef boost::mpl::vector<Bitwise> sequence;
-      
    public:
-    typedef sequence properties;
-     typedef Expression<Unary> visitor_base_type;
-     typedef ExpressionBaseGenerator<sequence, Expression<Unary> >::type base_type;
+      typedef boost::mpl::vector<Bitwise> Properties;
+     typedef Expression<Unary> VisitorBaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
    };
    
 
   /// Specify the bitwise left shift interface.
    class ShiftLeft {
-   private:
-      typedef boost::mpl::vector<Bitwise> sequence;
-      
    public:
-     typedef sequence properties;
-    typedef Expression<Binary> visitor_base_type;
-     typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+      typedef boost::mpl::vector<Bitwise> Properties;
+    typedef Expression<Binary> VisitorBaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
    };
 
   /// Specify the bitwise arithmetic right shift interface.
    class ArithmeticShiftRight {
-   private:
-      typedef boost::mpl::vector<Bitwise> sequence;
-      
    public:
-    typedef sequence properties;
-    typedef Expression<Binary> visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+      typedef boost::mpl::vector<Bitwise> Properties;
+    typedef Expression<Binary> VisitorBaseType;
+      typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
    };
 
   /// Specify the bitwise logical right shift interface.
    class LogicalShiftRight {
-   private:
-      typedef boost::mpl::vector<Bitwise> sequence;
-      
    public:
-    typedef sequence properties;
-    typedef Expression<Binary> visitor_base_type;
-      typedef ExpressionBaseGenerator<sequence, Expression<Binary> >::type base_type;
+      typedef boost::mpl::vector<Bitwise> Properties;
+    typedef Expression<Binary> VisitorBaseType;
+      typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
    };
 };
 

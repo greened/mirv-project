@@ -14,19 +14,19 @@ namespace mirv {
   /// visitor logic in one place, hiding the gory details from the
   /// symbol type tags and specific symbol type interfaces.
    template<typename Tag>
-   class Symbol : public Tag::base_type {
+   class Symbol : public Tag::BaseType {
    public:
-     typedef typename Tag::base_type base_type;
-     typedef typename Tag::visitor_base_type visitor_base_type;
+     typedef typename Tag::BaseType BaseType;
+     typedef typename Tag::VisitorBaseType VisitorBaseType;
 
    protected:
      Symbol(void) {}
      template<typename A1>
-     Symbol(A1 a1) : base_type(a1) {}
+     Symbol(A1 a1) : BaseType(a1) {}
      template<typename A1, typename A2>
-     Symbol(A1 a1, A2 a2) : base_type(a1, a2) {}
+     Symbol(A1 a1, A2 a2) : BaseType(a1, a2) {}
      template<typename A1, typename A2, typename A3>
-     Symbol(A1 a1, A2 a2, A3 a3) : base_type(a1, a2, a3) {}
+     Symbol(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
 
    public:
      static typename ptr<Symbol<Tag> >::type
@@ -68,57 +68,57 @@ namespace mirv {
   /// symbols.
   class InnerSymbol : public InnerImpl<Symbol<Base>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
   public:
-    typedef Symbol<Base> visitor_base_type;
+    typedef Symbol<Base> VisitorBaseType;
     virtual void accept(SymbolVisitor &V);
   };
 
   /// This is a symbol with no children.
   class LeafSymbol : public LeafImpl<VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
   public:
-    typedef Symbol<Base> visitor_base_type;
+    typedef Symbol<Base> VisitorBaseType;
     virtual void accept(SymbolVisitor &V);
   };
 
   /// A symbol that has a type associated with it.
   class Typed {
   private:
-    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type interface_base_type;
+    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type InterfaceBaseType;
 
-  public:
-    class interface : public interface_base_type { 
+    class Interface : public InterfaceBaseType { 
     public:
-      typedef ptr<Symbol<Type<TypeBase> > >::const_type const_type_ptr;
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type ConstTypePtr;
 
    private:
-      const_type_ptr the_type;
+      ConstTypePtr theType;
 
     public:
-      interface(const_type_ptr t)
-	: the_type(t) {};
+      Interface(ConstTypePtr t)
+	: theType(t) {};
 
-      const_type_ptr type(void) const {
-	return(the_type);
+      ConstTypePtr type(void) const {
+	return(theType);
       }
       virtual void accept(mirv::SymbolVisitor &) {
 	error("Typed::accept called");
       }
     };
-    typedef interface base_type;
-    typedef Symbol<Base> visitor_base_type;
+
+  public:
+    typedef Interface BaseType;
+    typedef Symbol<Base> VisitorBaseType;
   };
 
   /// A symbol that has a name associated with it.
   class Named {
   private:
-    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type interface_base_type;
+    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type InterfaceBaseType;
 
-  public:
-    class interface : public interface_base_type { 
+    class Interface : public InterfaceBaseType { 
     private:
       std::string the_name;
 
     public:
-      interface(const std::string &n)
+      Interface(const std::string &n)
 	: the_name(n) {};
 
       const std::string &name(void) const {
@@ -128,8 +128,10 @@ namespace mirv {
 	error("Named::accept called");
       }
     };
-    typedef interface base_type;
-    typedef Symbol<Base> visitor_base_type;
+
+  public:
+    typedef Interface BaseType;
+    typedef Symbol<Base> VisitorBaseType;
   };
 }
 

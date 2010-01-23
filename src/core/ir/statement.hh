@@ -44,24 +44,24 @@ namespace mirv {
   /// (Statement<IfThen>, Statement<DoWhile>, etc.).  It keeps all of
   /// the property and visitor logic in one place, hiding the gory
   /// details from the statement type tags and specific statement type
-  /// interfaces.
+  /// Interfaces.
    template<typename Tag>
-   class Statement: public Tag::base_type {
+   class Statement: public Tag::BaseType {
    public:
-      /// The immediate base type of this statement, distinct from
-      /// the base type that will be visited by a StatementVisitor.
-     typedef typename Tag::base_type BaseType;
+     /// The immediate base type of this statement, distinct from
+     /// the base type that will be visited by a StatementVisitor.
+     typedef typename Tag::BaseType BaseType;
 
       /// A list of sorted property tags.
      typedef typename boost::mpl::sort<
-       typename Tag::properties,
+       typename Tag::Properties,
        detail::StatementPropertyLess<boost::mpl::_1, boost::mpl::_2>
-       >::type properties;
+       >::type Properties;
    private:
       /// A list of property statements generated from the list of
       /// property tags.  This defines the visitation order for
       /// property statements.
-      typedef typename boost::mpl::transform<properties, PropertyStatementGenerator>::type property_statements;
+      typedef typename boost::mpl::transform<Properties, PropertyStatementGenerator>::type PropertyStatements;
 
    public:
       // If there are properties, visit those first, otherwise visit
@@ -74,10 +74,10 @@ namespace mirv {
       /// generators, etc.) used to implement the statement class
       /// hierarchy.
       typedef typename boost::mpl::eval_if<
-	boost::mpl::empty<properties>,
-	boost::mpl::identity<typename Tag::visitor_base_type>,
-	boost::mpl::deref<typename boost::mpl::begin<property_statements>::type>
-	>::type visitor_base_type;
+	boost::mpl::empty<Properties>,
+	boost::mpl::identity<typename Tag::VisitorBaseType>,
+	boost::mpl::deref<typename boost::mpl::begin<PropertyStatements>::type>
+	>::type VisitorBaseType;
 
    protected:
      Statement(void) {}
@@ -129,31 +129,31 @@ namespace mirv {
     public:
       typedef Statement<Base> Child;
 
-      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
+      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type BaseType;
 
     private:
-      typedef ptr<Child>::type child_ptr;
-      typedef std::list<child_ptr> child_list;
+      typedef ptr<Child>::type ChildPtr;
+      typedef std::list<ChildPtr> ChildList;
 
     public:
       /// Make this compatible with certain standard algorithms.
-      typedef const child_ptr & const_reference;
+      typedef const ChildPtr & const_reference;
 
-      typedef child_list::iterator iterator;
-      typedef child_list::reverse_iterator reverse_iterator;
-      typedef child_list::const_iterator const_iterator;
-      typedef child_list::const_reverse_iterator const_reverse_iterator;
+      typedef ChildList::iterator iterator;
+      typedef ChildList::reverse_iterator reverse_iterator;
+      typedef ChildList::const_iterator const_iterator;
+      typedef ChildList::const_reverse_iterator const_reverse_iterator;
 
-      typedef child_list::size_type size_type;
+      typedef ChildList::size_type size_type;
     };
   }
 
-  /// This is an inner statement abstract interface.  It exists
+  /// This is an inner statement abstract Interface.  It exists
   /// because we need to be able to inherit virtually from inner
   /// statements (to allow property statement visitors to manipulate
   /// operands) but we do not want to force subclasses to explicitly
   /// initialize the inner statement object.  Separating the
-  /// interface from the implementation solves that problem.
+  /// Interface from the implementation solves that problem.
   class InnerStatementBase : public Statement<Inner<detail::InnerStatementTraits> > {};
 
   /// This is the implementation of inner statements.  It is
@@ -167,9 +167,9 @@ namespace mirv {
 	Virtual<InnerStatementBase>
       >::type> BaseType;
    public:
-    InnerStatement(child_ptr Child) : BaseType(Child) {}
-    InnerStatement(child_ptr Child1,
-		   child_ptr Child2) : BaseType(Child1, Child2) {}
+    InnerStatement(ChildPtr Child) : BaseType(Child) {}
+    InnerStatement(ChildPtr Child1,
+		   ChildPtr Child2) : BaseType(Child1, Child2) {}
      virtual void accept(StatementVisitor &V);
    };
  
@@ -186,27 +186,27 @@ namespace mirv {
    class Conditional {
     public:
      typedef boost::mpl::int_<0> order;
-     typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
-     typedef Statement<Base> visitor_base_type;
-     typedef boost::mpl::vector<> properties;
+     typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type BaseType;
+     typedef Statement<Base> VisitorBaseType;
+     typedef boost::mpl::vector<> Properties;
    };
 
     /// Child statements may be executed multiple times
     class Iterative {
     public:
       typedef boost::mpl::int_<1> order;
-      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
-     typedef Statement<Base> visitor_base_type;
-     typedef boost::mpl::vector<> properties;
+      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type BaseType;
+     typedef Statement<Base> VisitorBaseType;
+     typedef boost::mpl::vector<> Properties;
     };
 
     /// Modifies program state
     class Mutating {
     public:
       typedef boost::mpl::int_<2> order;
-      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type base_type;
-     typedef Statement<Base> visitor_base_type;
-     typedef boost::mpl::vector<> properties;
+      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type BaseType;
+     typedef Statement<Base> VisitorBaseType;
+     typedef boost::mpl::vector<> Properties;
     };
 
   /// This is a metafunction to generate a scattered base class
@@ -224,135 +224,128 @@ namespace mirv {
     /// Statement semantics are somehow affected by expressions
     class Controlled {
     private:
-       typedef boost::mpl::vector<> sequence;
+      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type InterfaceBaseType;
 
-    public:
-       class interface;
-      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type interface_base_type;
-      typedef Statement<Base> visitor_base_type;
-      typedef sequence properties;
-
-       class interface
-	     : public virtual interface_base_type {
+       class Interface : public virtual InterfaceBaseType {
        protected:
-	 typedef ptr<Expression<Base> >::type expression_ptr;
-	 typedef ptr<Expression<Base> >::const_type const_expression_ptr;
-	  typedef std::list<expression_ptr> expression_list;
+	 typedef ptr<Expression<Base> >::type ExpressionPtr;
+	 typedef ptr<Expression<Base> >::const_type ConstExpressionPtr;
+	  typedef std::list<ExpressionPtr> ExpressionList;
 
        private:
-	  expression_list expressions;
+	  ExpressionList expressions;
 
        protected:
 	 template<typename A1>
-	 interface(A1 a1) {
+	 Interface(A1 a1) {
 	   expressions.push_back(a1);
 	 }
 	 template<typename A1, typename A2>
-	 interface(A1 a1, A2 a2) {
+	 Interface(A1 a1, A2 a2) {
 	   expressions.push_back(a1);
 	   expressions.push_back(a2);
 	 }
 
-	  typedef expression_list::iterator expression_iterator;
-	  typedef expression_list::const_iterator const_expression_iterator;
+	  typedef ExpressionList::iterator ExpressionIterator;
+	  typedef ExpressionList::const_iterator ConstExpressionIterator;
 
-	  expression_iterator expression_begin(void) {
+	  ExpressionIterator expressionBegin(void) {
 	     return(expressions.begin());
 	  };
-	  const_expression_iterator expression_begin(void) const {
+	  ConstExpressionIterator expressionBegin(void) const {
 	     return(expressions.begin());
 	  };
 
-	  expression_iterator expression_end(void) {
+	  ExpressionIterator expressionEnd(void) {
 	     return(expressions.end());
 	  };
-	  const_expression_iterator expression_end(void) const {
+	  ConstExpressionIterator expressionEnd(void) const {
 	     return(expressions.end());
 	  };
 
-	  void expression_push_back(expression_ptr c) {
+	  void expressionPushBack(ExpressionPtr c) {
 	     expressions.push_back(c);
 	  };
 
-	  expression_ptr expression_front(void) {
-	     check_invariant(!expression_empty(),
-			     "Attempt to get operand from empty node");
+	  ExpressionPtr expressionFront(void) {
+	     checkInvariant(!expressionEmpty(),
+			    "Attempt to get operand from empty node");
 	     return(expressions.front());
 	  };
 
-	  const_expression_ptr expression_front(void) const {
-	     check_invariant(!expression_empty(),
-			     "Attempt to get operand from empty node");
+	  ConstExpressionPtr expressionFront(void) const {
+	     checkInvariant(!expressionEmpty(),
+			    "Attempt to get operand from empty node");
 	     return(expressions.front());
 	  };
 
-	  expression_ptr expression_back(void) {
-	     check_invariant(!expression_empty(),
-			     "Attempt to get operand from empty node");
+	  ExpressionPtr expressionBack(void) {
+	     checkInvariant(!expressionEmpty(),
+			    "Attempt to get operand from empty node");
 	     return(expressions.back());
 	  };
 
-	  const_expression_ptr expression_back(void) const {
-	     check_invariant(!expression_empty(),
-			     "Attempt to get operand from empty node");
+	  ConstExpressionPtr expressionBack(void) const {
+	     checkInvariant(!expressionEmpty(),
+			    "Attempt to get operand from empty node");
 	     return(expressions.back());
 	  };
 
-	  typedef expression_list::size_type size_type;
-	  size_type expression_size(void) const { return(expressions.size()); };
+	  typedef ExpressionList::size_type size_type;
+	  size_type expressionSize(void) const { return(expressions.size()); };
 
-	  bool expression_empty(void) const { return(expressions.empty()); };
+	  bool expressionEmpty(void) const { return(expressions.empty()); };
        };
 
-       typedef StatementBaseGenerator<sequence, interface>::type base_type;
+    public:
+      typedef boost::mpl::vector<> Properties;
+      typedef Statement<Base> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
     };
 
   /// A statement with a single expression child.  It may have one of
   /// more children of other types.
-    class SingleExpression {
-    private:
-       typedef boost::mpl::vector<> sequence;
+    class SingleExpression { 
+    private: 
+      typedef Statement<Controlled> InterfaceBaseType;
 
-    public:
-       typedef Statement<Controlled> interface_base_type;
-      typedef Statement<Controlled> visitor_base_type;
-      typedef sequence properties;
-
-       class interface
-	     : public interface_base_type {
+       class Interface : public InterfaceBaseType {
        public:
 	 template<typename A1>
-	 interface(A1 a1) : interface_base_type(a1) {}
+	 Interface(A1 a1) : InterfaceBaseType(a1) {}
 
-	  typedef interface_base_type::expression_ptr expression_ptr;
-	  typedef interface_base_type::const_expression_ptr
-         const_expression_ptr;
+	 typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
+	 typedef InterfaceBaseType::ConstExpressionPtr
+         ConstExpressionPtr;
 
-         void set_expression(expression_ptr e) {
-            if (this->expression_empty()) {
-               expression_push_back(e);
-            }
-            else {
-               *--this->expression_end() = e;
-            }
-         };
+         void setExpression(ExpressionPtr e) {
+	   if (this->expressionEmpty()) {
+	     expressionPushBack(e);
+	   }
+	   else {
+	     *--this->expressionEnd() = e;
+	   }
+         }
 
-         expression_ptr get_expression(void) {
-            check_invariant(!this->expression_empty()
-			    && *this->expression_begin(),
-                            "Attempt to get non-existent expression");
-            return(*this->expression_begin());
-         };
+         ExpressionPtr getExpression(void) {
+	   checkInvariant(!this->expressionEmpty()
+			  && *this->expressionBegin(),
+			  "Attempt to get non-existent expression");
+	   return(*this->expressionBegin());
+         }
 
-         const_expression_ptr get_expression(void) const {
-            check_invariant(!this->expression_empty()
-			    && *this->expression_begin(),
-                            "Attempt to get non-existent expression");
-            return(*this->expression_begin());
-         };
+         ConstExpressionPtr getExpression(void) const {
+            checkInvariant(!this->expressionEmpty()
+			   && *this->expressionBegin(),
+			   "Attempt to get non-existent expression");
+            return(*this->expressionBegin());
+         }
       }; 
 
-      typedef StatementBaseGenerator<sequence, interface>::type base_type;
+    public:
+      typedef boost::mpl::vector<> Properties;
+      typedef Statement<Controlled> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 }
 

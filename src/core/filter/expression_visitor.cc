@@ -10,15 +10,15 @@
 namespace mirv {
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Base> >::type e) {}
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<InnerExpression>::type e) {
-    ptr<InnerExpression::visitor_base_type>::type p = fast_cast<InnerExpression::visitor_base_type>(e);
+    ptr<InnerExpression::VisitorBaseType>::type p = fast_cast<InnerExpression::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<InnerExpressionBase>::type e) {
-    ptr<InnerExpressionBase::visitor_base_type>::type p = fast_cast<InnerExpressionBase::visitor_base_type>(e);
-    visit(static_cast<ptr<InnerExpressionBase::visitor_base_type>::type>(e));
+    ptr<InnerExpressionBase::VisitorBaseType>::type p = fast_cast<InnerExpressionBase::VisitorBaseType>(e);
+    visit(static_cast<ptr<InnerExpressionBase::VisitorBaseType>::type>(e));
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<LeafExpression>::type e) {
-    ptr<LeafExpression::visitor_base_type>::type p = fast_cast<LeafExpression::visitor_base_type>(e);
+    ptr<LeafExpression::VisitorBaseType>::type p = fast_cast<LeafExpression::VisitorBaseType>(e);
     visit(p);
   }
   // Establish an order for properties.  This coresponds to the
@@ -33,7 +33,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Arithmetic>::visitor_base_type>::type p = fast_cast<Expression<Arithmetic>::visitor_base_type>(e);
+      ptr<Expression<Arithmetic>::VisitorBaseType>::type p = fast_cast<Expression<Arithmetic>::VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -47,7 +47,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Logical>::visitor_base_type>::type p = fast_cast<Expression<Logical>::visitor_base_type>(e);
+      ptr<Expression<Logical>::VisitorBaseType>::type p = fast_cast<Expression<Logical>::VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -61,7 +61,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Bitwise>::visitor_base_type>::type p = fast_cast<Expression<Bitwise>::visitor_base_type>(e);
+      ptr<Expression<Bitwise>::VisitorBaseType>::type p = fast_cast<Expression<Bitwise>::VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -75,7 +75,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Relational>::visitor_base_type>::type p = fast_cast<Expression<Relational>::visitor_base_type>(e);
+      ptr<Expression<Relational>::VisitorBaseType>::type p = fast_cast<Expression<Relational>::VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -101,7 +101,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Commutative>::visitor_base_type>::type p = fast_cast<Expression<Commutative>::visitor_base_type>(e);
+      ptr<Expression<Commutative>::VisitorBaseType>::type p = fast_cast<Expression<Commutative>::VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -131,7 +131,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Associative>::visitor_base_type>::type p = fast_cast<Expression<Associative>::visitor_base_type>(e);
+      ptr<Expression<Associative>::VisitorBaseType>::type p = fast_cast<Expression<Associative>::VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -165,7 +165,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Transitive>::visitor_base_type>::type p = fast_cast<Expression<Transitive>::visitor_base_type>(e);
+      ptr<Expression<Transitive>::VisitorBaseType>::type p = fast_cast<Expression<Transitive>::VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -204,7 +204,7 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Reflexive>::visitor_base_type>::type p = fast_cast<Expression<Reflexive>::visitor_base_type>(e);
+      ptr<Expression<Reflexive>::VisitorBaseType>::type p = fast_cast<Expression<Reflexive>::VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -246,98 +246,98 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Ref>::visitor_base_type>::type p = fast_cast<Expression<Ref>::visitor_base_type>(e);
+      ptr<Expression<Ref>::VisitorBaseType>::type p = fast_cast<Expression<Ref>::VisitorBaseType>(e);
       visit(p);
     }
   }
 
 ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Unary> >::type e) {
-  ptr<Expression<Unary>::visitor_base_type>::type p = fast_cast<Expression<Unary>::visitor_base_type>(e);
+  ptr<Expression<Unary>::VisitorBaseType>::type p = fast_cast<Expression<Unary>::VisitorBaseType>(e);
   visit(p);
 }
 ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Binary> >::type e) {
-  ptr<Expression<Binary>::visitor_base_type>::type p = fast_cast<Expression<Binary>::visitor_base_type>(e);
+  ptr<Expression<Binary>::VisitorBaseType>::type p = fast_cast<Expression<Binary>::VisitorBaseType>(e);
   visit(p);
 }
 
   // We always prefer to visit the properties because they give us
   // semantic information.
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Add> >::type e) {
-    ptr<Expression<Add>::visitor_base_type>::type p = fast_cast<Expression<Add>::visitor_base_type>(e);
+    ptr<Expression<Add>::VisitorBaseType>::type p = fast_cast<Expression<Add>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Subtract> >::type e) {
-    ptr<Expression<Subtract>::visitor_base_type>::type p = fast_cast<Expression<Subtract>::visitor_base_type>(e);
+    ptr<Expression<Subtract>::VisitorBaseType>::type p = fast_cast<Expression<Subtract>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Divide> >::type e) {
-    ptr<Expression<Divide>::visitor_base_type>::type p = fast_cast<Expression<Divide>::visitor_base_type>(e);
+    ptr<Expression<Divide>::VisitorBaseType>::type p = fast_cast<Expression<Divide>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Multiply> >::type e) {
-    ptr<Expression<Multiply>::visitor_base_type>::type p = fast_cast<Expression<Multiply>::visitor_base_type>(e);
+    ptr<Expression<Multiply>::VisitorBaseType>::type p = fast_cast<Expression<Multiply>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Modulus> >::type e) {
-    ptr<Expression<Modulus>::visitor_base_type>::type p = fast_cast<Expression<Modulus>::visitor_base_type>(e);
+    ptr<Expression<Modulus>::VisitorBaseType>::type p = fast_cast<Expression<Modulus>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Negate> >::type e) {
-    ptr<Expression<Negate>::visitor_base_type>::type p = fast_cast<Expression<Negate>::visitor_base_type>(e);
+    ptr<Expression<Negate>::VisitorBaseType>::type p = fast_cast<Expression<Negate>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::type e) {
-    ptr<Expression<LogicalAnd>::visitor_base_type>::type p = fast_cast<Expression<LogicalAnd>::visitor_base_type>(e);
+    ptr<Expression<LogicalAnd>::VisitorBaseType>::type p = fast_cast<Expression<LogicalAnd>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<LogicalOr> >::type e) {
-    ptr<Expression<LogicalOr>::visitor_base_type>::type p = fast_cast<Expression<LogicalOr>::visitor_base_type>(e);
+    ptr<Expression<LogicalOr>::VisitorBaseType>::type p = fast_cast<Expression<LogicalOr>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<LogicalNot> >::type e) {
-    ptr<Expression<LogicalNot>::visitor_base_type>::type p = fast_cast<Expression<LogicalNot>::visitor_base_type>(e);
+    ptr<Expression<LogicalNot>::VisitorBaseType>::type p = fast_cast<Expression<LogicalNot>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::type e) {
-    ptr<Expression<BitwiseAnd>::visitor_base_type>::type p = fast_cast<Expression<BitwiseAnd>::visitor_base_type>(e);
+    ptr<Expression<BitwiseAnd>::VisitorBaseType>::type p = fast_cast<Expression<BitwiseAnd>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::type e) {
-    ptr<Expression<BitwiseOr>::visitor_base_type>::type p = fast_cast<Expression<BitwiseOr>::visitor_base_type>(e);
+    ptr<Expression<BitwiseOr>::VisitorBaseType>::type p = fast_cast<Expression<BitwiseOr>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type e) {
-    ptr<Expression<BitwiseComplement>::visitor_base_type>::type p = fast_cast<Expression<BitwiseComplement>::visitor_base_type>(e);
+    ptr<Expression<BitwiseComplement>::VisitorBaseType>::type p = fast_cast<Expression<BitwiseComplement>::VisitorBaseType>(e);
     visit(p);
   }
 
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<LessThan> >::type e) {
-    ptr<Expression<LessThan>::visitor_base_type>::type p = fast_cast<Expression<LessThan>::visitor_base_type>(e);
+    ptr<Expression<LessThan>::VisitorBaseType>::type p = fast_cast<Expression<LessThan>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::type e) {
-    ptr<Expression<LessThanOrEqual>::visitor_base_type>::type p = fast_cast<Expression<LessThanOrEqual>::visitor_base_type>(e);
+    ptr<Expression<LessThanOrEqual>::VisitorBaseType>::type p = fast_cast<Expression<LessThanOrEqual>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Equal> >::type e) {
-    ptr<Expression<Equal>::visitor_base_type>::type p = fast_cast<Expression<Equal>::visitor_base_type>(e);
+    ptr<Expression<Equal>::VisitorBaseType>::type p = fast_cast<Expression<Equal>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<NotEqual> >::type e) {
-    ptr<Expression<NotEqual>::visitor_base_type>::type p = fast_cast<Expression<NotEqual>::visitor_base_type>(e);
+    ptr<Expression<NotEqual>::VisitorBaseType>::type p = fast_cast<Expression<NotEqual>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<GreaterThan> >::type e) {
-    ptr<Expression<GreaterThan>::visitor_base_type>::type p = fast_cast<Expression<GreaterThan>::visitor_base_type>(e);
+    ptr<Expression<GreaterThan>::VisitorBaseType>::type p = fast_cast<Expression<GreaterThan>::VisitorBaseType>(e);
     visit(p);
   }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::type e) {
-    ptr<Expression<GreaterThanOrEqual>::visitor_base_type>::type p = fast_cast<Expression<GreaterThanOrEqual>::visitor_base_type>(e);
+    ptr<Expression<GreaterThanOrEqual>::VisitorBaseType>::type p = fast_cast<Expression<GreaterThanOrEqual>::VisitorBaseType>(e);
     visit(p);
   }
 
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::type e) {
-    ptr<Expression<Reference<Variable> >::visitor_base_type>::type p = fast_cast<Expression<Reference<Variable> >::visitor_base_type>(e);
+    ptr<Expression<Reference<Variable> >::VisitorBaseType>::type p = fast_cast<Expression<Reference<Variable> >::VisitorBaseType>(e);
     visit(p);
   }
 }

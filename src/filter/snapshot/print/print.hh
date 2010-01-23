@@ -339,13 +339,13 @@ namespace mirv {
 	void visit(ptr<Statement<Assignment> >::type stmt) {
 	  this->enter(stmt);
 
-	  this->before_expression(stmt, stmt->get_left_expression());
-	  stmt->get_left_expression()->accept(this->expression_flow());
-	  this->after_expression(stmt, stmt->get_left_expression());
+	  this->beforeExpression(stmt, stmt->getLeftExpression());
+	  stmt->getLeftExpression()->accept(this->expressionFlow());
+	  this->afterExpression(stmt, stmt->getLeftExpression());
 
-	  this->before_expression(stmt, stmt->get_right_expression());
-	  stmt->get_right_expression()->accept(this->expression_flow());
-	  this->after_expression(stmt, stmt->get_right_expression());
+	  this->beforeExpression(stmt, stmt->getRightExpression());
+	  stmt->getRightExpression()->accept(this->expressionFlow());
+	  this->afterExpression(stmt, stmt->getRightExpression());
 
 	  this->leave(stmt);
 	}
@@ -410,14 +410,14 @@ namespace mirv {
        void visit(ptr<Symbol<Module> >::type sym) {
          this->enter(sym);
 	 // Visit functions
-         for(Symbol<Module>::function_iterator f = sym->function_begin(),
-	       fend = sym->function_end();
+         for(Symbol<Module>::FunctionIterator f = sym->functionBegin(),
+	       fend = sym->functionEnd();
              f != fend;
              /* NULL */) {
             this->before(sym, *f);
             (*f)->accept(*this);
             this->after(sym, *f);
-            Symbol<Module>::function_iterator prev = f;
+            Symbol<Module>::FunctionIterator prev = f;
             if (++f != fend) {
 	      this->between(sym, *prev, *f);
             }
@@ -443,7 +443,7 @@ namespace mirv {
 
        /// Print the spafces specified by val.
          Stream &operator()(Stream &out) const {
-	   check_invariant(val >= 0, "Indent underflow");
+	   checkInvariant(val >= 0, "Indent underflow");
 	   int i = val;
             while(i--) {
                out << " ";

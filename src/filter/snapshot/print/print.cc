@@ -55,7 +55,7 @@ namespace mirv {
     JustLeft = false;
     out << indent(ind) << "tadecl " << sym->name()
 	<< sym->getElementType()->name();
-    for(Symbol<Array>::constDimensionIterator d = sym->dimensionBegin(),
+    for(Symbol<Array>::ConstDimensionIterator d = sym->dimensionBegin(),
 	  dend = sym->dimensionEnd();
 	d != dend;
 	++d) {
@@ -74,13 +74,13 @@ namespace mirv {
   {
     JustLeft = false;
     out << indent(ind) << "tfdecl " << sym->name();
-    if (!sym->getReturnType() || sym->parameters_empty()) {
+    if (!sym->getReturnType() || sym->parameterEmpty()) {
       return;
     }
     out << "{\n";
     out << indent(ind+IndentFactor) << "rtype " << sym->getReturnType()->name() << "\n";
     for (Symbol<Type<FunctionType> >::iterator p =
-	   sym->parameters_begin(), pend = sym->parameters_end();
+	   sym->parameterBegin(), pend = sym->parameterEnd();
 	 p != pend;
 	 ++p) {
       out << indent(ind+IndentFactor) << "ptype " << (*p)->name() << "\n";
@@ -350,7 +350,7 @@ namespace mirv {
   void PrintFilter::EnterExprAction::visit(ptr<Expression<Reference<Variable> > >::type expr)
    {
      JustLeft = false;
-     out << indent(ind) << "vref " << expr->get_symbol()->name();
+     out << indent(ind) << "vref " << expr->getSymbol()->name();
    }
 
   void PrintFilter::operator()(ptr<Node<Base> >::type node)

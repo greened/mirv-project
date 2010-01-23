@@ -31,12 +31,12 @@ namespace mirv {
   template<typename Traits>
   class Inner {
   public:
-    class interface : public Traits::base_type {
+    class Interface : public Traits::BaseType {
     public:
       typedef typename Traits::const_reference const_reference;
 
-      typedef typename ptr<typename Traits::Child>::type child_ptr;
-      typedef typename ptr<typename Traits::Child>::const_type const_child_ptr;
+      typedef typename ptr<typename Traits::Child>::type ChildPtr;
+      typedef typename ptr<typename Traits::Child>::const_type ConstChildPtr;
 
      typedef typename Traits::iterator iterator;
      typedef typename Traits::reverse_iterator reverse_iterator;
@@ -64,19 +64,19 @@ namespace mirv {
       virtual const_reverse_iterator rend(void) const = 0;
  
       /// Add a child to the front of the child sequence.
-      virtual void push_front(child_ptr c) = 0;
+      virtual void push_front(ChildPtr c) = 0;
       /// Add a child to the back of the child sequence.
-      virtual void push_back(child_ptr c) = 0;
+      virtual void push_back(ChildPtr c) = 0;
 
       /// Get the front of the child sequence.
-      virtual child_ptr front(void) = 0;
+      virtual ChildPtr front(void) = 0;
       /// Get the front of the child sequence.
-      virtual const_child_ptr front(void) const = 0;
+      virtual ConstChildPtr front(void) const = 0;
 
       /// Get the back of the child sequence.
-      virtual child_ptr back(void) = 0;
+      virtual ChildPtr back(void) = 0;
       /// Get the back of the child sequence.
-      virtual const_child_ptr back(void) const = 0;
+      virtual ConstChildPtr back(void) const = 0;
 
       /// Get the size of the child sequence.
       virtual size_type size(void) const = 0;
@@ -85,9 +85,9 @@ namespace mirv {
       virtual bool empty(void) const = 0;
     };
  
-    typedef interface base_type;
-    typedef typename Traits::base_type visitor_base_type;
-    typedef boost::mpl::vector<> properties;
+    typedef Interface BaseType;
+    typedef typename Traits::BaseType VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
  };
 
   /// This provides the implementation for inner IR nodes.  It
@@ -97,30 +97,30 @@ namespace mirv {
     template<typename Child, typename BaseType>
     class InnerImpl : public BaseType {
     public:
-      typedef typename ptr<Child>::type child_ptr;
-      typedef typename ptr<Child>::const_type const_child_ptr;
+      typedef typename ptr<Child>::type ChildPtr;
+      typedef typename ptr<Child>::const_type ConstChildPtr;
 
    protected:
-      typedef std::list<child_ptr> child_list;
+      typedef std::list<ChildPtr> ChildList;
 
    private:
-      child_list children;
+      ChildList children;
 
    public:
       InnerImpl(void) {}
       InnerImpl(const std::string &name) : BaseType(name) {}
-      InnerImpl(child_ptr C) {
+      InnerImpl(ChildPtr C) {
        children.push_back(C);
      }
-     InnerImpl(child_ptr C1, child_ptr C2) {
+      InnerImpl(ChildPtr C1, ChildPtr C2) {
        children.push_back(C1);
        children.push_back(C2);
      }
  
-     typedef typename child_list::iterator iterator;
-     typedef typename child_list::reverse_iterator reverse_iterator;
-     typedef typename child_list::const_iterator const_iterator;
-     typedef typename child_list::const_reverse_iterator const_reverse_iterator;
+     typedef typename ChildList::iterator iterator;
+     typedef typename ChildList::reverse_iterator reverse_iterator;
+     typedef typename ChildList::const_iterator const_iterator;
+     typedef typename ChildList::const_reverse_iterator const_reverse_iterator;
 
       
       /// Get the start of the child sequence.
@@ -142,43 +142,43 @@ namespace mirv {
      const_reverse_iterator rend(void) const { return(children.rend()); }
  
       /// Add a child to the front of the child sequence.
-      void push_front(child_ptr c) {
+      void push_front(ChildPtr c) {
          children.push_front(c);
       }
       /// Add a child to the back of the child sequence.
-      void push_back(child_ptr c) {
+      void push_back(ChildPtr c) {
          children.push_back(c);
       }
 
       /// Get the front of the child sequence.
-      child_ptr front(void) {
-         check_invariant(!empty(),
-                         "Attempt to get operand from empty node");
+      ChildPtr front(void) {
+         checkInvariant(!empty(),
+			"Attempt to get operand from empty node");
          return(children.front());
       }
 
       /// Get the front of the child sequence.
-      const_child_ptr front(void) const {
-         check_invariant(!empty(),
-                         "Attempt to get operand from empty node");
+      ConstChildPtr front(void) const {
+         checkInvariant(!empty(),
+			"Attempt to get operand from empty node");
          return(children.front());
       }
 
       /// Get the back of the child sequence.
-      child_ptr back(void) {
-         check_invariant(!empty(),
-                         "Attempt to get operand from empty node");
+      ChildPtr back(void) {
+         checkInvariant(!empty(),
+			"Attempt to get operand from empty node");
          return(children.back());
       }
 
       /// Get the back of the child sequence.
-       const_child_ptr back(void) const {
-         check_invariant(!empty(),
-                         "Attempt to get operand from empty node");
+       ConstChildPtr back(void) const {
+         checkInvariant(!empty(),
+			"Attempt to get operand from empty node");
          return(children.back());
       }
 
-      typedef typename child_list::size_type size_type;
+      typedef typename ChildList::size_type size_type;
       /// Get the size of the child sequence.
       size_type size(void) const { return(children.size()); }
 
@@ -194,7 +194,6 @@ namespace mirv {
      template<typename A>
      LeafImpl(A a) : Tag(a) {}
    };
-
 }
 
 #endif

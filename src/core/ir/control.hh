@@ -9,26 +9,24 @@
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
-  /// Specify the interface for block/sequence statements.
+  /// Specify the Interface for block/sequence statements.
    class Block {
    private:
-      typedef boost::mpl::vector<> sequence;
+      typedef InnerStatement InterfaceBaseType;
 
-   public:
-     typedef InnerStatement visitor_base_type;
-     typedef sequence properties;
-
-      typedef InnerStatement interface_base_type;
-
-      class interface : public interface_base_type {
+      class Interface : public InterfaceBaseType {
       public:
 	 template<typename A1>
-	 interface(A1 a1) : interface_base_type(a1)  {}
+	 Interface(A1 a1) : InterfaceBaseType(a1)  {}
 	 template<typename A1, typename A2>
-	 interface(A1 a1, A2 a2) : interface_base_type(a1, a2)  {}
+	 Interface(A1 a1, A2 a2) : InterfaceBaseType(a1, a2)  {}
       };
 
-      typedef StatementBaseGenerator<sequence, interface>::type base_type;
+   public:
+      typedef boost::mpl::vector<> Properties;
+     typedef InnerStatement VisitorBaseType;
+
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
    /// This is a statement with only one child statement.  The child
@@ -36,25 +34,20 @@ namespace mirv {
    /// be under this control point.
    class SingleBlock {
    private:
-      typedef boost::mpl::vector<> sequence;
+     typedef InnerStatement InterfaceBaseType;
 
-   public:
-     typedef InnerStatement interface_base_type;
-     typedef InnerStatement visitor_base_type;
-     typedef sequence properties;
-
-      class interface : public interface_base_type {
+      class Interface : public InterfaceBaseType {
       public:
 	 template<typename A1>
 	 // If this isn't a block statement, make it one.
-	 interface(A1 a1) : 
-	   interface_base_type(dyn_cast<Statement<Block> >(a1) ?
+	 Interface(A1 a1) : 
+	   InterfaceBaseType(dyn_cast<Statement<Block> >(a1) ?
 			       a1 : mirv::make<Statement<Block> >(a1))  {}
-
-         typedef interface_base_type::child_ptr child_ptr;
-         typedef interface_base_type::const_child_ptr const_child_ptr;
+ 
+         typedef InterfaceBaseType::ChildPtr ChildPtr;
+         typedef InterfaceBaseType::ConstChildPtr ConstChildPtr;
          
-         void set_child_statement(child_ptr s) {
+         void setChildStatement(ChildPtr s) {
 	   if (!dyn_cast<Statement<Block> >(s)) {
 	     s = mirv::make<Statement<Block> >(s);
 	   }
@@ -66,15 +59,20 @@ namespace mirv {
 	   }
          }
 
-	child_ptr get_child_statement(void) {
-	  check_invariant(!this->empty(), 
+	ChildPtr getChildStatement(void) {
+	  checkInvariant(!this->empty(), 
 			  "Attempt to get statement from empty block");
 	  
 	  return(this->front());
 	}
       };
 
-      typedef StatementBaseGenerator<sequence, interface>::type base_type;
+   public:
+      typedef boost::mpl::vector<> Properties;
+     typedef InnerStatement VisitorBaseType;
+     typedef Properties properties;
+
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
   /// This is a statement with two child statements.  The children
@@ -82,28 +80,23 @@ namespace mirv {
   /// be under this control point.
    class DualBlock {
    private:
-      typedef boost::mpl::vector<> sequence;
+     typedef InnerStatement InterfaceBaseType;
 
-   public:
-     typedef InnerStatement interface_base_type;
-     typedef InnerStatement visitor_base_type;
-     typedef sequence properties;
-
-      class interface : public interface_base_type {
+      class Interface : public InterfaceBaseType {
          // Protected because these are probably bad names for subclasses
       protected:
 	// If these are not blocks, make them so.
 	template<typename A1, typename A2>
-	interface(A1 a1, A2 a2) :
-	  interface_base_type(dyn_cast<Statement<Block> >(a1)?
+	Interface(A1 a1, A2 a2) :
+	  InterfaceBaseType(dyn_cast<Statement<Block> >(a1)?
 			      a1 : mirv::make<Statement<Block> >(a1),
 			      dyn_cast<Statement<Block> >(a2) ?
 			      a2 : mirv::make<Statement<Block> >(a2))  {}
 
-         typedef interface_base_type::child_ptr child_ptr;
-         typedef interface_base_type::const_child_ptr const_child_ptr;
+         typedef InterfaceBaseType::ChildPtr ChildPtr;
+         typedef InterfaceBaseType::ConstChildPtr ConstChildPtr;
          
-	void set_left_child_statement(child_ptr s) {
+	void setLeftChildStatement(ChildPtr s) {
 	  if (!dyn_cast<Statement<Block> >(s)) {
 	    s = mirv::make<Statement<Block> >(s);
 	  }
@@ -115,12 +108,12 @@ namespace mirv {
 	  }
 	}
 
-	void set_right_child_statement(child_ptr s) {
+	void setRightChildStatement(ChildPtr s) {
 	  if (!dyn_cast<Statement<Block> >(s)) {
 	    s = mirv::make<Statement<Block> >(s);
 	  }
 	  if (this->empty()) {
-	    push_back(child_ptr());  // Placeholder for left operand
+	    push_back(ChildPtr());  // Placeholder for left operand
 	    push_back(s);
 	  }
 	  else {
@@ -128,279 +121,259 @@ namespace mirv {
 	  }
 	}
 
-         child_ptr get_left_child_statement(void) {      
-            check_invariant(!this->empty(),
+         ChildPtr getLeftChildStatement(void) {      
+            checkInvariant(!this->empty(),
                             "Attempt to get statement from empty block");
             return(this->front());
          };
          
-         const_child_ptr get_left_child_statement(void) const {
-            check_invariant(!this->empty(),
+         ConstChildPtr getLeftChildStatement(void) const {
+            checkInvariant(!this->empty(),
                             "Attempt to get statement from empty block");
             return(this->front());
          };
          
-         child_ptr get_right_child_statement(void) {      
-            check_invariant(this->size() > 1 && this->back(),
+         ChildPtr getRightChildStatement(void) {      
+            checkInvariant(this->size() > 1 && this->back(),
                             "Attempt to get missing statement from block");
             return(this->back());
          };
          
-         const_child_ptr get_right_child_statement(void) const {
-            check_invariant(this->size() > 1 && this->back(),
+         ConstChildPtr getRightChildStatement(void) const {
+            checkInvariant(this->size() > 1 && this->back(),
                             "Attempt to get missing statement from block");
             return(this->back());
          };
       };
 
-      typedef StatementBaseGenerator<sequence, interface>::type base_type;
+   public:
+      typedef boost::mpl::vector<> Properties;
+     typedef InnerStatement VisitorBaseType;
+
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
   /// This is a statement with a single controlling condition
    class SingleCondition {
    private:
-      typedef boost::mpl::vector<> sequence;
+      typedef Statement<SingleExpression> InterfaceBaseType;
 
-   public:
-      typedef Statement<SingleExpression> interface_base_type;
-     typedef Statement<SingleExpression> visitor_base_type;
-     typedef sequence properties;
-      
-      class interface 
-            : public interface_base_type {
-         typedef interface_base_type::expression_ptr expression_ptr;
-         typedef interface_base_type::const_expression_ptr 
-         const_expression_ptr;
+      class Interface 
+            : public InterfaceBaseType {
+         typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
+         typedef InterfaceBaseType::ConstExpressionPtr 
+         ConstExpressionPtr;
 
       public:
 	 template<typename A1>
-	 interface(A1 a1) : interface_base_type(a1)  {}
+	 Interface(A1 a1) : InterfaceBaseType(a1)  {}
 
-         void set_condition(expression_ptr e) {
-            set_expression(e);
+         void setCondition(ExpressionPtr e) {
+            setExpression(e);
          };
 
-         expression_ptr get_condition(void) {
-            return(this->get_expression());
+         ExpressionPtr getCondition(void) {
+            return(this->getExpression());
          };
 
-         const_expression_ptr get_condition(void) const {
-            return(this->get_expression());
+         ConstExpressionPtr getCondition(void) const {
+            return(this->getExpression());
          };
       };
 
-      typedef StatementBaseGenerator<sequence, interface>::type base_type;
+   public:
+      typedef boost::mpl::vector<> Properties;
+     typedef Statement<SingleExpression> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
-  /// Specify the if-then statement interface.
+  /// Specify the if-then statement Interface.
   class IfThen {
    private:
-      typedef boost::mpl::vector<Conditional> sequence;
-
-     class Base : public Statement<SingleCondition>,
-		  public Statement<SingleBlock> {
+     class Interface : public Statement<SingleCondition>,
+		       public Statement<SingleBlock> {
      public:
        template<typename S, typename E>
-       Base(E e, S s) : Statement<SingleCondition>(e),
-			Statement<SingleBlock>(s) {}
+       Interface(E e, S s) : Statement<SingleCondition>(e),
+			     Statement<SingleBlock>(s) {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("IfThen::Base::accept called");
        }
      };
-     typedef Base root;
 
   public:
-    typedef sequence properties;
-    typedef StatementBaseGenerator<sequence, root>::type base_type;
-    typedef Statement<SingleBlock> visitor_base_type;
+    typedef boost::mpl::vector<Conditional> Properties;
+    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Statement<SingleBlock> VisitorBaseType;
   };
   
-  /// Specify the if-then-else statement interface.
+  /// Specify the if-then-else statement Interface.
    class IfElse {
    private:
-      typedef boost::mpl::vector<Conditional> sequence;
-
-     class Base : public Statement<SingleCondition>,
-		  public Statement<DualBlock> {
+     class Interface : public Statement<SingleCondition>,
+		       public Statement<DualBlock> {
      public:
        template<typename S1, typename S2, typename E>
-       Base(E e, S1 s1, S2 s2) : Statement<SingleCondition>(e),
-				 Statement<DualBlock>(s1, s2) {}
+       Interface(E e, S1 s1, S2 s2) : Statement<SingleCondition>(e),
+				      Statement<DualBlock>(s1, s2) {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("IfElse::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-     typedef Statement<DualBlock> visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<Conditional> Properties;
+     typedef Statement<DualBlock> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
-  /// Specify the while statement interface.
+  /// Specify the while statement Interface.
    class While {
    private:
-      typedef boost::mpl::vector<Conditional, Iterative> sequence;
-
-     class Base : public Statement<SingleCondition>,
-		  public Statement<SingleBlock> {
+     class Interface : public Statement<SingleCondition>,
+		       public Statement<SingleBlock> {
      public:
        template<typename S1, typename E>
-       Base(E e, S1 s1) : Statement<SingleCondition>(e),
-			  Statement<SingleBlock>(s1) {}
+       Interface(E e, S1 s1) : Statement<SingleCondition>(e),
+			       Statement<SingleBlock>(s1) {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("While::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-     typedef Statement<SingleBlock> visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<Conditional, Iterative> Properties;
+     typedef Statement<SingleBlock> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
-  /// Specify the do-while statement interface.
+  /// Specify the do-while statement Interface.
    class DoWhile {
    private:
-      typedef boost::mpl::vector<Conditional> sequence;
-
-     class Base : public Statement<SingleCondition>,
-		  public Statement<SingleBlock> {
+     class Interface : public Statement<SingleCondition>,
+		       public Statement<SingleBlock> {
      public:
        template<typename S1, typename E>
-       Base(E e, S1 s1) : Statement<SingleCondition>(e),
-			  Statement<SingleBlock>(s1) {}
+       Interface(E e, S1 s1) : Statement<SingleCondition>(e),
+			       Statement<SingleBlock>(s1) {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("DoWhile::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-     typedef Statement<SingleBlock> visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<Conditional> Properties;
+     typedef Statement<SingleBlock> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
-  /// Specify the case statement interface.
+  /// Specify the case statement Interface.
    class Case {
    private:
-      typedef boost::mpl::vector<> sequence;
-
-     class Base : public Statement<SingleCondition>,
-		  public Statement<SingleBlock> {
+     class Interface : public Statement<SingleCondition>,
+		       public Statement<SingleBlock> {
      public:
        template<typename S1, typename E>
-       Base(E e, S1 s1) : Statement<SingleCondition>(e),
-			  Statement<SingleBlock>(s1) {}
+       Interface(E e, S1 s1) : Statement<SingleCondition>(e),
+			       Statement<SingleBlock>(s1) {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Case::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-     typedef Statement<SingleBlock> visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<> Properties;
+     typedef Statement<SingleBlock> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
    
   /// This is a list of case statements.  It is the statement type
   /// that appears under a switch statement.
    class CaseBlock {
    private:
-      typedef boost::mpl::vector<> sequence;
+     typedef Statement<SingleBlock> InterfaceBaseType;
 
-   public:
-     typedef Statement<SingleBlock> visitor_base_type;
-     typedef Statement<SingleBlock> interface_base_type;
-     typedef sequence properties;
-
-      class interface : public virtual interface_base_type {
-         typedef interface_base_type::child_ptr child_ptr;
+      class Interface : public virtual InterfaceBaseType {
+         typedef InterfaceBaseType::ChildPtr ChildPtr;
       public:
        template<typename S1>
-       interface(S1 s1) : Statement<SingleBlock>(s1) {}
+       Interface(S1 s1) : Statement<SingleBlock>(s1) {}
 
          // Override base methods
-         void push_back(child_ptr c) {
+         void push_back(ChildPtr c) {
 	   // check_invariant(safe_cast<Statement<Case> >(c),
            //                  "Attempt to insert non-case statement in case block");
-            interface_base_type::push_back(c);
+            InterfaceBaseType::push_back(c);
          };
       };
 
-      typedef StatementBaseGenerator<sequence, interface>::type base_type;
+   public:
+      typedef boost::mpl::vector<> Properties;
+     typedef Statement<SingleBlock> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
-  /// Specify the switch statement interface.
+  /// Specify the switch statement Interface.
    class Switch {
    private:
-      typedef boost::mpl::vector<Conditional> sequence;
-
-     class Base : public Statement<SingleCondition>,
-		  public Statement<CaseBlock> {
+     class Interface : public Statement<SingleCondition>,
+		       public Statement<CaseBlock> {
      public:
        template<typename S1, typename E>
-       Base(E e, S1 s1) : Statement<SingleCondition>(e),
-			  Statement<CaseBlock>(s1) {}
+       Interface(E e, S1 s1) : Statement<SingleCondition>(e),
+			       Statement<CaseBlock>(s1) {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Switch::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-     typedef Statement<CaseBlock> visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<Conditional> Properties;
+     typedef Statement<CaseBlock> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
   /// This is a statement with a single label
    class SingleLabel {
    private:
-      typedef boost::mpl::vector<> sequence;
+      typedef Statement<SingleExpression> InterfaceBaseType;
 
-   public:
-     typedef Statement<SingleExpression> visitor_base_type;
-     typedef sequence properties;
-      typedef Statement<SingleExpression> interface_base_type;
-      
-      class interface 
-            : public interface_base_type {
-         typedef interface_base_type::expression_ptr expression_ptr;
-         typedef interface_base_type::const_expression_ptr 
-         const_expression_ptr;
+      class Interface 
+            : public InterfaceBaseType {
+         typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
+         typedef InterfaceBaseType::ConstExpressionPtr 
+         ConstExpressionPtr;
 
       public:
 	template<typename E>
-	interface(E e) : Statement<SingleExpression>(e) {}
+	Interface(E e) : Statement<SingleExpression>(e) {}
 
-         void set_label(expression_ptr e) {
+         void setLabel(ExpressionPtr e) {
 	   // check_invariant(safe_cast<Expression<Label> >(e),
            //                  "Attempt to set non-label as label");
             
-            set_expression(e);
+            setExpression(e);
          };
 
-         expression_ptr get_label(void) {
-            return(this->get_expression());
+         ExpressionPtr getLabel(void) {
+            return(this->getExpression());
          };
 
-         const_expression_ptr get_label(void) const {
-            return(this->get_expression());
+         ConstExpressionPtr getLabel(void) const {
+            return this->getExpression();
          };
       };
 
-      typedef StatementBaseGenerator<sequence, interface>::type base_type;
+   public:
+      typedef boost::mpl::vector<> Properties;
+     typedef Statement<SingleExpression> VisitorBaseType;      
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
   /// A before statement specifies a block statement with an entry
@@ -409,25 +382,22 @@ namespace mirv {
   /// deeply nested set of loops.
   class Before {
    private:
-      typedef boost::mpl::vector<Iterative> sequence;  // Of a sort
-
-     class Base : public Statement<SingleLabel>,
-		  public Statement<SingleBlock> {
+     class Interface : public Statement<SingleLabel>,
+		       public Statement<SingleBlock> {
      public:
        template<typename S1, typename E>
-       Base(E e, S1 s1) : Statement<SingleLabel>(e),
-			  Statement<SingleBlock>(s1) {}
+       Interface(E e, S1 s1) : Statement<SingleLabel>(e),
+			       Statement<SingleBlock>(s1) {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Before::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-     typedef Statement<SingleBlock> visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<Iterative> Properties;  // Of a sort
+     typedef Statement<SingleBlock> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
 
@@ -437,25 +407,22 @@ namespace mirv {
   /// statements.
    class After {
    private:
-      typedef boost::mpl::vector<Conditional> sequence;  // Of a sort
-
-     class Base : public Statement<SingleLabel>,
-		  public Statement<SingleBlock> {
+     class Interface : public Statement<SingleLabel>,
+		       public Statement<SingleBlock> {
      public:
        template<typename S1, typename E>
-       Base(E e, S1 s1) : Statement<SingleLabel>(e),
-			  Statement<SingleBlock>(s1) {}
+       Interface(E e, S1 s1) : Statement<SingleLabel>(e),
+			       Statement<SingleBlock>(s1) {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("After::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-     typedef Statement<SingleBlock> visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<Conditional> Properties;  // Of a sort
+     typedef Statement<SingleBlock> VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
   /// This is an arbitrary goto statement.  It should not appear in
@@ -464,40 +431,32 @@ namespace mirv {
   /// restructure the IR to be fully structured.
    class Goto {
    private:
-      typedef boost::mpl::vector<Conditional> sequence;
-
-     class Base : public Statement<SingleLabel>,
-		    public LeafStatement {
+     class Interface : public Statement<SingleLabel>,
+		       public LeafStatement {
      public:
        template<typename E>
-       Base(E e) : Statement<SingleLabel>(e),
-		   LeafStatement() {}
+       Interface(E e) : Statement<SingleLabel>(e),
+			LeafStatement() {}
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Goto::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-     typedef LeafStatement visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<Conditional> Properties;
+     typedef LeafStatement VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
    /// A return does not return an expression.  Instead, assignment to
    /// a special location determines the return value.  This separates
    /// changes in data state from changes in control state.
    class Return {
-   private:
-      typedef boost::mpl::vector<> sequence;
-
-      typedef LeafStatement root;
-
    public:
-     typedef root visitor_base_type;
-     typedef sequence properties;
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
+      typedef boost::mpl::vector<> Properties;
+     typedef LeafStatement VisitorBaseType;
+      typedef StatementBaseGenerator<Properties, LeafStatement>::type BaseType;
    };
 };
 
