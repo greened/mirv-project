@@ -64,7 +64,7 @@ namespace mirv {
       };
 
      /// Get the statement flow.
-     StmtFlow &statement_flow(void) {
+     StmtFlow &statementFlow(void) {
        return stmt;
      }
 
@@ -111,42 +111,42 @@ namespace mirv {
          this->enter(sym);
 
 	 // Visit types
-         for(Symbol<Module>::type_iterator t = sym->type_begin(),
-                tend = sym->type_end();
+         for(Symbol<Module>::TypeIterator t = sym->typeBegin(),
+                tend = sym->typeEnd();
              t != tend;
              /* NULL */) {
             this->before(sym, *t);
             (*t)->accept(*this);
             this->after(sym, *t);
-            Symbol<Module>::type_iterator prev = t;
+            Symbol<Module>::TypeIterator prev = t;
             if (++t != tend) {
 	      this->between(sym, *prev, *t);
             }
          }
 
 	 // Visit variables
-         for(Symbol<Module>::variable_iterator v = sym->variable_begin(),
-                vend = sym->variable_end();
+         for(Symbol<Module>::VariableIterator v = sym->variableBegin(),
+                vend = sym->variableEnd();
              v != vend;
              /* NULL */) {
             this->before(sym, *v);
             (*v)->accept(*this);
             this->after(sym, *v);
-            Symbol<Module>::variable_iterator prev = v;
+            Symbol<Module>::VariableIterator prev = v;
             if (++v != vend) {
 	      this->between(sym, *prev, *v);
             }
          }
 
 	 // Visit functions
-         for(Symbol<Module>::function_iterator f = sym->function_begin(),
-                fend = sym->function_end();
+         for(Symbol<Module>::FunctionIterator f = sym->functionBegin(),
+                fend = sym->functionEnd();
              f != fend;
              /* NULL */) {
             this->before(sym, *f);
             (*f)->accept(*this);
             this->after(sym, *f);
-            Symbol<Module>::function_iterator prev = f;
+            Symbol<Module>::FunctionIterator prev = f;
             if (++f != fend) {
 	      this->between(sym, *prev, *f);
             }
@@ -159,21 +159,21 @@ namespace mirv {
      void visit(ptr<Symbol<Function> >::type sym) {
          this->enter(sym);
 	 // Visit variables
-         for(Symbol<Function>::variable_iterator v = sym->variable_begin(),
-                vend = sym->variable_end();
+         for(Symbol<Function>::VariableIterator v = sym->variableBegin(),
+                vend = sym->variableEnd();
              v != vend;
              /* NULL */) {
             this->before(sym, *v);
             (*v)->accept(*this);
             this->after(sym, *v);
-            Symbol<Function>::variable_iterator prev = v;
+            Symbol<Function>::VariableIterator prev = v;
             if (++v != vend) {
 	      this->between(sym, *prev, *v);
             }
          }
 
 	 // Visit statements
-	 sym->getStatement()->accept(this->statement_flow());
+	 sym->getStatement()->accept(this->statementFlow());
 
          this->leave(sym);
       }

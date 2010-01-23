@@ -16,17 +16,17 @@ namespace mirv {
      typedef InnerImpl<Symbol<Variable>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> VariableBaseType;
 
    public:
-     class interface : public NamedBaseType,
+     class Interface : public NamedBaseType,
 		       public TypedBaseType,
 		       public VariableBaseType,
 		       public StatementBaseType {
      public:
-       typedef StatementBaseType::child_ptr statement_ptr;
-       typedef VariableBaseType::child_ptr VariablePtr;
+       typedef StatementBaseType::ChildPtr StatementPtr;
+       typedef VariableBaseType::ChildPtr VariablePtr;
 
-       interface(const std::string &n,
-		 const_type_ptr t,
-		 statement_ptr s)
+       Interface(const std::string &n,
+		 ConstTypePtr t,
+		 StatementPtr s)
 	 : NamedBaseType(n),
 	   TypedBaseType(t),
 	   // If the statement is not a block, make it one.
@@ -34,31 +34,31 @@ namespace mirv {
 			     s : mirv::make<Statement<Block> >(s)) {};
 
        /// Add a local variable to this function.
-       void variablesPushBack(VariablePtr v) {
+       void variablePushBack(VariablePtr v) {
 	 VariableBaseType::push_back(v);
        }
 
-       typedef VariableBaseType::iterator variable_iterator;
-       typedef VariableBaseType::const_iterator const_variable_iterator;
+       typedef VariableBaseType::iterator VariableIterator;
+       typedef VariableBaseType::const_iterator ConstVariableIterator;
        /// Get the start of the local variable sequence.
-       variable_iterator variable_begin(void) {
+       VariableIterator variableBegin(void) {
 	 return VariableBaseType::begin();
        }
        /// Get the end of the local variable sequence.
-       variable_iterator variable_end(void) {
+       VariableIterator variableEnd(void) {
 	 return VariableBaseType::end();
        }
        /// Get the start of the local variable sequence.
-       const_variable_iterator variable_begin(void) const {
+       ConstVariableIterator variableBegin(void) const {
 	 return VariableBaseType::begin();
        }
        /// Get the end of the local variable sequence.
-       const_variable_iterator variable_end(void) const {
+       ConstVariableIterator variableEnd(void) const {
 	 return VariableBaseType::end();
        }
 
        /// Get the single block statement child.
-       statement_ptr getStatement(void) {
+       StatementPtr getStatement(void) {
 	 return *StatementBaseType::begin();
        }
 
@@ -66,8 +66,8 @@ namespace mirv {
 	 error("Function::Base::accept called");
        }
      };
-     typedef interface base_type;
-     typedef TypedBaseType visitor_base_type;
+     typedef Interface BaseType;
+     typedef TypedBaseType VisitorBaseType;
    };
 }
 

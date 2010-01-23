@@ -113,16 +113,16 @@ int main(void)
   ptr<Symbol<Function> >::type f =
     make<Symbol<Function> >("foo", ftype, dowhile);
 
-  f->variablesPushBack(a);
-  f->variablesPushBack(b);
+  f->variablePushBack(a);
+  f->variablePushBack(b);
 
   ptr<Symbol<Module> >::type m =
     Symbol<Module>::make("Test");
 
-  m->typesPushBack(make<Symbol<Type<Integral> > >("int32", 32));
-  m->typesPushBack(ftype);
-  m->functionsPushBack(f);
-  m->variablesPushBack(c);
+  m->typePushBack(make<Symbol<Type<Integral> > >("int32", 32));
+  m->typePushBack(ftype);
+  m->functionPushBack(f);
+  m->variablePushBack(c);
 
   PrintFilter print(std::cout);
 

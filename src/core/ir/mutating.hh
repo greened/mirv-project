@@ -9,63 +9,62 @@ namespace mirv {
   /// expressions.
    class DualExpression {
    public:
-      class interface;
-      typedef interface base_type;
-      typedef Statement<Controlled> interface_base_type;
-     typedef boost::mpl::vector<> properties;
-     typedef Statement<Controlled> visitor_base_type;
+      class Interface;
+      typedef Interface BaseType;
+      typedef Statement<Controlled> InterfaceBaseType;
+     typedef boost::mpl::vector<> Properties;
+     typedef Statement<Controlled> VisitorBaseType;
 
-      class interface 
-            : public interface_base_type {
+      class Interface : public InterfaceBaseType {
       public:
 	template<typename E1, typename E2>
-	interface(E1 e1, E2 e2) : Statement<Controlled>(e1, e2) {}
+	Interface(E1 e1, E2 e2) : Statement<Controlled>(e1, e2) {}
 
-         typedef interface_base_type::expression_ptr expression_ptr;
-         typedef interface_base_type::const_expression_ptr 
-         const_expression_ptr;
+         typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
+         typedef InterfaceBaseType::ConstExpressionPtr 
+         ConstExpressionPtr;
          
-         void set_left_expression(expression_ptr e) {
-            if (expression_empty()) {
-               expression_push_back(e);
+         void setLeftExpression(ExpressionPtr e) {
+            if (expressionEmpty()) {
+               expressionPushBack(e);
             }
             else {
-               *expression_begin() = e;
+               *expressionBegin() = e;
             }
          };
 
-         void set_right_expression(expression_ptr e) {
-            if (expression_empty()) {
-               expression_push_back(expression_ptr()); // Placeholder
-               expression_push_back(e);
+         void setRightExpression(ExpressionPtr e) {
+            if (expressionEmpty()) {
+               expressionPushBack(ExpressionPtr()); // Placeholder
+               expressionPushBack(e);
             }
             else {
-               *--expression_end() = e;
+               *--expressionEnd() = e;
             }
          };
          
-         expression_ptr get_left_expression(void) {
-            check_invariant(!expression_empty() && *expression_begin(),
-                            "Attempt to get non-existent expression");
-            return(expression_front());
+         ExpressionPtr getLeftExpression(void) {
+            checkInvariant(!expressionEmpty() && *expressionBegin(),
+			   "Attempt to get non-existent expression");
+            return(expressionFront());
          };
 
-         const_expression_ptr get_left_expression(void) const {
-            check_invariant(!expression_empty() && *expression_begin(),
-                            "Attempt to get non-existent expression");
-            return(expression_front());
+         ConstExpressionPtr getLeftExpression(void) const {
+            checkInvariant(!expressionEmpty() && *expressionBegin(),
+			   "Attempt to get non-existent expression");
+            return(expressionFront());
          };
 
-         expression_ptr get_right_expression(void) {
-            check_invariant(expression_size() > 1 && expression_back(),
-                            "Attempt to get non-existent expression");
-            return(expression_back());
+         ExpressionPtr getRightExpression(void) {
+            checkInvariant(expressionSize() > 1 && expressionBack(),
+			   "Attempt to get non-existent expression");
+            return(expressionBack());
          };
 
-         const_expression_ptr get_right_expression(void) const {
-            check_invariant(expression_size() > 1 && expression_back(),
-                            "Attempt to get non-existent expression");
-            return(expression_back());
+         ConstExpressionPtr getRightExpression(void) const {
+            checkInvariant(expressionSize() > 1 && expressionBack(),
+			   "Attempt to get non-existent expression");
+            return(expressionBack());
          };
       };
    };
@@ -77,27 +76,24 @@ namespace mirv {
   /// translate, but we are not concerned about those.
    class Assignment {
    private:
-      typedef boost::mpl::vector<Mutating> sequence;
-
-     class Base : public Statement<DualExpression>,
-		  public LeafStatement {
+     class Interface : public Statement<DualExpression>,
+		       public LeafStatement {
      public:
        template<typename E1, typename E2>
-       Base(E1 e1, E2 e2) : Statement<DualExpression>(e1, e2),
-			    LeafStatement() {}
-       typedef expression_ptr child_ptr;
-       typedef const_expression_ptr const_child_ptr;
+       Interface(E1 e1, E2 e2) : Statement<DualExpression>(e1, e2),
+				 LeafStatement() {}
+       typedef ExpressionPtr ChildPtr;
+       typedef ConstExpressionPtr ConstChildPtr;
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Assignment::Base::accept called");
        }
      };
-     typedef Base root;
 
    public:
-      typedef StatementBaseGenerator<sequence, root>::type base_type;
-     typedef sequence properties;
-     typedef Statement<DualExpression> visitor_base_type;
+     typedef boost::mpl::vector<Mutating> Properties;
+     typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+     typedef Statement<DualExpression> VisitorBaseType;
    };
 }
 

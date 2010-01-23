@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 /// Assert that Check is true and abort with Msg if it is not.
-#define check_invariant(Check, Msg) \
+#define checkInvariant(Check, Msg) \
    if (!(Check)) {                              \
       error(Msg);                               \
    }
@@ -23,7 +23,7 @@ namespace mirv {
   /// checks and/or output to perform.
   class DebugManager {
   private:
-    static DebugManager *instance;
+    static DebugManager *inst;
 
     /// Is debugging active?
     bool active;
@@ -38,13 +38,13 @@ namespace mirv {
 
   public:
     /// Return whether debugging is active.
-    bool IsActive(void) { return active; }
+    bool isActive(void) { return active; }
     /// Return whether any features implied by flag is active.
-    bool Feature(Flags flag) { return flags & flag; }
+    bool feature(Flags flag) { return flags & flag; }
 
     /// Get the instance of the DebugManager.
-    static DebugManager &Instance(void) {
-      return *(instance ? instance : instance = new DebugManager);
+    static DebugManager &instance(void) {
+      return *(inst ? inst : inst = new DebugManager);
     }
   };
 }

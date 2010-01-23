@@ -13,7 +13,7 @@ namespace mirv {
    namespace Builder {
       /// Transform a one-operand node into a single-child IR node.
      template<typename NodeType,
-	      typename Child = typename NodeType::child_ptr,
+	      typename Child = typename NodeType::ChildPtr,
 	      typename Dummy = boost::proto::callable>
       struct ConstructUnary : boost::proto::callable {
 	typedef typename ptr<NodeType>::type result_type;
@@ -25,8 +25,8 @@ namespace mirv {
 
      /// Transform a two-operand node to a two-child IR node.
       template<typename NodeType,
-	       typename Child1 = typename NodeType::child_ptr,
-	       typename Child2 = typename NodeType::child_ptr,
+	       typename Child1 = typename NodeType::ChildPtr,
+	       typename Child2 = typename NodeType::ChildPtr,
 	       typename Dummy = boost::proto::callable>
       struct ConstructBinary : boost::proto::callable {
 	typedef typename ptr<NodeType>::type result_type;
@@ -40,13 +40,13 @@ namespace mirv {
      /// child to a block if it already exists.
      template<>
      struct ConstructBinary<Statement<Block>,
-			    Statement<Block>::child_ptr,
-			    Statement<Block>::child_ptr,
+			    Statement<Block>::ChildPtr,
+			    Statement<Block>::ChildPtr,
 			    boost::proto::callable> : boost::proto::callable {
        typedef ptr<Statement<Block> >::type result_type;
 
-       result_type operator()(Statement<Block>::child_ptr left,
-			      Statement<Block>::child_ptr right) {
+       result_type operator()(Statement<Block>::ChildPtr left,
+			      Statement<Block>::ChildPtr right) {
 	 if (ptr<Statement<Block> >::type lb =
 	     dyn_cast<Statement<Block> >(left)) {
 	   if (ptr<Statement<Block> >::type rb =
@@ -67,9 +67,9 @@ namespace mirv {
 
      /// Transform a three-operand node to a three-child IR node.
      template<typename NodeType,
-	      typename Child1 = typename NodeType::child_ptr,
-	      typename Child2 = typename NodeType::child_ptr,
-	      typename Child3 = typename NodeType::child_ptr,
+	      typename Child1 = typename NodeType::ChildPtr,
+	      typename Child2 = typename NodeType::ChildPtr,
+	      typename Child3 = typename NodeType::ChildPtr,
 	      typename Dummy = boost::proto::callable>
      struct ConstructTernary : boost::proto::callable {
        typedef typename ptr<NodeType>::type result_type;

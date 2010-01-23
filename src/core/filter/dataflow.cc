@@ -3,7 +3,7 @@
 
 namespace mirv {
   template AttributeManager<NullDataflow> *
-  AttributeManager<NullDataflow>::instance;
+  AttributeManager<NullDataflow>::inst;
   template<> AttributeManager<NullDataflow> *
-  AttributeManager<NullDataflow>::instance = 0;
+  AttributeManager<NullDataflow>::inst = 0;
 }

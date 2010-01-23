@@ -7,22 +7,23 @@ namespace mirv {
   /// This is a symbol tag for variable symbols.  Variables have a
   /// type and a name.
    class Variable {
-   public:
-      class interface
-	: public Symbol<Typed>,
-	  public Symbol<Named>,
-	  public LeafSymbol {
+   private:
+     class Interface : public Symbol<Typed>,
+		       public Symbol<Named>,
+		       public LeafSymbol {
       public:
-         interface(const std::string &n,
-                   const_type_ptr t)
+       Interface(const std::string &n,
+		 ConstTypePtr t)
 	   : Symbol<Typed>(t), Symbol<Named>(n){};
 
-	virtual void accept(mirv::SymbolVisitor &) {
-	  error("Variable::Base::accept called");
-	}
-      };
-     typedef interface base_type;
-     typedef LeafSymbol visitor_base_type;
+       virtual void accept(mirv::SymbolVisitor &) {
+	 error("Variable::Base::accept called");
+       }
+     };
+
+   public:
+     typedef Interface BaseType;
+     typedef LeafSymbol VisitorBaseType;
    };
 }
 

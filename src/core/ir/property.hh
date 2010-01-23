@@ -26,12 +26,12 @@ namespace mirv {
       typename boost::mpl::transform<Sequence, Generator>::type,
       Virtual<boost::mpl::empty_base>,
       InheritOp
-      >::type properties_hierarchy_type;
+      >::type PropertiesHierarchyType;
   
 public:
   typedef typename InheritOp::template apply<
   Base, 
-  properties_hierarchy_type>::type type;
+  PropertiesHierarchyType>::type type;
 };
 };
 

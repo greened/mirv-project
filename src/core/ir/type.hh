@@ -18,39 +18,38 @@ namespace mirv {
    template<typename Tag>
    class Type {
    public:
-     typedef typename Tag::base_type base_type;
-     typedef typename Tag::visitor_base_type visitor_base_type;
+     typedef typename Tag::BaseType BaseType;
+     typedef typename Tag::VisitorBaseType VisitorBaseType;
 
      Type() {}
-     Type(const std::string &name) : base_type(name) {}
+     Type(const std::string &name) : BaseType(name) {}
    };
 
   /// A type tag for the base type of all types.
    class TypeBase {
    private:
-     typedef Symbol<Named> interface_base_type;
+     typedef Symbol<Named> InterfaceBaseType;
 
-   public:
-
-      class interface : public interface_base_type {
+      class Interface : public InterfaceBaseType {
       public:
-	interface(const std::string &name) : interface_base_type(name) {}
+	Interface(const std::string &name) : InterfaceBaseType(name) {}
 	typedef int BitSizeType;
 	virtual BitSizeType bitsize(void) const = 0;
       };
 
-      typedef interface base_type;
-     typedef Symbol<Base> visitor_base_type;
+   public:
+     typedef Interface BaseType;
+     typedef Symbol<Base> VisitorBaseType;
    };
 
   //  template<>
-  //class Symbol<Type<TypeBase> > : public Type<TypeBase>::base_type {};
+  //class Symbol<Type<TypeBase> > : public Type<TypeBase>::BaseType {};
 
   /// A type with no children.
   class LeafType : public LeafImpl<Symbol<Type<TypeBase> > > {
   public:
     typedef LeafImpl<Symbol<Type<TypeBase> > > BaseType;
-    typedef Symbol<Type<TypeBase> > visitor_base_type;
+    typedef Symbol<Type<TypeBase> > VisitorBaseType;
     LeafType(const std::string &name) : BaseType(name) {}
   };
 
@@ -61,96 +60,96 @@ namespace mirv {
   public:
     InnerType(const std::string &name) : BaseType(name) {}
     typedef InnerImpl<Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Symbol<Type<TypeBase> > >::type> BaseType;
-    typedef Symbol<Type<TypeBase> > visitor_base_type;
+    typedef Symbol<Type<TypeBase> > VisitorBaseType;
   };
 
   /// A type with no children that has a specific bit size, for
   /// example integer and floating point types.
    class Simple {
    private:
-     typedef LeafType interface_base_type;
+     typedef LeafType InterfaceBaseType;
 
-     class interface : public interface_base_type {
+     class Interface : public InterfaceBaseType {
      private:
        BitSizeType bsize;
 
      public:
-       interface(const std::string &name, BitSizeType s)
-	 : interface_base_type(name), bsize(s) {};
+       Interface(const std::string &name, BitSizeType s)
+	 : InterfaceBaseType(name), bsize(s) {};
 
        BitSizeType bitsize(void) const {
 	 return bsize;
        }
      };
+
    public:
-     typedef interface base_type;
-     typedef LeafType visitor_base_type;
+     typedef Interface BaseType;
+     typedef LeafType VisitorBaseType;
    };
 
   /// Integer types.
    struct Integral {
    private:
-    typedef Symbol<Type<Simple> > interface_base_type;
+    typedef Symbol<Type<Simple> > InterfaceBaseType;
 
-     class interface : public interface_base_type {
+     class Interface : public InterfaceBaseType {
      public:
-       interface(const std::string &name, BitSizeType size) :
-	 interface_base_type(name, size) {}
+       Interface(const std::string &name, BitSizeType size) :
+	 InterfaceBaseType(name, size) {}
      };
 
    public:
-     typedef interface base_type;
-     typedef Symbol<Type<Simple> > visitor_base_type;
+     typedef Interface BaseType;
+     typedef Symbol<Type<Simple> > VisitorBaseType;
   };
 
   /// Floating point types.
    struct Floating {
-    typedef Symbol<Type<Simple> > interface_base_type;
+    typedef Symbol<Type<Simple> > InterfaceBaseType;
 
-     class interface : public interface_base_type {
+     class Interface : public InterfaceBaseType {
      public:
-       interface(const std::string &name, BitSizeType size) :
-	 interface_base_type(name, size) {}
+       Interface(const std::string &name, BitSizeType size) :
+	 InterfaceBaseType(name, size) {}
      };
+
    public:
-     typedef interface base_type;
-     typedef Symbol<Type<Simple> > visitor_base_type;
+     typedef Interface BaseType;
+     typedef Symbol<Type<Simple> > VisitorBaseType;
   };
 
   /// A type that is built upon other types.  For example structures
   /// and pointers.
    struct Derived {
    public:
-      typedef InnerType base_type;
-     typedef InnerType visitor_base_type;
+      typedef InnerType BaseType;
+     typedef InnerType VisitorBaseType;
    };
 
   /// An array type.  Array types are true multidimensional concepts.
    struct Array {
    private:
-     typedef Symbol<Type<Derived> > interface_base_type;
+     typedef Symbol<Type<Derived> > InterfaceBaseType;
 
-   public:
-      class interface
-            : public interface_base_type {
+      class Interface : public InterfaceBaseType {
       public:
-         typedef int dimension_type;
+         typedef int DimensionType;
 
       private:
-         typedef std::vector<int> dimension_vector;
+         typedef std::vector<int> DimensionVector;
 
-         dimension_vector dimensions;
+         DimensionVector dimensions;
 
       public:
-	interface(const std::string &name) : interface_base_type(name) {}
-	typedef Symbol<Type<TypeBase> > child_type;
-	typedef ptr<child_type>::type child_ptr;
-         typedef ptr<child_type>::const_type const_child_ptr;
+	Interface(const std::string &name) : InterfaceBaseType(name) {}
+	typedef Symbol<Type<TypeBase> > ChildType;
+	typedef ptr<ChildType>::type ChildPtr;
+         typedef ptr<ChildType>::const_type ConstChildPtr;
 
-         typedef dimension_vector::iterator dimensionIterator;
-         typedef dimension_vector::const_iterator constDimensionIterator;
+         typedef DimensionVector::iterator DimensionIterator;
+         typedef DimensionVector::const_iterator ConstDimensionIterator;
 
-         void setElementType(child_ptr c) {
+         void setElementType(ChildPtr c) {
             if (empty()) {
                push_back(c);
             }
@@ -159,33 +158,33 @@ namespace mirv {
             }
          }
 
-         child_ptr getElementType(void) {
+         ChildPtr getElementType(void) {
             return(front());
          }
-         const_child_ptr getElementType(void) const {
+         ConstChildPtr getElementType(void) const {
             return(front());
          }
 
 	/// Get the start of the dimension sequence.
-         dimensionIterator dimensionBegin(void) {
+         DimensionIterator dimensionBegin(void) {
             return(dimensions.begin());
          }
 	/// Get the start of the dimension sequence.
-         constDimensionIterator dimensionBegin(void) const {
+         ConstDimensionIterator dimensionBegin(void) const {
             return(dimensions.begin());
          }
 
 	/// Get the end of the dimension sequence.
-         dimensionIterator dimensionEnd(void) {
+         DimensionIterator dimensionEnd(void) {
             return(dimensions.end());
          }
 	/// Get the end of the dimension sequence.
-         constDimensionIterator dimensionEnd(void) const {
+         ConstDimensionIterator dimensionEnd(void) const {
             return(dimensions.end());
          }
 
 	/// Add a dimension.
-         void dimensionPushBack(dimension_type d) {
+         void dimensionPushBack(DimensionType d) {
             dimensions.push_back(d);
          }
 
@@ -198,25 +197,25 @@ namespace mirv {
 	  error("Array::accept called");
 	}
       };
-     typedef interface base_type;
-     typedef Symbol<Type<Derived> > visitor_base_type;
+
+   public:
+     typedef Interface BaseType;
+     typedef Symbol<Type<Derived> > VisitorBaseType;
    };
 
   /// A pointer type.
    struct Pointer {
    private:
-     typedef Symbol<Type<Derived> > interface_base_type;
+     typedef Symbol<Type<Derived> > InterfaceBaseType;
 
-   public:
-      class interface
-            : public interface_base_type {
+      class Interface : public InterfaceBaseType {
       public:
-	interface(const std::string &name) : interface_base_type(name) {}
-	typedef Symbol<Type<TypeBase> > child_type;
-	typedef ptr<child_type>::type child_ptr;
-         typedef ptr<child_type>::const_type const_child_ptr;
+	Interface(const std::string &name) : InterfaceBaseType(name) {}
+	typedef Symbol<Type<TypeBase> > ChildType;
+	typedef ptr<ChildType>::type ChildPtr;
+         typedef ptr<ChildType>::const_type ConstChildPtr;
 
-         void setBaseType(child_ptr c) {
+         void setBaseType(ChildPtr c) {
             if (empty()) {
                push_back(c);
             }
@@ -225,19 +224,21 @@ namespace mirv {
             }
          }
 
-         child_ptr getBaseType(void) {
+         ChildPtr getBaseType(void) {
             return(front());
          }
 
-         const_child_ptr getBaseType(void) const {
+         ConstChildPtr getBaseType(void) const {
             return(front());
          }
 	virtual void accept(mirv::SymbolVisitor &) {
 	  error("Pointer::accept called");
 	}
       };
-     typedef interface base_type;
-     typedef Symbol<Type<Derived> > visitor_base_type;
+
+   public:
+     typedef Interface BaseType;
+     typedef Symbol<Type<Derived> > VisitorBaseType;
    };
 
   /// A function type.  Function types have a return type and a list
@@ -247,19 +248,17 @@ namespace mirv {
   /// sequence.
    struct FunctionType {
    private:
-     typedef Symbol<Type<Derived> > interface_base_type;
+     typedef Symbol<Type<Derived> > InterfaceBaseType;
 
-   public:
-      class interface
-            : public interface_base_type {
+      class Interface : public InterfaceBaseType {
       public:
-	typedef Symbol<Type<TypeBase> > child_type;
-	typedef ptr<child_type>::type child_ptr;
-	typedef ptr<child_type>::const_type const_child_ptr;
+	typedef Symbol<Type<TypeBase> > ChildType;
+	typedef ptr<ChildType>::type ChildPtr;
+	typedef ptr<ChildType>::const_type ConstChildPtr;
 
-	interface(const std::string &name,
-		  child_ptr ReturnType = child_ptr())
-	  : interface_base_type(name) {
+	Interface(const std::string &name,
+		  ChildPtr ReturnType = ChildPtr())
+	  : InterfaceBaseType(name) {
 	  setReturnType(ReturnType);
 	}
 
@@ -270,7 +269,7 @@ namespace mirv {
 	/// By conventon, the return type is the first element of the
 	/// underlying child list.  A void function will have a 0
 	/// pointer as the first child.
-	void setReturnType(child_ptr c) {
+	void setReturnType(ChildPtr c) {
 	  if (empty()) {
 	    push_back(c);
 	  }
@@ -279,47 +278,49 @@ namespace mirv {
 	  }
 	}
 
-	child_ptr getReturnType(void) {
+	ChildPtr getReturnType(void) {
 	  return(front());
 	}
 
-	const_child_ptr getReturnType(void) const {
+	ConstChildPtr getReturnType(void) const {
 	  return(front());
 	}
 
 	/// Add a parameter type.
-	void parametersPushBack(child_ptr Parameter) {
+	void parameterPushBack(ChildPtr Parameter) {
 	  push_back(Parameter);
 	}
 
 	/// Return whether this function type does not have any
 	/// parameters.
-	bool parameters_empty(void) const {
+	bool parameterEmpty(void) const {
 	  return empty();
 	}
 
 	/// Get the start of the parameter type sequence.
-	iterator parameters_begin(void) {
+	iterator parameterBegin(void) {
 	  return ++begin();
 	}
 	/// Get the start of the parameter type sequence.
-	const_iterator parameters_begin(void) const {
+	const_iterator parameterBegin(void) const {
 	  return ++begin();
 	}
 	/// Get the end of the parameter type sequence.
-	iterator parameters_end(void) {
+	iterator parameterEnd(void) {
 	  return end();
 	}
 	/// Get the end of the parameter type sequence.
-	const_iterator parameters_end(void) const {
+	const_iterator parameterEnd(void) const {
 	  return end();
 	}
 	virtual void accept(mirv::SymbolVisitor &) {
 	  error("FunctionType::accept called");
 	}
       };
-     typedef interface base_type;
-     typedef Symbol<Type<Derived> > visitor_base_type;
+
+   public:
+     typedef Interface BaseType;
+     typedef Symbol<Type<Derived> > VisitorBaseType;
    };
 }
 

@@ -24,7 +24,7 @@ namespace mirv {
   inline typename boost::shared_ptr<To> safe_cast(boost::shared_ptr<From> val)
   {
     typename boost::shared_ptr<To> ret = boost::dynamic_pointer_cast<To>(val);
-    check_invariant(ret, "Failed safe_cast");
+    checkInvariant(ret, "Failed safe_cast");
 
     return ret;
   }
@@ -55,8 +55,8 @@ namespace mirv {
   {
     typedef typename boost::add_reference<typename boost::remove_pointer<To *>::type>::type ref_type;
 
-    if (DebugManager::Instance().IsActive()
-	&& DebugManager::Instance().Feature(DebugManager::SafeCast)) {
+    if (DebugManager::instance().isActive()
+	&& DebugManager::instance().feature(DebugManager::SafeCast)) {
       ref_type thisr(dynamic_cast<ref_type>(*val));
       return &thisr;
     }
@@ -69,8 +69,8 @@ namespace mirv {
   template<typename To, typename From>
   typename boost::shared_ptr<To> fast_cast(typename boost::shared_ptr<From> const &val)
   {
-    if (DebugManager::Instance().IsActive()
-	&& DebugManager::Instance().Feature(DebugManager::SafeCast)) {
+    if (DebugManager::instance().isActive()
+	&& DebugManager::instance().feature(DebugManager::SafeCast)) {
       typename ptr<To>::type ret = dyn_cast<To>(val);
       return ret;
     }
