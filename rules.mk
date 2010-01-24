@@ -1,7 +1,7 @@
 include $(BUILDTOOLS)/configure/ln.mk
 include $(BUILDTOOLS)/configure/touch.mk
 
-IFLAGS = -I$(SRCDIR)/src/lib -I$(FINAL_BUILDDIR)/include
+IFLAGS = -I$(SRCDIR)/src/Library -I$(FINAL_BUILDDIR)/include
 DFLAGS = -DBOOST_MPL_LIMIT_VECTOR_SIZE=40 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
 
 debug_CFLAGS := -g -Wall -Werror
