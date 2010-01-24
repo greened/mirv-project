@@ -42,10 +42,9 @@
 // STDOUT:    }
 // STDOUT: }
 
-#include <mirv/core/ir/ir.hh>
-
-#include <mirv/core/builder/make.hh>
-#include <mirv/filter/snapshot/print/print.hh>
+#include <mirv/core/ir/IR.hpp>
+#include <mirv/core/builder/Make.hpp>
+#include <mirv/filter/snapshot/print/Print.hpp>
 
 using mirv::Symbol;
 using mirv::Module;
