@@ -30,9 +30,9 @@
 // STDOUT:       vref a
 // STDOUT:       vref c
 
-#include <mirv/core/ir/ir.hh>
-#include <mirv/core/builder/builder.hh>
-#include <mirv/filter/snapshot/print/print.hh>
+#include <mirv/core/ir/IR.hpp>
+#include <mirv/core/builder/Builder.hpp>
+#include <mirv/filter/snapshot/print/Print.hpp>
 
 using mirv::Symbol;
 using mirv::Variable;

@@ -25,14 +25,14 @@ else
                         | $(SORT) | $(UNIQ) > $*.dd
 endif
 
-PROCESS_CDEPS := $(CP) $*.d $*.P; cat $*.d; \
+PROCESS_CDEPS := $(CP) $*.d $*.P && cat $*.d && \
                     $(SED) -e 's%#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
-                           -e '%^$$% d' -e 's%$$% :%' < $*.d >> $*.P; \
+                           -e '%^$$% d' -e 's%$$% :%' < $*.d >> $*.P && \
                  $(MV) -f $*.P $*.d
 
-PROCESS_CXXDEPS := $(CP) $*.dd $*.PP; cat $*.dd; \
+PROCESS_CXXDEPS := $(CP) $*.dd $*.PP && cat $*.dd && \
                       $(SED) -e 's%#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
-                             -e '%^$$% d' -e 's%$$% :%' < $*.dd >> $*.PP; \
+                             -e '%^$$% d' -e 's%$$% :%' < $*.dd >> $*.PP && \
                    $(MV) -f $*.PP $*.dd
 
 endif
