@@ -20,4 +20,11 @@ include $(BUILDTOOLS)/cautodep.mk
 	$(if $(QUIET),$(info [CC] $@))
 	$(QUIET)$(CC) $(CFLAGS) $(CPICFLAGS) $(CPPFLAGS) -c $< -o $@
 
+%.dso: %.c
+	+$(QUIET)[ -d $(@D) ] || mkdir -p $(@D)
+	$(QUIET)$(CMAKEDEPEND)
+	$(QUIET)$(PROCESS_CDEPS)
+	$(if $(QUIET),$(info [CC] $@))
+	$(QUIET)$(CC) $(CFLAGS) $(CPICFLAGS) $(CPPFLAGS) -c $< -o $@
+
 endif
