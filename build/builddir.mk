@@ -20,6 +20,8 @@ MAKETARGET = $(MAKE) $(MAKE_SILENT_DIRECTORY) -C $(subst $(PATHSEP_SUBST),/,$(1)
                      FLAVOR=$(notdir $(subst $(PATHSEP_SUBST),/,$(1))) SRCDIR=$(CURDIR) BUILDTOOLS=$(BUILDTOOLS) FINAL_BUILDDIR=$(subst $(PATHSEP_SUBST),/,$(1)) $(BUILD_MAKEFLAGS) $(MAKECMDGOALS)
 
 define make_builddir_target_impl
+$$(call debug,[build] Make $(1))
+
 .PHONY: $(1)
 $(1):
 	+$(QUIET)[ -d $(subst $(PATHSEP_SUBST),/,$(1)) ] || mkdir -p $(subst $(PATHSEP_SUBST),/,$(1))
