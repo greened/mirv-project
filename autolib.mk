@@ -25,7 +25,7 @@ $$($(1)_OBJDIR)/$(1).a: $$($(1)_OBJS)
 
 $$(call debug,[lib] $$($(1)_OBJDIR)/$(1).a: $$($(1)_OBJS))
 
-$(1)_SOBJS := $$(patsubst %.o,%-pic.o,$$($(1)_OBJS))
+$(1)_SOBJS := $$(patsubst %.o,%.dso,$$($(1)_OBJS))
 
 $$($(1)_OBJDIR)/$(1).so: $$($(1)_SOBJS)
 	$$(if $(QUIET),$$(info [SHLIB] $$@))
