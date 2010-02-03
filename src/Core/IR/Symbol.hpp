@@ -5,6 +5,9 @@
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 
+#include <functional>
+#include <string>
+
 namespace mirv {
   struct SymbolVisitor;
 
@@ -13,54 +16,71 @@ namespace mirv {
   /// Symbol<Function>, etc.).  It keeps all of the property and
   /// visitor logic in one place, hiding the gory details from the
   /// symbol type tags and specific symbol type interfaces.
-   template<typename Tag>
-   class Symbol : public Tag::BaseType {
-   public:
-     typedef typename Tag::BaseType BaseType;
-     typedef typename Tag::VisitorBaseType VisitorBaseType;
+  template<typename Tag>
+  class Symbol : public Tag::BaseType {
+  public:
+    typedef typename Tag::BaseType BaseType;
+    typedef typename Tag::VisitorBaseType VisitorBaseType;
 
-   protected:
-     Symbol(void) {}
-     template<typename A1>
-     Symbol(A1 a1) : BaseType(a1) {}
-     template<typename A1, typename A2>
-     Symbol(A1 a1, A2 a2) : BaseType(a1, a2) {}
-     template<typename A1, typename A2, typename A3>
-     Symbol(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
+  protected:
+    Symbol(void) {}
+    template<typename A1>
+    Symbol(A1 a1) : BaseType(a1) {}
+    template<typename A1, typename A2>
+    Symbol(A1 a1, A2 a2) : BaseType(a1, a2) {}
+    template<typename A1, typename A2, typename A3>
+    Symbol(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
 
-   public:
-     static typename ptr<Symbol<Tag> >::type
-     make(void) {
-       return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>());
-     }
+  public:
+    static typename ptr<Symbol<Tag> >::type
+    make(void) {
+      return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>());
+    }
 
-     template<typename A1>
-     static typename ptr<Symbol<Tag> >::type
-     make(A1 a1) {
-       return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1));
-     }
+    template<typename A1>
+    static typename ptr<Symbol<Tag> >::type
+    make(A1 a1) {
+      return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1));
+    }
 
-     template<typename A1, typename A2>
-     static typename ptr<Symbol<Tag> >::type
-     make(A1 a1, A2 a2) {
-       return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1, a2));
-     }
+    template<typename A1, typename A2>
+    static typename ptr<Symbol<Tag> >::type
+    make(A1 a1, A2 a2) {
+      return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1, a2));
+    }
 
-     template<typename A1, typename A2, typename A3>
-     static typename ptr<Symbol<Tag> >::type
-     make(A1 a1, A2 a2, A3 a3) {
-       return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1, a2, a3));
-     }
+    template<typename A1, typename A2, typename A3>
+    static typename ptr<Symbol<Tag> >::type
+    make(A1 a1, A2 a2, A3 a3) {
+      return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1, a2, a3));
+    }
 
-     virtual void accept(SymbolVisitor &V);
-   };
+    virtual void accept(SymbolVisitor &V);
+  };
 
   /// A specialization for base symbols.
-   template<>
-   class Symbol<Base> : public Node<Base> { 
-   public:
-     virtual void accept(SymbolVisitor &V);
-   };
+  template<>
+  class Symbol<Base> : public Node<Base> { 
+  public:
+    virtual void accept(SymbolVisitor &V);
+  };
+
+  /// This is a function object to allow searching on sets of symbols by name.
+  template<typename SymbolTag>
+  class SymbolByName :
+    public std::binary_function<boost::shared_ptr<Symbol<SymbolTag> >,
+				const std::string &,
+				bool> {
+  private:
+    typedef std::binary_function<typename ptr<Symbol<SymbolTag> >::type,
+				 const std::string &,
+				 bool> BaseType;
+  public:
+    bool operator()(typename ptr<Symbol<SymbolTag> >::type symbol,
+		    const std::string &name) {
+      return symbol->name() == name;
+    }
+  };
 
   /// This is the implementation of inner symbols.  It is
   /// inherited from once in the hierarchy for any inner symbols.
@@ -88,7 +108,7 @@ namespace mirv {
     public:
       typedef ptr<Symbol<Type<TypeBase> > >::const_type ConstTypePtr;
 
-   private:
+    private:
       ConstTypePtr theType;
 
     public:

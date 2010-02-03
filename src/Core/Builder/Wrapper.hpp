@@ -10,6 +10,7 @@ namespace mirv {
        struct else_;
        struct do_;
        struct while_;
+       struct type;
      };
 
      /// This is a proto wrapper to install builder-specific
@@ -27,6 +28,7 @@ namespace mirv {
        BOOST_PROTO_EXTENDS_MEMBERS(
 				   ((keyword::else_,   else_))
 				   ((keyword::while_,  while_))
+				   ((keyword::type,    type))
 				   )
      };
    }

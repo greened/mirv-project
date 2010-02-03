@@ -5,6 +5,9 @@
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Statement.hpp>
 
+#include <tr1/functional>
+//#include <boost/bind.hpp>
+
 namespace mirv {
   /// This is a symbol tag for function symbols.
    class Function {
@@ -23,6 +26,11 @@ namespace mirv {
      public:
        typedef StatementBaseType::ChildPtr StatementPtr;
        typedef VariableBaseType::ChildPtr VariablePtr;
+
+       Interface(const std::string &n,
+		 ConstTypePtr t)
+	 : NamedBaseType(n),
+	   TypedBaseType(t) {}
 
        Interface(const std::string &n,
 		 ConstTypePtr t,
@@ -55,6 +63,12 @@ namespace mirv {
        /// Get the end of the local variable sequence.
        ConstVariableIterator variableEnd(void) const {
 	 return VariableBaseType::end();
+       }
+
+       VariableIterator variableFind(const std::string &name) {
+	 return std::find_if(variableBegin(), variableEnd(),
+			     std::tr1::bind(SymbolByName<Variable>(), std::tr1::placeholders::_1, name));
+	 //boost::bind(SymbolByName<Symbol<Variable> >(), _1, name));
        }
 
        /// Get the single block statement child.

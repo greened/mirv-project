@@ -10,7 +10,172 @@
 #include <algorithm>
 
 namespace mirv {
-   namespace Builder {
+  namespace Builder {
+    /// This is a proto object transform to hold references to the
+    /// created module and funceion symbols.  This allows children to
+    /// query for various symbols as needed.
+    class SymbolTable {
+    private:
+      typedef mirv::ptr<mirv::Symbol<mirv::Module> >::type ModulePointer;
+      ModulePointer module;
+      typedef mirv::ptr<mirv::Symbol<mirv::Function> >::type FunctionPointer;
+      FunctionPointer function;
+
+    public:
+      SymbolTable(ModulePointer m, FunctionPointer f)
+	: module(m), function(f) {}
+
+
+      void setFunction(FunctionPointer f) {
+	function = f;
+      }
+      void clearFunction(void) {
+	function.reset();
+      }
+
+      template<typename SymbolType> struct Key {};
+
+      /// Get the variable symbol at the current scope only.  Return a
+      /// null pointer if the symbol does not exist.
+      ptr<Symbol<Variable> >::type
+      lookupAtCurrentScope(const std::string &name,
+			   Key<Symbol<Variable> >) const {
+	if (function) {
+	  Symbol<Function>::VariableIterator i = function->variableFind(name);
+	  if (i != function->variableEnd()) {
+	    return *i;
+	  }
+        }
+	Symbol<Module>::VariableIterator i = module->variableFind(name);
+	if (i != module->variableEnd()) {
+	  return *i;
+	}
+        return ptr<Symbol<Variable> >::type();
+      } 
+     
+      /// Get the function symbol at the current scope only.  Return a
+      /// null pointer if the symbol does not exist.
+      ptr<Symbol<Function> >::type
+      lookupAtCurrentScope(const std::string &name,
+			   Key<Symbol<Function> >) const {
+	Symbol<Module>::FunctionIterator i = module->functionFind(name);
+	if (i != module->functionEnd()) {
+	  return *i;
+	}
+	return ptr<Symbol<Function> >::type();
+      }
+
+      /// Get the type symbol at the current scope only.  Return a
+      /// null pointer if the symbol does not exist.
+      ptr<Symbol<Type<TypeBase> > >::type
+      lookupAtCurrentScope(const std::string &name,
+			   Key<Symbol<Type<TypeBase> > >) const {
+	Symbol<Module>::TypeIterator i = module->typeFind(name);
+	if (i != module->typeEnd()) {
+	  return *i;
+	}
+	return ptr<Symbol<Type<TypeBase> > >::type();
+      }
+
+      ptr<Symbol<Variable> >::type
+      lookupAtAllScopes(const std::string &name,
+			Key<Symbol<Variable> >) const {
+	ptr<Symbol<Variable> >::type var =
+	  lookupAtCurrentScope(name, Key<Symbol<Variable> >());
+	if (function && !var) {
+	  // Look up at module scope
+	  SymbolTable ModuleScope(module, ptr<Symbol<Function> >::type());
+	  var = ModuleScope.lookupAtCurrentScope(name, Key<Symbol<Variable> >());
+        }
+	if (!var) {
+	  error("Could not find variable");
+	}
+	return var;
+      } 
+     
+      ptr<Symbol<Function> >::type
+      lookupAtAllScopes(const std::string &name,
+			Key<Symbol<Function> >) const {
+	ptr<Symbol<Function> >::type function =
+	  lookupAtCurrentScope(name, Key<Symbol<Function> >());
+	if (!function) {
+	  error("Could not find function");
+	}
+	return function;
+      }
+
+      ptr<Symbol<Type<TypeBase> > >::type
+      lookupAtAllScopes(const std::string &name,
+			Key<Symbol<Type<TypeBase> > >) const {
+	ptr<Symbol<Type<TypeBase> > >::type type =
+	  lookupAtCurrentScope(name, Key<Symbol<Type<TypeBase> > >());
+        if (!type) {
+	  error("Could not find type");
+	}
+        return type;
+      }
+
+      void addAtCurrentScope(ptr<Symbol<Variable> >::type var) {
+	ptr<Symbol<Variable> >::type result =
+	  lookupAtCurrentScope(var->name(), Key<Symbol<Variable> >());
+        if (result) {
+	  error("Variable already exists");
+	}
+        if (function) {
+	  function->variablePushBack(var);
+          return;
+        }
+        module->variablePushBack(var);
+      }
+
+      void addAtCurrentScope(ptr<Symbol<Function> >::type func) {
+	ptr<Symbol<Function> >::type result =
+	  lookupAtCurrentScope(func->name(), Key<Symbol<Function> >());
+        if (result) {
+	  error("Function already exists");
+	}
+        module->functionPushBack(func);
+      }
+
+      void addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::type type) {
+	ptr<Symbol<Type<TypeBase> > >::type result =
+	  lookupAtCurrentScope(type->name(), Key<Symbol<Type<TypeBase> > >());
+        if (result) {
+	  error("Type already exists");
+	}
+        module->typePushBack(type);
+      }
+    };
+    
+    /// This is a callable transform to set the function scope in a
+    /// symbol table.
+    struct SetFunction : boost::proto::callable {
+      typedef SymbolTable result_type;
+
+      SymbolTable operator()(const SymbolTable &symtab,
+			     ptr<Symbol<Function> >::type function) {
+	result_type result(symtab);
+	result.setFunction(function);
+        return result;
+      }
+    };
+
+    /// This is a callable transform to lookup a symbol.
+    template<typename SymbolType,
+	     typename Dummy = boost::proto::callable>
+    struct LookupSymbol : boost::proto::callable {
+      typedef typename ptr<SymbolType>::type result_type;
+
+      result_type operator()(const SymbolTable &symtab,
+			     const std::string &name) {
+	result_type result = symtab.lookupAtAllScopes(name, SymbolTable::Key<SymbolType>());
+	if (!result) {
+	  error("Symbol does not exist");
+	}
+        return result;
+      }
+    };
+
       /// Transform a one-operand node into a single-child IR node.
      template<typename NodeType,
 	      typename Child = typename NodeType::ChildPtr,

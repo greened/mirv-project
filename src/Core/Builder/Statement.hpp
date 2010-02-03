@@ -9,11 +9,11 @@
 namespace mirv {
    namespace Builder {
      /// This is the rule to match assignment statements.
-     typedef boost::proto::assign<ConstructExpressionGrammar, ConstructExpressionGrammar> Assign;
+     typedef boost::proto::assign<ConstructExpressionGrammar, ConstructExpressionGrammar> AssignRule;
      /// This is the rule to match a sequence of statements.  The
      /// comma serves the same purpose as the semicolon in C-like
      /// languages.
-     typedef boost::proto::comma<ConstructStatementGrammar, ConstructStatementGrammar> Comma;
+     typedef boost::proto::comma<ConstructStatementGrammar, ConstructStatementGrammar> CommaRule;
 
      namespace keyword {
        /// This is a proto tag to build a terminal symbol to kick off

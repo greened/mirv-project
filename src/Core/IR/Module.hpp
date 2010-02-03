@@ -48,6 +48,11 @@ namespace mirv {
 	 return FunctionBaseType::end();
        }
 
+       FunctionIterator functionFind(const std::string &name) {
+	 return std::find_if(functionBegin(), functionEnd(),
+			     std::tr1::bind(SymbolByName<Function>(), std::tr1::placeholders::_1, name));
+       }
+
        // Access variable information
        typedef VariableBaseType::ChildPtr VariablePointer;
 
@@ -75,6 +80,11 @@ namespace mirv {
 	 return VariableBaseType::end();
        }
 
+       VariableIterator variableFind(const std::string &name) {
+	 return std::find_if(variableBegin(), variableEnd(),
+			     std::tr1::bind(SymbolByName<Variable>(), std::tr1::placeholders::_1, name));
+       }
+
        // Access type information
        typedef TypeBaseType::ChildPtr TypePointer;
 
@@ -100,6 +110,11 @@ namespace mirv {
        /// Return the end of the type sequence.
        ConstTypeIterator typeEnd(void) const {
 	 return TypeBaseType::end();
+       }
+
+       TypeIterator typeFind(const std::string &name) {
+	 return std::find_if(typeBegin(), typeEnd(),
+			     std::tr1::bind(SymbolByName<Type<TypeBase> >(), std::tr1::placeholders::_1, name));
        }
 
        virtual void accept(mirv::SymbolVisitor &) {
