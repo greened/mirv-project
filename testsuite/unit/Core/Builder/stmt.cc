@@ -35,9 +35,13 @@
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;
+using mirv::Module;
+using mirv::Function;
 using mirv::Variable;
 using mirv::Type;
+using mirv::TypeBase;
 using mirv::Integral;
+using mirv::FunctionType;
 using mirv::Statement;
 using mirv::Base;
 using mirv::ptr;
@@ -51,15 +55,36 @@ using Builder::do_;
 
 int main(void)
 {
-  Builder::Variable a =
-    {{Symbol<Variable>::make("a", make<Symbol<Type<Integral> > >("int32", 32))}};
-  Builder::Variable b =
-    {{Symbol<Variable>::make("b", make<Symbol<Type<Integral> > >("int32", 32))}};
-  Builder::Variable c =
-    {{Symbol<Variable>::make("c", make<Symbol<Type<Integral> > >("int32", 32))}};
+  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+
+  ptr<Symbol<Type<TypeBase> > >::type functype =
+    make<Symbol<Type<FunctionType> > >("functype");
+  module->typePushBack(functype);
+
+  ptr<Symbol<Type<TypeBase> > >::type inttype =
+    make<Symbol<Type<Integral> > >("int32", 32);
+  module->typePushBack(inttype);
+
+  ptr<Symbol<Function> >::type function =
+    make<Symbol<Function> >("testfunc", functype);
+
+  module->functionPushBack(function);
+
+  ptr<Symbol<Variable> >::type asym = make<Symbol<Variable> >("a", inttype);
+  function->variablePushBack(asym);
+
+  ptr<Symbol<Variable> >::type bsym = make<Symbol<Variable> >("b", inttype);
+  module->variablePushBack(bsym);
+
+  ptr<Symbol<Variable> >::type csym = make<Symbol<Variable> >("c", inttype);
+  function->variablePushBack(csym);
+
+  Builder::VariableTerminal a = {{"a"}};
+  Builder::VariableTerminal b = {{"b"}};
+  Builder::VariableTerminal c = {{"c"}};
 
   ptr<Statement<Base> >::type stmt =
-    Builder::translate_statement(
+    Builder::translate_statement(module, function,
       do_[
 	a = a + b,
         if_(b > c) [
