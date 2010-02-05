@@ -34,6 +34,7 @@ namespace mirv {
     class Interface : public Traits::BaseType {
     public:
       typedef typename Traits::const_reference const_reference;
+      typedef typename Traits::value_type value_type;
 
       typedef typename ptr<typename Traits::Child>::type ChildPtr;
       typedef typename ptr<typename Traits::Child>::const_type ConstChildPtr;

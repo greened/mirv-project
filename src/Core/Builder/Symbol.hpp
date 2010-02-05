@@ -48,17 +48,26 @@ namespace mirv {
 	 }
        };
        /// This is a proto tag to build a terminal symbol to kick off
-       /// struct type construction.
+       /// integral type construction.
        struct int_ {
 	 friend std::ostream& operator<<(std::ostream& sout, int_) {
 	   return sout << "int_";
 	 }
        };
        /// This is a proto tag to build a terminal symbol to kick off
-       /// struct type construction.
+       /// floating point type construction.
        struct float_ {
 	 friend std::ostream& operator<<(std::ostream& sout, float_) {
 	   return sout << "float_";
+	 }
+       };
+       /// This is a proto tag to build a terminal symbol to kick off
+       /// type construction when we need a way to specify no type.
+       /// For example, conmstructing a function type with no return
+       /// value.
+       struct void_ {
+	 friend std::ostream& operator<<(std::ostream& sout, void_) {
+	   return sout << "void_";
 	 }
        };
      }
@@ -94,8 +103,11 @@ namespace mirv {
        IntegerTerminal
        > FloatRule;
 
+     /// This is the rule to match void types.
+     typedef Wrapper<boost::proto::terminal<keyword::void_>::type> VoidTerminal;
+
      /// This is the rule to match simple type symbols.  It matches
-     /// int_(int)|float_(float)
+     /// int_(int)|float_(float)|void_
      typedef boost::proto::or_<
        IntRule,
        FloatRule
@@ -103,13 +115,16 @@ namespace mirv {
 
      /// Define a rule for a list of types.
      struct TypeRule;
+     struct TypeList;
+     typedef boost::proto::comma<
+       TypeList,
+       TypeRule
+       > TypeListListPart;
+
      struct TypeList :
        boost::proto::or_<
        TypeRule,
-       boost::proto::comma<
-	 TypeList,
-	 TypeRule
-	 >
+       TypeListListPart
        > {};
 
      typedef Wrapper<boost::proto::terminal<keyword::struct_>::type> StructTerminal;
@@ -124,12 +139,25 @@ namespace mirv {
        TypeList
        > StructTypeRule;
 
-     /// This is the rule to match type symbols.  It matches
-     /// IntType|FloatType|StructType
+     class TypeRule;
+
+     /// This is the rule to match function type symbols.  It matches
+     /// Type|void_(TypeList)
+     typedef boost::proto::function<
+       boost::proto::or_<
+	 VoidTerminal,
+	 TypeRule
+	 >,
+       TypeList
+       > FunctionTypeRule;
+
+     /// This is the rule to  match type symbols.  It matches
+     /// IntType|FloatType|StructType|FunctionType
      class TypeRule :
        boost::proto::or_<
        SimpleTypeRule,
-       StructTypeRule
+       StructTypeRule,
+       FunctionTypeRule
        > {};
 
      /// Define a rule to access a type from a module.

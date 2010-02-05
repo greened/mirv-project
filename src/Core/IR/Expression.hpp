@@ -131,6 +131,7 @@ namespace mirv {
 
      public:
        /// Make this compatible with certain standard algorithms.
+       typedef ChildPtr value_type;
        typedef const ChildPtr & const_reference;
 
        typedef ChildList::iterator iterator;
