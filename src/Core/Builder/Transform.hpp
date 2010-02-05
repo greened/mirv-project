@@ -3,6 +3,10 @@
 
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Builder/Make.hpp>
+#include <mirv/Core/IR/Symbol.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Module.hpp>
+#include <mirv/Core/IR/Function.hpp>
 
 #include <boost/proto/proto.hpp>
 
@@ -16,9 +20,9 @@ namespace mirv {
     /// query for various symbols as needed.
     class SymbolTable {
     private:
-      typedef mirv::ptr<mirv::Symbol<mirv::Module> >::type ModulePointer;
+      typedef ptr<Symbol<Module> >::type ModulePointer;
       ModulePointer module;
-      typedef mirv::ptr<mirv::Symbol<mirv::Function> >::type FunctionPointer;
+      typedef ptr<Symbol<Function> >::type FunctionPointer;
       FunctionPointer function;
 
     public:
@@ -175,6 +179,43 @@ namespace mirv {
         return result;
       }
     };
+
+    /// This is a callable transform to lookup a symbol and add it to
+    /// the current scope if it does not exist.
+    template<typename SymbolType,
+	     typename Dummy = boost::proto::callable>
+    struct LookupAndAddSymbol : boost::proto::callable {
+      typedef typename ptr<SymbolType>::type result_type;
+
+      result_type operator()(SymbolTable &symtab,
+			     result_type symbol) {
+	result_type result = symtab.lookupAtAllScopes(symbol->getName(),
+						      SymbolTable::Key<SymbolType>());
+	if (!result) {
+	  symtab.addAtCurrentScope(result);
+	}
+	else {
+	  symbol->reset();
+	}
+        return result;
+      }
+    };
+
+#if 0
+    /// This is a callable transform to add a symbol at the current
+    /// scope.  If the symbol already exists, it is an error.
+    template<typename SymbolType,
+	     typename Dummy = boost::proto::callable>
+    struct AddAtCurrentScope : boost::proto::callable {
+      typedef typename ptr<SymbolType>::type result_type;
+
+      result_type operator()(SymbolTable &symtab,
+			     result_type symbol) {
+	symtab.addAtCurrentScope(symbol);
+        return symbol;
+      }
+    };
+#endif
 
       /// Transform a one-operand node into a single-child IR node.
      template<typename NodeType,
