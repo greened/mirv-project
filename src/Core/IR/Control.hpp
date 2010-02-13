@@ -16,6 +16,7 @@ namespace mirv {
 
       class Interface : public InterfaceBaseType {
       public:
+	Interface(void) : InterfaceBaseType() {}
 	 template<typename A1>
 	 Interface(A1 a1) : InterfaceBaseType(a1)  {}
 	 template<typename A1, typename A2>
@@ -23,10 +24,10 @@ namespace mirv {
       };
 
    public:
-      typedef boost::mpl::vector<> Properties;
+     typedef boost::mpl::vector<> Properties;
      typedef InnerStatement VisitorBaseType;
 
-      typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+     typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
    };
 
    /// This is a statement with only one child statement.  The child

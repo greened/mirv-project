@@ -10,6 +10,14 @@
 
 namespace mirv {
    namespace Builder {
+     /// This is a utility to check if a builder fragment matches the
+     /// builder grammar.  It is mainly used for debugging.
+     template<typename Grammar, typename Expr>
+     void
+     checkMatch(const Expr &expr) {
+       BOOST_MPL_ASSERT(( boost::proto::matches<typename boost::proto::result_of::as_expr<Expr, Domain>::type, Grammar> ));
+     }
+
      /// This is the utility to transform a proto build expression to
      /// a MIRV IR expression.
      template<typename Expr>
@@ -17,8 +25,8 @@ namespace mirv {
      translate_expression(ptr<Symbol<Module> >::type module,
 			  ptr<Symbol<Function> >::type function,
 			  const Expr &expr) {
-       BOOST_MPL_ASSERT(( boost::proto::matches<Expr, ConstructExpressionGrammar> ));
-       SymbolTable symtab(module, function);
+       checkMatch<ConstructExpressionGrammar>(expr);
+       ptr<SymbolTable>::type symtab(new SymbolTable(module, function));
        ConstructExpressionGrammar trans;
        return trans(expr, 0, symtab);
      }
@@ -30,8 +38,8 @@ namespace mirv {
      translate_statement(ptr<Symbol<Module> >::type module,
 			 ptr<Symbol<Function> >::type function,
 			 const Expr &expr) {
-       BOOST_MPL_ASSERT(( boost::proto::matches<Expr, ConstructStatementGrammar> ));
-       SymbolTable symtab(module, function);
+       checkMatch<ConstructStatementGrammar>(expr);
+       ptr<SymbolTable>::type symtab(new SymbolTable(module, function));
        ConstructStatementGrammar trans;
        return trans(expr, 0, symtab);
      }
@@ -43,8 +51,8 @@ namespace mirv {
      translate(ptr<Symbol<Module> >::type module,
 	       ptr<Symbol<Function> >::type function,
 	       const Expr &expr) {
-       BOOST_MPL_ASSERT(( boost::proto::matches<Expr, ConstructGrammar> ));
-       SymbolTable symtab(module, function);
+       checkMatch<ConstructGrammar>(expr);
+       ptr<SymbolTable>::type symtab(new SymbolTable(module, function));
        ConstructGrammar trans;
        return trans(expr, 0, symtab);
      }

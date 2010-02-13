@@ -3,6 +3,7 @@
 
 // Order is important here.  In particular, Domain.hpp must be included
 // after Grammar.hpp.
+#include <mirv/Core/Builder/Symbol.hpp>
 #include <mirv/Core/Builder/Expression.hpp>
 #include <mirv/Core/Builder/Statement.hpp>
 #include <mirv/Core/Builder/Grammar.hpp>
@@ -17,20 +18,26 @@ namespace mirv {
       /// An if_ "operator."  This is a protoized object that implements
       /// the subscript operator to kick off if statement generation.
        const IfTerminal if_ = {{}};
-    }
 
-    namespace {
       /// A while_ "operator."  This is a protoized object that
       /// implements the subscript operator to kick off dowhile
       /// statement generation.
       const WhileTerminal while_ = {{}};
-    }
 
-    namespace {
       /// A do_ "operator."  This is a protoized object that
       /// implements the subscript operator to kick off dowhile
       /// statement generation.
       const DoTerminal do_ = {{}};
+
+      /// A function "operator."  This is a protoized object that
+      /// implements the subscript operator to kick off function
+      /// symbol generation.
+      const FunctionTerminal function = {{}};
+
+      /// A var "operator."  This is a protoized object that
+      /// implements the subscript operator to kick off variable
+      /// symbol generation.
+      const VarTerminal var = {{}};
     }
   }
 }

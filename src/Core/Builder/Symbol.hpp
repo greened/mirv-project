@@ -73,7 +73,7 @@ namespace mirv {
      }
 
      /// A terminal for string constants.
-     typedef Wrapper<boost::proto::terminal<std::string>::type> StringTerminal;
+     typedef Wrapper<boost::proto::terminal<boost::proto::convertible_to<std::string> >::type> StringTerminal;
      /// A terminal for integer constants.
      typedef Wrapper<boost::proto::terminal<int>::type> IntegerTerminal;
 
@@ -161,10 +161,10 @@ namespace mirv {
        > {};
 
      /// Define a rule to access a type from a module.
-     typedef boost::proto::or_<
+     struct TypeAccessRule : boost::proto::or_<
        StringTerminal,
        TypeRule
-       > TypeAccessRule;
+       > {};
 
      // Variables:
      //
@@ -176,16 +176,20 @@ namespace mirv {
 
      /// This is the rule to match variable symbols.  It matches
      /// var["name"].type["name"|type].
-     typedef boost::proto::subscript<
-       boost::proto::member<
-	 boost::proto::subscript<
-	   VarTerminal,
-	   StringTerminal
-	   >,
-	 TypeTerminal
-	 >,
+     struct VariableNameSpecifier : boost::proto::subscript<
+       VarTerminal,
+       StringTerminal
+       > {};
+
+     struct VariableTypeMember : boost::proto::member<
+       VariableNameSpecifier,
+       TypeTerminal
+       > {};
+
+     struct VariableRule : boost::proto::subscript<
+       VariableTypeMember,
        TypeAccessRule
-       > VariableRule;
+       > {};
 
      //
      // Functions:
@@ -206,36 +210,36 @@ namespace mirv {
 	 >
        > {};
 
-  /// Define a rule to match a variable declaration or a statement.
-  typedef boost::proto::or_<
-    VariableRule,
-    ConstructStatementGrammar
-    > VariableOrStatement;
+     /// Define a rule to match a variable declaration or a statement.
+     struct VariableOrStatement : boost::proto::or_<
+       VariableRule,
+       ConstructStatementGrammar
+       > {};
 
-  /// Define a rule to match a list of variables and statements.
-     struct VariableStatementList : public boost::proto::or_<
-    VariableOrStatement,
-    boost::proto::comma<
-      VariableStatementList,
-      VariableOrStatement
-      >
-    > {};
+     /// Define a rule to match a list of variables and statements.
+     struct VariableStatementList : boost::proto::or_<
+       VariableOrStatement,
+       boost::proto::comma<
+	 VariableStatementList,
+	 VariableOrStatement
+	 >
+       > {};
 
      /// This is the rule to match function symbols.  It matches
-  /// function["name"].type["name"|type][body].
-  typedef boost::proto::subscript<
-    boost::proto::subscript<
-      boost::proto::member<
-	boost::proto::subscript<
-	  FunctionTerminal,
-	  StringTerminal
-	  >,
-	TypeTerminal
-	>,
-      TypeAccessRule
-      >,
-	VariableStatementList
-    > FunctionRule;
+     /// function["name"].type["name"|type][body].
+     typedef boost::proto::subscript<
+       boost::proto::subscript<
+	 boost::proto::member<
+	   boost::proto::subscript<
+	     FunctionTerminal,
+	     StringTerminal
+	     >,
+	   TypeTerminal
+	   >,
+	 TypeAccessRule
+	 >,
+       VariableStatementList
+       > FunctionRule;
 
   // Builder syntax
   //
