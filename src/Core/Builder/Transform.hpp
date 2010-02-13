@@ -37,6 +37,10 @@ namespace mirv {
 	function.reset();
       }
 
+      FunctionPointer getFunction(void) const {
+	return function;
+      }
+
       template<typename SymbolType> struct Key {};
 
       /// Get the variable symbol at the current scope only.  Return a
@@ -154,13 +158,12 @@ namespace mirv {
     /// This is a callable transform to set the function scope in a
     /// symbol table.
     struct SetFunction : boost::proto::callable {
-      typedef SymbolTable result_type;
+      typedef ptr<SymbolTable>::type result_type;
 
-      SymbolTable operator()(const SymbolTable &symtab,
+      result_type operator()(ptr<SymbolTable>::type symtab,
 			     ptr<Symbol<Function> >::type function) {
-	result_type result(symtab);
-	result.setFunction(function);
-        return result;
+	symtab->setFunction(function);
+        return symtab;
       }
     };
 
@@ -170,9 +173,9 @@ namespace mirv {
     struct LookupSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
-      result_type operator()(const SymbolTable &symtab,
+      result_type operator()(ptr<SymbolTable>::const_type symtab,
 			     const std::string &name) {
-	result_type result = symtab.lookupAtAllScopes(name, SymbolTable::Key<SymbolType>());
+	result_type result = symtab->lookupAtAllScopes(name, SymbolTable::Key<SymbolType>());
 	if (!result) {
 	  error("Symbol does not exist");
 	}
@@ -187,12 +190,12 @@ namespace mirv {
     struct LookupAndAddSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
-      result_type operator()(SymbolTable &symtab,
+      result_type operator()(ptr<SymbolTable>::type symtab,
 			     result_type symbol) {
-	result_type result = symtab.lookupAtAllScopes(symbol->getName(),
+	result_type result = symtab->lookupAtAllScopes(symbol->getName(),
 						      SymbolTable::Key<SymbolType>());
 	if (!result) {
-	  symtab.addAtCurrentScope(result);
+	  symtab->addAtCurrentScope(result);
 	}
 	else {
 	  symbol->reset();
@@ -209,9 +212,9 @@ namespace mirv {
     struct AddAtCurrentScope : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
-      result_type operator()(SymbolTable &symtab,
+      result_type operator()(ptr<SymbolTable>::type symtab,
 			     result_type symbol) {
-	symtab.addAtCurrentScope(symbol);
+	symtab->addAtCurrentScope(symbol);
         return symbol;
       }
     };

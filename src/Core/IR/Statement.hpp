@@ -89,6 +89,12 @@ namespace mirv {
      Statement(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
 
    public:
+     static typename ptr<Statement<Tag> >::type
+     make(void) {
+       typename ptr<Statement<Tag> >::type p(new Statement<Tag>());
+       return p;
+     }
+
      template<typename A1>
      static typename ptr<Statement<Tag> >::type
      make(A1 a1) {
@@ -168,6 +174,7 @@ namespace mirv {
 	Virtual<InnerStatementBase>
       >::type> BaseType;
    public:
+    InnerStatement(void) : BaseType() {}
     InnerStatement(ChildPtr Child) : BaseType(Child) {}
     InnerStatement(ChildPtr Child1,
 		   ChildPtr Child2) : BaseType(Child1, Child2) {}

@@ -2,6 +2,7 @@
 #define mirv_Core_Builder_SymbolGrammar_hpp
 
 #include <mirv/Core/Builder/Symbol.hpp>
+#include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/lexical_cast.hpp>
@@ -29,18 +30,19 @@ namespace mirv {
     struct ConstructUnarySymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
-      result_type operator()(const SymbolTable &symtab,
+      result_type operator()(ptr<SymbolTable>::type symtab,
 			     size_t size) {
 	std::string name = detail::GetBaseName<SymbolType>::value;
 	name += boost::lexical_cast<std::string>(size);
 
 	// Make sure we're not already in the symbol table at the current scope.
-	result_type exists = symtab.lookupAtCurrentScope(name, SymbolTable::Key<SymbolType>());
+	result_type exists = symtab->lookupAtCurrentScope(name, SymbolTable::Key<SymbolType>());
 	if (exists) {
 	  error("Symbol exists");
 	}
 	result_type result = make<SymbolType>(name, size);
-	symtab.addAtCurrentScope(result);
+	symtab->addAtCurrentScope(result);
+	return result;
       }
     };
 
@@ -51,16 +53,17 @@ namespace mirv {
     struct ConstructBinarySymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
-      result_type operator()(const SymbolTable &symtab,
+      result_type operator()(ptr<SymbolTable>::type symtab,
 			     const std::string &name,
-			     typename ptr<Symbol<Type<TypeBase> > >::type type) {
+			     boost::shared_ptr<Symbol<Type<TypeBase> > > type) {
 	// Make sure we're not already in the symbol table at the current scope.
-	result_type exists = symtab.lookupAtCurrentScope(name, SymbolTable::Key<SymbolType>());
+	result_type exists = symtab->lookupAtCurrentScope(name, SymbolTable::Key<SymbolType>());
 	if (exists) {
 	  error("Symbol exists");
 	}
 	result_type result = make<SymbolType>(name, type);
-	symtab.addAtCurrentScope(result);
+	symtab->addAtCurrentScope(result);
+	return result;
       }
     };
 
@@ -72,11 +75,38 @@ namespace mirv {
       }
     };
 
-    /// This is a callable transform to construction a type list with
-    /// a single member type.
+    /// This is a callable transform to get the current function.
+    struct GetFunction : boost::proto::callable {
+      typedef ptr<Symbol<Function> >::type result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+			     boost::shared_ptr<Node<Base> >) {
+	result_type function = symtab->getFunction();
+	if (function->statementEmpty()) {
+	  function->statementPushBack(make<Statement<Block> >());
+	}
+	checkInvariant(function->getStatement(), "No function statement");
+	return function;
+      }
+    };
+
+    /// This is a callable transform to add a statement to a function.
+    struct AddFunctionStatement : boost::proto::callable {
+      typedef ptr<Symbol<Function> >::type result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+			     boost::shared_ptr<Statement<Base> > body) {
+	result_type function = symtab->getFunction();
+	function->statementPushBack(body);
+	return function;
+      }
+    };
+
+    /// This is a callable transform to construct a type list with a
+    /// single member type.
     struct ConstructTypeList : boost::proto::callable {
       typedef std::list<ptr<Symbol<Type<TypeBase> > >::type> result_type;
-      result_type operator()(ptr<Symbol<Type<TypeBase> > >::type type) {
+      result_type operator()(boost::shared_ptr<Symbol<Type<TypeBase> > > type) {
 	result_type typelist;
 	typelist.push_back(type);
 	return typelist;
@@ -87,7 +117,7 @@ namespace mirv {
     struct AddToTypeList : boost::proto::callable {
       typedef std::list<ptr<Symbol<Type<TypeBase> > >::type> result_type;
       result_type operator()(result_type &typelist,
-			     ptr<Symbol<Type<TypeBase> > >::type type) {
+			     boost::shared_ptr<Symbol<Type<TypeBase> > > type) {
 	// TODO: Check for duplicates.
 	typelist.push_back(type);
 	return typelist;
@@ -97,36 +127,12 @@ namespace mirv {
   // Define the symbol grammar.
   struct ConstructSymbolGrammar;
 
-  struct ConstructSymbolGrammarCases {
-    /// This is the default case.  It matches nothing, ensuring that
-    /// illegal oncstructs flag an error.
-    template<typename Tag>
-    struct case_ : boost::proto::not_<boost::proto::_> {};
-  };
-
-      /// This is the grammar for module symbols.
+    /// This is the grammar for module symbols.
     typedef boost::proto::when<
       ModuleRule,
       ConstructSymbolGrammar(boost::proto::_right,
 			     boost::proto::_state,
 			     ConstructUnary<SymbolTable, ptr<Symbol<Module> >::type>(ConstructUnary<Symbol<Module>, const std::string &>(boost::proto::_value(boost::proto::_right(boost::proto::_left)))))> ModuleBuilder;
-
-    /// This is the grammar for function symbols.
-    typedef boost::proto::when<
-      FunctionRule,
-      // TODO: Need to set the function body
-      ConstructSymbolGrammar(boost::proto::_right,
-			     boost::proto::_state,
-			     SetFunction(boost::proto::_data,
-					 ConstructBinarySymbol<
-					 Symbol<
-					 Function> 
-					 >(boost::proto::_data,
-					   // Function name
-					   boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left))),
-					   // Function type
-					   LookupSymbol<Symbol<Type<TypeBase> > >(boost::proto::_data,
-									     boost::proto::_right(boost::proto::_left)))))> FunctionBuilder;
 
     /// This is the grammar for variable symbols.
   typedef boost::proto::when<
@@ -135,16 +141,38 @@ namespace mirv {
       Symbol<
 	Variable> >(boost::proto::_data,
 		    // Variable name
-		    boost::proto::_right(boost::proto::_left(boost::proto::_left)),
+		    boost::proto::_value(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
 		    // Variable type
 		    LookupSymbol<Symbol<Type<TypeBase> > >(boost::proto::_data,
-							   boost::proto::_right))> VariableBuilder;
+							   boost::proto::_value(boost::proto::_right)))> VariableBuilder;
 
-  template<>
-  struct ConstructSymbolGrammarCases::case_<boost::proto::tag::subscript>
-    : boost::proto::or_<ModuleBuilder,
-			FunctionBuilder,
-			VariableBuilder> {};
+    /// This is the grammar for function bodies.  It can contain
+    /// variable declarations and statements.  We add variables and
+    /// statements as we find them.  Variables are handled by the
+    /// variable rule so we need only worry about statements.
+    struct FunctionBodyBuilder : boost::proto::or_<
+      VariableBuilder,
+      boost::proto::when<ConstructStatementGrammar,
+			 AddFunctionStatement(boost::proto::_data,
+					      ConstructStatementGrammar(boost::proto::_))>
+      > {};
+
+    /// This is the grammar for function symbols.
+    typedef boost::proto::when<
+      FunctionRule,
+      GetFunction(boost::proto::_data,
+		  FunctionBodyBuilder(boost::proto::_right,
+				      boost::proto::_state,
+				      SetFunction(boost::proto::_data,
+						  ConstructBinarySymbol<
+						  Symbol<
+						  Function> 
+						  >(boost::proto::_data,
+						    // Function name
+						    boost::proto::_value(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
+						    // Function type
+						    LookupSymbol<Symbol<Type<TypeBase> > >(boost::proto::_data,
+											   boost::proto::_value(boost::proto::_right(boost::proto::_left)))))))> FunctionBuilder;
 
     /// This is the grammar for void types.
     typedef boost::proto::when<
@@ -199,8 +227,11 @@ namespace mirv {
 
     /// This aggregates all of the symbol rules.  It serves as the
     /// grammar for all statements.
-    struct ConstructSymbolGrammar
-      : boost::proto::switch_<ConstructSymbolGrammarCases> {};
+    struct ConstructSymbolGrammar : boost::proto::or_<
+      ModuleBuilder,
+      FunctionBuilder,
+      VariableBuilder
+      > {};
   }
 }
 

@@ -71,9 +71,28 @@ namespace mirv {
 	 //boost::bind(SymbolByName<Symbol<Variable> >(), _1, name));
        }
 
+       void statementPushBack(StatementPtr stmt) {
+	 // If the statement is not a block, make it one.
+	 if (StatementBaseType::empty())  {
+	   StatementPtr newStmt = (dyn_cast<Statement<Block> >(stmt) ?
+				   stmt : mirv::make<Statement<Block> >(stmt));
+	   StatementBaseType::push_back(newStmt);
+	 }
+	 else {
+	   ptr<Statement<Block> >::type block =
+	     safe_cast<Statement<Block> >(StatementBaseType::front());
+	   block->push_back(stmt);
+	 }
+       }
+
        /// Get the single block statement child.
        StatementPtr getStatement(void) {
 	 return *StatementBaseType::begin();
+       }
+
+       /// Return whether the function does not have a statement.
+       bool statementEmpty(void) const {
+	 return StatementBaseType::empty();
        }
 
        virtual void accept(mirv::SymbolVisitor &) {
