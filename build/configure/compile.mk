@@ -21,7 +21,7 @@ $$(call debug,[mc_compile_impl] mc_compile_impl("$(1)" "$(2)" "$(3)" "$(4)" "$(5
 $(1)_OSRCFILE := $(FINAL_BUILDDIR)/configure/$(1)_compile_test.$(4)
 $(1)_OFILE := $$(patsubst %.$(4),%.o,$$($(1)_OSRCFILE))
 
-$(1)_compile_source := $$(subst $$(newline), ,$$(subst $$(space),_,$$($(3))))
+$(1)_compile_source := $$(subst $$(newline), ,$$(subst $$(space),`,$$($(3))))
 
 $$(call debug,[mc_compile_impl] $(1)_compile_source = $$($(1)_compile_source))
 $$(call debug,[mc_compile_impl] $(1)_OSRCFILE = $$($(1)_OSRCFILE))
@@ -30,7 +30,7 @@ $$(call debug,[mc_compile_impl] $(1)_OFILE    = $$($(1)_OFILE))
 .PRECIOUS: $$($(1)_OSRCFILE)
 $$($(1)_OSRCFILE):
 	$(QUIET)cat /dev/null > $$@
-	$(QUIET)$$(foreach line,$$($(1)_compile_source),echo "$$(subst _, ,$$(line))" >> $$@; )
+	$(QUIET)$$(foreach line,$$($(1)_compile_source),echo "$$(subst `, ,$$(line))" >> $$@; )
 
 $$(call debug,[mc_compile_impl] $$($(1)_OFILE): $$($(1)_OSRCFILE) $(6))
 
