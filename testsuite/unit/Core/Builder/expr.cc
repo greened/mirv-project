@@ -43,11 +43,11 @@ int main(void)
   ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
 
   ptr<Symbol<Type<TypeBase> > >::type functype =
-    make<Symbol<Type<FunctionType> > >("functype");
+    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >::type());
   module->typePushBack(functype);
 
   ptr<Symbol<Type<TypeBase> > >::type inttype =
-    make<Symbol<Type<Integral> > >("int32", 32);
+    make<Symbol<Type<Integral> > >(32);
   module->typePushBack(inttype);
 
   ptr<Symbol<Function> >::type function =

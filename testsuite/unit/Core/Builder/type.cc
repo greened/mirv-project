@@ -1,9 +1,9 @@
-// Test building of variables.
+// Test building of types.
 //
 // STDOUT: fdef testfunc {
 // STDOUT:    vdecl a int32
 // STDOUT:    {
-// STDOUT:
+// STDOUT: 
 // STDOUT:    }
 // STDOUT: }
 
@@ -27,25 +27,19 @@ using mirv::make;
 
 namespace Builder = mirv::Builder;
 
-using Builder::var;
 using Builder::function;
+using Builder::var;
+using Builder::void_;
+using Builder::int_;
 
 int main(void)
 {
   ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
 
-  ptr<Symbol<Type<TypeBase> > >::type functype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >::type());
-  module->typePushBack(functype);
-
-  ptr<Symbol<Type<TypeBase> > >::type inttype =
-    make<Symbol<Type<Integral> > >(32);
-  module->typePushBack(inttype);
-
   ptr<Node<Base> >::type code =
     Builder::translate(module, ptr<Symbol<Function> >::type(),
-      function["testfunc"].type["void ()"] [
-	var["a"].type["int32"]
+      function["testfunc"].type[void_()] [
+        var["a"].type[int_(32)]
       ]
     );
 

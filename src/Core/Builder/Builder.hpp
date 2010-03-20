@@ -38,6 +38,15 @@ namespace mirv {
       /// implements the subscript operator to kick off variable
       /// symbol generation.
       const VarTerminal var = {{}};
+
+      /// A void_ "operator."  This is a protoized object that
+      /// implements the function operator to construct function types
+      /// with no return value.
+      const VoidTerminal void_ = {{}};
+
+      /// An int_ "operator."  This is a protoized object that
+      /// implements the function operator to construct integer types.
+      const IntTerminal int_ = {{}};
     }
   }
 }

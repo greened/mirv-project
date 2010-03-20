@@ -56,6 +56,16 @@ namespace mirv {
     }
 
     virtual void accept(SymbolVisitor &V);
+
+     template<typename Arg>
+     static std::string getName(Arg &a) {
+       return Tag::getName(a);
+     }
+
+     template<typename Arg1, typename Arg2>
+     static std::string getName(Arg1 &a1, Arg2 &a2) {
+       return Tag::getName(a1, a2);
+     }
   };
 
   /// A specialization for base symbols.

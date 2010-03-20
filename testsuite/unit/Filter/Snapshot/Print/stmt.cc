@@ -56,11 +56,11 @@ using mirv::make;
 int main(void)
 {
   ptr<Symbol<Variable> >::type a =
-    Symbol<Variable>::make("a", make<Symbol<Type<Integral> > >("int32", 32));
+    Symbol<Variable>::make("a", make<Symbol<Type<Integral> > >(32));
   ptr<Symbol<Variable> >::type b =
-    Symbol<Variable>::make("b", make<Symbol<Type<Integral> > >("int32", 32));
+    Symbol<Variable>::make("b", make<Symbol<Type<Integral> > >(32));
   ptr<Symbol<Variable> >::type c =
-    Symbol<Variable>::make("c", make<Symbol<Type<Integral> > >("int32", 32));
+    Symbol<Variable>::make("c", make<Symbol<Type<Integral> > >(32));
 
   ptr<Statement<Base> >::type dowhile =
     Statement<DoWhile>::make(

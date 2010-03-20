@@ -41,13 +41,11 @@ namespace mirv {
 	return function;
       }
 
-      template<typename SymbolType> struct Key {};
-
       /// Get the variable symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
       ptr<Symbol<Variable> >::type
       lookupAtCurrentScope(const std::string &name,
-			   Key<Symbol<Variable> >) const {
+			   Symbol<Variable> *) const {
 	if (function) {
 	  Symbol<Function>::VariableIterator i = function->variableFind(name);
 	  if (i != function->variableEnd()) {
@@ -65,7 +63,7 @@ namespace mirv {
       /// null pointer if the symbol does not exist.
       ptr<Symbol<Function> >::type
       lookupAtCurrentScope(const std::string &name,
-			   Key<Symbol<Function> >) const {
+			   Symbol<Function> *) const {
 	Symbol<Module>::FunctionIterator i = module->functionFind(name);
 	if (i != module->functionEnd()) {
 	  return *i;
@@ -77,7 +75,7 @@ namespace mirv {
       /// null pointer if the symbol does not exist.
       ptr<Symbol<Type<TypeBase> > >::type
       lookupAtCurrentScope(const std::string &name,
-			   Key<Symbol<Type<TypeBase> > >) const {
+			   Symbol<Type<TypeBase> > *) const {
 	Symbol<Module>::TypeIterator i = module->typeFind(name);
 	if (i != module->typeEnd()) {
 	  return *i;
@@ -87,13 +85,15 @@ namespace mirv {
 
       ptr<Symbol<Variable> >::type
       lookupAtAllScopes(const std::string &name,
-			Key<Symbol<Variable> >) const {
+			Symbol<Variable> *) const {
 	ptr<Symbol<Variable> >::type var =
-	  lookupAtCurrentScope(name, Key<Symbol<Variable> >());
+	  lookupAtCurrentScope(name, reinterpret_cast<Symbol<Variable> *>(0));
 	if (function && !var) {
 	  // Look up at module scope
 	  SymbolTable ModuleScope(module, ptr<Symbol<Function> >::type());
-	  var = ModuleScope.lookupAtCurrentScope(name, Key<Symbol<Variable> >());
+	  var = ModuleScope.lookupAtCurrentScope(
+            name,
+            reinterpret_cast<Symbol<Variable> *>(0));
         }
 	if (!var) {
 	  error("Could not find variable");
@@ -103,9 +103,9 @@ namespace mirv {
      
       ptr<Symbol<Function> >::type
       lookupAtAllScopes(const std::string &name,
-			Key<Symbol<Function> >) const {
+			Symbol<Function> *) const {
 	ptr<Symbol<Function> >::type function =
-	  lookupAtCurrentScope(name, Key<Symbol<Function> >());
+	  lookupAtCurrentScope(name, reinterpret_cast<Symbol<Function> *>(0));
 	if (!function) {
 	  error("Could not find function");
 	}
@@ -114,9 +114,10 @@ namespace mirv {
 
       ptr<Symbol<Type<TypeBase> > >::type
       lookupAtAllScopes(const std::string &name,
-			Key<Symbol<Type<TypeBase> > >) const {
+			Symbol<Type<TypeBase> > *) const {
 	ptr<Symbol<Type<TypeBase> > >::type type =
-	  lookupAtCurrentScope(name, Key<Symbol<Type<TypeBase> > >());
+	  lookupAtCurrentScope(name,
+                               reinterpret_cast<Symbol<Type<TypeBase> > *>(0));
         if (!type) {
 	  error("Could not find type");
 	}
@@ -125,7 +126,8 @@ namespace mirv {
 
       void addAtCurrentScope(ptr<Symbol<Variable> >::type var) {
 	ptr<Symbol<Variable> >::type result =
-	  lookupAtCurrentScope(var->name(), Key<Symbol<Variable> >());
+	  lookupAtCurrentScope(var->name(),
+                               reinterpret_cast<Symbol<Variable> *>(0));
         if (result) {
 	  error("Variable already exists");
 	}
@@ -138,7 +140,8 @@ namespace mirv {
 
       void addAtCurrentScope(ptr<Symbol<Function> >::type func) {
 	ptr<Symbol<Function> >::type result =
-	  lookupAtCurrentScope(func->name(), Key<Symbol<Function> >());
+	  lookupAtCurrentScope(func->name(),
+                               reinterpret_cast<Symbol<Function> *>(0));
         if (result) {
 	  error("Function already exists");
 	}
@@ -147,7 +150,8 @@ namespace mirv {
 
       void addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::type type) {
 	ptr<Symbol<Type<TypeBase> > >::type result =
-	  lookupAtCurrentScope(type->name(), Key<Symbol<Type<TypeBase> > >());
+	  lookupAtCurrentScope(type->name(),
+                               reinterpret_cast<Symbol<Type<TypeBase> > *>(0));
         if (result) {
 	  error("Type already exists");
 	}
@@ -175,7 +179,8 @@ namespace mirv {
 
       result_type operator()(ptr<SymbolTable>::const_type symtab,
 			     const std::string &name) {
-	result_type result = symtab->lookupAtAllScopes(name, SymbolTable::Key<SymbolType>());
+	result_type result =
+          symtab->lookupAtAllScopes(name, reinterpret_cast<SymbolType *>(0));
 	if (!result) {
 	  error("Symbol does not exist");
 	}
@@ -192,13 +197,14 @@ namespace mirv {
 
       result_type operator()(ptr<SymbolTable>::type symtab,
 			     result_type symbol) {
-	result_type result = symtab->lookupAtAllScopes(symbol->getName(),
-						      SymbolTable::Key<SymbolType>());
+	result_type result =
+          symtab->lookupAtAllScopes(symbol->name(), 
+                                    reinterpret_cast<SymbolType *>(0));
 	if (!result) {
 	  symtab->addAtCurrentScope(result);
 	}
 	else {
-	  symbol->reset();
+	  symbol.reset();
 	}
         return result;
       }
