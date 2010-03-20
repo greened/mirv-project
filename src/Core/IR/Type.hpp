@@ -1,10 +1,17 @@
 #ifndef mirv_Core_IR_Type_hpp
 #define mirv_Core_IR_Type_hpp
 
-#include <mirv/Core/IR/Symbol.hpp>
-
 #include <vector>
 #include <numeric>
+
+#include <boost/lexical_cast.hpp>
+#include <boost/fusion/iterator.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <boost/fusion/include/front.hpp>
+#include <boost/fusion/include/pop_front.hpp>
+#include <boost/fusion/include/size.hpp>
+
+#include <mirv/Core/IR/Symbol.hpp>
 
 namespace mirv {
    struct SymbolVisitor;
@@ -23,6 +30,16 @@ namespace mirv {
 
      Type() {}
      Type(const std::string &name) : BaseType(name) {}
+
+     template<typename Arg>
+     static std::string getName(Arg &a) {
+       return Tag::getName(a);
+     }
+
+     template<typename Arg1, typename Arg2>
+     static std::string getName(Arg1 &a1, Arg2 &a2) {
+       return Tag::getName(a1, a2);
+     }
    };
 
   /// A type tag for the base type of all types.
@@ -94,13 +111,18 @@ namespace mirv {
 
      class Interface : public InterfaceBaseType {
      public:
-       Interface(const std::string &name, BitSizeType size) :
-	 InterfaceBaseType(name, size) {}
+       Interface(BitSizeType size) :
+           InterfaceBaseType("int" + boost::lexical_cast<std::string>(size),
+                             size) {}
      };
 
    public:
      typedef Interface BaseType;
      typedef Symbol<Type<Simple> > VisitorBaseType;
+
+     static std::string getName(Interface::BitSizeType size) {
+       return "int" + boost::lexical_cast<std::string>(size);
+     }
   };
 
   /// Floating point types.
@@ -109,20 +131,25 @@ namespace mirv {
 
      class Interface : public InterfaceBaseType {
      public:
-       Interface(const std::string &name, BitSizeType size) :
-	 InterfaceBaseType(name, size) {}
+       Interface(BitSizeType size) :
+           InterfaceBaseType("float" + boost::lexical_cast<std::string>(size),
+                             size) {}
      };
 
    public:
      typedef Interface BaseType;
      typedef Symbol<Type<Simple> > VisitorBaseType;
+
+     static std::string getName(Interface::BitSizeType size) {
+       return "float" + boost::lexical_cast<std::string>(size);
+     }
   };
 
   /// A type that is built upon other types.  For example structures
   /// and pointers.
    struct Derived {
    public:
-      typedef InnerType BaseType;
+     typedef InnerType BaseType;
      typedef InnerType VisitorBaseType;
    };
 
@@ -256,17 +283,8 @@ namespace mirv {
 	typedef ptr<ChildType>::type ChildPtr;
 	typedef ptr<ChildType>::const_type ConstChildPtr;
 
-	Interface(const std::string &name,
-		  ChildPtr ReturnType = ChildPtr())
-	  : InterfaceBaseType(name) {
-	  setReturnType(ReturnType);
-	}
-
-	BitSizeType bitsize(void) const {
-	  return 0;
-	}
-
-	/// By conventon, the return type is the first element of the
+      private:
+        /// By conventon, the return type is the first element of the
 	/// underlying child list.  A void function will have a 0
 	/// pointer as the first child.
 	void setReturnType(ChildPtr c) {
@@ -278,17 +296,58 @@ namespace mirv {
 	  }
 	}
 
+        std::string constructName(ChildPtr ReturnType) {
+          if (ReturnType) {
+            return ReturnType->name() + " ()";
+          }
+          else {
+            return "void ()";
+          }
+        }
+
+        template<typename InputIterator>
+        std::string constructName(ChildPtr ReturnType,
+                                  InputIterator start, InputIterator end) {
+          std::stringstream name;
+          name << ReturnType->name() << "(";
+          for (InputIterator a = start; a != end; /* NULL */) {
+            name << (*a)->name();
+            if ((a = boost::fusion::next(a)) != end) {
+              name << ',';
+            }
+          }
+          name << ")";
+          return name.str();
+        }
+
+      public:
+	Interface(ChildPtr returnType)
+            : InterfaceBaseType(constructName(returnType)) {
+	  setReturnType(returnType);
+        }
+
+        template<typename Sequence>
+	Interface(ChildPtr returnType, Sequence range)
+            : InterfaceBaseType(constructName(returnType,
+                                              boost::fusion::begin(range),
+                                              boost::fusion::end(range))) {
+	  setReturnType(returnType);
+          // Add the parameter types.
+          std::copy(boost::fusion::begin(range),
+                    boost::fusion::end(range),
+                    std::back_inserter(*this));
+	}
+
+	BitSizeType bitsize(void) const {
+	  return 0;
+	}
+
 	ChildPtr getReturnType(void) {
 	  return(front());
 	}
 
 	ConstChildPtr getReturnType(void) const {
 	  return(front());
-	}
-
-	/// Add a parameter type.
-	void parameterPushBack(ChildPtr Parameter) {
-	  push_back(Parameter);
 	}
 
 	/// Return whether this function type does not have any
@@ -318,9 +377,58 @@ namespace mirv {
 	}
       };
 
+     class Output {
+       std::ostream &out;
+
+     public:
+       Output(std::ostream &o) : out(o) {}
+       typedef void result_type;
+       template<typename Item>
+       result_type operator()(Item i) const {
+         out << ", " << i->getName();
+       }
+     };
+
    public:
      typedef Interface BaseType;
      typedef Symbol<Type<Derived> > VisitorBaseType;
+
+     static std::string
+     getName(ptr<Symbol<Type<TypeBase> > >::type returnType) {
+       if (returnType) {
+         return returnType->name() + " ()";
+       }
+       else {
+         return "void ()";
+       }
+     }
+
+     template<typename FusionSequence>
+     static std::string getName(ptr<Symbol<Type<TypeBase> > >::type returnType,
+                                FusionSequence argTypes) {
+       std::stringstream name;
+       if (returnType) {
+         name << returnType->name() << " (";
+       }
+       else {
+         name << "void (";
+       }
+
+       int size = boost::fusion::size(argTypes);
+
+       if (size > 0) {
+         // Print the first argument type.
+         name << boost::fusion::front(argTypes)->name();
+         if (size > 1) {
+           // Print the following argument type preceeded by a comma.
+           boost::fusion::for_each(boost::fusion::pop_front(argTypes),
+                                   Output(name));
+         }
+       }
+  
+       name << ")";
+       return name.str();
+     }
    };
 }
 

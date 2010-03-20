@@ -2,6 +2,7 @@
 #define mirv_Core_IR_Function_hpp
 
 #include <mirv/Core/IR/Symbol.hpp>
+#include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Statement.hpp>
 
@@ -101,6 +102,11 @@ namespace mirv {
      };
      typedef Interface BaseType;
      typedef TypedBaseType VisitorBaseType;
+
+     static std::string getName(const std::string &name,
+                                ptr<Symbol<Type<TypeBase> > >::type type) {
+       return name;
+     }
    };
 }
 

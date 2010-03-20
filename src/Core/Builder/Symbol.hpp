@@ -139,7 +139,7 @@ namespace mirv {
        TypeList
        > StructTypeRule;
 
-     class TypeRule;
+     struct TypeRule;
 
      /// This is the rule to match function type symbols.  It matches
      /// Type|void_(TypeList)
@@ -149,11 +149,23 @@ namespace mirv {
 	 TypeRule
 	 >,
        TypeList
+       > FunctionTypeWithArgsRule;
+
+     typedef boost::proto::function<
+       boost::proto::or_<
+	 VoidTerminal,
+	 TypeRule
+	 >
+       > FunctionTypeWithoutArgsRule;
+
+     typedef boost::proto::or_<
+       FunctionTypeWithArgsRule,
+       FunctionTypeWithoutArgsRule
        > FunctionTypeRule;
 
      /// This is the rule to  match type symbols.  It matches
      /// IntType|FloatType|StructType|FunctionType
-     class TypeRule :
+     struct TypeRule :
        boost::proto::or_<
        SimpleTypeRule,
        StructTypeRule,
@@ -164,6 +176,12 @@ namespace mirv {
      struct TypeAccessRule : boost::proto::or_<
        StringTerminal,
        TypeRule
+       > {};
+
+     /// Define a rule to access a function type from a module.
+     struct FunctionTypeAccessRule : boost::proto::or_<
+       StringTerminal,
+       FunctionTypeRule
        > {};
 
      // Variables:
@@ -236,7 +254,7 @@ namespace mirv {
 	     >,
 	   TypeTerminal
 	   >,
-	 TypeAccessRule
+	 FunctionTypeAccessRule
 	 >,
        VariableStatementList
        > FunctionRule;

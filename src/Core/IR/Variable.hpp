@@ -24,6 +24,11 @@ namespace mirv {
    public:
      typedef Interface BaseType;
      typedef LeafSymbol VisitorBaseType;
+
+     static std::string getName(const std::string &name,
+                                ptr<Symbol<Type<TypeBase> > >::type type) {
+       return name;
+     }
    };
 }
 

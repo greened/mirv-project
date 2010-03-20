@@ -2,45 +2,35 @@
 #define mirv_Core_Builder_SymbolGrammar_hpp
 
 #include <mirv/Core/Builder/Symbol.hpp>
+#include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/fusion/iterator.hpp>
+#include <boost/fusion/include/transform.hpp>
 
 namespace mirv {
   namespace Builder {
-    namespace detail {
-      /// This computes the base name of a simple type at compile time.
-      template<typename SymbolType>
-      struct GetBaseName;
-      template<>
-      struct GetBaseName<Symbol<Type<Integral> > > {
-	static const char *value;
-      };
-      template<>
-      struct GetBaseName<Symbol<Type<Floating> > > {
-	static const char *value;
-      };
-    }
-
     /// This is a callable transform to construct a symbol.  If the
     /// symbol exists at the current scope, it is an error.
     template<typename SymbolType,
 	     typename Dummy = boost::proto::callable>
-    struct ConstructUnarySymbol : boost::proto::callable {
+    struct UnaryConstructSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
+      template<typename Arg>
       result_type operator()(ptr<SymbolTable>::type symtab,
-			     size_t size) {
-	std::string name = detail::GetBaseName<SymbolType>::value;
-	name += boost::lexical_cast<std::string>(size);
+			     Arg a) {
+	std::string name = SymbolType::getName(a);
 
 	// Make sure we're not already in the symbol table at the current scope.
-	result_type exists = symtab->lookupAtCurrentScope(name, SymbolTable::Key<SymbolType>());
+	ptr<Symbol<Base> >::type exists =
+          symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
 	if (exists) {
 	  error("Symbol exists");
 	}
-	result_type result = make<SymbolType>(name, size);
+	result_type result = make<SymbolType>(a);
 	symtab->addAtCurrentScope(result);
 	return result;
       }
@@ -50,18 +40,22 @@ namespace mirv {
     /// symbol exists at the current scope, it is an error.
     template<typename SymbolType,
 	     typename Dummy = boost::proto::callable>
-    struct ConstructBinarySymbol : boost::proto::callable {
+    struct BinaryConstructSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
+      template<typename Arg1, typename Arg2>
       result_type operator()(ptr<SymbolTable>::type symtab,
-			     const std::string &name,
-			     boost::shared_ptr<Symbol<Type<TypeBase> > > type) {
+			     Arg1 a1,
+			     Arg2 a2) {
+	std::string name = SymbolType::getName(a1, a2);
+
 	// Make sure we're not already in the symbol table at the current scope.
-	result_type exists = symtab->lookupAtCurrentScope(name, SymbolTable::Key<SymbolType>());
+	result_type exists =
+          symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
 	if (exists) {
 	  error("Symbol exists");
 	}
-	result_type result = make<SymbolType>(name, type);
+	result_type result = make<SymbolType>(a1, a2);
 	symtab->addAtCurrentScope(result);
 	return result;
       }
@@ -72,6 +66,31 @@ namespace mirv {
       typedef ptr<Symbol<Type<TypeBase> > >::type result_type;
       result_type operator()(void) {
 	return result_type();
+      }
+    };
+
+    /// This is a callable transform to translate a proto expression
+    /// to a symbol.
+    template<typename SymbolType>
+    struct TranslateToSymbol : boost::proto::callable {
+      typedef typename ptr<SymbolType>::type result_type;
+
+      template<typename Expr>
+      result_type operator()(const Expr &e) const {
+        return translate(e);
+      }
+    };
+
+    /// This is a callable transform to construct a function type.
+    struct ConstructFunctionTypeSymbol : boost::proto::callable {
+      typedef ptr<Symbol<Type<FunctionType> > >::type result_type;
+
+      template<typename Arg1, typename Arg2>
+      result_type operator()(ptr<SymbolTable>::type symtab, Arg1 a1, Arg2 a2) {
+        return BinaryConstructSymbol<Symbol<Type<FunctionType> > >(
+          symtab, "", a1, boost::fusion::transform(
+            boost::fusion::pop_front(a2),
+            TranslateToSymbol<Symbol<Type<FunctionType> > >()));
       }
     };
 
@@ -124,113 +143,192 @@ namespace mirv {
       }
     };
 
-  // Define the symbol grammar.
-  struct ConstructSymbolGrammar;
+    // Define the symbol grammar.
+    struct ConstructSymbolGrammar;
 
     /// This is the grammar for module symbols.
     typedef boost::proto::when<
       ModuleRule,
-      ConstructSymbolGrammar(boost::proto::_right,
-			     boost::proto::_state,
-			     ConstructUnary<SymbolTable, ptr<Symbol<Module> >::type>(ConstructUnary<Symbol<Module>, const std::string &>(boost::proto::_value(boost::proto::_right(boost::proto::_left)))))> ModuleBuilder;
-
-    /// This is the grammar for variable symbols.
-  typedef boost::proto::when<
-    VariableRule,
-    ConstructBinarySymbol<
-      Symbol<
-	Variable> >(boost::proto::_data,
-		    // Variable name
-		    boost::proto::_value(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
-		    // Variable type
-		    LookupSymbol<Symbol<Type<TypeBase> > >(boost::proto::_data,
-							   boost::proto::_value(boost::proto::_right)))> VariableBuilder;
-
-    /// This is the grammar for function bodies.  It can contain
-    /// variable declarations and statements.  We add variables and
-    /// statements as we find them.  Variables are handled by the
-    /// variable rule so we need only worry about statements.
-    struct FunctionBodyBuilder : boost::proto::or_<
-      VariableBuilder,
-      boost::proto::when<ConstructStatementGrammar,
-			 AddFunctionStatement(boost::proto::_data,
-					      ConstructStatementGrammar(boost::proto::_))>
-      > {};
-
-    /// This is the grammar for function symbols.
-    typedef boost::proto::when<
-      FunctionRule,
-      GetFunction(boost::proto::_data,
-		  FunctionBodyBuilder(boost::proto::_right,
-				      boost::proto::_state,
-				      SetFunction(boost::proto::_data,
-						  ConstructBinarySymbol<
-						  Symbol<
-						  Function> 
-						  >(boost::proto::_data,
-						    // Function name
-						    boost::proto::_value(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
-						    // Function type
-						    LookupSymbol<Symbol<Type<TypeBase> > >(boost::proto::_data,
-											   boost::proto::_value(boost::proto::_right(boost::proto::_left)))))))> FunctionBuilder;
+      ConstructSymbolGrammar(
+        boost::proto::_right,
+        boost::proto::_state,
+        ConstructUnary<SymbolTable, ptr<Symbol<Module> >::type>(
+          ConstructUnary<Symbol<Module>, const std::string &>(
+            boost::proto::_value(boost::proto::_right(boost::proto::_left)))))
+      > ModuleBuilder;
 
     /// This is the grammar for void types.
     typedef boost::proto::when<
       VoidTerminal,
-      ConstructVoidType()> VoidBuilder;
+      ConstructVoidType()
+      > VoidBuilder;
 
     /// This is the grammar for type lists.
+    // TODO: Use fold_tree<>.
     typedef boost::proto::when<
       TypeListListPart,
       AddToTypeList(ConstructSymbolGrammar(boost::proto::_left),
-		    ConstructSymbolGrammar(boost::proto::_right))> TypeListListPartBuilder;
+		    ConstructSymbolGrammar(boost::proto::_right))
+      > TypeListListPartBuilder;
 
     typedef boost::proto::or_<
       boost::proto::when<
 	TypeRule,
 	ConstructTypeList(ConstructSymbolGrammar(boost::proto::_))
 	>,
-      boost::proto::when<
-	TypeListListPart,
-	AddToTypeList(ConstructSymbolGrammar(boost::proto::_right),
-		      ConstructSymbolGrammar(boost::proto::_left))
-	> > TypeListBuilder;
+      TypeListListPartBuilder
+      > OldTypeListBuilder;
+
+    struct TypeListBuilder : boost::proto::when<
+      TypeList,
+      boost::proto::functional::flatten(
+        ConstructSymbolGrammar(boost::proto::_))
+      > {};
+
+    struct FunctionTypeBuilder;
+
+    /// This is the grammar for integral types.
+    typedef boost::proto::when<
+      IntRule,
+      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+        boost::proto::_data,
+        UnaryConstructSymbol<Symbol<Type<Integral> > >(
+          boost::proto::_data,
+          boost::proto::_value(boost::proto::_right)))
+      > IntBuilder;
+
+    /// This is the grammar for floating point types.
+    typedef boost::proto::when<
+      FloatRule,
+      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+        boost::proto::_data,
+        UnaryConstructSymbol<Symbol<Type<Floating> > >(
+          boost::proto::_data,
+          boost::proto::_value(boost::proto::_right)))
+      > FloatBuilder;
+
+    struct TypeBuilder;
 
     /// This is the grammar for function types.
+    struct FunctionReturnTypeBuilder : boost::proto::or_<
+      VoidBuilder,
+      TypeBuilder
+      > {};
+
+    struct FunctionTypeBuilder : boost::proto::or_<
+      boost::proto::when<
+	FunctionTypeWithArgsRule,
+	LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+          boost::proto::_data,
+          ConstructFunctionTypeSymbol(
+            boost::proto::_data,
+            FunctionReturnTypeBuilder(boost::proto::_left),
+            boost::proto::_expr))
+        >,
+      boost::proto::when<
+        FunctionTypeWithoutArgsRule,
+        LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+          boost::proto::_data,
+          UnaryConstructSymbol<Symbol<Type<FunctionType> > >(
+            boost::proto::_data,
+            FunctionReturnTypeBuilder(boost::proto::_left)))
+        >
+      > {};
+  
+    /// This is the grammar to construct types.
+    struct TypeBuilder : boost::proto::or_<
+      IntBuilder,
+      FloatBuilder,
+      FunctionTypeBuilder
+      > {};
+
+    /// This is the grammar to look up a type.  In the case of
+    /// constructed types, see if it already exists in the symbol table
+    /// and add it if not.
+    typedef boost::proto::or_<
+      boost::proto::when<
+        StringTerminal,
+        LookupSymbol<Symbol<Type<TypeBase> > >(
+          boost::proto::_data,
+          boost::proto::_value)
+        >,
+      TypeBuilder
+      > TypeAccessBuilder;
+
+    typedef boost::proto::or_<
+      boost::proto::when<
+        StringTerminal,
+        LookupSymbol<Symbol<Type<TypeBase> > >(
+          boost::proto::_data,
+          boost::proto::_value)
+        >,
+      FunctionTypeBuilder
+      > FunctionTypeAccessBuilder;
+
+    /// This is the grammar for variable symbols.
     typedef boost::proto::when<
-      FunctionTypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(boost::proto::_data,
-						   ConstructBinarySymbol<Symbol<Type<FunctionType> > >(ConstructSymbolGrammar(boost::proto::_left),
-												       ConstructSymbolGrammar(boost::proto::_right)))> FunctionTypeBuilder;
+      VariableRule,
+      BinaryConstructSymbol<
+        Symbol<Variable> >(
+          boost::proto::_data,
+          // Variable name
+          boost::proto::_value(boost::proto::_right(
+                                 boost::proto::_left(boost::proto::_left))),
+          // Variable type
+          TypeAccessBuilder(boost::proto::_right))
+      > VariableBuilder;
 
-  /// This is the grammar for integral types.
-  typedef boost::proto::when<
-    IntRule,
-    ConstructUnarySymbol<Symbol<Type<Integral> > >(ConstructSymbolGrammar(boost::proto::_right))> IntBuilder;
+    typedef boost::proto::when<
+      ConstructStatementGrammar,
+      AddFunctionStatement(boost::proto::_data,
+                           ConstructStatementGrammar(boost::proto::_))
+      > FunctionStatementBuilder;
 
-  /// This is the grammar for floating point types.
-  typedef boost::proto::when<
-    FloatRule,
-    ConstructUnarySymbol<Symbol<Type<Floating> > >(ConstructSymbolGrammar(boost::proto::_right))> FloatBuilder;
+    struct VariableOrStatementBuilder : boost::proto::or_<
+      VariableBuilder,
+      FunctionStatementBuilder
+      > {};
 
-  /// This is the grammar to look up a type.  In the case of
-  /// constructed types, see if it already exists in the symbol table
-  /// and add it if not.
-  typedef boost::proto::or_<
-    boost::proto::when<
-      StringTerminal,
-      LookupSymbol<Symbol<Type<TypeBase> > >(boost::proto::_value)
-      >,
-    boost::proto::when<
-      TypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(ConstructGrammar(boost::proto::_))> > TypeAccessBuilder;
+    /// This is the grammar for function bodies.  It can contain
+    /// variable declarations and statements.  We add variables and
+    /// statements as we find them.  Variables are handled by the
+    /// variable rule so we need only worry about statements.
+    struct FunctionBodyBuilder : boost::proto::or_<
+       VariableOrStatementBuilder,
+       boost::proto::comma<
+	 FunctionBodyBuilder,
+	 VariableOrStatementBuilder
+	 >
+       > {};
+
+    /// This is the grammar for function symbols.
+    typedef boost::proto::when<
+      FunctionRule,
+      GetFunction(
+        boost::proto::_data,
+        FunctionBodyBuilder(
+          // Function body
+          boost::proto::_right,
+          boost::proto::_state,
+          SetFunction(
+            boost::proto::_data,
+            BinaryConstructSymbol<Symbol<Function> >(
+              boost::proto::_data,
+              // Function name
+              boost::proto::_value(
+                boost::proto::_right(
+                  boost::proto::_left(boost::proto::_left(
+                                        boost::proto::_left)))),
+              // Function type
+              FunctionTypeAccessBuilder(
+                boost::proto::_right(boost::proto::_left))))))
+      > FunctionBuilder;
 
     /// This aggregates all of the symbol rules.  It serves as the
     /// grammar for all statements.
     struct ConstructSymbolGrammar : boost::proto::or_<
       ModuleBuilder,
-      FunctionBuilder,
-      VariableBuilder
+      FunctionBuilder
       > {};
   }
 }

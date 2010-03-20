@@ -124,6 +124,10 @@ namespace mirv {
    public:
      typedef Interface BaseType;
      typedef FunctionBaseType VisitorBaseType;
+
+     static std::string getName(const std::string &name) {
+       return name;
+     }
    };
 }
 
