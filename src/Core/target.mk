@@ -5,6 +5,8 @@ libmirv_core_SRCDIR := $(dir $(lastword $(MAKEFILE_LIST)))
 libmirv_core_SUBDIRS := Builder Filter IR Memory Utility
 libmirv_core_SRCDIRS := $(foreach dir,$(libmirv_core_SUBDIRS),$(addprefix $(libmirv_core_SRCDIR),$(dir)))
 
+include $(BUILDTOOLS)/boost.mk
+
 $(call debug,[core] SRCDIRS = $(libmirv_core_SRCDIRS))
 
 include $(BUILDTOOLS)/autolib.mk
