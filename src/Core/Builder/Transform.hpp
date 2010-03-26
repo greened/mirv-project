@@ -29,6 +29,20 @@ namespace mirv {
       SymbolTable(ModulePointer m, FunctionPointer f)
 	: module(m), function(f) {}
 
+      static ptr<SymbolTable>::type make(ModulePointer m) {
+        ptr<SymbolTable>::type result(new SymbolTable(m, FunctionPointer()));
+        return result;
+      }
+
+      void setModule(ModulePointer m) {
+	module = m;
+      }
+      void clearModule(void) {
+	module.reset();
+      }
+      ModulePointer getModule(void) const {
+	return module;
+      }
 
       void setFunction(FunctionPointer f) {
 	function = f;
@@ -36,7 +50,6 @@ namespace mirv {
       void clearFunction(void) {
 	function.reset();
       }
-
       FunctionPointer getFunction(void) const {
 	return function;
       }
@@ -159,6 +172,18 @@ namespace mirv {
       }
     };
     
+    /// This is a callable transform to set the module scope in a
+    /// symbol table.
+    struct SetModule : boost::proto::callable {
+      typedef ptr<SymbolTable>::type result_type;
+
+      result_type operator()(ptr<SymbolTable>::type symtab,
+			     ptr<Symbol<Module> >::type module) {
+	symtab->setModule(module);
+        return symtab;
+      }
+    };
+
     /// This is a callable transform to set the function scope in a
     /// symbol table.
     struct SetFunction : boost::proto::callable {
