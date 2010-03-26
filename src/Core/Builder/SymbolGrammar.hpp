@@ -9,6 +9,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/iterator.hpp>
 #include <boost/fusion/include/transform.hpp>
+#include <boost/type_traits.hpp>
 
 namespace mirv {
   namespace Builder {
@@ -28,6 +29,11 @@ namespace mirv {
 	ptr<Symbol<Base> >::type exists =
           symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
 	if (exists) {
+          if (boost::is_base_and_derived<Symbol<Type<TypeBase> >,
+              SymbolType>::value) {
+            // It's ok to have a type already declared.
+            return safe_cast<SymbolType>(exists);
+          }
 	  error("Symbol exists");
 	}
 	result_type result = make<SymbolType>(a);
@@ -53,6 +59,11 @@ namespace mirv {
 	result_type exists =
           symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
 	if (exists) {
+          if (boost::is_base_and_derived<Symbol<Type<TypeBase> >,
+              SymbolType>::value) {
+            // It's ok to have a type already declared.
+            return safe_cast<SymbolType>(exists);
+          }
 	  error("Symbol exists");
 	}
 	result_type result = make<SymbolType>(a1, a2);
@@ -91,6 +102,17 @@ namespace mirv {
           symtab, "", a1, boost::fusion::transform(
             boost::fusion::pop_front(a2),
             TranslateToSymbol<Symbol<Type<FunctionType> > >()));
+      }
+    };
+
+    /// This is a callable transform to get the current module.
+    struct GetModule : boost::proto::callable {
+      typedef ptr<Symbol<Module> >::type result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+			     boost::shared_ptr<Node<Base> >) {
+	result_type module = symtab->getModule();
+	return module;
       }
     };
 
@@ -149,12 +171,16 @@ namespace mirv {
     /// This is the grammar for module symbols.
     typedef boost::proto::when<
       ModuleRule,
-      ConstructSymbolGrammar(
-        boost::proto::_right,
-        boost::proto::_state,
-        ConstructUnary<SymbolTable, ptr<Symbol<Module> >::type>(
-          ConstructUnary<Symbol<Module>, const std::string &>(
-            boost::proto::_value(boost::proto::_right(boost::proto::_left)))))
+      GetModule(
+        boost::proto::_data,
+        ConstructSymbolGrammar(
+          boost::proto::_right,
+          boost::proto::_state,
+          SetModule(
+            boost::proto::_data,
+            ConstructUnary<Symbol<Module>, const std::string &>(
+              boost::proto::_value(boost::proto::_right(
+                                     boost::proto::_left))))))
       > ModuleBuilder;
 
     /// This is the grammar for void types.
@@ -325,7 +351,7 @@ namespace mirv {
       > FunctionBuilder;
 
     /// This aggregates all of the symbol rules.  It serves as the
-    /// grammar for all statements.
+    /// grammar for all symbols.
     struct ConstructSymbolGrammar : boost::proto::or_<
       ModuleBuilder,
       FunctionBuilder

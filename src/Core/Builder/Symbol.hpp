@@ -267,8 +267,6 @@ namespace mirv {
   //   Body
   // ];
 
-  typedef Wrapper<boost::proto::terminal<keyword::module>::type> ModuleTerminal;
-
      /// Define a terminal type for module symbols.
   typedef Wrapper<boost::proto::terminal<keyword::module>::type> ModuleTerminal;
 

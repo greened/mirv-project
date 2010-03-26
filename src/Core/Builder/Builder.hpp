@@ -29,6 +29,11 @@ namespace mirv {
       /// statement generation.
       const DoTerminal do_ = {{}};
 
+      /// A module "operator."  This is a protoized object that
+      /// implements the subscript operator to kick off module symbol
+      /// generation.
+      const ModuleTerminal module = {{}};
+
       /// A function "operator."  This is a protoized object that
       /// implements the subscript operator to kick off function
       /// symbol generation.
