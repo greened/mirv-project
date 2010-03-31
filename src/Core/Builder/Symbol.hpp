@@ -4,6 +4,7 @@
 #include <mirv/Core/Builder/Transform.hpp>
 #include <mirv/Core/Builder/DomainFwd.hpp>
 #include <mirv/Core/Builder/GrammarFwd.hpp>
+#include <mirv/Core/Builder/Keywords.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 
@@ -11,67 +12,6 @@
 
 namespace mirv {
    namespace Builder {
-     namespace keyword {
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// module construction.
-       struct module {
-	 friend std::ostream& operator<<(std::ostream& sout, module) {
-	   return sout << "module";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// function construction.
-       struct function {
-	 friend std::ostream& operator<<(std::ostream& sout, function) {
-	   return sout << "function";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// variable construction.
-       struct var {
-	 friend std::ostream& operator<<(std::ostream& sout, var) {
-	   return sout << "var";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// type lookup.
-       struct type {
-	 friend std::ostream& operator<<(std::ostream& sout, type) {
-	   return sout << "type";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// struct type construction.
-       struct struct_ {
-	 friend std::ostream& operator<<(std::ostream& sout, struct_) {
-	   return sout << "struct_";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// integral type construction.
-       struct int_ {
-	 friend std::ostream& operator<<(std::ostream& sout, int_) {
-	   return sout << "int_";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// floating point type construction.
-       struct float_ {
-	 friend std::ostream& operator<<(std::ostream& sout, float_) {
-	   return sout << "float_";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// type construction when we need a way to specify no type.
-       /// For example, conmstructing a function type with no return
-       /// value.
-       struct void_ {
-	 friend std::ostream& operator<<(std::ostream& sout, void_) {
-	   return sout << "void_";
-	 }
-       };
-     }
-
      /// A terminal for string constants.
      typedef Wrapper<boost::proto::terminal<boost::proto::convertible_to<std::string> >::type> StringTerminal;
      /// A terminal for integer constants.

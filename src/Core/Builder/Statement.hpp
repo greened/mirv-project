@@ -4,6 +4,7 @@
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/Builder/DomainFwd.hpp>
 #include <mirv/Core/Builder/GrammarFwd.hpp>
+#include <mirv/Core/Builder/Keywords.hpp>
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
@@ -14,39 +15,6 @@ namespace mirv {
      /// comma serves the same purpose as the semicolon in C-like
      /// languages.
      typedef boost::proto::comma<ConstructStatementGrammar, ConstructStatementGrammar> CommaRule;
-
-     namespace keyword {
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// if-then and if-else statement construction.
-       struct if_ {
-	 friend std::ostream& operator<<(std::ostream& sout, if_) {
-	   return sout << "if_";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// building of the else portion of an if-else statement.
-       struct else_ { 
-	 friend std::ostream& operator<<(std::ostream& sout, else_) {
-	   return sout << "else_";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// do-while statement construction.
-       struct do_ {
-	 friend std::ostream& operator<<(std::ostream& sout, do_) {
-	   return sout << "do_";
-	 }
-       };
-       /// This is a proto tag to build a terminal symbol to kick off
-       /// do-while statement construction specified as a C-like while
-       /// statement.  It also serves to kick off construction of the
-       /// while portion of a do-while statement.
-       struct while_ {
-	 friend std::ostream& operator<<(std::ostream& sout, while_) {
-	   return sout << "while_";
-	 }
-       };
-     }
 
      /// Define a terminal type for if-then and if-else statements.
      typedef Wrapper<boost::proto::terminal<keyword::if_>::type> IfTerminal;

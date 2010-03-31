@@ -7,8 +7,8 @@
 #include <mirv/Core/Builder/Expression.hpp>
 #include <mirv/Core/Builder/Statement.hpp>
 #include <mirv/Core/Builder/Grammar.hpp>
-#include <mirv/Core/Builder/Domain.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
+#include <mirv/Core/Builder/Domain.hpp>
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 
