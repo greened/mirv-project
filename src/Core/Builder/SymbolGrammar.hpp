@@ -120,8 +120,9 @@ namespace mirv {
     struct GetFunction : boost::proto::callable {
       typedef ptr<Symbol<Function> >::type result_type;
 
+      template<typename T>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-			     boost::shared_ptr<Node<Base> >) {
+			     T) {
 	result_type function = symtab->getFunction();
 	if (function->statementEmpty()) {
 	  function->statementPushBack(make<Statement<Block> >());
@@ -354,7 +355,9 @@ namespace mirv {
     /// grammar for all symbols.
     struct ConstructSymbolGrammar : boost::proto::or_<
       ModuleBuilder,
-      FunctionBuilder
+      FunctionBuilder,
+      VariableBuilder,
+      TypeBuilder
       > {};
   }
 }

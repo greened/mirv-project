@@ -12,8 +12,9 @@ namespace mirv {
      /// expressions.  In particular, it ensures that members like
      /// else_ and while_ are accessible.
      struct Domain
-       : boost::proto::domain<boost::proto::pod_generator<Wrapper>,
-			      ConstructGrammar>
+         : boost::proto::domain<
+       boost::proto::pod_generator<Wrapper>
+       /*, ConstructGrammar*/>
      {};
    }
 }

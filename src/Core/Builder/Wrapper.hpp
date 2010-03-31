@@ -1,18 +1,11 @@
 #ifndef mirv_Core_Builder_Wrapper_hpp
 #define mirv_Core_Builder_Wrapper_hpp
 
+#include <mirv/Core/Builder/Keywords.hpp>
 #include <mirv/Core/Builder/DomainFwd.hpp>
 
 namespace mirv {
    namespace Builder {
-     namespace keyword {
-       struct if_;
-       struct else_;
-       struct do_;
-       struct while_;
-       struct type;
-     };
-
      /// This is a proto wrapper to install builder-specific
      /// capabilities into builder expressions.  It includes members
      /// such as while_ and else_ to allow complex statement
