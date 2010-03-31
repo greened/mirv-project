@@ -38,7 +38,7 @@ make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$
 %.out: %.exe
 	$(QUIET)$(<) > $(@)
 
-%.cf: %.cc
+%.cf: %.cpp
 	$(QUIET)$(GREP) "STDOUT" $(<) | $(CUT) -d' ' -f3- > $(@)
 
 %.result: %.out %.cf
