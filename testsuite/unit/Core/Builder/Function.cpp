@@ -57,7 +57,7 @@ int main(void)
   Builder::VariableTerminal b = {{"b"}};
 
   ptr<Node<Base> >::type code =
-    Builder::translate(module, ptr<Symbol<Function> >::type(),
+    Builder::translate(module,
       function["testfunc"].type["void ()"] [
        	a = a + b
       ]

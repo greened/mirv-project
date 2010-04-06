@@ -109,8 +109,8 @@ namespace mirv {
     struct GetModule : boost::proto::callable {
       typedef ptr<Symbol<Module> >::type result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-			     boost::shared_ptr<Node<Base> >) {
+      template<typename T>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab, T) {
 	result_type module = symtab->getModule();
 	return module;
       }
@@ -121,8 +121,7 @@ namespace mirv {
       typedef ptr<Symbol<Function> >::type result_type;
 
       template<typename T>
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-			     T) {
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab, T) {
 	result_type function = symtab->getFunction();
 	if (function->statementEmpty()) {
 	  function->statementPushBack(make<Statement<Block> >());
@@ -168,21 +167,6 @@ namespace mirv {
 
     // Define the symbol grammar.
     struct ConstructSymbolGrammar;
-
-    /// This is the grammar for module symbols.
-    typedef boost::proto::when<
-      ModuleRule,
-      GetModule(
-        boost::proto::_data,
-        ConstructSymbolGrammar(
-          boost::proto::_right,
-          boost::proto::_state,
-          SetModule(
-            boost::proto::_data,
-            ConstructUnary<Symbol<Module>, const std::string &>(
-              boost::proto::_value(boost::proto::_right(
-                                     boost::proto::_left))))))
-      > ModuleBuilder;
 
     /// This is the grammar for void types.
     typedef boost::proto::when<
@@ -350,6 +334,40 @@ namespace mirv {
               FunctionTypeAccessBuilder(
                 boost::proto::_right(boost::proto::_left))))))
       > FunctionBuilder;
+
+    // This is the grammar to match a variable declaration, a type
+    // definition or a function definition.
+    struct VariableTypeOrFunctionBuilder : boost::proto::or_<
+      VariableBuilder,
+      TypeBuilder,
+      FunctionBuilder
+      > {};
+
+    /// This is the grammar for module bodies.  It can contain
+    /// variable declarations, type declarations and functions .  We
+    /// add symbols as we find them.
+    struct ModuleBodyBuilder : boost::proto::or_<
+       VariableTypeOrFunctionBuilder,
+       boost::proto::comma<
+	 ModuleBodyBuilder,
+	 VariableTypeOrFunctionBuilder
+	 >
+       > {};
+
+    /// This is the grammar for module symbols.
+    typedef boost::proto::when<
+      ModuleRule,
+      GetModule(
+        boost::proto::_data,
+        ModuleBodyBuilder(
+          boost::proto::_right,
+          boost::proto::_state,
+          SetModule(
+            boost::proto::_data,
+            ConstructUnary<Symbol<Module>, const std::string &>(
+              boost::proto::_value(boost::proto::_right(
+                                     boost::proto::_left))))))
+      > ModuleBuilder;
 
     /// This aggregates all of the symbol rules.  It serves as the
     /// grammar for all symbols.
