@@ -39,7 +39,7 @@ int main(void)
   ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
 
   ptr<Node<Base> >::type code =
-    Builder::translate(module, ptr<Symbol<Function> >::type(),
+    Builder::translate(module,
       function["testfunc"].type[void_()] [
 	var["a"].type[int_(32)],
 	var["b"].type[int_(32)],

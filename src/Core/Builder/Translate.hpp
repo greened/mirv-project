@@ -56,6 +56,28 @@ namespace mirv {
        ConstructGrammar trans;
        return trans(expr, 0, symtab);
      }
+
+     template<typename Expr>
+     ptr<Node<Base> >::type
+     translate(ptr<Symbol<Module> >::type module,
+	       const Expr &expr) {
+       checkMatch<ConstructGrammar>(expr);
+       ptr<SymbolTable>::type symtab(
+         new SymbolTable(module, ptr<Symbol<Function> >::type()));
+       ConstructGrammar trans;
+       return trans(expr, 0, symtab);
+     }
+
+     template<typename Expr>
+     ptr<Node<Base> >::type
+     translate(const Expr &expr) {
+       checkMatch<ConstructGrammar>(expr);
+       ptr<SymbolTable>::type symtab(
+         new SymbolTable(ptr<Symbol<Module> >::type(),
+                         ptr<Symbol<Function> >::type()));
+       ConstructGrammar trans;
+       return trans(expr, 0, symtab);
+     }
    }
 }
 

@@ -1,14 +1,11 @@
 // Test building of variables.
 //
-// STDOUT: mdef testmodule {
-// STDOUT:    tfdecl void ()
-// STDOUT:    tsdecl int32 integral 32
-// STDOUT:    fdecl testfunc
-// STDOUT:    fdef testfunc {
-// STDOUT:       vdecl a int32
-// STDOUT:       {
+// STDOUT: fdef testfunc {
+// STDOUT:    vdecl a int32
+// STDOUT:    vdecl b int32
+// STDOUT:    vdecl c int32
+// STDOUT:    {
 // STDOUT:
-// STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
 
@@ -34,18 +31,23 @@ namespace Builder = mirv::Builder;
 
 using Builder::var;
 using Builder::function;
-using Builder::module;
 using Builder::void_;
 using Builder::int_;
 
 int main(void)
 {
+  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+
+  Builder::VariableTerminal a = {{"a"}};
+  Builder::VariableTerminal b = {{"b"}};
+  Builder::VariableTerminal c = {{"c"}};
+
   ptr<Node<Base> >::type code =
-    Builder::translate(
-      module["testmodule"] [
-        function["testfunc"].type[void_()] [
-  	  var["a"].type[int_(32)]
-        ]
+    Builder::translate(module, ptr<Symbol<Function> >::type(),
+      function["testfunc"].type[void_()] [
+	var[a].type[int_(32)],
+	var[b].type[int_(32)],
+	var[c].type[int_(32)]
       ]
     );
 
