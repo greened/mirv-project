@@ -56,6 +56,7 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Type<Array> > >::type);
     virtual void visit(ptr<Symbol<Type<Pointer> > >::type);
     virtual void visit(ptr<Symbol<Type<FunctionType> > >::type);
+    virtual void visit(ptr<Symbol<Type<StructType> > >::type);
   };
 }
 

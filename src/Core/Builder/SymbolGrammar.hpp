@@ -21,7 +21,7 @@ namespace mirv {
       typedef typename ptr<SymbolType>::type result_type;
 
       template<typename Arg>
-      result_type operator()(ptr<SymbolTable>::type symtab,
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
 			     Arg a) {
 	std::string name = SymbolType::getName(a);
 
@@ -50,13 +50,13 @@ namespace mirv {
       typedef typename ptr<SymbolType>::type result_type;
 
       template<typename Arg1, typename Arg2>
-      result_type operator()(ptr<SymbolTable>::type symtab,
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
 			     Arg1 a1,
 			     Arg2 a2) {
 	std::string name = SymbolType::getName(a1, a2);
 
 	// Make sure we're not already in the symbol table at the current scope.
-	result_type exists =
+	ptr<Symbol<Base> >::type exists =
           symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
 	if (exists) {
           if (boost::is_base_and_derived<Symbol<Type<TypeBase> >,
@@ -83,12 +83,19 @@ namespace mirv {
     /// This is a callable transform to translate a proto expression
     /// to a symbol.
     template<typename SymbolType>
-    struct TranslateToSymbol : boost::proto::callable {
-      typedef typename ptr<SymbolType>::type result_type;
+    class TranslateToSymbol : boost::proto::callable {
+    private:
+      boost::shared_ptr<SymbolTable> symtab;
+
+    public:
+      TranslateToSymbol<SymbolType>(boost::shared_ptr<SymbolTable> s)
+      : symtab(s) {}
+
+     typedef typename ptr<SymbolType>::type result_type;
 
       template<typename Expr>
       result_type operator()(const Expr &e) const {
-        return translate(e);
+        return safe_cast<SymbolType>(translate(e, symtab));
       }
     };
 
@@ -97,11 +104,28 @@ namespace mirv {
       typedef ptr<Symbol<Type<FunctionType> > >::type result_type;
 
       template<typename Arg1, typename Arg2>
-      result_type operator()(ptr<SymbolTable>::type symtab, Arg1 a1, Arg2 a2) {
-        return BinaryConstructSymbol<Symbol<Type<FunctionType> > >(
-          symtab, "", a1, boost::fusion::transform(
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Arg1 a1,
+                             Arg2 a2) {
+        return BinaryConstructSymbol<Symbol<Type<FunctionType> > >()(
+          symtab, a1, boost::fusion::transform(
             boost::fusion::pop_front(a2),
-            TranslateToSymbol<Symbol<Type<FunctionType> > >()));
+            TranslateToSymbol<Symbol<Type<TypeBase> > >(symtab)));
+      }
+    };
+
+    /// This is a callable transform to construct a struct type.
+    struct ConstructStructTypeSymbol : boost::proto::callable {
+      typedef ptr<Symbol<Type<StructType> > >::type result_type;
+
+      template<typename List>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             const std::string &name,
+                             List memberList) {
+        return BinaryConstructSymbol<Symbol<Type<StructType> > >()(
+          symtab, name, boost::fusion::transform(
+            boost::proto::flatten(memberList),
+            TranslateToSymbol<Symbol<Type<TypeBase> > >(symtab)));
       }
     };
 
@@ -143,28 +167,6 @@ namespace mirv {
       }
     };
 
-    /// This is a callable transform to construct a type list with a
-    /// single member type.
-    struct ConstructTypeList : boost::proto::callable {
-      typedef std::list<ptr<Symbol<Type<TypeBase> > >::type> result_type;
-      result_type operator()(boost::shared_ptr<Symbol<Type<TypeBase> > > type) {
-	result_type typelist;
-	typelist.push_back(type);
-	return typelist;
-      }
-    };
-
-    /// This is a callable transform to aggregate a list of types.
-    struct AddToTypeList : boost::proto::callable {
-      typedef std::list<ptr<Symbol<Type<TypeBase> > >::type> result_type;
-      result_type operator()(result_type &typelist,
-			     boost::shared_ptr<Symbol<Type<TypeBase> > > type) {
-	// TODO: Check for duplicates.
-	typelist.push_back(type);
-	return typelist;
-      }
-    };
-
     // Define the symbol grammar.
     struct ConstructSymbolGrammar;
 
@@ -173,28 +175,6 @@ namespace mirv {
       VoidTerminal,
       ConstructVoidType()
       > VoidBuilder;
-
-    /// This is the grammar for type lists.
-    // TODO: Use fold_tree<>.
-    typedef boost::proto::when<
-      TypeListListPart,
-      AddToTypeList(ConstructSymbolGrammar(boost::proto::_left),
-		    ConstructSymbolGrammar(boost::proto::_right))
-      > TypeListListPartBuilder;
-
-    typedef boost::proto::or_<
-      boost::proto::when<
-	TypeRule,
-	ConstructTypeList(ConstructSymbolGrammar(boost::proto::_))
-	>,
-      TypeListListPartBuilder
-      > OldTypeListBuilder;
-
-    struct TypeListBuilder : boost::proto::when<
-      TypeList,
-      boost::proto::functional::flatten(
-        ConstructSymbolGrammar(boost::proto::_))
-      > {};
 
     struct FunctionTypeBuilder;
 
@@ -245,12 +225,26 @@ namespace mirv {
             FunctionReturnTypeBuilder(boost::proto::_left)))
         >
       > {};
+
+// This is the grammar for struct types.
+    struct StructTypeBuilder : boost::proto::when<
+      StructTypeRule,
+      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+        boost::proto::_data,
+        ConstructStructTypeSymbol(
+          boost::proto::_data,
+          // Struct name
+          boost::proto::_value(boost::proto::_right(boost::proto::_left)),
+          // Member type list
+          boost::proto::_right))
+      > {};
   
     /// This is the grammar to construct types.
     struct TypeBuilder : boost::proto::or_<
       IntBuilder,
       FloatBuilder,
-      FunctionTypeBuilder
+      FunctionTypeBuilder,
+      StructTypeBuilder
       > {};
 
     /// This is the grammar to look up a type.  In the case of

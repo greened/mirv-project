@@ -70,6 +70,14 @@ namespace mirv {
 
      template<typename Expr>
      ptr<Node<Base> >::type
+     translate(const Expr &expr, ptr<SymbolTable>::type symtab) {
+       checkMatch<ConstructGrammar>(expr);
+       ConstructGrammar trans;
+       return trans(expr, 0, symtab);
+     }
+
+     template<typename Expr>
+     ptr<Node<Base> >::type
      translate(const Expr &expr) {
        checkMatch<ConstructGrammar>(expr);
        ptr<SymbolTable>::type symtab(

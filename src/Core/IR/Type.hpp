@@ -3,7 +3,9 @@
 
 #include <vector>
 #include <numeric>
+//#include <tr1/functional>
 
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/iterator.hpp>
 #include <boost/fusion/include/for_each.hpp>
@@ -29,7 +31,6 @@ namespace mirv {
      typedef typename Tag::VisitorBaseType VisitorBaseType;
 
      Type() {}
-     Type(const std::string &name) : BaseType(name) {}
 
      template<typename Arg>
      static std::string getName(Arg &a) {
@@ -70,14 +71,73 @@ namespace mirv {
     LeafType(const std::string &name) : BaseType(name) {}
   };
 
+   namespace detail {
+     /// A traits class to define various properties of inner types
+     /// such as child type, iterator types and other things.
+     class InnerTypeTraits {
+     public:
+       typedef Symbol<Type<TypeBase> > Child;
+       typedef Symbol<Type<TypeBase> > BaseType;
+
+     private:
+       typedef boost::shared_ptr<Child> ChildPtr;
+       typedef std::list<ChildPtr> ChildList;
+
+     public:
+       /// Make this compatible with certain standard algorithms.
+       typedef ChildPtr value_type;
+       typedef const ChildPtr & const_reference;
+
+       typedef ChildList::iterator iterator;
+       typedef ChildList::reverse_iterator reverse_iterator;
+       typedef ChildList::const_iterator const_iterator;
+       typedef ChildList::const_reverse_iterator const_reverse_iterator;
+
+       typedef ChildList::size_type size_type;
+     };
+   }
+
+  /// This is an inner type abstract interface.  It exists because we
+  /// need to be able to inherit virtually from inner types (to allow
+  /// property symbol visitors to manipulate children) but we do not
+  /// want to force subclasses to explicitly initialize the inner type
+  /// object.  Separating the interface from the implementation solves
+  /// that problem.
+    template<>
+    class Symbol<Type<Inner<detail::InnerTypeTraits> > > : public Inner<detail::InnerTypeTraits>::BaseType {
+    private:
+      typedef Inner<detail::InnerTypeTraits>::BaseType BaseType;
+
+    public:
+      Symbol<Type<Inner<detail::InnerTypeTraits> > >(const std::string &name)
+      : BaseType(name) {}
+
+      typedef Symbol<Type<TypeBase> > VisitorBaseType;
+      virtual void accept(SymbolVisitor &V);
+   };
+
+  class InnerTypeBase : public Symbol<Type<Inner<detail::InnerTypeTraits> > > {
+  private:
+    typedef Symbol<Type<Inner<detail::InnerTypeTraits> > > BaseType;
+  public:
+    InnerTypeBase(const std::string &name) : BaseType(name) {}
+  };
+
   /// This is the implementation of inner types.  It is inherited from
   /// once in the hierarchy for any inner types.  This holds the child
   /// pointers and other data necessary for inner types.
-  class InnerType : public InnerImpl<Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Symbol<Type<TypeBase> > >::type> {
+  class InnerType : public InnerImpl<
+    Symbol<Type<TypeBase> >,
+    VisitedInherit1<SymbolVisitor>::apply<InnerTypeBase>::type> {
+  private:
+    typedef InnerImpl<
+    Symbol<Type<TypeBase> >,
+    VisitedInherit1<SymbolVisitor>::apply<InnerTypeBase>::type> BaseType;
+
   public:
     InnerType(const std::string &name) : BaseType(name) {}
-    typedef InnerImpl<Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Symbol<Type<TypeBase> > >::type> BaseType;
-    typedef Symbol<Type<TypeBase> > VisitorBaseType;
+
+    virtual void accept(SymbolVisitor &V);
   };
 
   /// A type with no children that has a specific bit size, for
@@ -327,15 +387,16 @@ namespace mirv {
         }
 
         template<typename Sequence>
-	Interface(ChildPtr returnType, Sequence range)
+	Interface(ChildPtr returnType, Sequence args)
             : InterfaceBaseType(constructName(returnType,
-                                              boost::fusion::begin(range),
-                                              boost::fusion::end(range))) {
+                                              boost::fusion::begin(args),
+                                              boost::fusion::end(args))) {
 	  setReturnType(returnType);
           // Add the parameter types.
-          std::copy(boost::fusion::begin(range),
-                    boost::fusion::end(range),
-                    std::back_inserter(*this));
+          boost::fusion::for_each(args,
+                                  boost::bind(&Interface::push_back,
+                                              this,
+                                              _1));
 	}
 
 	BitSizeType bitsize(void) const {
@@ -428,6 +489,69 @@ namespace mirv {
   
        name << ")";
        return name.str();
+     }
+   };
+
+  /// A struct type.  Struct types have a list of member types.
+   struct StructType {
+   private:
+     typedef Symbol<Type<Derived> > InterfaceBaseType;
+
+     class Interface : public InterfaceBaseType {
+      public:
+	typedef Symbol<Type<TypeBase> > ChildType;
+       typedef boost::shared_ptr<ChildType> ChildPtr;
+       typedef boost::shared_ptr<const ChildType> ConstChildPtr;
+
+      private:
+      public:
+        template<typename Sequence>
+	Interface(std::string &name, Sequence members)
+            : InterfaceBaseType(name) {
+          // Add the member types.
+          boost::fusion::for_each(members,
+                                  boost::bind(&Interface::push_back,
+                                              this,
+                                              _1));
+	}
+
+	BitSizeType bitsize(void) const {
+          // TODO: This depends on ABI rules.
+	  return 0;
+	}
+
+	/// Get the start of the member type sequence.
+	iterator memberBegin(void) {
+	  return begin();
+	}
+	/// Get the start of the member type sequence.
+	const_iterator memberBegin(void) const {
+	  return begin();
+	}
+	/// Get the end of the member type sequence.
+	iterator memberEnd(void) {
+	  return end();
+	}
+	/// Get the end of the member type sequence.
+	const_iterator memberEnd(void) const {
+	  return end();
+	}
+	virtual void accept(mirv::SymbolVisitor &) {
+	  error("StructType::accept called");
+	}
+      };
+
+   public:
+     typedef Interface BaseType;
+     typedef Symbol<Type<Derived> > VisitorBaseType;
+
+     static std::string getName(std::string &name) {
+       return name;
+     }
+
+     template<typename List>
+     static std::string getName(std::string &name, List) {
+       return getName(name);
      }
    };
 }
