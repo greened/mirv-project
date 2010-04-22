@@ -18,7 +18,7 @@ $$(call debug,[unit] $(1)_OBJS = $$($(1)_OBJS))
 
 $$(foreach obj,$$($(1)_OBJS),$$(call make_simple_exe,$$(obj),$(3),$(7),$(8),$(9)))
 
-$(1)_UNITTESTS += $$(patsubst %.o,%.result,$$($(1)_OBJS))
+$(1)_UNITTESTS += $$(patsubst %.o,%.display,$$($(1)_OBJS))
 
 endef
 
@@ -33,7 +33,7 @@ endef
 # $9: Dependency
 make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9)))
 
-.PRECIOUS: %.out %.cf
+.PRECIOUS: %.out %.cf %.result
 
 %.out: %.exe
 	$(QUIET)$(<) > $(@)
@@ -47,5 +47,9 @@ make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$
 	        else \
 	          echo "FAIL: $(*).exe" | $(TEE) $(@); \
 	        fi
+
+.PHONY: %.display
+%.display: %.result
+	$(QUIET)cat $<
 
 endif
