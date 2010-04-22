@@ -76,7 +76,21 @@ namespace mirv {
 	 ++p) {
       out << indent(ind+IndentFactor) << "ptype " << (*p)->name() << "\n";
     }
-    out << "}";
+    out << indent(ind) << "}";
+  }
+
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<StructType> > >::type sym)
+  {
+    JustLeft = false;
+    out << indent(ind) << "tcdecl " << sym->name();
+    out << " {\n";
+    for (Symbol<Type<StructType> >::iterator p =
+	   sym->begin(), pend = sym->end();
+	 p != pend;
+	 ++p) {
+      out << indent(ind+IndentFactor) << "mtype " << (*p)->name() << "\n";
+    }
+    out << indent(ind) << "}";
   }
 
   void PrintFilter::EnterDefSymbolAction::visit(ptr<Symbol<Function> >::type sym)

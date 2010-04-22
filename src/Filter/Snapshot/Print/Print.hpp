@@ -50,6 +50,7 @@ namespace mirv {
 	void visit(ptr<Symbol<Type<Array> > >::type sym);
 	void visit(ptr<Symbol<Type<Pointer> > >::type sym);
 	void visit(ptr<Symbol<Type<FunctionType> > >::type sym);
+	void visit(ptr<Symbol<Type<StructType> > >::type sym);
       };
 
       class EnterDefSymbolAction : public VisitSymbolAction {

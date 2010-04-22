@@ -14,6 +14,7 @@ namespace mirv {
   struct Array;
   struct Pointer;
   struct FunctionType;
+  struct StructType;
 }
 
 #endif

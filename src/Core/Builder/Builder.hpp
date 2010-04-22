@@ -52,6 +52,14 @@ namespace mirv {
       /// An int_ "operator."  This is a protoized object that
       /// implements the function operator to construct integer types.
       const IntTerminal int_ = {{}};
+
+      /// A float_ "operator."  This is a protoized object that
+      /// implements the function operator to construct float types.
+      const FloatTerminal float_ = {{}};
+
+      /// A struct_ "operator."  This is a protoized object that
+      /// implements the function operator to construct struct types.
+      const StructTerminal struct_ = {{}};
     }
   }
 }

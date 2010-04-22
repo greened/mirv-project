@@ -33,11 +33,16 @@ namespace mirv {
   public:
     class Interface : public Traits::BaseType {
     public:
+      Interface(void) {}
+      template<typename Arg>
+      Interface(Arg a) : Traits::BaseType(a) {}
+
       typedef typename Traits::const_reference const_reference;
       typedef typename Traits::value_type value_type;
 
-      typedef typename ptr<typename Traits::Child>::type ChildPtr;
-      typedef typename ptr<typename Traits::Child>::const_type ConstChildPtr;
+      typedef typename boost::shared_ptr<typename Traits::Child> ChildPtr;
+      typedef typename boost::shared_ptr<const typename Traits::Child>
+      ConstChildPtr;
 
      typedef typename Traits::iterator iterator;
      typedef typename Traits::reverse_iterator reverse_iterator;
@@ -98,8 +103,8 @@ namespace mirv {
     template<typename Child, typename BaseType>
     class InnerImpl : public BaseType {
     public:
-      typedef typename ptr<Child>::type ChildPtr;
-      typedef typename ptr<Child>::const_type ConstChildPtr;
+      typedef typename boost::shared_ptr<Child> ChildPtr;
+      typedef typename boost::shared_ptr<const Child> ConstChildPtr;
 
    protected:
       typedef std::list<ChildPtr> ChildList;

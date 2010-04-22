@@ -96,4 +96,9 @@ namespace mirv {
     ptr<Symbol<Type<FunctionType> >::VisitorBaseType>::type p = fast_cast<Symbol<Type<FunctionType> >::VisitorBaseType>(s);
     visit(p);
   }
+
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::type s) {
+    ptr<Symbol<Type<StructType> >::VisitorBaseType>::type p = fast_cast<Symbol<Type<StructType> >::VisitorBaseType>(s);
+    visit(p);
+  }
 }

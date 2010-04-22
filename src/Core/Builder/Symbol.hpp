@@ -55,16 +55,13 @@ namespace mirv {
 
      /// Define a rule for a list of types.
      struct TypeRule;
-     struct TypeList;
-     typedef boost::proto::comma<
-       TypeList,
-       TypeRule
-       > TypeListListPart;
 
-     struct TypeList :
-       boost::proto::or_<
+     struct TypeList : boost::proto::or_<
        TypeRule,
-       TypeListListPart
+       boost::proto::comma<
+         TypeList,
+         TypeRule
+         >
        > {};
 
      typedef Wrapper<boost::proto::terminal<keyword::struct_>::type> StructTerminal;
@@ -105,8 +102,7 @@ namespace mirv {
 
      /// This is the rule to  match type symbols.  It matches
      /// IntType|FloatType|StructType|FunctionType
-     struct TypeRule :
-       boost::proto::or_<
+     struct TypeRule : boost::proto::or_<
        SimpleTypeRule,
        StructTypeRule,
        FunctionTypeRule
