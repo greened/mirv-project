@@ -43,9 +43,9 @@ make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$
 
 %.result: %.out %.cf
 	$(QUIET)if $(CMP) -s $(*).out $(*).cf; then \
-	          echo "PASS: $(*).exe" | $(TEE) $(@); \
+	          echo "PASS: $(*).exe" > $(@); \
 	        else \
-	          echo "FAIL: $(*).exe" | $(TEE) $(@); \
+	          echo "FAIL: $(*).exe" > $(@); \
 	        fi
 
 .PHONY: %.display
