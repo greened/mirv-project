@@ -45,11 +45,7 @@ namespace mirv {
 	void visit(ptr<Symbol<Module> >::type sym);
 	void visit(ptr<Symbol<Function> >::type sym);
 	void visit(ptr<Symbol<Variable> >::type sym);
-	void visit(ptr<Symbol<Type<Integral> > >::type sym);
-	void visit(ptr<Symbol<Type<Floating> > >::type sym);
-	void visit(ptr<Symbol<Type<Array> > >::type sym);
-	void visit(ptr<Symbol<Type<Pointer> > >::type sym);
-	void visit(ptr<Symbol<Type<FunctionType> > >::type sym);
+	void visit(ptr<Symbol<Type<TypeBase> > >::type sym);
 	void visit(ptr<Symbol<Type<StructType> > >::type sym);
       };
 

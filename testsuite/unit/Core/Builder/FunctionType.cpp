@@ -1,9 +1,12 @@
 // Test building of function types.
 //
-// STDOUT: fdef testfunc {
-// STDOUT:    vdecl a int32
-// STDOUT:    {
-// STDOUT: 
+// STDOUT: mdef testmodule {
+// STDOUT:    fdecl testfunc
+// STDOUT:    fdef testfunc {
+// STDOUT:       vdecl a int32
+// STDOUT:       {
+// STDOUT:
+// STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
 
@@ -28,40 +31,25 @@ using mirv::make;
 namespace Builder = mirv::Builder;
 
 using Builder::function;
+using Builder::module;
 using Builder::var;
 using Builder::void_;
 using Builder::int_;
 
 int main(void)
 {
-  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
-
-  boost::proto::display_expr(
-    function["testfunc"].type[void_(int_(32), int_(16))] [
-      var["a"].type[int_(32)]
-    ]
-  );
-
-#if 0
-  Builder::checkMatch<Builder::ConstructGrammar>(
-    function["testfunc"].type[void_(int_(32), int_(16))] [
-      var["a"].type[int_(32)]
-    ]
-  );
-#endif
-
-#if 0
   ptr<Node<Base> >::type code =
-    Builder::translate(module, ptr<Symbol<Function> >::type(),
+    Builder::translate(
+      module["testmodule"] [
         function["testfunc"].type[void_(int_(32), int_(16))] [
-        var["a"].type[int_(32)]
+          var["a"].type[int_(32)]
+        ]
       ]
     );
 
   PrintFilter print(std::cout);
   
   print(code);
-#endif
 
   return(0);
 }

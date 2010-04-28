@@ -1,12 +1,15 @@
 // Test building of struct types.
 //
-// STDOUT: struct teststruct {
-// STDOUT:   int32,
-// STDOUT:   float32,
-// STDOUT:   struct testnest {
-// STDOUT:     int32
-// STDOUT:   },
-// STDOUT:   int16
+// STDOUT: mdef testmodule {
+// STDOUT:    tdecl testnest {
+// STDOUT:       int32
+// STDOUT:    }
+// STDOUT:    tdecl teststruct {
+// STDOUT:       int32,
+// STDOUT:       float32,
+// STDOUT:       testnest,
+// STDOUT:       int16
+// STDOUT:    }
 // STDOUT: }
 
 #include <mirv/Core/IR/IR.hpp>
@@ -40,7 +43,6 @@ int main(void)
         ]
       ]
   );
-
 #if 0
   ptr<Node<Base> >::type code =
     Builder::translate(
@@ -60,6 +62,5 @@ int main(void)
   
   print(code);
 #endif
-
   return(0);
 }

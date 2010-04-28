@@ -1,9 +1,11 @@
 // Test building of struct types.
 //
-// STDOUT: struct teststruct {
-// STDOUT:   int32,
-// STDOUT:   float32,
-// STDOUT:   int16
+// STDOUT: mdef testmodule {
+// STDOUT:    tdecl teststruct {
+// STDOUT:       int32,
+// STDOUT:       float32,
+// STDOUT:       int16
+// STDOUT:    }
 // STDOUT: }
 
 #include <mirv/Core/IR/IR.hpp>
