@@ -328,6 +328,48 @@ namespace mirv {
      typedef Symbol<Type<Derived> > VisitorBaseType;
    };
 
+  namespace detail {
+     class OutputArg {
+       std::ostream &out;
+
+     public:
+       OutputArg(std::ostream &o) : out(o) {}
+       typedef void result_type;
+       template<typename Item>
+       result_type operator()(Item i) const {
+         out << ", " << i->name();
+       }
+     };
+
+    /// A helper template selected on sequence size so we don't
+    /// attempt to front() or pop_front() an empty list.
+    template<int size>
+    class OutputArgs {
+    private:
+      std::ostream &out;
+
+    public:
+      OutputArgs(std::ostream &o) : out(o) {}
+      template<typename ArgSeq>
+      void operator()(ArgSeq argTypes) {
+        // Print the first argument type.
+        out << boost::fusion::front(argTypes)->name();
+        // Print the following argument type preceeded by a comma.
+        boost::fusion::for_each(boost::fusion::pop_front(argTypes),
+                                OutputArg(out));
+      }
+    };
+
+    /// Specilization for an empty sequence.
+    template<>
+    class OutputArgs<0> {
+    public:
+      OutputArgs(std::ostream &) {}
+      template<typename ArgSeq>
+      void operator()(ArgSeq) {}
+    };
+  }
+
   /// A function type.  Function types have a return type and a list
   /// of parameter types.  A function that does not return anything
   /// will have a pointer to zero as its return type.  A funtion that
@@ -365,17 +407,22 @@ namespace mirv {
           }
         }
 
-        template<typename InputIterator>
-        std::string constructName(ChildPtr ReturnType,
-                                  InputIterator start, InputIterator end) {
+        template<typename Sequence>
+        std::string constructName(ChildPtr ReturnType, Sequence Args) {
           std::stringstream name;
-          name << ReturnType->name() << "(";
-          for (InputIterator a = start; a != end; /* NULL */) {
-            name << (*a)->name();
-            if ((a = boost::fusion::next(a)) != end) {
-              name << ',';
-            }
+          if (ReturnType) {
+            name << ReturnType->name() << " (";
           }
+          else {
+            name << "void ";
+          }
+
+          detail::OutputArgs<
+          boost::fusion::result_of::size<Sequence>::type::value
+            > outputArgs(name);
+
+          outputArgs(Args);
+
           name << ")";
           return name.str();
         }
@@ -388,9 +435,7 @@ namespace mirv {
 
         template<typename Sequence>
 	Interface(ChildPtr returnType, Sequence args)
-            : InterfaceBaseType(constructName(returnType,
-                                              boost::fusion::begin(args),
-                                              boost::fusion::end(args))) {
+            : InterfaceBaseType(constructName(returnType, args)) {
 	  setReturnType(returnType);
           // Add the parameter types.
           boost::fusion::for_each(args,
@@ -438,18 +483,6 @@ namespace mirv {
 	}
       };
 
-     class Output {
-       std::ostream &out;
-
-     public:
-       Output(std::ostream &o) : out(o) {}
-       typedef void result_type;
-       template<typename Item>
-       result_type operator()(Item i) const {
-         out << ", " << i->getName();
-       }
-     };
-
    public:
      typedef Interface BaseType;
      typedef Symbol<Type<Derived> > VisitorBaseType;
@@ -475,18 +508,12 @@ namespace mirv {
          name << "void (";
        }
 
-       int size = boost::fusion::size(argTypes);
+       detail::OutputArgs<
+       boost::fusion::result_of::size<FusionSequence>::type::value
+         > outputArgs(name);
 
-       if (size > 0) {
-         // Print the first argument type.
-         name << boost::fusion::front(argTypes)->name();
-         if (size > 1) {
-           // Print the following argument type preceeded by a comma.
-           boost::fusion::for_each(boost::fusion::pop_front(argTypes),
-                                   Output(name));
-         }
-       }
-  
+     outputArgs(argTypes);
+
        name << ")";
        return name.str();
      }

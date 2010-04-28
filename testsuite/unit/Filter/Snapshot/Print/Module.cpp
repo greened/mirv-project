@@ -1,8 +1,6 @@
 // Test printing of modules.
 //
 // STDOUT: mdef Test {
-// STDOUT:    tsdecl int32 integral 32
-// STDOUT:    tfdecl void ()
 // STDOUT:    vdecl c int32
 // STDOUT:    fdecl foo
 // STDOUT:    fdef foo {

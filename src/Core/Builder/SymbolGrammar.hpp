@@ -206,27 +206,37 @@ namespace mirv {
       TypeBuilder
       > {};
 
-    struct FunctionTypeBuilder : boost::proto::or_<
-      boost::proto::when<
-	FunctionTypeWithArgsRule,
-	LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+    // struct FunctionTypeBuilder : boost::proto::or_<
+    //   boost::proto::when<
+    //     FunctionTypeWithArgsRule,
+    //     LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+    //       boost::proto::_data,
+    //       ConstructFunctionTypeSymbol(
+    //         boost::proto::_data,
+    //         FunctionReturnTypeBuilder(boost::proto::_left),
+    //         boost::proto::_expr))
+    //     >,
+    //   boost::proto::when<
+    //     FunctionTypeWithoutArgsRule,
+    //     LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+    //       boost::proto::_data,
+    //       UnaryConstructSymbol<Symbol<Type<FunctionType> > >(
+    //         boost::proto::_data,
+    //         FunctionReturnTypeBuilder(boost::proto::_left)))
+    //     >
+    //   > {};
+
+    struct FunctionTypeBuilder : boost::proto::when<
+      FunctionTypeWithArgsRule,
+      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+        boost::proto::_data,
+        ConstructFunctionTypeSymbol(
           boost::proto::_data,
-          ConstructFunctionTypeSymbol(
-            boost::proto::_data,
-            FunctionReturnTypeBuilder(boost::proto::_left),
-            boost::proto::_expr))
-        >,
-      boost::proto::when<
-        FunctionTypeWithoutArgsRule,
-        LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
-          boost::proto::_data,
-          UnaryConstructSymbol<Symbol<Type<FunctionType> > >(
-            boost::proto::_data,
-            FunctionReturnTypeBuilder(boost::proto::_left)))
-        >
+          FunctionReturnTypeBuilder(boost::proto::_left),
+          boost::proto::_expr))
       > {};
 
-// This is the grammar for struct types.
+  // This is the grammar for struct types.
     struct StructTypeBuilder : boost::proto::when<
       StructTypeRule,
       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(

@@ -85,20 +85,22 @@ namespace mirv {
 	 VoidTerminal,
 	 TypeRule
 	 >,
-       TypeList
+       boost::proto::vararg<TypeRule>
        > FunctionTypeWithArgsRule;
 
-     typedef boost::proto::function<
-       boost::proto::or_<
-	 VoidTerminal,
-	 TypeRule
-	 >
-       > FunctionTypeWithoutArgsRule;
+     // typedef boost::proto::function<
+     //   boost::proto::or_<
+     //     VoidTerminal,
+     //     TypeRule
+     //     >
+     //   > FunctionTypeWithoutArgsRule;
 
-     typedef boost::proto::or_<
-       FunctionTypeWithArgsRule,
-       FunctionTypeWithoutArgsRule
-       > FunctionTypeRule;
+     // typedef boost::proto::or_<
+     //   FunctionTypeWithArgsRule,
+     //   FunctionTypeWithoutArgsRule
+     //   > FunctionTypeRule;
+
+     typedef FunctionTypeWithArgsRule FunctionTypeRule;
 
      /// This is the rule to  match type symbols.  It matches
      /// IntType|FloatType|StructType|FunctionType

@@ -1,8 +1,6 @@
 // Test building of variables.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    tsdecl int32 integral 32
-// STDOUT:    tfdecl void ()
 // STDOUT:    vdecl a int32
 // STDOUT:    vdecl b int32
 // STDOUT:    fdecl testfunc

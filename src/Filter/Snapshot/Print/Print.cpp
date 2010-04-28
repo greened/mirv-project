@@ -27,68 +27,27 @@ namespace mirv {
 	<< sym->type()->name();
   }
 
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<Integral> > >::type sym)
+  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<TypeBase> > >::type sym)
   {
-    JustLeft = false;
-    out << indent(ind) << "tsdecl " << sym->name() << " integral "
-	<< sym->bitsize();
-  }
-
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<Floating> > >::type sym)
-  {
-    JustLeft = false;
-    out << indent(ind) << "tsdecl " << sym->name() << " floating "
-	<< sym->bitsize();
-  }
-
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<Array> > >::type sym)
-  {
-    JustLeft = false;
-    out << indent(ind) << "tadecl " << sym->name()
-	<< sym->getElementType()->name();
-    for(Symbol<Array>::ConstDimensionIterator d = sym->dimensionBegin(),
-	  dend = sym->dimensionEnd();
-	d != dend;
-	++d) {
-      out << "[" << *d << "]";
-    }
-  }
-
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<Pointer> > >::type sym)
-  {
-    JustLeft = false;
-    out << indent(ind) << "tpdecl " << sym->name()
-	<< sym->getBaseType()->name();
-  }
-
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<FunctionType> > >::type sym)
-  {
-    JustLeft = false;
-    out << indent(ind) << "tfdecl " << sym->name();
-    if (!sym->getReturnType() || sym->parameterEmpty()) {
-      return;
-    }
-    out << "{\n";
-    out << indent(ind+IndentFactor) << "rtype " << sym->getReturnType()->name() << "\n";
-    for (Symbol<Type<FunctionType> >::iterator p =
-	   sym->parameterBegin(), pend = sym->parameterEnd();
-	 p != pend;
-	 ++p) {
-      out << indent(ind+IndentFactor) << "ptype " << (*p)->name() << "\n";
-    }
-    out << indent(ind) << "}";
+    // This is a type that doesn't need a declaration.  So tell the
+    // printer not to print a newline after it.
+    JustLeft = true;
   }
 
   void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<StructType> > >::type sym)
   {
     JustLeft = false;
-    out << indent(ind) << "tcdecl " << sym->name();
+    out << indent(ind) << "tdecl " << sym->name();
     out << " {\n";
     for (Symbol<Type<StructType> >::iterator p =
 	   sym->begin(), pend = sym->end();
 	 p != pend;
-	 ++p) {
-      out << indent(ind+IndentFactor) << "mtype " << (*p)->name() << "\n";
+	 /* NULL */) {
+      out << indent(ind+IndentFactor) << (*p)->name();
+      if (++p != pend) {
+        out << ',';
+      }
+      out << '\n';
     }
     out << indent(ind) << "}";
   }
