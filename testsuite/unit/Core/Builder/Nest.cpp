@@ -31,18 +31,6 @@ using Builder::module;
 
 int main(void)
 {
-  boost::proto::display_expr(
-      module["testmodule"] [
-        struct_["teststruct"] [
-          int_(32),
-          float_(32),
-          struct_["testnest"] [
-            int_(32)
-          ],
-          int_(16)
-        ]
-      ]
-  );
 #if 0
   ptr<Node<Base> >::type code =
     Builder::translate(
