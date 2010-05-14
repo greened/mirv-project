@@ -10,8 +10,10 @@ define doxygen_rule
 $(FINAL_BUILDDIR)/stamp-$(1)-doxygen: $(2)	
 	+$$(QUIET)[ -d $$(@D) ] || mkdir -p $$(@D)		
 	$$(if $$(QUIET),$$(info [DOX] $$@))
-	$$(QUIET)$$(DOXYGEN) $(2)
+	$$(QUIET)$$(DOXYGEN) $$<
 	$$(QUIET)$$(TOUCH) $$@
+
+$$(call debug,[dox] $(FINAL_BUILDDIR)/stamp-$(1)-doxygen: $(2))
 
 $(1)_DOXY_STAMPS += $(FINAL_BUILDDIR)/stamp-$(1)-doxygen
 
@@ -28,7 +30,7 @@ $(1)_DOXY_CONFIGS := $$(patsubst %.dox.in,%.dox,$$($(1)_INS))
 
 $$(call debug,[dox] $(1)_DOXY_CONFIGS = $$($(1)_DOXY_CONFIGS))
 
-$$(foreach config,$$($(1)_DOXY_CONFIGS),$$(eval $$(call doxygen_rule,$(1),$$(config))))
+$$(foreach config,$$($(1)_DOXY_CONFIGS),$$(eval $$(call doxygen_rule,$(1),$$(config) $(3))))
 
 endef
 
