@@ -4,7 +4,12 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/IntegralType.hpp>
+#include <mirv/Core/IR/FloatingType.hpp>
+#include <mirv/Core/IR/ArrayType.hpp>
+#include <mirv/Core/IR/PointerType.hpp>
+#include <mirv/Core/IR/FunctionType.hpp>
+#include <mirv/Core/IR/StructType.hpp>
 
 namespace mirv {
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Base> >::type s) {};
