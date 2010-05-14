@@ -36,10 +36,10 @@ make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$
 .PRECIOUS: %.out %.cf %.result
 
 %.out: %.exe
-	$(QUIET)$(<) > $(@)
+	-$(QUIET)$(<) > $(@)
 
 %.cf: %.cpp
-	$(QUIET)$(GREP) "STDOUT" $(<) | $(CUT) -d' ' -f3- > $(@)
+	-$(QUIET)$(GREP) "STDOUT" $(<) | $(CUT) -d' ' -f3- > $(@)
 
 %.result: %.out %.cf
 	$(QUIET)if $(CMP) -s $(*).out $(*).cf; then \
