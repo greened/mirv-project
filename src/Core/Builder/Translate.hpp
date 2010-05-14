@@ -63,8 +63,8 @@ namespace mirv {
      ptr<Node<Base> >::type
      translate(ptr<Symbol<Module> >::type module,
 	       const Expr &expr) {
-       std::cout << "Translating:\n";
-       boost::proto::display_expr(expr);
+       //std::cout << "Translating:\n";
+       //boost::proto::display_expr(expr);
        checkMatch<ConstructGrammar>(expr);
        ptr<SymbolTable>::type symtab(
          new SymbolTable(module, ptr<Symbol<Function> >::type()));
@@ -75,8 +75,8 @@ namespace mirv {
      template<typename Expr>
      ptr<Node<Base> >::type
      translate(const Expr &expr, ptr<SymbolTable>::type symtab) {
-       std::cout << "Translating:\n";
-       boost::proto::display_expr(expr);
+       //std::cout << "Translating:\n";
+       //boost::proto::display_expr(expr);
        checkMatch<ConstructGrammar>(expr);
        ConstructGrammar trans;
        return trans(expr, 0, symtab);
@@ -85,8 +85,8 @@ namespace mirv {
      template<typename Expr>
      ptr<Node<Base> >::type
      translate(const Expr &expr) {
-       std::cout << "Translating:\n";
-       boost::proto::display_expr(expr);
+       //std::cout << "Translating:\n";
+       //boost::proto::display_expr(expr);
        checkMatch<ConstructGrammar>(expr);
        ptr<SymbolTable>::type symtab(
          new SymbolTable(ptr<Symbol<Module> >::type(),
