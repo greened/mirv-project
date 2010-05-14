@@ -6,6 +6,7 @@
 #include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/proto/proto.hpp>
+#include <boost/mpl/print.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/iterator.hpp>
 #include <boost/fusion/include/transform.hpp>
@@ -95,6 +96,8 @@ namespace mirv {
 
       template<typename Expr>
       result_type operator()(const Expr &e) const {
+        //std::cout << "Translating:\n";
+        //boost::proto::display_expr(e);
         return safe_cast<SymbolType>(translate(e, symtab));
       }
     };
@@ -107,12 +110,61 @@ namespace mirv {
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              Arg1 a1,
                              Arg2 a2) {
+        TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
         return BinaryConstructSymbol<Symbol<Type<FunctionType> > >()(
           symtab, a1, boost::fusion::transform(
-            boost::fusion::pop_front(a2),
-            TranslateToSymbol<Symbol<Type<TypeBase> > >(symtab)));
+            boost::fusion::pop_front(a2), translator));
       }
     };
+
+    namespace detail {
+      template<typename ResultType, bool Matches>
+      class TranslateListImpl {
+      public:
+        template<typename List>
+        ResultType operator()(boost::shared_ptr<SymbolTable> symtab,
+                              const List typeList) {
+          TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
+          return boost::fusion::transform(
+            boost::proto::flatten(typeList), translator);
+        }
+      };
+
+      template<typename ResultType>
+      class TranslateListImpl<ResultType, false> {
+      public:
+        template<typename List>
+        ResultType operator()(boost::shared_ptr<SymbolTable> symtab,
+                              const List typeList) {
+          return TranslateToSymbol<Symbol<Type<TypeBase> > >(symtab)(typeList);
+        }
+      };
+      
+      template<typename List>
+      class TranslateList {
+      public:
+        typedef typename boost::mpl::if_<
+        boost::proto::matches<List, StrictTypeList>,
+        typename boost::fusion::result_of::transform<
+          const typename boost::proto::result_of::flatten<const List>::type,
+          TranslateToSymbol<Symbol<Type<TypeBase> > > >::type,
+        ptr<Symbol<Type<TypeBase> > >::type
+        >::type result_type;
+
+        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                               const List theList) {
+          return TranslateListImpl<result_type,
+            boost::proto::matches<List, StrictTypeList>::value>()(symtab, 
+                                                                  theList);
+        }
+      };
+
+      template<typename List>
+      typename TranslateList<List>::result_type
+      translateList(boost::shared_ptr<SymbolTable> symtab, List typeList) {
+        return TranslateList<List>()(symtab, typeList);
+      }
+    }
 
     /// This is a callable transform to construct a struct type.
     struct ConstructStructTypeSymbol : boost::proto::callable {
@@ -122,10 +174,11 @@ namespace mirv {
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              const std::string &name,
                              List memberList) {
+        //std::cout << "Building struct:\n";
+        //boost::proto::display_expr(memberList);
+
         return BinaryConstructSymbol<Symbol<Type<StructType> > >()(
-          symtab, name, boost::fusion::transform(
-            boost::proto::flatten(memberList),
-            TranslateToSymbol<Symbol<Type<TypeBase> > >(symtab)));
+          symtab, name, detail::translateList(symtab, memberList));
       }
     };
 

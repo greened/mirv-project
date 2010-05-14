@@ -55,13 +55,16 @@ namespace mirv {
 
      /// Define a rule for a list of types.
      struct TypeRule;
+     struct TypeList;
+
+     struct StrictTypeList : boost::proto::comma<
+       TypeList,
+       TypeRule
+       > {};
 
      struct TypeList : boost::proto::or_<
        TypeRule,
-       boost::proto::comma<
-         TypeList,
-         TypeRule
-         >
+       StrictTypeList
        > {};
 
      typedef Wrapper<boost::proto::terminal<keyword::struct_>::type> StructTerminal;
