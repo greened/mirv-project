@@ -4,6 +4,10 @@
 #include <vector>
 #include <numeric>
 //#include <tr1/functional>
+#include <boost/fusion/sequence/intrinsic/front.hpp>
+#include <boost/fusion/sequence/intrinsic/begin.hpp>
+#include <boost/fusion/sequence/intrinsic/end.hpp>
+#include <boost/fusion/include/distance.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
@@ -536,11 +540,25 @@ namespace mirv {
 	Interface(std::string &name, Sequence members)
             : InterfaceBaseType(name) {
           // Add the member types.
+          //typedef typename boost::fusion::result_of::begin<Sequence>::type begType;
+          //typedef typename boost::fusion::result_of::end<Sequence>::type endType;
+          //unsigned dist = boost::fusion::result_of::distance<begType, endType>::type::value;
+          //std::cout << dist << " members for struct " << name << '\n';
+
           boost::fusion::for_each(members,
                                   boost::bind(&Interface::push_back,
                                               this,
                                               _1));
 	}
+
+       /// Construct a struct type with a single member.
+       Interface(std::string &name, ptr<Symbol<Type<TypeBase> > >::type member)
+            : InterfaceBaseType(name) {
+         push_back(member);
+	}
+
+       /// Construct a struct type with no members.
+       Interface(std::string &name) : InterfaceBaseType(name) {}
 
 	BitSizeType bitsize(void) const {
           // TODO: This depends on ABI rules.
