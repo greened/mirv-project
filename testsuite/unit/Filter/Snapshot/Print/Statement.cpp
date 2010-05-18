@@ -30,7 +30,17 @@
 // STDOUT:       vref a
 // STDOUT:       vref c
 
-#include <mirv/Core/IR/IR.hpp>
+#include <mirv/Core/IR/Control.hpp>
+#include <mirv/Core/IR/Mutating.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/ArrayType.hpp>
+#include <mirv/Core/IR/FloatingType.hpp>
+#include <mirv/Core/IR/FunctionType.hpp>
+#include <mirv/Core/IR/IntegralType.hpp>
+#include <mirv/Core/IR/PointerType.hpp>
+#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/Arithmetic.hpp>
+#include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
