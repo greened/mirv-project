@@ -36,7 +36,7 @@ namespace mirv {
     public:
       OutputArgs(std::ostream &o) : out(o) {}
       template<typename ArgSeq>
-      void operator()(ArgSeq argTypes) {
+      void operator()(const ArgSeq &argTypes) {
         // Print the first argument type.
         out << boost::fusion::front(argTypes)->name();
         // Print the following argument type preceeded by a comma.
@@ -51,7 +51,7 @@ namespace mirv {
     public:
       OutputArgs(std::ostream &) {}
       template<typename ArgSeq>
-      void operator()(ArgSeq) {}
+      void operator()(const ArgSeq &) {}
     };
   }
 
@@ -94,7 +94,7 @@ namespace mirv {
         }
 
         template<typename Sequence>
-        std::string constructName(ChildPtr ReturnType, Sequence Args) {
+        std::string constructName(ChildPtr ReturnType, const Sequence &Args) {
           std::stringstream name;
           if (ReturnType) {
             name << ReturnType->name() << " (";
@@ -120,7 +120,7 @@ namespace mirv {
         }
 
         template<typename Sequence>
-	Interface(ChildPtr returnType, Sequence args)
+	Interface(ChildPtr returnType, const Sequence &args)
             : InterfaceBaseType(constructName(returnType, args)) {
 	  setReturnType(returnType);
           // Add the parameter types.
@@ -185,7 +185,7 @@ namespace mirv {
 
      template<typename FusionSequence>
      static std::string getName(ptr<Symbol<Type<TypeBase> > >::type returnType,
-                                FusionSequence argTypes) {
+                                const FusionSequence &argTypes) {
        std::stringstream name;
        if (returnType) {
          name << returnType->name() << " (";
