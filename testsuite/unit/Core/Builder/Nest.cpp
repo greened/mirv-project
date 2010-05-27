@@ -37,7 +37,6 @@ using Builder::module;
 
 int main(void)
 {
-#if 0
   ptr<Node<Base> >::type code =
     Builder::translate(
       module["testmodule"] [
@@ -55,6 +54,6 @@ int main(void)
   PrintFilter print(std::cout);
   
   print(code);
-#endif
+
   return(0);
 }
