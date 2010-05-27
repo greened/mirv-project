@@ -3,6 +3,7 @@ include $(BUILDTOOLS)/configure/touch.mk
 
 IFLAGS = -I$(SRCDIR)/src/Library -I$(FINAL_BUILDDIR)/include
 DFLAGS = -DBOOST_MPL_LIMIT_VECTOR_SIZE=40 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+# -DBOOST_SP_NO_SP_CONVERTIBLE=1
 
 #debug_CFLAGS := -g -Wall -Werror
 #debug_CXXFLAGS := -g -Wall -Werror
