@@ -10,7 +10,8 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<Relational, Transitive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      LessThan>::type BaseType;
   };
 
   /// Specify the interface for less-than-or-equal expressions.
@@ -18,7 +19,8 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<Relational, Transitive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      LessThanOrEqual>::type BaseType;
   };
 
   /// Specify the interface for equal expressions.
@@ -26,7 +28,8 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<Relational, Transitive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      Equal>::type BaseType;
   };
 
   /// Specify the interface for not-equal expressions.
@@ -34,7 +37,8 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<Relational, Transitive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      NotEqual>::type BaseType;
   };
 
   /// Specify the interface for greater-than-or-equal expressions.
@@ -42,7 +46,8 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<Relational, Transitive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      GreaterThanOrEqual>::type BaseType;
   };
 
   /// Specify the interface for greater-than expressions.
@@ -50,7 +55,8 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<Relational, Transitive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      GreaterThan>::type BaseType;
   };
 }
 

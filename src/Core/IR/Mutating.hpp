@@ -77,7 +77,8 @@ namespace mirv {
    class Assignment {
    private:
      class Interface : public Statement<DualExpression>,
-		       public LeafStatement {
+		       public LeafStatement,
+                       public boost::enable_shared_from_this<Statement<Assignment> > {
      public:
        template<typename E1, typename E2>
        Interface(E1 e1, E2 e2) : Statement<DualExpression>(e1, e2),

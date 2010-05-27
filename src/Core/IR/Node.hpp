@@ -8,7 +8,6 @@
 #include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/mpl/vector.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <list>
 
 namespace mirv {
@@ -19,7 +18,7 @@ namespace mirv {
 
   /// This is the base class for all IR constructs.
    template<>
-   class Node<Base> : public boost::enable_shared_from_this<Node<Base> > {
+   class Node<Base> {
    public:
      virtual ~Node<Base>(void);
    };

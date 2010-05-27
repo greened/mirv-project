@@ -12,7 +12,8 @@ namespace mirv {
 			       Associative, Transitive,
 			       Reflexive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      LogicalAnd>::type BaseType;
   };
 
   /// Specify the interface for the logical or expression.
@@ -22,7 +23,8 @@ namespace mirv {
 			       Associative, Transitive,
 			       Reflexive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      LogicalOr>::type BaseType;
   };
 
   /// Specify the interface for the logical not expression.
@@ -32,9 +34,9 @@ namespace mirv {
 			       Associative, Transitive,
 			       Reflexive> Properties;
     typedef Expression<Unary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
+      LogicalNot>::type BaseType;
   };
-
 };
 
 #endif

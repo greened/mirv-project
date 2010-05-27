@@ -8,6 +8,7 @@
 
 #include <mirv/Core/Utility/Debug.hpp>
 
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/mpl/inherit.hpp>
 #include <boost/mpl/inherit_linearly.hpp>
 #include <boost/mpl/bool.hpp>
@@ -399,15 +400,16 @@ namespace mirv {
   /// hierarchy of property expressions.  The Sequence is a sorted
   /// list of property tags and Root is the base type of the whole
   /// hierarchy.
-  template<typename Sequence, typename Root>
-   class ExpressionBaseGenerator {
-   public:
+  template<typename Sequence, typename Root, typename Tag>
+  class ExpressionBaseGenerator {
     /// The metafunction result.
     typedef typename Properties<PropertyExpressionGenerator, Root, Sequence,
-				VisitedInherit2<ExpressionVisitor> >::type
-      type;
-
-   };
+      VisitedInherit2<ExpressionVisitor> >::type HierarchyType;
+  public:
+    typedef typename VisitedInherit2<ExpressionVisitor>::template apply<
+    HierarchyType,
+    boost::enable_shared_from_this<Expression<Tag> > >::type type;
+  };
 }
 
 #include <mirv/Core/IR/Expression.ipp>

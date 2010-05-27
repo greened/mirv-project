@@ -10,7 +10,8 @@ namespace mirv {
    private:
      class Interface : public Symbol<Typed>,
 		       public Symbol<Named>,
-		       public LeafSymbol {
+		       public LeafSymbol,
+                       public boost::enable_shared_from_this<Symbol<Variable> > {
       public:
        Interface(const std::string &n,
 		 ConstTypePtr t)

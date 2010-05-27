@@ -4,7 +4,7 @@
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Statement.hpp>
+#include <mirv/Core/IR/Control.hpp>
 
 #include <tr1/functional>
 //#include <boost/bind.hpp>
@@ -23,7 +23,8 @@ namespace mirv {
      class Interface : public NamedBaseType,
 		       public TypedBaseType,
 		       public VariableBaseType,
-		       public StatementBaseType {
+		       public StatementBaseType,
+                       public boost::enable_shared_from_this<Symbol<Function> > {
      public:
        typedef StatementBaseType::ChildPtr StatementPtr;
        typedef VariableBaseType::ChildPtr VariablePtr;
@@ -40,7 +41,7 @@ namespace mirv {
 	   TypedBaseType(t),
 	   // If the statement is not a block, make it one.
 	   StatementBaseType(dyn_cast<Statement<Block> >(s) ?
-			     s : mirv::make<Statement<Block> >(s)) {};
+			     s : boost::static_pointer_cast<Statement<Base> >(mirv::make<Statement<Block> >(s))) {};
 
        /// Add a local variable to this function.
        void variablePushBack(VariablePtr v) {
@@ -76,7 +77,7 @@ namespace mirv {
 	 // If the statement is not a block, make it one.
 	 if (StatementBaseType::empty())  {
 	   StatementPtr newStmt = (dyn_cast<Statement<Block> >(stmt) ?
-				   stmt : mirv::make<Statement<Block> >(stmt));
+				   stmt : boost::static_pointer_cast<Statement<Base> >(mirv::make<Statement<Block> >(stmt)));
 	   StatementBaseType::push_back(newStmt);
 	 }
 	 else {

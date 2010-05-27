@@ -12,7 +12,8 @@ namespace mirv {
          Associative, Transitive,
          Reflexive> Properties;
      typedef Expression<Binary> VisitorBaseType;
-     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+       BitwiseAnd>::type BaseType;
    };
    
   /// Specify the bitwise or interface.
@@ -22,7 +23,8 @@ namespace mirv {
          Associative, Transitive,
          Reflexive> Properties;
      typedef Expression<Binary> VisitorBaseType;
-     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+       BitwiseOr>::type BaseType;
    };
 
   /// Specify the bitwise xor interface.
@@ -32,7 +34,8 @@ namespace mirv {
          Associative, Transitive,
          Reflexive> Properties;
      typedef Expression<Binary> VisitorBaseType;
-     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+       BitwiseXor>::type BaseType;
    };
    
   /// Specify the bitwise complement interface.
@@ -40,7 +43,8 @@ namespace mirv {
    public:
       typedef boost::mpl::vector<Bitwise> Properties;
      typedef Expression<Unary> VisitorBaseType;
-     typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
+       BitwiseComplement>::type BaseType;
    };
    
 
@@ -49,7 +53,8 @@ namespace mirv {
    public:
       typedef boost::mpl::vector<Bitwise> Properties;
     typedef Expression<Binary> VisitorBaseType;
-     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+       ShiftLeft>::type BaseType;
    };
 
   /// Specify the bitwise arithmetic right shift interface.
@@ -57,7 +62,8 @@ namespace mirv {
    public:
       typedef boost::mpl::vector<Bitwise> Properties;
     typedef Expression<Binary> VisitorBaseType;
-      typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+       ArithmeticShiftRight>::type BaseType;
    };
 
   /// Specify the bitwise logical right shift interface.
@@ -65,7 +71,8 @@ namespace mirv {
    public:
       typedef boost::mpl::vector<Bitwise> Properties;
     typedef Expression<Binary> VisitorBaseType;
-      typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+     typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+       LogicalShiftRight>::type BaseType;
    };
 };
 

@@ -1,3 +1,4 @@
+
 #ifndef mirv_Core_IR_StructType_hpp
 #define mirv_Core_IR_StructType_hpp
 
@@ -15,7 +16,8 @@ namespace mirv {
   private:
     typedef Symbol<Type<Derived> > InterfaceBaseType;
 
-    class Interface : public InterfaceBaseType {
+    class Interface : public InterfaceBaseType,
+                      public boost::enable_shared_from_this<Symbol<Type<StructType> > > {
     public:
       typedef Symbol<Type<TypeBase> > ChildType;
       typedef boost::shared_ptr<ChildType> ChildPtr;
