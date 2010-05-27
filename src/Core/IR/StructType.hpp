@@ -26,7 +26,7 @@ namespace mirv {
     private:
     public:
       template<typename Sequence>
-      Interface(std::string &name, Sequence members)
+      Interface(std::string &name, const Sequence &members)
           : InterfaceBaseType(name) {
         // Add the member types.
         //typedef typename boost::fusion::result_of::begin<Sequence>::type begType;
