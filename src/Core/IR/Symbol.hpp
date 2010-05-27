@@ -5,6 +5,8 @@
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 
+#include <boost/enable_shared_from_this.hpp>
+
 #include <functional>
 #include <string>
 

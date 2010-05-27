@@ -38,7 +38,8 @@ namespace mirv {
    public:
      typedef boost::mpl::vector<> Properties;
      typedef LeafExpression VisitorBaseType;
-     typedef typename ExpressionBaseGenerator<Properties, Interface>::type BaseType;
+     typedef typename ExpressionBaseGenerator<Properties, Interface,
+       Reference<SymbolType> >::type BaseType;
    };
 
   /// Take the address of an lvalue expression.
@@ -48,7 +49,8 @@ namespace mirv {
 
     // TODO: Interface that checks for lvalues.
     typedef Expression<Unary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
+      AddressOf>::type BaseType;
   };
 
   /// Dereference the address provided by some expression.
@@ -56,7 +58,8 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<> Properties;
     typedef Expression<Unary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
+      Dereference>::type BaseType;
   };
 
   /// Specify the interface for array index expressions.
@@ -65,7 +68,8 @@ namespace mirv {
     typedef boost::mpl::vector<> Properties;
     // TODO: Support multi-dimension arrays natively?
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      ArrayRef>::type BaseType;
   };
 
   /// Specify the interface for function call expressions.
@@ -73,7 +77,8 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<> Properties;
     typedef InnerExpression VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, InnerExpression>::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, InnerExpression,
+      Call>::type BaseType;
    };
 }
 

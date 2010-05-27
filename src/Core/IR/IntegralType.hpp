@@ -11,7 +11,8 @@ namespace mirv {
    private:
     typedef Symbol<Type<Simple> > InterfaceBaseType;
 
-     class Interface : public InterfaceBaseType {
+     class Interface : public InterfaceBaseType,
+                       public boost::enable_shared_from_this<Symbol<Type<Integral> > > {
      public:
        Interface(BitSizeType size) :
            InterfaceBaseType("int" + boost::lexical_cast<std::string>(size),

@@ -17,7 +17,8 @@ namespace mirv {
      class Interface : public Symbol<Named>,
                        public FunctionBaseType,
 		       public TypeBaseType,
-		       public VariableBaseType {
+		       public VariableBaseType,
+                       public boost::enable_shared_from_this<Symbol<Module> > {
      public:
        Interface(const std::string &n) : Symbol<Named>(n) {}
 

@@ -11,7 +11,8 @@ namespace mirv {
   private:
     typedef Symbol<Type<Derived> > InterfaceBaseType;
 
-    class Interface : public InterfaceBaseType {
+    class Interface : public InterfaceBaseType,
+                      public boost::enable_shared_from_this<Symbol<Type<Pointer> > > {
     public:
       Interface(const std::string &name) : InterfaceBaseType(name) {}
       typedef Symbol<Type<TypeBase> > ChildType;

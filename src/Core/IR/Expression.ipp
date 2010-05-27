@@ -1,7 +1,9 @@
+// -*-C++-*-
 #ifndef mirv_Core_IR_Expression_ipp
 #define mirv_Core_IR_Expression_ipp
 
 #include <mirv/Core/Filter/ExpressionVisitor.hpp>
+#include <mirv/Core/Filter/NodeVisitor.hpp>
 
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Logical.hpp>
@@ -14,9 +16,10 @@ namespace mirv {
    template<typename Op>
    void Expression<Op>::accept(ExpressionVisitor &V)
    {
-     ptr<Node<Base> >::type pn = this->shared_from_this();
-     typename ptr<Expression<Op> >::type p = safe_cast<Expression<Op> >(pn);
-     V.visit(p);
+     detail::AcceptImpl<Expression<Op>,
+       boost::is_base_of<boost::enable_shared_from_this<Expression<Op> >,
+       Expression<Op> >::value> impl;
+     impl(this, V);
    }
 }
 

@@ -10,43 +10,31 @@
 namespace mirv {
   void Expression<Base>::accept(ExpressionVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<Expression<Base> >::type p = safe_cast<Expression<Base> >(pn);
-    V.visit(p);
+    error("Expression<Base>::accept called");
   }
 
   void Expression<Inner<detail::InnerExpressionTraits> >::accept(ExpressionVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<Expression<Base> >::type p = safe_cast<Expression<Base> >(pn);
-    V.visit(p);
+    error("Expression<Inner>::accept called");
   }
 
   void InnerExpression::accept(ExpressionVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<InnerExpression>::type p = safe_cast<InnerExpression>(pn);
-    V.visit(p);
+    error("InnerExpression::accept called");
   }
 
   void LeafExpression::accept(ExpressionVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<LeafExpression>::type p = safe_cast<LeafExpression>(pn);
-    V.visit(p);
+    error("LeafExpression::accept called");
   }
 
   void Unary::Interface::accept(ExpressionVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<Expression<Unary> >::type p = safe_cast<Expression<Unary> >(pn);
-    V.visit(p);
+    error("Unary::Interface::accept called");
   }
 
   void Binary::Interface::accept(ExpressionVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<Expression<Binary> >::type p = safe_cast<Expression<Binary> >(pn);
-    V.visit(p);
+    error("Binary::Interface::accept called");
   }
 }

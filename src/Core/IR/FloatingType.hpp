@@ -10,7 +10,8 @@ namespace mirv {
    struct Floating {
     typedef Symbol<Type<Simple> > InterfaceBaseType;
 
-     class Interface : public InterfaceBaseType {
+     class Interface : public InterfaceBaseType,
+                       public boost::enable_shared_from_this<Symbol<Type<Floating> > > {
      public:
        Interface(BitSizeType size) :
            InterfaceBaseType("float" + boost::lexical_cast<std::string>(size),

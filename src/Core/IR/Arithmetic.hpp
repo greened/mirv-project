@@ -14,7 +14,8 @@ namespace mirv {
 			       Associative, Transitive, 
 			       Reflexive> Properties;
      typedef Expression<Binary> VisitorBaseType;
-     typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      Add>::type BaseType;
   };
 
   /// Specify the interface to a subtract expression.
@@ -24,7 +25,8 @@ namespace mirv {
 			       Transitive, 
 			       Reflexive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      Subtract>::type BaseType;
   };
 
   /// Specify the interface to a multiply expression.
@@ -34,7 +36,8 @@ namespace mirv {
 			       Associative, Transitive, 
 			       Reflexive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      Multiply>::type BaseType;
   };
 
   /// Specify the interface to a divide expression.
@@ -44,7 +47,8 @@ namespace mirv {
 			       Associative, Transitive, 
 			       Reflexive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      Divide>::type BaseType;
   };
 
   /// Specify the interface to a modulo expression.
@@ -54,7 +58,8 @@ namespace mirv {
 			       Transitive, 
 			       Reflexive> Properties;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
+      Modulus>::type BaseType;
   };
 
   /// Specify the interface to a negate expression.
@@ -63,7 +68,8 @@ namespace mirv {
     typedef boost::mpl::vector<Arithmetic, 
 			       Reflexive> Properties;
     typedef Expression<Unary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Unary> >::type BaseType;
+    typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
+      Negate>::type BaseType;
   };
 };
 

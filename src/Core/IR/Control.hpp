@@ -6,6 +6,7 @@
 #include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {
@@ -14,7 +15,8 @@ namespace mirv {
    private:
       typedef InnerStatement InterfaceBaseType;
 
-      class Interface : public InterfaceBaseType {
+     class Interface : public InterfaceBaseType,
+                       public boost::enable_shared_from_this<Statement<Block> > {
       public:
 	Interface(void) : InterfaceBaseType() {}
 	 template<typename A1>
@@ -192,7 +194,8 @@ namespace mirv {
   class IfThen {
    private:
      class Interface : public Statement<SingleCondition>,
-		       public Statement<SingleBlock> {
+		       public Statement<SingleBlock>,
+                       public boost::enable_shared_from_this<Statement<IfThen> > {
      public:
        template<typename S, typename E>
        Interface(E e, S s) : Statement<SingleCondition>(e),
@@ -213,7 +216,8 @@ namespace mirv {
    class IfElse {
    private:
      class Interface : public Statement<SingleCondition>,
-		       public Statement<DualBlock> {
+		       public Statement<DualBlock>,
+                       public boost::enable_shared_from_this<Statement<IfElse> > {
      public:
        template<typename S1, typename S2, typename E>
        Interface(E e, S1 s1, S2 s2) : Statement<SingleCondition>(e),
@@ -234,7 +238,8 @@ namespace mirv {
    class While {
    private:
      class Interface : public Statement<SingleCondition>,
-		       public Statement<SingleBlock> {
+		       public Statement<SingleBlock>,
+                       public boost::enable_shared_from_this<Statement<While> > {
      public:
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleCondition>(e),
@@ -255,7 +260,8 @@ namespace mirv {
    class DoWhile {
    private:
      class Interface : public Statement<SingleCondition>,
-		       public Statement<SingleBlock> {
+		       public Statement<SingleBlock>,
+                       public boost::enable_shared_from_this<Statement<DoWhile> > {
      public:
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleCondition>(e),
@@ -276,7 +282,8 @@ namespace mirv {
    class Case {
    private:
      class Interface : public Statement<SingleCondition>,
-		       public Statement<SingleBlock> {
+		       public Statement<SingleBlock>,
+                       public boost::enable_shared_from_this<Statement<Case> > {
      public:
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleCondition>(e),
@@ -299,7 +306,7 @@ namespace mirv {
    private:
      typedef Statement<SingleBlock> InterfaceBaseType;
 
-      class Interface : public virtual InterfaceBaseType {
+     class Interface : public virtual InterfaceBaseType {
          typedef InterfaceBaseType::ChildPtr ChildPtr;
       public:
        template<typename S1>
@@ -323,7 +330,8 @@ namespace mirv {
    class Switch {
    private:
      class Interface : public Statement<SingleCondition>,
-		       public Statement<CaseBlock> {
+		       public Statement<CaseBlock>,
+                       public boost::enable_shared_from_this<Statement<Switch> > {
      public:
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleCondition>(e),
@@ -384,7 +392,8 @@ namespace mirv {
   class Before {
    private:
      class Interface : public Statement<SingleLabel>,
-		       public Statement<SingleBlock> {
+		       public Statement<SingleBlock>,
+                       public boost::enable_shared_from_this<Statement<Before> > {
      public:
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleLabel>(e),
@@ -409,7 +418,8 @@ namespace mirv {
    class After {
    private:
      class Interface : public Statement<SingleLabel>,
-		       public Statement<SingleBlock> {
+		       public Statement<SingleBlock>,
+                       public boost::enable_shared_from_this<Statement<After> > {
      public:
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleLabel>(e),
@@ -433,7 +443,8 @@ namespace mirv {
    class Goto {
    private:
      class Interface : public Statement<SingleLabel>,
-		       public LeafStatement {
+		       public LeafStatement,
+                       public boost::enable_shared_from_this<Statement<Goto> > {
      public:
        template<typename E>
        Interface(E e) : Statement<SingleLabel>(e),

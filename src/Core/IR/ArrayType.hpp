@@ -12,7 +12,8 @@ namespace mirv {
    private:
      typedef Symbol<Type<Derived> > InterfaceBaseType;
 
-      class Interface : public InterfaceBaseType {
+     class Interface : public InterfaceBaseType,
+                       public boost::enable_shared_from_this<Symbol<Type<Array> > > {
       public:
          typedef int DimensionType;
 
