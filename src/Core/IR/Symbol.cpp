@@ -16,22 +16,16 @@
 namespace mirv {
   void Symbol<Base>::accept(SymbolVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<Symbol<Base> >::type p = safe_cast<Symbol<Base> >(pn);
-    V.visit(p);
+    error("Symbol<Base>::accept called");
   }
 
   void InnerSymbol::accept(SymbolVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<InnerSymbol>::type p = safe_cast<InnerSymbol>(pn);
-    V.visit(p);
+    error("InnerSymbol::accept called");
   }
 
   void LeafSymbol::accept(SymbolVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<LeafSymbol>::type p = safe_cast<LeafSymbol>(pn);
-    V.visit(p);
+    error("LeafSymbol::accept called");
   }
 }

@@ -13,16 +13,11 @@
 namespace mirv {
   void Symbol<Type<Inner<detail::InnerTypeTraits> > >::accept(SymbolVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<Symbol<Type<TypeBase> > >::type p =
-      safe_cast<Symbol<Type<TypeBase> > >(pn);
-    V.visit(p);
+    error("Symbol<Type<Inner<>>>::accept called");
   }
 
   void InnerType::accept(SymbolVisitor &V)
   {
-    ptr<Node<Base> >::type pn = shared_from_this();
-    ptr<InnerType>::type p = safe_cast<InnerType>(pn);
-    V.visit(p);
+    error("InnerType::accept called");
   }
 }
