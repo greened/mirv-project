@@ -3,9 +3,9 @@
 
 // Order is important here.  In particular, Domain.hpp must be included
 // after Grammar.hpp.
-#include <mirv/Core/Builder/Symbol.hpp>
-#include <mirv/Core/Builder/Expression.hpp>
-#include <mirv/Core/Builder/Statement.hpp>
+#include <mirv/Core/Builder/SymbolRules.hpp>
+#include <mirv/Core/Builder/ExpressionRules.hpp>
+#include <mirv/Core/Builder/StatementRules.hpp>
 #include <mirv/Core/Builder/Grammar.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/Builder/Domain.hpp>

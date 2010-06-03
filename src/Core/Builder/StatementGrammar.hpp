@@ -1,7 +1,7 @@
 #ifndef mirv_Core_Builder_StatementGrammar_hpp
 #define mirv_Core_Builder_StatementGrammar_hpp
 
-#include <mirv/Core/Builder/Statement.hpp>
+#include <mirv/Core/Builder/StatementRules.hpp>
 
 #include <boost/proto/proto.hpp>
 

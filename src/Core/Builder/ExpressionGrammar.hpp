@@ -1,7 +1,7 @@
 #ifndef mirv_Core_Builder_ExpressionGrammar_hpp
 #define mirv_Core_Builder_ExpressionGrammar_hpp
 
-#include <mirv/Core/Builder/Expression.hpp>
+#include <mirv/Core/Builder/ExpressionRules.hpp>
 
 #include <boost/proto/proto.hpp>
 

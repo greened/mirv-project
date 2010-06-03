@@ -1,7 +1,7 @@
 #ifndef mirv_Core_Builder_SymbolGrammar_hpp
 #define mirv_Core_Builder_SymbolGrammar_hpp
 
-#include <mirv/Core/Builder/Symbol.hpp>
+#include <mirv/Core/Builder/SymbolRules.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
