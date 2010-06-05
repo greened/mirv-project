@@ -1,5 +1,5 @@
-#ifndef mirv_Core_Builder_SymbolRules_hpp
-#define mirv_Core_Builder_SymbolRules_hpp
+#ifndef mirv_Core_Builder_ModuleRulesFwd_hpp
+#define mirv_Core_Builder_ModuleRulesFwd_hpp
 
 #include <mirv/Core/Builder/Transform.hpp>
 #include <mirv/Core/Builder/DomainFwd.hpp>
@@ -12,6 +12,7 @@
 
 namespace mirv {
    namespace Builder {
+     struct ModuleRule;
    }
 }
 
