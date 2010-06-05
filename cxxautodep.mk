@@ -22,7 +22,7 @@ CXXMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.dd $<,$(CPP
 #endif
 
 PROCESS_CXXDEPS = $(CP) -f $*.dd $*.PP && \
-                      $(SED) -i -e 's%$(@F)%$@%' $*.PP && \
+                      $(SED) -i -e 's%$(subst .,\.,$(@F))%$@%' $*.PP && \
                       $(SED) -e 's%\#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
                              -e '\%^$$% d' -e 's%$$% :%' < $*.dd >> $*.PP && \
                   $(MV) -f $*.PP $*.dd
