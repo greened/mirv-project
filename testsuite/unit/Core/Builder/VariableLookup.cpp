@@ -19,6 +19,7 @@
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;
@@ -51,7 +52,8 @@ int main(void)
   Builder::VariableTerminal c = {{"c"}};
 
   ptr<Node<Base> >::type code =
-    Builder::translate(module, ptr<Symbol<Function> >::type(),
+    Builder::translateWithGrammar<Builder::FunctionBuilder>(
+      module, ptr<Symbol<Function> >::type(),
       function["testfunc"].type[void_()] [
 	var[a].type[int_(32)],
 	var[b].type[int_(32)],

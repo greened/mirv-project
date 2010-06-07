@@ -42,6 +42,9 @@
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/DoWhileGrammar.hpp>
+#include <mirv/Core/Builder/IfElseGrammar.hpp>
+#include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;

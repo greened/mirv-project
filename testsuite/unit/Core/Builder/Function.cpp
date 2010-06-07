@@ -22,6 +22,7 @@
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;
@@ -40,10 +41,7 @@ using mirv::make;
 
 namespace Builder = mirv::Builder;
 
-using Builder::if_;
-using Builder::do_;
 using Builder::function;
-using Builder::var;
 
 int main(void)
 {
@@ -67,7 +65,7 @@ int main(void)
   Builder::VariableTerminal b = {{"b"}};
 
   ptr<Node<Base> >::type code =
-    Builder::translate(module,
+    Builder::translateWithGrammar<Builder::FunctionBuilder>(module,
       function["testfunc"].type["void ()"] [
        	a = a + b
       ]

@@ -20,6 +20,7 @@
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/StructType.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Node;
@@ -38,7 +39,7 @@ using Builder::module;
 int main(void)
 {
   ptr<Node<Base> >::type code =
-    Builder::translate(
+    Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
         struct_["teststruct"] [
           int_(32),

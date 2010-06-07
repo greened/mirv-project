@@ -1,6 +1,8 @@
 #ifndef mirv_Core_Builder_TypeGrammar_hpp
 #define mirv_Core_Builder_TypeGrammar_hpp
 
+#include <mirv/Core/Builder/TypeGrammarFwd.hpp>
+
 #include <mirv/Core/Builder/IntegralTypeGrammar.hpp>
 #include <mirv/Core/Builder/FloatingTypeGrammar.hpp>
 #include <mirv/Core/Builder/FunctionTypeGrammar.hpp>
