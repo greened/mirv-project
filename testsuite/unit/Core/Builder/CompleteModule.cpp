@@ -58,6 +58,7 @@
 #include <mirv/Core/IR/Control.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;
@@ -92,7 +93,7 @@ int main(void)
   Builder::VariableTerminal d = {{"d"}};
 
   ptr<Node<Base> >::type code =
-    Builder::translate(
+    Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
 	var[a].type[int_(32)],
 	var[b].type[int_(32)],

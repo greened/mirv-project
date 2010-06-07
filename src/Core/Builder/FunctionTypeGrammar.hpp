@@ -4,7 +4,6 @@
 #include <mirv/Core/Builder/FunctionTypeGrammarFwd.hpp>
 
 #include <mirv/Core/Builder/VoidTypeGrammar.hpp>
-#include <mirv/Core/Builder/VoidTypeGrammar.hpp>
 #include <mirv/Core/Builder/TypeGrammar.hpp>
 #include <mirv/Core/Builder/FunctionTypeRules.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>

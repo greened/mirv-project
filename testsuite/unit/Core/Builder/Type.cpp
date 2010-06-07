@@ -17,6 +17,7 @@
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/StructType.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;
@@ -45,7 +46,8 @@ int main(void)
   ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
 
   ptr<Node<Base> >::type code =
-    Builder::translate(module, ptr<Symbol<Function> >::type(),
+    Builder::translateWithGrammar<Builder::FunctionBuilder>(
+      module, ptr<Symbol<Function> >::type(),
       function["testfunc"].type[void_()] [
         var["a"].type[int_(32)]
       ]

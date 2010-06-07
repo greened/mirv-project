@@ -53,6 +53,10 @@
 #include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Relational.hpp>
+#include <mirv/Core/Builder/AssignGrammar.hpp>
+#include <mirv/Core/Builder/DoWhileGrammar.hpp>
+#include <mirv/Core/Builder/IfElseGrammar.hpp>
+#include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
@@ -88,7 +92,7 @@ int main(void)
   Builder::VariableTerminal c = {{"c"}};
 
   ptr<Node<Base> >::type code =
-    Builder::translate(module,
+    Builder::translateWithGrammar<Builder::FunctionBuilder>(module,
       function["testfunc"].type[void_()] [
 	var["a"].type[int_(32)],
 	var["b"].type[int_(32)],
