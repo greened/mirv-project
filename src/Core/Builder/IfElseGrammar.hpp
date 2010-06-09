@@ -1,6 +1,8 @@
 #ifndef mirv_Core_Builder_IfElseGrammar_hpp
 #define mirv_Core_Builder_IfElseGrammar_hpp
 
+#include <mirv/Core/Builder/IfElseGrammarFwd.hpp>
+
 #include <mirv/Core/Builder/IfElseRules.hpp>
 
 namespace mirv {

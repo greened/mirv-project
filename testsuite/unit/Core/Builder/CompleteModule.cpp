@@ -59,6 +59,8 @@
 #include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
+#include <mirv/Core/Builder/Domain.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;

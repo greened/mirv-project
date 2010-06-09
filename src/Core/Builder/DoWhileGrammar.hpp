@@ -1,6 +1,8 @@
 #ifndef mirv_Core_Builder_DoWhileGrammar_hpp
 #define mirv_Core_Builder_DoWhileGrammar_hpp
 
+#include <mirv/Core/Builder/DoWhileGrammarFwd.hpp>
+
 #include <mirv/Core/Builder/DoWhileRules.hpp>
 
 namespace mirv {
