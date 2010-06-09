@@ -44,7 +44,8 @@
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/DoWhileGrammar.hpp>
 #include <mirv/Core/Builder/IfElseGrammar.hpp>
-#include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/Domain.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;

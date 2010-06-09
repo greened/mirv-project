@@ -1,6 +1,8 @@
 #ifndef mirv_Core_Builder_Domain_hpp
 #define mirv_Core_Builder_Domain_hpp
 
+#include <mirv/Core/Builder/DomainFwd.hpp>
+
 #include <mirv/Core/Builder/Grammar.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 

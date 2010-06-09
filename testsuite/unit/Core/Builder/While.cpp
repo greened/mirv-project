@@ -52,6 +52,7 @@
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/IfGrammar.hpp>
 #include <mirv/Core/Builder/WhileGrammar.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;

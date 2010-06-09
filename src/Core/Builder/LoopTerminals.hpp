@@ -3,6 +3,7 @@
 
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/Builder/Keywords.hpp>
+
 #include <boost/proto/proto.hpp>
 
 namespace mirv {

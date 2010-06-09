@@ -4,6 +4,8 @@
 #include <mirv/Core/Builder/Keywords.hpp>
 #include <mirv/Core/Builder/DomainFwd.hpp>
 
+#include <boost/proto/proto.hpp>
+
 namespace mirv {
    namespace Builder {
      /// This is a proto wrapper to install builder-specific

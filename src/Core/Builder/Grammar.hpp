@@ -1,6 +1,8 @@
 #ifndef mirv_Core_Builder_Grammar_hpp
 #define mirv_Core_Builder_Grammar_hpp
 
+#include <mirv/Core/Builder/GrammarFwd.hpp>
+
 #include <mirv/Core/Builder/ExpressionGrammar.hpp>
 #include <mirv/Core/Builder/StatementGrammar.hpp>
 #include <mirv/Core/Builder/SymbolGrammar.hpp>

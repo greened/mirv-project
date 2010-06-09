@@ -1,6 +1,8 @@
 #ifndef mirv_Core_Builder_WhileGrammar_hpp
 #define mirv_Core_Builder_WhileGrammar_hpp
 
+#include <mirv/Core/Builder/WhileGrammarFwd.hpp>
+
 #include <mirv/Core/Builder/WhileRules.hpp>
 
 namespace mirv {
