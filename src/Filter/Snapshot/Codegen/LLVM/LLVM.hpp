@@ -9,8 +9,62 @@
 namespace mirv {
   /// This is a filter to translate from MIRV IR to LLVM IR.
   class LLVMCodegenFilter
-    : public Filter<Node<Base> > {
+      : public Filter<Node<Base> > {
   private:
+    /// Entering each symbol
+    class EnterDeclSymbolAction : public VisitSymbolAction {
+    public:
+      EnterDeclSymbolAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
+
+      void visit(ptr<Symbol<Module> >::type sym);
+      void visit(ptr<Symbol<Function> >::type sym);
+      void visit(ptr<Symbol<Variable> >::type sym);
+      void visit(ptr<Symbol<Type<TypeBase> > >::type sym);
+      void visit(ptr<Symbol<Type<StructType> > >::type sym);
+    };
+
+    class EnterDefSymbolAction : public VisitSymbolAction {
+    public:
+      EnterDefSymbolAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
+
+      void visit(ptr<Symbol<Function> >::type sym);
+      void visit(ptr<Symbol<Variable> >::type sym);
+    };
+
+    /// Leaving each symbol declaration.
+    class LeaveDeclSymbolAction : public VisitSymbolAction {
+    public:
+      LeaveDeclSymbolAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
+
+      /// Print the final newline after each symbol declaration.
+      void visit(ptr<Symbol<Base> >::type sym) {
+        if (!JustLeft) {
+          out << "\n";
+        }
+        JustLeft = true;
+      }
+    };
+
+    /// Leaving each symbol definition.
+    class LeaveDefSymbolAction : public VisitSymbolAction {
+    public:
+      LeaveDefSymbolAction(Stream &o, Indent &i, bool &j)
+	  : out(o), ind(i), JustLeft(j) {}
+
+      /// Print the final newline after each symbol definition.
+      void visit(ptr<Symbol<Variable> >::type sym) {
+        if (!JustLeft) {
+          out << "\n";
+        }
+        JustLeft = true;
+      }
+      void visit(ptr<Symbol<Module> >::type sym);
+      void visit(ptr<Symbol<Function> >::type sym);
+    };
+
     /// Entering each statement
     class EnterAction : public VisitStatementAction {
     private:
@@ -63,7 +117,7 @@ namespace mirv {
 
     /// This is the flow for translating expressions.
     class LLVMCodegenExpressionFlow
-      : public ForwardExpressionFlow<
+        : public ForwardExpressionFlow<
       EnterExprAction,
       NullAction,
       NullAction,
@@ -81,8 +135,8 @@ namespace mirv {
 
     public:
       LLVMCodegenExpressionFlow(const EnterExprAction &e)
-	: BaseType(e, NullAction(), NullAction(), NullAction(),
-		   NullAction(), NullDataflow()) {}
+          : BaseType(e, NullAction(), NullAction(), NullAction(),
+                     NullAction(), NullDataflow()) {}
     };
 
     /// This is the flow for translating statements.
@@ -108,16 +162,16 @@ namespace mirv {
     public:
       LLVMCodegenFlow(const EnterAction &e,
 		      const LLVMCodegenExpressionFlow &expr)
-	: BaseType(e,
-		   NullAction(),
-		   NullAction(),
-		   NullAction(),
-		   NullAction(),
-		   NullAction(),
-		   NullAction(),
-		   expr,
-		   NullDataflow(),
-		   NullDataflow::Confluence()) {}
+          : BaseType(e,
+                     NullAction(),
+                     NullAction(),
+                     NullAction(),
+                     NullAction(),
+                     NullAction(),
+                     NullAction(),
+                     expr,
+                     NullDataflow(),
+                     NullDataflow::Confluence()) {}
     };
 
   public:
