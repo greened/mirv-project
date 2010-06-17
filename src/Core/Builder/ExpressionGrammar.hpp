@@ -1,14 +1,14 @@
 #ifndef mirv_Core_Builder_ExpressionGrammar_hpp
 #define mirv_Core_Builder_ExpressionGrammar_hpp
 
+#include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
+
 #include <mirv/Core/Builder/ExpressionRules.hpp>
 
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
   namespace Builder {
-    struct ConstructExpressionGrammar;
-
     /// Define the rules for the expression builder grammar.
     struct ConstructExpressionGrammarCases {
       /// This is the default case.  It matches nothing so that
@@ -17,196 +17,231 @@ namespace mirv {
       struct case_ : boost::proto::not_<boost::proto::_> {};
     };
 
+    namespace detail {
+      template<typename Rule, typename Tag>
+      struct UnaryBuilder : boost::proto::when<
+        Rule,
+        ConstructUnary<
+          Expression<Tag>
+          >(ConstructExpressionGrammar(boost::proto::_child))
+        > {};
+
+      template<typename Rule, typename Tag>
+      struct BinaryBuilder :  boost::proto::when<
+        Rule,
+        ConstructBinary<
+          Expression<Tag>
+          >(ConstructExpressionGrammar(boost::proto::_left),
+            ConstructExpressionGrammar(boost::proto::_right))
+        > {};
+    }
+
+    struct VariableRefBuilder : boost::proto::when<
+      VariableTerminal,
+      ConstructUnary<
+        Expression<Reference<Variable> >
+        >(LookupSymbol<Symbol<Variable> >(boost::proto::_data,
+                                          boost::proto::_value))
+      > {};
+    
     /// This is the grammar for all terminal expressions.
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::terminal>
-      : boost::proto::or_<
-      boost::proto::when<VariableTerminal,
-			 ConstructUnary<Expression<Reference<Variable> > >(LookupSymbol<Symbol<Variable> >(boost::proto::_data, boost::proto::_value))> > {};
+        : boost::proto::or_<VariableRefBuilder> {};
 
     /// This is the grammar for negate expressions.
+    struct NegateBuilder : detail::UnaryBuilder<NegateRule, Negate> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::negate>
-      :  boost::proto::when<NegateRule,
-			    ConstructUnary<Expression<Negate> >(ConstructExpressionGrammar(boost::proto::_child))> {};
+        : NegateBuilder {};
 
     /// This is the grammar for complement expressions.
+    struct ComplementBuilder
+        : detail::UnaryBuilder<ComplementRule, BitwiseComplement> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::complement>
-      : boost::proto::when<ComplementRule,
-			   ConstructUnary<Expression<BitwiseComplement> >(ConstructExpressionGrammar(boost::proto::_child))> {};
+        : ComplementRule {};
 
     /// This is the grammar for deref expressions.
+    struct DerefBuilder 
+        : detail::UnaryBuilder<DereferenceRule, Dereference> {};
+
     template<>
-    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::dereference>
-      : boost::proto::when<DereferenceRule,
-			   ConstructUnary<Expression<Dereference> >(ConstructExpressionGrammar(boost::proto::_child))> {};
+    struct ConstructExpressionGrammarCases::case_<
+      boost::proto::tag::dereference
+      > : DerefBuilder {};
 
 #if 0
     /// This is the grammar for addrof expressions.
+    struct AddressOfBuilder 
+        : detail::UnaryBuilder<AddressOfRule, AddressOf> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::address_of>
-      : boost::proto::when<AddressOfRule,
-			   ConstructUnary<Expression<AddressOf> >(ConstructExpressionGrammar(boost::proto::_child))> {};
+        : AddressOfBuilder {};
 #endif
 
     /// This is the grammar for logical not expressions.
+    struct NotBuilder 
+        : detail::UnaryBuilder<NotRule, LogicalNot> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_not>
-      : boost::proto::when<NotRule,
-			   ConstructUnary<Expression<LogicalNot> >(ConstructExpressionGrammar(boost::proto::_child))> {};
+        : NotBuilder {};
 
     /// This is the grammar for add expressions.
+    struct AddBuilder 
+        : detail::BinaryBuilder<AddRule, Add> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::plus>
-      : boost::proto::when<
-      AddRule,
-      ConstructBinary<Expression<Add> >(ConstructExpressionGrammar(boost::proto::_left),
-					      ConstructExpressionGrammar(boost::proto::_right))> {};
+        : AddBuilder {};
 
   /// This is the grammar for subtract expressions.
+    struct MinusBuilder 
+        : detail::BinaryBuilder<MinusRule, Subtract> {};
+
   template<>
   struct ConstructExpressionGrammarCases::case_<boost::proto::tag::minus>
-    : boost::proto::when<
-    MinusRule,
-    ConstructBinary<Expression<Subtract> >(ConstructExpressionGrammar(boost::proto::_left),
-						 ConstructExpressionGrammar(boost::proto::_right))> {};
+      : MinusBuilder {};
 
 /// This is the grammar for multiply expressions.
-template<>
-struct ConstructExpressionGrammarCases::case_<boost::proto::tag::multiplies>
-  : boost::proto::when<
-  MultipliesRule,
-  ConstructBinary<Expression<Multiply> >(ConstructExpressionGrammar(boost::proto::_left),
-					       ConstructExpressionGrammar(boost::proto::_right))> {};
+    struct MultipliesBuilder 
+        : detail::BinaryBuilder<MultipliesRule, Multiply> {};
+
+    template<>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::multiplies>
+        : MultipliesBuilder {};
 
     /// This is the grammar for divide expressions.
+    struct DividesBuilder 
+        : detail::BinaryBuilder<DividesRule, Divide> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::divides>
-      : boost::proto::when<
-      DividesRule,
-      ConstructBinary<Expression<Divide> >(ConstructExpressionGrammar(boost::proto::_left),
-						 ConstructExpressionGrammar(boost::proto::_right))> {};
+        : DividesBuilder {};
 
   /// This is the grammar for left shift expressions.
-  template<>
+    struct ShiftLeftBuilder 
+        : detail::BinaryBuilder<ShiftLeftRule, ShiftLeft> {};
+
+    template<>
   struct ConstructExpressionGrammarCases::case_<boost::proto::tag::shift_left>
-    : boost::proto::when<
-    ShiftLeftRule,
-    ConstructBinary<Expression<ShiftLeft> >(ConstructExpressionGrammar(boost::proto::_left),
-						  ConstructExpressionGrammar(boost::proto::_right))> {};
+        : ShiftLeftBuilder {};
 
 /// This is the grammar for right shift expressions.
-template<>
-struct ConstructExpressionGrammarCases::case_<boost::proto::tag::shift_right>
-  : boost::proto::when<
-  ShiftRightRule,
-  ConstructBinary<Expression<ArithmeticShiftRight> >(ConstructExpressionGrammar(boost::proto::_left),
-							   ConstructExpressionGrammar(boost::proto::_right))> {};
+    struct ShiftRightBuilder 
+        : detail::BinaryBuilder<ShiftRightRule, ArithmeticShiftRight> {};
+
+    template<>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::shift_right>
+    : ShiftRightBuilder {};
 
     /// This is the grammar for modulo expressions.
+    struct ModulusBuilder 
+        : detail::BinaryBuilder<ModulusRule, Modulus> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::modulus>
-      : boost::proto::when<
-      ModulusRule,
-      ConstructBinary<Expression<Modulus> >(ConstructExpressionGrammar(boost::proto::_left),
-						  ConstructExpressionGrammar(boost::proto::_right))> {};
+        : ModulusBuilder {};
 
   /// This is the grammar for greater than expressions.
+    struct GreaterBuilder 
+        : detail::BinaryBuilder<GreaterRule, GreaterThan> {};
+
   template<>
   struct ConstructExpressionGrammarCases::case_<boost::proto::tag::greater>
-    : boost::proto::when<
-    GreaterRule,
-    ConstructBinary<Expression<GreaterThan> >(ConstructExpressionGrammar(boost::proto::_left),
-						    ConstructExpressionGrammar(boost::proto::_right))> {};
+      : GreaterBuilder {};
 
 /// This is the grammar for less than expressions.
-template<>
+    struct LessBuilder 
+        : detail::BinaryBuilder<LessRule, LessThan> {};
+
+    template<>
 struct ConstructExpressionGrammarCases::case_<boost::proto::tag::less>
-  : boost::proto::when<
-  LessRule,
-  ConstructBinary<Expression<LessThan> >(ConstructExpressionGrammar(boost::proto::_left),
-					       ConstructExpressionGrammar(boost::proto::_right))> {};
+        : LessBuilder {};
 
     /// This is the grammar for greater than or equal expressions.
+    struct GreaterEqualBuilder 
+        : detail::BinaryBuilder<GreaterEqualRule, GreaterThanOrEqual> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::greater_equal>
-      : boost::proto::when<
-      GreaterEqualRule,
-      ConstructBinary<Expression<GreaterThanOrEqual> >(ConstructExpressionGrammar(boost::proto::_left),
-							     ConstructExpressionGrammar(boost::proto::_right))> {};
+        : GreaterEqualBuilder {};
 
   /// This is the grammar for less than or equal expressions.
+    struct LessEqualBuilder 
+        : detail::BinaryBuilder<LessEqualRule, LessThanOrEqual> {};
+
   template<>
   struct ConstructExpressionGrammarCases::case_<boost::proto::tag::less_equal>
-    : boost::proto::when<
-    LessEqualRule,
-    ConstructBinary<Expression<LessThanOrEqual> >(ConstructExpressionGrammar(boost::proto::_left),
-							ConstructExpressionGrammar(boost::proto::_right))> {};
+      : LessEqualBuilder {};
 
 /// This is the grammar for equal expressions.
+    struct EqualBuilder 
+        : detail::BinaryBuilder<EqualRule, Equal> {};
+
 template<>
 struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
-  : boost::proto::when<
-  EqualRule,
-  ConstructBinary<Expression<Equal> >(ConstructExpressionGrammar(boost::proto::_left),
-					    ConstructExpressionGrammar(boost::proto::_right))> {};
+    : EqualBuilder {};
 
     /// This is the grammar for not equal expressions.
+    struct NotEqualBuilder 
+        : detail::BinaryBuilder<NotEqualRule, NotEqual> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::not_equal_to>
-      : boost::proto::when<
-      NotEqualRule,
-      ConstructBinary<Expression<NotEqual> >(ConstructExpressionGrammar(boost::proto::_left),
-						   ConstructExpressionGrammar(boost::proto::_right))> {};
+        : NotEqualBuilder {};
 
-  /// This is the grammar for logical or expressions.
+    /// This is the grammar for logical or expressions.
+    struct OrBuilder 
+        : detail::BinaryBuilder<OrRule, LogicalOr> {};
+
   template<>
   struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_or>
-    : boost::proto::when<
-    OrRule,
-    ConstructBinary<Expression<LogicalOr> >(ConstructExpressionGrammar(boost::proto::_left),
-						  ConstructExpressionGrammar(boost::proto::_right))> {};
+      : OrBuilder {};
 
 /// This is the grammar for logical and expressions.
-template<>
+    struct AndBuilder 
+        : detail::BinaryBuilder<AndRule, LogicalAnd> {};
+
+    template<>
 struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
-  : boost::proto::when<
-  AndRule,
-  ConstructBinary<Expression<LogicalAnd> >(ConstructExpressionGrammar(boost::proto::_left),
-						 ConstructExpressionGrammar(boost::proto::_right))> {};
+        : AndBuilder {};
 
     /// This is the grammar for bitwise or expressions.
+    struct BitwiseOrBuilder 
+        : detail::BinaryBuilder<BitwiseOrRule, BitwiseOr> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_or>
-      : boost::proto::when<
-      BitwiseOrRule,
-      ConstructBinary<Expression<BitwiseOr> >(ConstructExpressionGrammar(boost::proto::_left),
-						    ConstructExpressionGrammar(boost::proto::_right))> {};
+        : BitwiseOrBuilder {};
 
   /// This is the grammar for bitwise and expressions.
+    struct BitwiseAndBuilder 
+        : detail::BinaryBuilder<BitwiseAndRule, BitwiseAnd> {};
+
   template<>
   struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_and>
-    : boost::proto::when<
-    BitwiseAndRule,
-    ConstructBinary<Expression<BitwiseAnd> >(ConstructExpressionGrammar(boost::proto::_left),
-						   ConstructExpressionGrammar(boost::proto::_right))> {};
+      : BitwiseAndBuilder {};
 
 /// This is the grammar for bitwise xor expressions.
+    struct BitwiseXorBuilder 
+        : detail::BinaryBuilder<BitwiseXorRule, BitwiseXor> {};
+
 template<>
 struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
-  : boost::proto::when<
-  BitwiseXorRule,
-  ConstructBinary<Expression<BitwiseXor> >(ConstructExpressionGrammar(boost::proto::_left),
-						 ConstructExpressionGrammar(boost::proto::_right))> {};
+    : BitwiseXorBuilder {};
 
     /// This is the grammar for array reference expressions.
+    struct SubscriptBuilder 
+        : detail::BinaryBuilder<SubscriptRule, ArrayRef> {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::subscript>
-      : boost::proto::when<
-      SubscriptRule,
-      ConstructBinary<Expression<ArrayRef> >(ConstructExpressionGrammar(boost::proto::_left),
-						   ConstructExpressionGrammar(boost::proto::_right))> {};
+        : SubscriptBuilder {};
 
   //         ConstructNary<CallRule, Call>
 
