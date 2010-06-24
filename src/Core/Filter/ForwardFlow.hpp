@@ -355,6 +355,29 @@ namespace mirv {
       }
    };
 
+  /// This is a type generator to create forward flow types.
+  struct ForwardFlowGenerator {
+    template<
+      typename EnterAction,
+      typename LeaveAction,
+      typename BeforeStmtAction,
+      typename AfterStmtAction,
+      typename BetweenStmtAction,
+      typename BeforeExprAction,
+      typename AfterExprAction,
+      typename ExprFlow,
+      typename Dataflow,
+      typename Confluence>
+    struct apply {
+      typedef ForwardFlow<
+        EnterAction, LeaveAction, BeforeStmtAction, 
+        AfterStmtAction, BetweenStmtAction,
+        BeforeExprAction, AfterExprAction, ExprFlow,
+        Dataflow, Confluence
+        > type;
+    };
+    };
+
   /// This is a generator function to create forward flows.  It uses
   /// argument type deduction to relieve the user of the need to
   /// specify all of the template arguments.
