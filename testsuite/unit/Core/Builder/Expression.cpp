@@ -21,7 +21,8 @@
 #include <mirv/Core/IR/StructType.hpp>
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/ExpressionGrammar.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Module;

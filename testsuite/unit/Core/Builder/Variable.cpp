@@ -16,8 +16,8 @@
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/StructType.hpp>
-#include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;

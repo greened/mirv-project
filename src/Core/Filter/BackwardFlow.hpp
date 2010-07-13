@@ -7,16 +7,16 @@ namespace mirv {
   /// This flow walks backward through statements, visiting rightmost
   /// operands first.
    template<
-      typename EnterAction = NullAction,
-      typename LeaveAction = NullAction,
-      typename BeforeStmtAction = NullAction,
-      typename AfterStmtAction = NullAction,
-     typename BetweenStmtAction = NullAction,
-      typename BeforeExprAction = NullAction,
-      typename AfterExprAction = NullAction,
-      typename ExprFlow = NullExpressionFlow,
-      typename Dataflow = NullDataflow,
-      typename Confluence = Dataflow::Confluence>
+      typename EnterAction,
+      typename LeaveAction,
+      typename BeforeStmtAction,
+      typename AfterStmtAction,
+     typename BetweenStmtAction,
+     typename JoinAction,
+      typename BeforeExprAction,
+     typename ExprAction,
+     typename AfterExprAction
+     >
    class BackwardFlow
          : public StatementFlow<
       EnterAction,
@@ -24,23 +24,29 @@ namespace mirv {
       BeforeStmtAction,
       AfterStmtAction,
       BetweenStmtAction,
+     JoinAction,
       BeforeExprAction,
-      AfterExprAction,
-      ExprFlow,
-      Dataflow,
-      Confluence> {
+     ExprAction,
+     AfterExprAction
+     > {
+     typedef Map<ptr<Expression<Base>>::type, bool>::type LabelIterateMapType;
+     LabelIterateMapType iterateMap;
+
    public:
-      BackwardFlow(const EnterAction &e,
+     BackwardFlow(const EnterAction &e,
                    const LeaveAction &l,
                    const BeforeStmtAction &bs,
                    const AfterStmtAction &as,
-                   const BetweenStmtAction &bts,
+                  const JoinAction &j,
+                  const BetweenStmtAction &bts,
                    const BeforeExprAction &be,
-                   const AfterExprAction &ae,
-                   const ExprFlow &expr,
-                   const Dataflow &d,
-                   const Confluence &c)
-	: StatementFlow(e, l, bs, as, bts, be, ae, expr, d, c) {}
+                  const ExprAction &ex,
+                  const AfterExprAction &ae)
+         : StatementFlow(e, l, bs, as, bts, j, be, ex, ae) {}
+
+    // Allow in-place construction of actions.
+    template<typename ...Args>
+    BackwardFlow(Args &...args) : BaseType(args...) {}
 
      /// Visit block statements from the last statement to the first.
       void visit(ptr<Statement<Block> >::type stmt) {
@@ -65,16 +71,14 @@ namespace mirv {
       void visit(ptr<Statement<IfThen> >::type stmt) {
          enter(stmt);
 
-         Dataflow denter(dataflow());
-
          beforeStatement(stmt, *stmt->child());
          stmt->child()->accept(*this);
          afterStatement(stmt, *stmt->child());
 
-         confluence(dataflow(), dataflow(), denter);
+         this->joinPoint(stmt, stmt->child());
 
          beforeExpression(stmt, *stmt->expression());
-         stmt->expression()->accept(expression());
+         this->doExpression(stmt, stmt->expression());
          afterExpression(stmt, *stmt->expression());
 
          leave(stmt);
@@ -89,26 +93,22 @@ namespace mirv {
 
          Statement<IfElse>::iterator s = stmt->begin();
 
-         beforeStatement(stmt, **s);
+         beforeStatement(stmt, *s);
          (*s)->accept(*this);
-         afterStatement(stmt, **s);
-
-         Dataflow then(dataflow());
+         afterStatement(stmt, *s);
 
          Statement<IfElse>::iterator prev = s++;
 
-         betweenStatement(stmt, **prev, **s);
+         betweenStatement(stmt, *prev, *s);
 
-         dataflow() = denter;
-
-         beforeStatement(stmt, **s);
+         beforeStatement(stmt, *s);
          (*s)->accept(*this);
-         afterStatement(stmt, **s);
+         afterStatement(stmt, *s);
 
-         confluence(dataflow(), dataflow(), then);
+         this->joinPoint(stmt, *prev, *s);
 
          beforeExpression(stmt, *stmt->expression());
-         stmt->expression()->accept(expression());
+         this->doExpression(stmt, stmt->expression());
          afterExpression(stmt, *stmt->expression());
 
          leave(stmt);
@@ -120,26 +120,20 @@ namespace mirv {
          enter(stmt);
 
          beforeExpression(stmt, *stmt->expression());
-         stmt->expression()->accept(expression());
+         this->doExpression(stmt, stmt->expression());
          afterExpression(stmt, *stmt->expression());
-
-         Dataflow firstExpr(dataflow());
 
          do {
             beforeStatement(stmt, *stmt->child());
             stmt->child()->accept(*this);
             afterStatement(stmt, *stmt->child());
 
-            // Is denter right?
-            confluence(dataflow(), dataflow(), denter);
-
             beforeExpression(stmt, *stmt->expression());
-            stmt->expression()->accept(expression());
+            this->doExpression(stmt, stmt->expression());
             afterExpression(stmt, *stmt->expression());
-         } while (dataflow().change());
 
-         // Iterating vs-> never enter
-         confluence(dataflow(), dataflow(), firstExpr);
+            // Join point: Enter while and expression.
+         } while (this->joinPoint(stmt, stmt->expression()));
 
          leave(stmt);
       }
@@ -149,22 +143,17 @@ namespace mirv {
       void visit(ptr<Statement<DoWhile> >::type stmt) {
          enter(stmt);
 
-         Dataflow denter(dataflow());
-
          do {
             beforeStatement(stmt, *stmt->child());
             stmt->child()->accept(*this);
             afterStatement(stmt, *stmt->child());
 
             beforeExpression(stmt, *stmt->expression());
-            stmt->expression()->accept(expression());
+            this->doExpression(stmt, stmt->expression());
             afterExpression(stmt, *stmt->expression());
 
-            confluence(dataflow(), dataflow(), denter);
-         } while (dataflow()->change());
-
-         // Always at least one iteration so no need for confluence
-         // here
+            // Join point: Body and expression
+         } while (this->joinPoint(stmt, stmt->child(), stmt->expression()));
 
          leave(stmt);
       }
@@ -174,29 +163,25 @@ namespace mirv {
       void visit(ptr<Statement<Switch> >::type stmt) {
          enter(stmt);
 
-         Dataflow intoExpr;
-
          for(Statement<Switch>::reverse_iterator s = stmt->rbegin(),
                 send = stmt->rend();
              s != send;
              ;) {
             beforeStatement(stmt, *s);
             (*s)->accept(*this);
-            afterStatement(stmt, **s);
+            afterStatement(stmt, *s);
             Statement<Block>::iterator prev = s;
 
-            // Fall-through vs. direct jump
-            confluence(intoExpr, intoExpr, dataflow());
+            // Join point: Jump to label and fall-through.
+            this->joinPoint(stmt, *s, *prev);
 
             if (++s != send) {
                betweenStatement(stmt, **prev, **s);
             }
          }
 
-         dataflow() = intoExpr;
-
          beforeExpression(stmt, *stmt->expression());
-         stmt->expression()->accept(expression());
+         this->doExpression(stmt, stmt->expression());
          afterExpression(stmt, *stmt->expression());
 
          leave(stmt);
@@ -212,8 +197,7 @@ namespace mirv {
          afterStatement(stmt, *stmt->child());
 
          beforeExpression(stmt, *stmt->expression());
-         stmt->expression()->accept(expression());
-
+         this->doExpression(stmt, stmt->expression());
          afterExpression(stmt, *stmt->expression());
 
          leave(stmt);
@@ -225,26 +209,31 @@ namespace mirv {
       void visit(ptr<Statement<Before> >::type stmt) {
          enter(stmt);
 
+         LabelIterateMapType::iterator i;
+         bool inserted = false;
+
+         tie(i, inserted) =
+           iterateMap.insert(std::make_pair(stmt->getExpression(), false));
+         checkInvariant(inserted, "Duplicate label in iterate map");
+
          do {
             beforeStatement(stmt, *stmt->child());
             stmt->child()->accept(*this);
             afterStatement(stmt, *stmt->child());
 
-            Dataflow &label = get_attribute<Dataflow>(stmt);
+            // Join point: Statement and jump.  Handled at jump.
+         } while(i->second);
 
-            confluence(dataflow(), dataflow(), label);
-         } while(label.changed() || dataflow.changed());
+         iterateMap.erase(i);
 
-         leave(stmt);
+         this->doLeave(stmt);
       }
 
      /// Visit After statements.
       void visit(ptr<Statement<After> >::type stmt) {
          enter(stmt);
 
-         Dataflow &label = get_attribute<Dataflow>(stmt);
-
-         confluence(dataflow(), dataflow(), label);
+         // Join point: Statement and jump.  Hanled at jump.
 
          beforeStatement(stmt, *stmt->child());
          stmt->child()->accept(*this);
@@ -257,8 +246,15 @@ namespace mirv {
       void visit(ptr<Statement<Goto> >::type stmt) {
          enter(stmt);
 
-         Dataflow &label = get_attribute<Dataflow>(*stmt->target());
-         dataflow() = label;  // Pick up data from where I go to
+         LabelIterateMapType::iterator i =
+           iterateMap.find(stmt->getExpression());
+
+         // Join point: Jump and target.
+         bool iterate = this->joinPoint(stmt, stmt, stmt->child());
+
+         if (i != iterateMap.end()) {
+           i->second = iterate;
+         }
 
          leave(stmt);
       }
@@ -272,20 +268,47 @@ namespace mirv {
      /// Visit Assignment statements, visiting the left-hand side,
      /// then the right-hand side.
       void visit(ptr<Statement<Assignment> >::type stmt) {
-         this->enter(stmt);
+         this->doEnter(stmt);
 
-         this->beforeExpression(stmt, stmt->getLeftExpression());
-         stmt->getLeftExpression()->accept(this->expressionFlow());
+         this->doBeforeExpression(stmt, stmt->getLeftExpression());
+         this->doExpression(stmt, stmt->getLeftExpression());
          this->afterExpression(stmt, stmt->getLeftExpression());
 
-         this->beforeExpression(stmt, stmt->getRightExpression());
-         stmt->getRightExpression()->accept(this->expressionFlow());
+         this->doBeforeExpression(stmt, stmt->getRightExpression());
+         this->doExpression(stmt, stmt->getRightExpression());
          this->afterExpression(stmt, stmt->getRightExpression());
 
-         this->leave(stmt);
+         this->doLeave(stmt);
       }
 
    };
+
+  /// This is a type generator to create forward flow types.
+  struct BackwardFlowGenerator {
+    template<
+      typename EnterAction,
+      typename LeaveAction,
+      typename BeforeStmtAction,
+      typename AfterStmtAction,
+      typename BetweenStmtAction,
+      typename BeforeExprAction,
+      typename ExprAction,
+      typename AfterExprAction
+      >
+    struct apply {
+      typedef BackwardFlow<
+        EnterAction,
+        LeaveAction,
+        BeforeStmtAction, 
+        AfterStmtAction,
+        BetweenStmtAction,
+        JoinAction,
+        BeforeExprAction,
+        ExprAction,
+        AfterExprAction
+        > type;
+    };
+  };
 }
 
 #endif

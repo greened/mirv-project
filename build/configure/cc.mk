@@ -8,15 +8,17 @@ include $(BUILDTOOLS)/configure/tool.mk
 include $(BUILDTOOLS)/configure/executable.mk
 include $(BUILDTOOLS)/configure/execute.mk
 
-ifeq ($(CC),)
-  $(call mc_target_tool,CC,gcc cc)
-else
-  ifeq ($(origin CC),default)
-    $(call debug,Origin CC)
-    override CC :=
-    $(call mc_target_tool,CC,gcc cc)
-  endif
-endif
+$(call mc_target_tool,CC,gcc cc)
+
+#ifeq ($(CC),)
+#  $(call mc_target_tool,CC,gcc cc)
+#else
+#  ifeq ($(origin CC),default)
+#    $(call debug,Origin CC)
+#    override CC :=
+#    $(call mc_target_tool,CC,gcc cc)
+#  endif
+#endif
 
 # See if the C compiler works
 override C_COMPILE_SOURCE := int main(void) { return(0); }

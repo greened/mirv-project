@@ -1,8 +1,11 @@
 #ifndef mirv_Filter_Snapshot_Codegen_LLVM_hpp
 #define mirv_Filter_Snapshot_Codegen_LLVM_hpp
 
+#include <mirv/Core/Filter/AttributeFlow.hpp>
 #include <mirv/Core/Filter/ForwardFlow.hpp>
+#include <mirv/Core/Filter/ExpressionFlow.hpp>
 #include <mirv/Core/Filter/Filter.hpp>
+#include <mirv/Core/Filter/FlowAction.hpp>
 #include <mirv/Core/Filter/Action.hpp>
 #include <mirv/Core/IR/Node.hpp>
 
@@ -11,11 +14,22 @@ namespace mirv {
   class LLVMCodegenFilter
       : public Filter<Node<Base> > {
   private:
+    class InheritedAttribute {};
+    class SynthesizedAttribute {};
+
+    typedef FlowAttributeManager<
+      InheritedAttribute,
+      SynthesizedAttribute
+      > FlowAttributeManagerType;
+
     /// Entering each symbol
-    class EnterDeclSymbolAction : public VisitSymbolAction {
+    class EnterDeclSymbolVisitor : public SymbolVisitor {
+    private:
+      FlowAttributeManagerType &attributeManager;
+
     public:
-      EnterDeclSymbolAction(Stream &o, Indent &i, bool &j)
-	  : out(o), ind(i), JustLeft(j) {}
+      EnterDeclSymbolVisitor(FlowAttributeManagerType &am)
+	  : attributeManager(am) {}
 
       void visit(ptr<Symbol<Module> >::type sym);
       void visit(ptr<Symbol<Function> >::type sym);
@@ -24,53 +38,78 @@ namespace mirv {
       void visit(ptr<Symbol<Type<StructType> > >::type sym);
     };
 
-    class EnterDefSymbolAction : public VisitSymbolAction {
+    class EnterDeclSymbolAction : public VisitAction<EnterDeclSymbolVisitor> {
     public:
-      EnterDefSymbolAction(Stream &o, Indent &i, bool &j)
-	  : out(o), ind(i), JustLeft(j) {}
+      EnterDeclSymbolAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<EnterDeclSymbolVisitor>(attributeManager) {}
+    };
+
+    class EnterDefSymbolVisitor : public SymbolVisitor {
+    private:
+      FlowAttributeManagerType &attributeManager;
+
+    public:
+      EnterDefSymbolVisitor(FlowAttributeManagerType &am)
+	  : attributeManager(am) {}
 
       void visit(ptr<Symbol<Function> >::type sym);
       void visit(ptr<Symbol<Variable> >::type sym);
     };
 
-    /// Leaving each symbol declaration.
-    class LeaveDeclSymbolAction : public VisitSymbolAction {
+    class EnterDefSymbolAction : public VisitAction<EnterDefSymbolVisitor> {
     public:
-      LeaveDeclSymbolAction(Stream &o, Indent &i, bool &j)
-	  : out(o), ind(i), JustLeft(j) {}
+      EnterDefSymbolAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<EnterDefSymbolVisitor>(attributeManager) {}
+    };
+
+    /// Leaving each symbol declaration.
+    class LeaveDeclSymbolVisitor : public SymbolVisitor {
+    private:
+      FlowAttributeManagerType &attributeManager;
+
+    public:
+      LeaveDeclSymbolVisitor(FlowAttributeManagerType &am)
+	  : attributeManager(am) {}
 
       /// Print the final newline after each symbol declaration.
-      void visit(ptr<Symbol<Base> >::type sym) {
-        if (!JustLeft) {
-          out << "\n";
-        }
-        JustLeft = true;
-      }
+      void visit(ptr<Symbol<Base> >::type sym) {}
+    };
+
+    class LeaveDeclSymbolAction : public VisitAction<LeaveDeclSymbolVisitor> {
+    public:
+      LeaveDeclSymbolAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<LeaveDeclSymbolVisitor>(attributeManager) {}
     };
 
     /// Leaving each symbol definition.
-    class LeaveDefSymbolAction : public VisitSymbolAction {
+    class LeaveDefSymbolVisitor : public SymbolVisitor {
+    private:
+      FlowAttributeManagerType &attributeManager;
+
     public:
-      LeaveDefSymbolAction(Stream &o, Indent &i, bool &j)
-	  : out(o), ind(i), JustLeft(j) {}
+      LeaveDefSymbolVisitor(FlowAttributeManagerType &am)
+	  : attributeManager(am) {}
 
       /// Print the final newline after each symbol definition.
-      void visit(ptr<Symbol<Variable> >::type sym) {
-        if (!JustLeft) {
-          out << "\n";
-        }
-        JustLeft = true;
-      }
+      void visit(ptr<Symbol<Variable> >::type sym) {}
       void visit(ptr<Symbol<Module> >::type sym);
       void visit(ptr<Symbol<Function> >::type sym);
     };
 
+    class LeaveDefSymbolAction : public VisitAction<LeaveDefSymbolVisitor> {
+    public:
+      LeaveDefSymbolAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<LeaveDefSymbolVisitor>(attributeManager) {}
+    };
+
     /// Entering each statement
-    class EnterAction : public VisitStatementAction {
+    class EnterStatementVisitor : public StatementVisitor {
     private:
+      FlowAttributeManagerType &attributeManager;
 
     public:
-      EnterAction() {}
+      EnterStatementVisitor(FlowAttributeManagerType &am)
+          : attributeManager(am) {}
 
       void visit(ptr<Statement<Block> >::type stmt);
       void visit(ptr<Statement<IfThen> >::type stmt);
@@ -87,12 +126,20 @@ namespace mirv {
       void visit(ptr<Statement<Assignment> >::type stmt);
     };
 
+    class EnterStatementAction : public VisitAction<EnterStatementVisitor> {
+    public:
+      EnterStatementAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<EnterStatementVisitor>(attributeManager) {}
+    };
+
     /// Entering each expression
-    class EnterExprAction : public VisitExpressionAction {
+    class EnterExpressionVisitor : public ExpressionVisitor {
     private:
+      FlowAttributeManagerType &attributeManager;
 
     public:
-      EnterExprAction() {}
+      EnterExpressionVisitor(FlowAttributeManagerType &am)
+          : attributeManager(am) {}
 
       void visit(ptr<Expression<Add> >::type expr);
       void visit(ptr<Expression<Subtract> >::type expr);
@@ -115,18 +162,29 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Variable> > >::type expr);
     };
 
+    class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {
+    public:
+      EnterExpressionAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<EnterExpressionVisitor>(attributeManager) {}
+    };
+
     /// This is the flow for translating expressions.
-    class LLVMCodegenExpressionFlow
-        : public ForwardExpressionFlow<
-      EnterExprAction,
+    class LLVMCodegenExpressionFlow : public AttributeFlow<
+      InheritedAttribute,
+      SynthesizedAttribute,
+      ForwardExpressionFlowGenerator,
+      EnterExpressionAction,
       NullAction,
       NullAction,
       NullAction,
       NullAction
       > {
     private:
-      typedef ForwardExpressionFlow<
-      EnterExprAction,
+      typedef AttributeFlow<
+      InheritedAttribute,
+      SynthesizedAttribute,
+      ForwardExpressionFlowGenerator,
+      EnterExpressionAction,
       NullAction,
       NullAction,
       NullAction,
@@ -134,44 +192,44 @@ namespace mirv {
       > BaseType;
 
     public:
-      LLVMCodegenExpressionFlow(const EnterExprAction &e)
-          : BaseType(e, NullAction(), NullAction(), NullAction(),
-                     NullAction(), NullDataflow()) {}
+      LLVMCodegenExpressionFlow()
+          : BaseType(InheritedAttribute()) {}
+
+      LLVMCodegenExpressionFlow(FlowAttributeManagerType &)
+          : BaseType(InheritedAttribute()) {}        
     };
 
     /// This is the flow for translating statements.
-    class LLVMCodegenFlow : public ForwardFlow<
-      EnterAction,
+    class LLVMCodegenFlow : public AttributeFlow<
+      InheritedAttribute,
+      SynthesizedAttribute,
+      ForwardFlowGenerator,
+      EnterStatementAction,
       NullAction,
       NullAction,
       NullAction,
       NullAction,
+      NullJoinAction,
       NullAction,
-      NullAction,
-      LLVMCodegenExpressionFlow> {
-      typedef ForwardFlow<
-	EnterAction,
+      FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
+      NullAction> {
+      typedef AttributeFlow<
+        InheritedAttribute,
+        SynthesizedAttribute,
+        ForwardFlowGenerator,
+	EnterStatementAction,
 	NullAction,
 	NullAction,
 	NullAction,
 	NullAction,
+	NullJoinAction,
 	NullAction,
-	NullAction,
-	LLVMCodegenExpressionFlow> BaseType;
+        FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
+	NullAction> BaseType;
 
     public:
-      LLVMCodegenFlow(const EnterAction &e,
-		      const LLVMCodegenExpressionFlow &expr)
-          : BaseType(e,
-                     NullAction(),
-                     NullAction(),
-                     NullAction(),
-                     NullAction(),
-                     NullAction(),
-                     NullAction(),
-                     expr,
-                     NullDataflow(),
-                     NullDataflow::Confluence()) {}
+      LLVMCodegenFlow()
+          : BaseType(InheritedAttribute()) {}
     };
 
   public:

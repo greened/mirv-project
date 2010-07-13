@@ -6,37 +6,46 @@
 namespace mirv {
   const int PrintFilter::IndentFactor = 3;
 
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Module> >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
   {
-    JustLeft = false;
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
     out << indent(ind) << "mdef " << sym->name() << " {\n";
-    ind += IndentFactor;
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Function> >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
   {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
     // Just declarations.
-    JustLeft = false;
     out << indent(ind) << "fdecl " << sym->name();
   }
 
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Variable> >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
-    JustLeft = false;
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
     out << indent(ind) << "vdecl " << sym->name() << " "
-	<< sym->type()->name();
+      << sym->type()->name();
   }
 
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<TypeBase> > >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::type sym)
   {
     // This is a type that doesn't need a declaration.  So tell the
     // printer not to print a newline after it.
-    JustLeft = true;
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::EnterDeclSymbolAction::visit(ptr<Symbol<Type<StructType> > >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::type sym)
   {
-    JustLeft = false;
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
     out << indent(ind) << "tdecl " << sym->name();
     out << " {\n";
     for (Symbol<Type<StructType> >::iterator p =
@@ -52,312 +61,459 @@ namespace mirv {
     out << indent(ind) << "}";
   }
 
-  void PrintFilter::EnterDefSymbolAction::visit(ptr<Symbol<Function> >::type sym)
+  /// Print the final newline after each symbol declaration.
+  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Base> >::type)
   {
-    JustLeft = false;
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
+      attributeManager.getInheritedAttribute().out() << "\n";
+    }
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
+
+  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::type)
+  {
+    // Don't do anything since we didn't print anything for this
+    // type.
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
+
+      /// Print the final newline after struct types.
+  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::type)
+  {
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
+      attributeManager.getInheritedAttribute().out() << "\n";
+    }
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
+
+  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
     out << indent(ind) << "fdef " << sym->name() << " {\n";
-    ind += IndentFactor;
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterDefSymbolAction::visit(ptr<Symbol<Variable> >::type sym)
+  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
-    JustLeft = false;
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
     out << indent(ind) << "vdecl " << sym->name() << " "
-	<< sym->type()->name();
+      << sym->type()->name();
   }
 
-   void PrintFilter::LeaveDefSymbolAction::visit(ptr<Symbol<Module> >::type sym) {
-     ind -= IndentFactor;
-     if (!JustLeft) {
-       out << "\n";
-     }
-     out << indent(ind) << "}\n";
-     JustLeft = true;
-   }
-
-   void PrintFilter::LeaveDefSymbolAction::visit(ptr<Symbol<Function> >::type sym) {
-     ind -= IndentFactor;
-     if (!JustLeft) {
-       out << "\n";
-     }
-     out << indent(ind) << "}\n";
-     JustLeft = true;
-   }
-
-   void PrintFilter::EnterAction::visit(ptr<Statement<Block> >::type stmt)
-   {
-     JustLeft = false;
-     out << indent(ind) << "{\n";
-     ind += IndentFactor;
+  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
+  {
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
+      attributeManager.getInheritedAttribute().out() << "\n";
     }
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
 
-    void PrintFilter::EnterAction::visit(ptr<Statement<IfThen> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "ifThen\n";
-      ind += IndentFactor;
-    }
+  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Module> >::type sym) {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
 
-    void PrintFilter::EnterAction::visit(ptr<Statement<IfElse> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "ifElse\n";
-      ind += IndentFactor;
-    }
+    out << indent(ind) << "}\n";
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
 
-    void PrintFilter::EnterAction::visit(ptr<Statement<While> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "while\n";
-      ind += IndentFactor;
-    }
+  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Function> >::type sym) {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
 
-    void PrintFilter::EnterAction::visit(ptr<Statement<DoWhile> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "doWhile\n";
-      ind += IndentFactor;
-    }
-
-    void PrintFilter::EnterAction::visit(ptr<Statement<Switch> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "switch\n";
-      ind += IndentFactor;
-    }
-
-    void PrintFilter::EnterAction::visit(ptr<Statement<Case> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "case";
-    }
-
-    void PrintFilter::EnterAction::visit(ptr<Statement<CaseBlock> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "caseblock";
-    }
-
-    void PrintFilter::EnterAction::visit(ptr<Statement<Before> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "before ";
-    }
-
-    void PrintFilter::EnterAction::visit(ptr<Statement<After> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "after ";
-    }
-
-    void PrintFilter::EnterAction::visit(ptr<Statement<Goto> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "goto ";
-    }
-
-    void PrintFilter::EnterAction::visit(ptr<Statement<Return> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "return\n";
-    }
-
-    void PrintFilter::EnterAction::visit(ptr<Statement<Assignment> >::type stmt)
-    {
-      JustLeft = false;
-      out << indent(ind) << "assign\n";
-      ind += IndentFactor;
-    }
-
-   void PrintFilter::LeaveAction::visit(ptr<Statement<Block> >::type stmt) {
-     ind -= IndentFactor;
-     if (!JustLeft) {
-       out << "\n";
-     }
-     out << indent(ind) << "}\n";
-     JustLeft = true;
-   }
-
-  void PrintFilter::LeaveAction::visit(ptr<Statement<Return> >::type stmt) {
-    if (!JustLeft) {
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
       out << "\n";
     }
-    JustLeft = true;
+    out << indent(ind) << "}\n";
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<Add> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "+\n";
-       ind += IndentFactor;
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "{\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<IfThen> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "ifThen\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<IfElse> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "ifElse\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<While> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "while\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<DoWhile> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "doWhile\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Switch> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "switch\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Case> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "case";
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<CaseBlock> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "caseblock";
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Before> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "before ";
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<After> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "after ";
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Goto> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "goto ";
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Return> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "return\n";
+  }
+
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Assignment> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "assign\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Base> >::type stmt)
+  {
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
+      attributeManager.getInheritedAttribute().out() << "\n";
     }
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
 
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<Subtract> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "-\n";
-       ind += IndentFactor;
+  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Block> >::type stmt) {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
+      out << "\n";
     }
+    out << indent(ind) << "}\n";
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
 
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<Multiply> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "*\n";
-       ind += IndentFactor;
+  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Return> >::type stmt) {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
+      out << "\n";
     }
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
 
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<Divide> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "/\n";
-       ind += IndentFactor;
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Add> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "+\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Subtract> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "-\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Multiply> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "*\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Divide> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "/\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Modulus> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "%\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Negate> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "neg\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "&&\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalOr> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "||\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalNot> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "!\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "&\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "|\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "~\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThan> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "<\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "<=\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Equal> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "==\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<NotEqual> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "!=\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThan> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << ">\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << ">=\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "vref " << expr->getSymbol()->name();
+  }
+
+  void PrintFilter::LeaveExpressionVisitor::visit(ptr<Expression<Base> >::type expr)
+  {
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
+      attributeManager.getInheritedAttribute().out() << "\n";
     }
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
 
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<Modulus> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "%\n";
-       ind += IndentFactor;
+  void PrintFilter::LeaveExpressionVisitor::visit(ptr<InnerExpression>::type expr)
+  {
+    if (!attributeManager.getSynthesizedAttribute().justLeft()) {
+      attributeManager.getInheritedAttribute().out() << "\n";
     }
-
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<Negate> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "neg\n";
-       ind += IndentFactor;
-    }
-
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalAnd> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "&&\n";
-       ind += IndentFactor;
-    }
-
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalOr> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "||\n";
-       ind += IndentFactor;
-    }
-
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<LogicalNot> >::type expr)
-    {
-      JustLeft = false;
-       out << indent(ind) << "!\n";
-       ind += IndentFactor;
-    }
-
-    void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseAnd> >::type expr)
-    {
-      JustLeft = false;
-      out << indent(ind) << "&\n";
-      ind += IndentFactor;
-   }
-
-   void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseOr> >::type expr)
-   {
-      JustLeft = false;
-      out << indent(ind) << "|\n";
-      ind += IndentFactor;
-   }
-
-   void PrintFilter::EnterExprAction::visit(ptr<Expression<BitwiseComplement> >::type expr)
-   {
-      JustLeft = false;
-      out << indent(ind) << "~\n";
-      ind += IndentFactor;
-   }
-
-   void PrintFilter::EnterExprAction::visit(ptr<Expression<LessThan> >::type expr)
-   {
-      JustLeft = false;
-      out << indent(ind) << "<\n";
-      ind += IndentFactor;
-   }
-
-   void PrintFilter::EnterExprAction::visit(ptr<Expression<LessThanOrEqual> >::type expr)
-   {
-      JustLeft = false;
-      out << indent(ind) << "<=\n";
-      ind += IndentFactor;
-   }
-
-   void PrintFilter::EnterExprAction::visit(ptr<Expression<Equal> >::type expr)
-   {
-      JustLeft = false;
-      out << indent(ind) << "==\n";
-      ind += IndentFactor;
-   }
-
-   void PrintFilter::EnterExprAction::visit(ptr<Expression<NotEqual> >::type expr)
-   {
-      JustLeft = false;
-      out << indent(ind) << "!=\n";
-      ind += IndentFactor;
-   }
-
-   void PrintFilter::EnterExprAction::visit(ptr<Expression<GreaterThan> >::type expr)
-   {
-      JustLeft = false;
-      out << indent(ind) << ">\n";
-      ind += IndentFactor;
-   }
-
-   void PrintFilter::EnterExprAction::visit(ptr<Expression<GreaterThanOrEqual> >::type expr)
-   {
-      JustLeft = false;
-      out << indent(ind) << ">=\n";
-      ind += IndentFactor;
-   }
-
-  void PrintFilter::EnterExprAction::visit(ptr<Expression<Reference<Variable> > >::type expr)
-   {
-     JustLeft = false;
-     out << indent(ind) << "vref " << expr->getSymbol()->name();
-   }
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
 
   void PrintFilter::operator()(ptr<Node<Base> >::type node)
-   {
-     if (ptr<Symbol<Module> >::type s = boost::dynamic_pointer_cast<Symbol<Module> >(node)) {
-       JustLeft = false;
-       ptr<SymbolVisitor>::type declflow(new PrintDeclSymbolFlow(EnterDeclSymbolAction(out, ind, JustLeft),
-								 LeaveDeclSymbolAction(out, ind, JustLeft)));
-       s->accept(*declflow);
-       ptr<SymbolVisitor>::type defflow(new PrintDefSymbolFlow(EnterDefSymbolAction(out, ind, JustLeft),
-							       LeaveDefSymbolAction(out, ind, JustLeft),
-							       PrintFlow(EnterAction(out, ind, JustLeft),
-									 LeaveAction(out, ind, JustLeft),
-									 PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
-											     LeaveExprAction(out, ind, JustLeft)))));
-       s->accept(*defflow);
-     }
-     else if (ptr<Symbol<Base> >::type s = boost::dynamic_pointer_cast<Symbol<Base> >(node)) {
-       JustLeft = false;
-       ptr<SymbolVisitor>::type defflow(makeSymbolFlow(EnterDefSymbolAction(out, ind, JustLeft),
-						       LeaveDefSymbolAction(out, ind, JustLeft),
-						       NullAction(),
-						       NullAction(),
-						       NullAction(),
-						       PrintFlow(EnterAction(out, ind, JustLeft),
-								 LeaveAction(out, ind, JustLeft),
-								 PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
-										     LeaveExprAction(out, ind, JustLeft)))));
-       s->accept(*defflow);
-     }
-     else if (ptr<Statement<Base> >::type s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
-       JustLeft = false;
-       ptr<StatementVisitor>::type flow(new PrintFlow(EnterAction(out, ind, JustLeft),
-						      LeaveAction(out, ind, JustLeft),
-						      PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
-									  LeaveExprAction(out, ind, JustLeft))));
-       s->accept(*flow);
-     }
-     else if (ptr<Expression<Base> >::type e = boost::dynamic_pointer_cast<Expression<Base> >(node)) {
-       JustLeft = false;
-       ptr<ExpressionVisitor>::type flow(new PrintExpressionFlow(EnterExprAction(out, ind, JustLeft),
-								 LeaveExprAction(out, ind, JustLeft)));
-       e->accept(*flow);
-     }
-   }
+  {
+    if (ptr<Symbol<Module> >::type s =
+        boost::dynamic_pointer_cast<Symbol<Module> >(node)) {
+      ptr<SymbolVisitor>::type declflow(new PrintDeclSymbolFlow(out));
+      s->accept(*declflow);
+      ptr<SymbolVisitor>::type defflow(new PrintDefSymbolFlow(out));
+      s->accept(*defflow);
+    }
+    else if (ptr<Symbol<Base> >::type s =
+             boost::dynamic_pointer_cast<Symbol<Base> >(node)) {
+      ptr<SymbolVisitor>::type defflow(new PrintDefSymbolFlow(out));
+      s->accept(*defflow);
+    }
+    else if (ptr<Statement<Base> >::type s =
+             boost::dynamic_pointer_cast<Statement<Base> >(node)) {
+      ptr<StatementVisitor>::type flow(new PrintFlow(out));
+      s->accept(*flow);
+    }
+    else if (ptr<Expression<Base> >::type e =
+             boost::dynamic_pointer_cast<Expression<Base> >(node)) {
+      ptr<ExpressionVisitor>::type flow(new PrintExpressionFlow(out));
+      e->accept(*flow);
+    }
+  }
 }

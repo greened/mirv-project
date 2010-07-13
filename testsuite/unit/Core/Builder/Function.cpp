@@ -21,8 +21,8 @@
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
-#include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;
