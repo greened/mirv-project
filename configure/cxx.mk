@@ -8,15 +8,17 @@ include $(BUILDTOOLS)/configure/configure.mk
 include $(BUILDTOOLS)/configure/executable.mk
 include $(BUILDTOOLS)/configure/execute.mk
 
-ifeq ($(CXX),)
-  $(call mc_target_tool,CXX,g++ c++,Could not find C++ compiler)
-else
-  ifeq ($(origin CXX),default)
-    $(call debug,Origin CXX)
-    override CXX :=
-    $(call mc_target_tool,CXX,g++ c++,Could not find C++ compiler)
-  endif
-endif
+$(call mc_target_tool,CXX,g++ c++,Could not find C++ compiler)
+
+#ifeq ($(CXX),)
+#  $(call mc_target_tool,CXX,g++ c++,Could not find C++ compiler)
+#else
+#  ifeq ($(origin CXX),default)
+#    $(call debug,Origin CXX)
+#    override CXX :=
+#    $(call mc_target_tool,CXX,g++ c++,Could not find C++ compiler)
+#  endif
+#endif
 
 # See if the C++ compiler works
 override CXX_COMPILE_SOURCE := int main(void) { return(0); }
