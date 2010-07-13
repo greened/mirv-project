@@ -2,8 +2,8 @@
 #include <mirv/Core/IR/Attribute.hpp>
 
 namespace mirv {
-  template AttributeManager<NullDataflow> *
-  AttributeManager<NullDataflow>::inst;
-  template<> AttributeManager<NullDataflow> *
-  AttributeManager<NullDataflow>::inst = 0;
+  template NodeAttributeManager<NullDataflow> *
+  NodeAttributeManager<NullDataflow>::inst;
+  template<> NodeAttributeManager<NullDataflow> *
+  NodeAttributeManager<NullDataflow>::inst = 0;
 }

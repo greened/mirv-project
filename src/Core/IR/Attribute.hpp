@@ -10,10 +10,10 @@ namespace mirv {
   /// This singleton takes care of mapping IR nodes to attributes.
   /// This makes it easier to add new attributes.
   template<typename T>
-  class AttributeManager {
+  class NodeAttributeManager {
   private:
     /// This is the singleton instance.
-    static AttributeManager<T> *inst;
+    static NodeAttributeManager<T> *inst;
 
     typedef std::map<ptr<Node<Base> >::type, typename ptr<T>::type> AttributeMap;
     /// This is a map from IR node to attribute.
@@ -21,8 +21,8 @@ namespace mirv {
 
   public:
     /// Get the singleton instance.
-    static AttributeManager<T> &instance(void) {
-      return *(inst ? inst : inst = new AttributeManager<T>);
+    static NodeAttributeManager<T> &instance(void) {
+      return *(inst ? inst : inst = new NodeAttributeManager<T>);
     }
 
   /// Set an attribute for and IR node.
@@ -41,13 +41,13 @@ namespace mirv {
   /// This is a free function to set a node attribute.
   template<typename T>
   void setAttribute(ptr<Node<Base> >::type node, typename ptr<T>::type attr) {
-    return AttributeManager<T>::instance().setAttribute(node, attr);
+    return NodeAttributeManager<T>::instance().setAttribute(node, attr);
   }
 
   /// This is a free function to get a node attribute.
   template<typename T>
   typename ptr<T>::type getAttribute(ptr<Node<Base> >::type node) {
-    return AttributeManager<T>::instance().getAttribute(node);
+    return NodeAttributeManager<T>::instance().getAttribute(node);
   }
 }
 

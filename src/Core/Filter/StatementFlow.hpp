@@ -3,147 +3,185 @@
 
 #include <mirv/Core/Filter/StatementVisitor.hpp>
 #include <mirv/Core/Filter/Action.hpp>
-#include <mirv/Core/Filter/ExpressionFlow.hpp>
 #include <mirv/Core/Filter/Dataflow.hpp>
 #include <mirv/Core/Memory/Heap.hpp>
 
 namespace mirv {
   /// This is the base class of all flows that walk statement trees.
-   template<
-      typename EnterAction = NullAction,
-      typename LeaveAction = NullAction,
-      typename BeforeStmtAction = NullAction, 
-      typename AfterStmtAction = NullAction,
-      typename BetweenStmtAction = NullAction,
-      typename BeforeExprAction = NullAction,
-      typename AfterExprAction = NullAction,
-      typename ExprFlow = NullExpressionFlow,
-      typename Dataflow = NullDataflow,
-     typename Confluence = typename Dataflow::Confluence>
-   class StatementFlow : public StatementVisitor {
-   private:
-     /// The action to apply upon entering a statement.
-      EnterAction ent;
-     /// The action to apply upon leaving a statement.
-      LeaveAction lve;
-     /// The action to apply before visiting a child statement.
-     BeforeStmtAction bfrstmt;
-     /// The action to apply after visiting a child statement.
-      AfterStmtAction aftstmt;
-     /// The action to apply between a pair of child statements.
-      BetweenStmtAction betstmt;
-     /// The action to apply before visiting a child expression.
-       BeforeExprAction bfrexpr;
-     /// The action to apply after visiting a child expression.
-       AfterExprAction aftexpr;
-     /// The flow to walk child expression trees.
-     ExprFlow exp;
-    /// The dataflow information to propagate. 
-     Dataflow data;
-     /// The dataflow confluence operation.
-     Confluence conf;
+  template<
+    typename EnterAction,
+    typename LeaveAction,
+    typename BeforeStmtAction, 
+    typename AfterStmtAction,
+    typename BetweenStmtAction,
+    typename JoinAction,
+    typename BeforeExprAction,
+    typename ExprAction,
+    typename AfterExprAction
+    >
+  class StatementFlow : public StatementVisitor {
+  private:
+    /// The action to apply upon entering a statement.
+    EnterAction ent;
+    /// The action to apply upon leaving a statement.
+    LeaveAction lve;
+    /// The action to apply before visiting a child statement.
+    BeforeStmtAction bfrstmt;
+    /// The action to apply after visiting a child statement.
+    AfterStmtAction aftstmt;
+    /// The action to apply between a pair of child statements.
+    BetweenStmtAction betstmt;
+    /// The action to apply at the join point of control flow.
+    JoinAction jn;
+    /// The action to apply before visiting a child expression.
+    BeforeExprAction bfrexpr;
+    /// The action to apply when visiting a child expression.
+    ExprAction expr;
+    /// The action to apply after visiting a child expression.
+    AfterExprAction aftexpr;
 
-     bool hitBreak;  /// Have we seen a break statement?
+  protected:
+    EnterAction &enterStatement(void) {
+      return ent;
+    }
 
-   protected:
-     /// Apply the enter action.
-     template<typename Stmt>
-     typename EnterAction::result_type enter(boost::shared_ptr<Stmt> stmt) {
-       return(ent(stmt));
-      }
+    EnterAction &leaveStatement(void) {
+      return lve;
+    }
 
-     /// Apply the leave action.
-     template<typename Stmt>
-     typename LeaveAction::result_type leave(boost::shared_ptr<Stmt> stmt) {
-       return(lve(stmt));
-      }
+    BeforeStmtAction &beforeStatement(void) {
+      return bfrstmt;
+    }
 
-     /// Apply the before action.
-     template<typename Stmt, typename Child>
-     typename BeforeStmtAction::result_type beforeStatement(boost::shared_ptr<Stmt> stmt,
-							     boost::shared_ptr<Child> child) {
-       return(bfrstmt(stmt, child));
-      }
+    AfterStmtAction &afterStatement(void) {
+      return aftstmt;
+    }
 
-     /// Apply the after action.
-     template<typename Stmt, typename Child>
-     typename AfterStmtAction::result_type afterStatement(boost::shared_ptr<Stmt> stmt,
-							   boost::shared_ptr<Child> child) {
-       return(aftstmt(stmt, child));
-      }
+    BetweenStmtAction &betweenStatement(void) {
+      return betstmt;
+    }
 
-     /// Apply the between action.
-     template<typename Stmt, typename Child>
-     typename BetweenStmtAction::result_type betweenStatement(boost::shared_ptr<Stmt> stmt,
-							      boost::shared_ptr<Child> child1,
-							      boost::shared_ptr<Child> child2) {
-       return(betstmt(stmt, child1, child2));
-      }
+    JoinAction &join(void) {
+      return jn;
+    }
 
-     /// Apply the before expression action.
-     template<typename Stmt, typename Expr>
-     typename BeforeExprAction::result_type beforeExpression(boost::shared_ptr<Stmt> stmt,
-							      boost::shared_ptr<Expr> expr) {
-       return(bfrexpr(stmt, expr));
-      }
+    BeforeExprAction &beforeExpression(void) {
+      return bfrexpr;
+    }
 
-     /// Apply the after expression action.
-     template<typename Stmt, typename Expr>
-     typename AfterExprAction::result_type afterExpression(boost::shared_ptr<Stmt> stmt,
-							    boost::shared_ptr<Expr> expr) {
-       return(aftexpr(stmt, expr));
-      }
+    ExprAction &expression(void) {
+      return expr;
+    }
 
-     /// Get the expression flow.
-     ExprFlow &expressionFlow(void) {
-       return exp;
-      }
+    AfterExprAction &afterExpression(void) {
+      return aftexpr;
+    }
 
-     // Get the current dataflow information.
-      Dataflow &dataflow(void) {
-         return(data);
-      }
+    /// Apply the enter action.
+    template<typename Stmt>
+    typename EnterAction::result_type doEnter(boost::shared_ptr<Stmt> stmt) {
+      return ent(stmt);
+    }
 
-     /// Apply the dataflow confluence.
-     typename Confluence::result_type confluence(Dataflow &out,
-						  const Dataflow &in1, const Dataflow &in2) {
-       return conf(out, in1, in2);
-     }
+    /// Apply the leave action.
+    template<typename Stmt>
+    typename LeaveAction::result_type doLeave(boost::shared_ptr<Stmt> stmt) {
+      return lve(stmt);
+    }
 
-     /// Return whether we saw a break in a child tree.
-     bool hasBreak(void) const {
-       return hitBreak;
-     }
+    /// Apply the before action.
+    template<typename Stmt, typename Child>
+    typename BeforeStmtAction::result_type doBeforeStatement(boost::shared_ptr<Stmt> stmt,
+                                                             boost::shared_ptr<Child> child) {
+      return bfrstmt(stmt, child);
+    }
 
-     /// Clear the hitBreak flag.
-     void setNoBreak(void) {
-       hitBreak = false;
-     }
-     /// Set the hitBreak flag.
-     void setHasBreak(void) {
-       hitBreak = true;
-     }
-     /// Set the hitBreak flag to a given value.
-     void setBreak(bool v) {
-       hitBreak = v;
-     }
+    /// Apply the after action.
+    template<typename Stmt, typename Child>
+    typename AfterStmtAction::result_type doAfterStatement(boost::shared_ptr<Stmt> stmt,
+                                                           boost::shared_ptr<Child> child) {
+      return aftstmt(stmt, child);
+    }
 
-   public:
-     StatementFlow(const EnterAction &e = NullAction(),
-		   const LeaveAction &l = NullAction(),
-		   const BeforeStmtAction &bs = NullAction(),
-		   const AfterStmtAction &as = NullAction(), 
-		   const BetweenStmtAction &bt = NullAction(),
-		   const BeforeExprAction &be = NullAction(),
-		   const AfterExprAction &ae = NullAction(), 
-		   const ExprFlow &expr = NullExpressionFlow(),
-		   const Dataflow &d = NullDataflow(),
-		   const Confluence &c = typename Dataflow::Confluence())
-	: ent(e), lve(l), bfrstmt(bs), aftstmt(as), betstmt(bt), bfrexpr(be),
-	  aftexpr(ae), exp(expr), data(d), conf(c) {}
-   };
+    /// Apply the between action.
+    template<typename Stmt, typename Child>
+    typename BetweenStmtAction::result_type doBetweenStatement(boost::shared_ptr<Stmt> stmt,
+                                                               boost::shared_ptr<Child> child1,
+                                                               boost::shared_ptr<Child> child2) {
+      return betstmt(stmt, child1, child2);
+    }
 
-  typedef StatementFlow<> NullStatementFlow;
+    /// Apply the join action.
+    template<typename Stmt, typename Child>
+    typename JoinAction::result_type doJoin(boost::shared_ptr<Stmt> stmt,
+                                            boost::shared_ptr<Child> child) {
+      return jn(stmt, child);
+    }
+
+    /// Apply the join action.
+    template<typename Stmt, typename Child1, typename Child2>
+    typename JoinAction::result_type doJoin(boost::shared_ptr<Stmt> stmt,
+                                            boost::shared_ptr<Child1> child1,
+                                            boost::shared_ptr<Child2> child2) {
+      return jn(stmt, child1, child2);
+    }
+
+    /// Apply the before expression action.
+    template<typename Stmt, typename Expr>
+    typename BeforeExprAction::result_type doBeforeExpression(boost::shared_ptr<Stmt> stmt,
+                                                              boost::shared_ptr<Expr> expr) {
+      return bfrexpr(stmt, expr);
+    }
+
+    /// Apply the expression action.
+    template<typename Stmt, typename Expr>
+    typename ExprAction::result_type doExpression(boost::shared_ptr<Stmt> stmt,
+                                                  boost::shared_ptr<Expr> exp) {
+      return expr(stmt, exp);
+    }
+
+    /// Apply the after expression action.
+    template<typename Stmt, typename Expr>
+    typename AfterExprAction::result_type doAfterExpression(boost::shared_ptr<Stmt> stmt,
+                                                            boost::shared_ptr<Expr> expr) {
+      return aftexpr(stmt, expr);
+    }
+
+  public:
+    StatementFlow(const EnterAction &e,
+                  const LeaveAction &l,
+                  const BeforeStmtAction &bs,
+                  const AfterStmtAction &as, 
+                  const BetweenStmtAction &bt,
+                  const JoinAction &j,
+                  const BeforeExprAction &be,
+                  const ExprAction &ex,
+                  const AfterExprAction &ae)
+        : ent(e), lve(l), bfrstmt(bs), aftstmt(as), betstmt(bt), jn(j),
+            bfrexpr(be), expr(ex), aftexpr(ae) {}
+
+    // Allow in-place construction of actions.
+    template <typename ...Args>
+    StatementFlow(Args &...args)
+        : ent(args...), lve(args...), bfrstmt(args...), aftstmt(args...),
+            betstmt(args...), jn(args...), bfrexpr(args...), expr(args...),
+            aftexpr(args...) {}
+
+    template<typename Flow>
+    void transfer(Flow &other) {}
+  };
+
+  typedef StatementFlow<
+    NullAction,
+    NullAction,
+    NullAction,
+    NullAction,
+    NullAction,
+    NullAction,
+    NullAction,
+    NullAction,
+    NullAction
+    > NullStatementFlow;
 }
 
 #endif

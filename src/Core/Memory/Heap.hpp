@@ -14,6 +14,8 @@ namespace mirv {
   struct ptr {
     typedef boost::shared_ptr<Type> type;
     typedef boost::shared_ptr<const Type> const_type;
+    typedef boost::weak_ptr<Type> weak_type;
+    typedef boost::weak_ptr<const Type> const_weak_type;
   };
 
   // TODO: Implement make_shared using variadic template args.

@@ -8,49 +8,83 @@
 namespace mirv {
   /// This is an action that does nothing.
   class NullAction {
-   public:
-      typedef void result_type;
+  public:
+    typedef void result_type;
 
-      template<typename Node>
-      result_type operator()(boost::shared_ptr<Node>) {}
-     template<typename Node1, typename Node2>
-     result_type operator()(boost::shared_ptr<Node1>,
-			    boost::shared_ptr<Node2>) {}
-     template<typename Node1, typename Node2, typename Node3>
-     result_type operator()(boost::shared_ptr<Node1>,
-			    boost::shared_ptr<Node2>,
-			    boost::shared_ptr<Node3>) {}
-   };
+    NullAction(void) {}
 
-  /// This action takes a statement visitor and sends it to the
-  /// statement for execution.
-   class VisitStatementAction : public StatementVisitor {
-   public:
-      template<typename Stmt>
-      result_type operator()(boost::shared_ptr<Stmt> stmt) {
-	return stmt->accept(*this);
-      }
-   };
- 
-  /// This action takes an expression visitor and sends it to the
-  /// expression for execution.
-  class VisitExpressionAction : public ExpressionVisitor {
-   public:
-      template<typename Expr>
-      result_type operator()(boost::shared_ptr<Expr> expr) {
-	return expr->accept(*this);
-      }
-   };
+    template<typename Arg>
+    NullAction(const Arg &) {}
 
-  /// This action takes a symbol visitor and sends it to the symbol
-  /// for execution.
-  class VisitSymbolAction : public SymbolVisitor {
-   public:
-      template<typename Expr>
-      result_type operator()(boost::shared_ptr<Expr> sym) {
-	return sym->accept(*this);
-      }
-   };
+    template<typename Node>
+    result_type operator()(boost::shared_ptr<Node>) {}
+    template<typename Node1, typename Node2>
+    result_type operator()(boost::shared_ptr<Node1>,
+                           boost::shared_ptr<Node2>) {}
+    template<typename Node1, typename Node2, typename Node3>
+    result_type operator()(boost::shared_ptr<Node1>,
+                           boost::shared_ptr<Node2>,
+                           boost::shared_ptr<Node3>) {}
+  };
+
+  /// This is an action that does nothing and says never to iterate.
+  class NullJoinAction {
+  public:
+    typedef bool result_type;
+
+    NullJoinAction(void) {}
+
+    template<typename Arg>
+    NullJoinAction(const Arg &) {}
+
+    template<typename Node>
+    result_type operator()(boost::shared_ptr<Node>) {
+      return false;
+    }
+
+    template<typename Node1, typename Node2>
+    result_type operator()(boost::shared_ptr<Node1>,
+                           boost::shared_ptr<Node2>) {
+      return false;
+    }
+
+    template<typename Node1, typename Node2, typename Node3>
+    result_type operator()(boost::shared_ptr<Node1>,
+                           boost::shared_ptr<Node2>,
+                           boost::shared_ptr<Node3>) {
+      return false;
+    }
+  };
+
+  /// This action takes a visitor and sends it to the
+  /// node for execution.
+  template<typename Visitor>
+  class VisitAction {
+  private:
+    Visitor visit;
+
+  protected:
+    Visitor &visitor(void) {
+      return visit;
+    }
+
+  public:
+    typedef typename Visitor::result_type result_type;
+
+    template<typename ...Args>
+    VisitAction(Args& ...args) : visit(args...) {}
+
+    template<typename Node>
+    result_type operator()(boost::shared_ptr<Node> node) {
+      return node->accept(visitor());
+    }
+
+    template<typename Parent, typename Node>
+    result_type operator()(boost::shared_ptr<Parent>,
+                           boost::shared_ptr<Node> node) {
+      return node->accept(visitor());
+    }
+  };
 }
 
 #endif

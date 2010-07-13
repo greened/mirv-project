@@ -33,7 +33,7 @@ namespace mirv {
           }
 	  error("Symbol exists");
 	}
-	result_type result = make<SymbolType>(a);
+	result_type result = mirv::make<SymbolType>(a);
 	symtab->addAtCurrentScope(result);
 	return result;
       }
@@ -63,7 +63,7 @@ namespace mirv {
           }
 	  error("Symbol exists");
 	}
-	result_type result = make<SymbolType>(a1, a2);
+	result_type result = mirv::make<SymbolType>(a1, a2);
 	symtab->addAtCurrentScope(result);
 	return result;
       }
