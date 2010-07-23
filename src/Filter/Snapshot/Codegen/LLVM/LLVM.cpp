@@ -4,6 +4,58 @@
 #include <mirv/Core/Utility/Cast.hpp>
 
 namespace mirv {
+  LLVMCodegenFilter::SynthesizedAttribute::
+  SynthesizedAttribute(const InheritedAttribute &inherited) 
+      : Context(inherited.Context),
+          Builder(inherited.Builder),
+          TheModule(inherited.TheModule),
+          TheFunction(inherited.TheFunction),
+          value(inherited.TheValue),
+          ReturnValue(inherited.ReturnValue) {}  
+
+  void LLVMCodegenFilter::
+  InheritedAttribute::createFunction(const std::string &name,
+                                     ptr<Symbol<Type<TypeBase> > > type)
+  {
+    checkInvariant(Function == 0, "Function already exists");
+
+    ptr<Symbol<Type<FunctionType> > > functionType = 
+      safe_cast<Symbol<Type<FunctionType> > >(type);
+        
+    llvm::Type *returnType = getType(type->getReturnType());
+    std::vector<const llvm::Type *> llvmParameterTypes;
+
+    for(auto p = type->parametersBegin();
+        p != type->parametersEnd();
+        ++p) {
+      llvmParameterTypes.push_back(getType(*p));
+    }
+
+    llvm::FunctionType *llvmFunctionType =
+      llvm::FunctionType::get(llvmReturnType,
+                              llvmParameterTypes);
+
+    TheFunction = llvm::Function::Create(llvmFunctionType,
+                                         linkage,
+                                         name,
+                                         TheModule);
+  }
+
+  void LLVMCodegenFilter::
+  InheritedAttribute::createVariable(const std::string &name,
+                                     ptr<Symbol<Type<TypeBase> > > type)
+  {
+    if (TheFunction) {
+      llvm::Type *llvmType = getType(type);
+      builder()->CreateAlloca(llvmType, 0, name);
+    }
+    else {
+      checkInvariant(TheModule, "No module for global variable");
+      llvm::Type *llvmType = getType(type);
+      TheModule->getOrInsertGlobal(name, llvmType);
+    }
+  }
+
   llvm::Type LLVMCodegenFilter::
   InheritedAttribute::getType(ptr<Symbol<Type<TypeBase> > >::type type) const
   {
@@ -110,108 +162,120 @@ namespace mirv {
     getInheritedAttribute().createVariable(sym->name(), sym->type());
   }
   
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
+  void LLVMCodegenFilter::
+  EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
   {
-    getInheritedAttribute().createBlock();
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Switch> >::type stmt)
-  {
+    getInheritedAttribute().createBlock("Block");
   }
 
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Before> >::type stmt)
   {
+    error("unimplemented");
+    getInheritedAttribute().createBlock("Before");
   }
 
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<After> >::type stmt)
   {
+    error("unimplemented");
   }
 
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Goto> >::type stmt)
   {
+    error("unimplemented");
   }
 
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Return> >::type stmt)
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Return> >::type stmt)
+  {
+    llvm::Value *inst = getInheritedAttribute().hasReturnValue() ?
+      builder()->CreateRet(getInheritedAttribute().getValue()) :
+      builder()->CreateRetVoid();
+
+    setSynthesizedAttribute(SynthesizedAttribute(inst));
+  }
+
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Assignment> >::type stmt)
+  {
+    // TODO: Handle return assignment.
+    // Forward flow visits rhs first, so it is at index 0.
+    llvm::Value *lhs = getSynthesizedAttribute(1).getValue();
+    llvm::Value *rhs = getSynthesizedAttribute(0).getValue();
+
+    // This assumes lhs is already an address.
+  }
+
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Add> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Assignment> >::type stmt)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Subtract> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<Add> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Multiply> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<Subtract> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Divide> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<Multiply> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Modulus> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<Divide> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Negate> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<Modulus> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<Negate> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LogicalOr> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LogicalNot> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalOr> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalNot> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LessThan> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThan> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Equal> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<NotEqual> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<Equal> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<GreaterThan> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<NotEqual> >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::type expr)
   {
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThan> >::type expr)
-  {
-  }
-
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::type expr)
-  {
-  }
-
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::type expr)
   {
   }
 
