@@ -46,6 +46,30 @@ namespace mirv {
     };
   }
 
+  /// This is an action that transfers the synthesized attribute from
+  /// one child to the inherited attribute of the next child.  Flows
+  /// can optionally use this to change the attribute flow behavior
+  /// from purely top-down/bottom-up to one that tracks an attribute
+  /// value through program control (for example, dataflow).
+  template<typename Action, typename FlowAttributeManager>
+  class AttributeFlowBetweenAction {
+  private:
+    Action between;
+    FlowAttributeManager &attributeManager;
+
+  public:
+    typedef void result_type;
+
+    AttributeFlowBetweenAction(FlowAttributeManager &am)
+        : between(am), attributeManager(am) {}
+    template<typename Arg>
+    void operator()(const Arg &a) {
+      between(a);
+      attributeManager.setInheritedAttribute(attributeManager.
+                                             getLastSynthesizedAttribute());
+    }
+  };
+
   /// This is a flow that adds attribute management to a base flow.
   template<
     typename Inherited,
