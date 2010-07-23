@@ -14,12 +14,46 @@ namespace mirv {
   class LLVMCodegenFilter
       : public Filter<Node<Base> > {
   private:
+    class InheritedAttribute;
+
+    class SynthesizedAttribute {
+    private:
+      llvm::Context Context;
+      ptr<llvm::IRBuilder>::type Builder;
+      llvm::Module *TheModule;
+      llvm::Function *TheFunction;
+      llvm::Value *value;n
+      bool ReturnValue;
+
+    public:
+      SynthesizedAttribute(llvm::Value *v = 0, bool isReturn = false) 
+          : Context(llvm::getGlobalContext()),
+              Builder(new llvm::IRBuilder(Context)),
+              TheModule(0),
+              TheFunction(0),
+              value(v),
+              ReturnValue(isReturn) {}
+
+      SynthesizedAttribute(const InheritedAttribute &inherited);
+
+      llvm::Value *getValue(void) const {
+        checkInvariant(value, "No value");
+        return value;
+      }
+      bool hasReturnValue(void) const {
+        return ReturnValue;
+      }
+    };
+
     class InheritedAttribute {
     private:
       llvm::Context &Context;
       ptr<llvm::IRBuilder>::type Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
+      llvm::Value *TheValue;
+      bool ReturnValue;
+      bool GenerateAddress;
 
       class TypeCreator : public SymbolVisitor {
       private:
@@ -45,14 +79,57 @@ namespace mirv {
       llvm::Type *getType(ptr<Symbol<Type<TypeBase> > >::type) const;
 
     public:
-      InheritedAttribute(void) 
+      InheritedAttribute(bool address = false) 
           : Context(llvm::getGlobalContext()),
               Builder(new llvm::IRBuilder(Context)),
               TheModule(0),
-              TheFunction(0) {}
+              TheFunction(0),
+              TheValue(0),
+              ReturnValue(false),
+              GenerateAddress(address) {}
+
+      InheritedAttribute(const InheritedAttribute &other) 
+          : Context(other.Context),
+              Builder(other.Builder),
+              TheModule(other.TheModule),
+              TheFunction(other.TheFunction),
+              TheValue(other.TheValue),
+              ReturnValue(other.ReturnValue),
+              // Do not inherit this property.
+              GenerateAddress(false) {}
+
+      InheritedAttribute(const SynthesizedAttribute &synthesized) 
+          : Context(synthesized.Context),
+              Builder(synthesized.Builder),
+              TheModule(synthesized.TheModule),
+              TheFunction(synthesized.TheFunction),
+              TheValue(synthesized.value),
+              ReturnValue(synthesized.ReturnValue),
+              GenerateAddress(false) {}
 
       ptr<llvm::IRBuilder>::type builder(void) {
         return Builder;
+      }
+
+      llvm::Value *getValue(void) const {
+        checkInvariant(TheValue, "No value");
+        return TheValue;
+      }
+
+      void setValue(llvm::Value *v, bool isReturn = false) {
+        checkInvariant(v, "No value");
+        TheValue = v;
+        if (isReturn) {
+          ReturnValue = true;
+        }
+      }
+
+      bool hasReturnValue(void) const {
+        return ReturnValue;
+      }
+
+      bool generateAddress(void) const {
+        return GenerateAddress;
       }
 
       void createModule(const std::string &name) {
@@ -61,58 +138,17 @@ namespace mirv {
       }
 
       void createFunction(const std::string &name,
-                          ptr<Symbol<Type<TypeBase> > > type) {
-        checkInvariant(Function == 0, "Function already exists");
-
-        ptr<Symbol<Type<FunctionType> > > functionType = 
-          safe_cast<Symbol<Type<FunctionType> > >(type);
-        
-        llvm::Type *returnType = getType(type->getReturnType());
-        std::vector<const llvm::Type *> llvmParameterTypes;
-
-        for(auto p = type->parametersBegin();
-            p != type->parametersEnd();
-            ++p) {
-          llvmParameterTypes.push_back(getType(*p));
-        }
-
-        llvm::FunctionType *llvmFunctionType =
-          llvm::FunctionType::get(llvmReturnType,
-                                  llvmParameterTypes);
-
-        TheFunction = llvm::Function::Create(llvmFunctionType,
-                                             linkage,
-                                             name,
-                                             TheModule);
-      }
+                          ptr<Symbol<Type<TypeBase> > > type);
 
       void createVariable(const std::string &name,
-                          ptr<Symbol<Type<TypeBase> > > type) {
-        if (!TheFunction) {
-          checkInvariant(TheModule, "No module for global variable");
-          llvm::Type *llvmType = getType(type);
-          TheModule->getOrInsertGlobal(name, llvmType);
-        }
-      }
+                          ptr<Symbol<Type<TypeBase> > > type);
 
-      void createBlock(void) {
+      void createBlock(const std::string &name) {
         checkInvariant(TheFunction, "No function for block");
         llvm::BasicBlock *block = llvm::BasicBlock::Create(Context,
-                                                           "",
+                                                           name,
                                                            TheFunction);
         builder()->setInsertPt(block);
-      }
-    };
-    class SynthesizedAttribute {
-    private:
-      llvm::Value *value;
-
-    public:
-      SynthesizedAttribute(llvm::Value *v = 0) 
-          : value(v) {}
-
-      llvm::Value *getValue(void) const {
-        return value;
       }
     };
 
@@ -212,8 +248,6 @@ namespace mirv {
       void visit(ptr<Statement<Before> >::type stmt);
       void visit(ptr<Statement<After> >::type stmt);
       void visit(ptr<Statement<Goto> >::type stmt);
-      void visit(ptr<Statement<Return> >::type stmt);
-      void visit(ptr<Statement<Assignment> >::type stmt);
     };
 
     class EnterStatementAction : public VisitAction<EnterStatementVisitor> {
@@ -222,13 +256,34 @@ namespace mirv {
           : VisitAction<EnterStatementVisitor>(attributeManager) {}
     };
 
-    /// Entering each expression
-    class EnterExpressionVisitor : public ExpressionVisitor {
+    /// Leaving each statement
+    class LeaveStatementVisitor : public StatementVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
     public:
-      EnterExpressionVisitor(FlowAttributeManagerType &am)
+      LeaveStatementVisitor(FlowAttributeManagerType &am)
+          : attributeManager(am) {}
+
+      void visit(ptr<Statement<Block> >::type stmt);
+      void visit(ptr<Statement<Before> >::type stmt);
+      void visit(ptr<Statement<After> >::type stmt);
+      void visit(ptr<Statement<Goto> >::type stmt);
+    };
+
+    class LeaveStatementAction : public VisitAction<LeaveStatementVisitor> {
+    public:
+      LeaveStatementAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<LeaveStatementVisitor>(attributeManager) {}
+    };
+
+    /// Leaveing each expression
+    class LeaveExpressionVisitor : public ExpressionVisitor {
+    private:
+      FlowAttributeManagerType &attributeManager;
+
+    public:
+      LeaveExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
       void visit(ptr<Expression<Add> >::type expr);
@@ -252,10 +307,10 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Variable> > >::type expr);
     };
 
-    class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {
+    class LeaveExpressionAction : public VisitAction<LeaveExpressionVisitor> {
     public:
-      EnterExpressionAction(FlowAttributeManagerType &attributeManager) 
-          : VisitAction<EnterExpressionVisitor>(attributeManager) {}
+      LeaveExpressionAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<LeaveExpressionVisitor>(attributeManager) {}
     };
 
     /// This is the flow for translating expressions.
@@ -263,8 +318,8 @@ namespace mirv {
       InheritedAttribute,
       SynthesizedAttribute,
       ForwardExpressionFlowGenerator,
-      EnterExpressionAction,
       NullAction,
+      LeaveExpressionAction,
       NullAction,
       NullAction,
       NullAction
@@ -274,8 +329,8 @@ namespace mirv {
       InheritedAttribute,
       SynthesizedAttribute,
       ForwardExpressionFlowGenerator,
-      EnterExpressionAction,
       NullAction,
+      LeaveExpressionAction,
       NullAction,
       NullAction,
       NullAction
@@ -295,7 +350,7 @@ namespace mirv {
       SynthesizedAttribute,
       ForwardFlowGenerator,
       EnterStatementAction,
-      NullAction,
+      LeaveStatementAction,
       NullAction,
       NullAction,
       NullAction,
@@ -308,7 +363,7 @@ namespace mirv {
         SynthesizedAttribute,
         ForwardFlowGenerator,
 	EnterStatementAction,
-	NullAction,
+	LeaveStatementAction,
 	NullAction,
 	NullAction,
 	NullAction,
