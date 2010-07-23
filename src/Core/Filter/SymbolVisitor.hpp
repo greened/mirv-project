@@ -15,6 +15,7 @@
 
 namespace mirv {
   /// This is the base class for all types that visit symbols.
+  template<typenme Result>
   struct SymbolVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<
