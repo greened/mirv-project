@@ -14,8 +14,107 @@ namespace mirv {
   class LLVMCodegenFilter
       : public Filter<Node<Base> > {
   private:
-    class InheritedAttribute {};
-    class SynthesizedAttribute {};
+    class InheritedAttribute {
+    private:
+      llvm::Context &Context;
+      ptr<llvm::IRBuilder>::type Builder;
+      llvm::Module *TheModule;
+      llvm::Function *TheFunction;
+
+      class TypeCreator : public SymbolVisitor {
+      private:
+        llvm::Context &Context;
+        llvm::Type *TheType;
+
+      public:
+        TypeCreator(llvm::Context &context) 
+            : Context(context) {}
+
+        virtual void visit(ptr<Symbol<Type<Integral> > >::type);
+        virtual void visit(ptr<Symbol<Type<Floating> > >::type);
+        virtual void visit(ptr<Symbol<Type<Array> > >::type);
+        virtual void visit(ptr<Symbol<Type<Pointer> > >::type);
+        virtual void visit(ptr<Symbol<Type<FunctionType> > >::type);
+        virtual void visit(ptr<Symbol<Type<StructType> > >::type);
+
+        llvm::Type *type(void) const {
+          return TheType;
+        }
+      };
+
+      llvm::Type *getType(ptr<Symbol<Type<TypeBase> > >::type) const;
+
+    public:
+      InheritedAttribute(void) 
+          : Context(llvm::getGlobalContext()),
+              Builder(new llvm::IRBuilder(Context)),
+              TheModule(0),
+              TheFunction(0) {}
+
+      ptr<llvm::IRBuilder>::type builder(void) {
+        return Builder;
+      }
+
+      void createModule(const std::string &name) {
+        checkInvariant(Module == 0, "Module already exists");
+        TheModule = new llvm::Module(name, getGlobalContext());
+      }
+
+      void createFunction(const std::string &name,
+                          ptr<Symbol<Type<TypeBase> > > type) {
+        checkInvariant(Function == 0, "Function already exists");
+
+        ptr<Symbol<Type<FunctionType> > > functionType = 
+          safe_cast<Symbol<Type<FunctionType> > >(type);
+        
+        llvm::Type *returnType = getType(type->getReturnType());
+        std::vector<const llvm::Type *> llvmParameterTypes;
+
+        for(auto p = type->parametersBegin();
+            p != type->parametersEnd();
+            ++p) {
+          llvmParameterTypes.push_back(getType(*p));
+        }
+
+        llvm::FunctionType *llvmFunctionType =
+          llvm::FunctionType::get(llvmReturnType,
+                                  llvmParameterTypes);
+
+        TheFunction = llvm::Function::Create(llvmFunctionType,
+                                             linkage,
+                                             name,
+                                             TheModule);
+      }
+
+      void createVariable(const std::string &name,
+                          ptr<Symbol<Type<TypeBase> > > type) {
+        if (!TheFunction) {
+          checkInvariant(TheModule, "No module for global variable");
+          llvm::Type *llvmType = getType(type);
+          TheModule->getOrInsertGlobal(name, llvmType);
+        }
+      }
+
+      void createBlock(void) {
+        checkInvariant(TheFunction, "No function for block");
+        llvm::BasicBlock *block = llvm::BasicBlock::Create(Context,
+                                                           "",
+                                                           TheFunction);
+        builder()->setInsertPt(block);
+      }
+    };
+    class SynthesizedAttribute {
+    private:
+      llvm::Value *value;
+
+    public:
+      SynthesizedAttribute(llvm::Value *v = 0) 
+          : value(v) {}
+
+      llvm::Value *getValue(void) const {
+        return value;
+      }
+    };
 
     typedef FlowAttributeManager<
       InheritedAttribute,
@@ -34,8 +133,6 @@ namespace mirv {
       void visit(ptr<Symbol<Module> >::type sym);
       void visit(ptr<Symbol<Function> >::type sym);
       void visit(ptr<Symbol<Variable> >::type sym);
-      void visit(ptr<Symbol<Type<TypeBase> > >::type sym);
-      void visit(ptr<Symbol<Type<StructType> > >::type sym);
     };
 
     class EnterDeclSymbolAction : public VisitAction<EnterDeclSymbolVisitor> {
@@ -112,13 +209,6 @@ namespace mirv {
           : attributeManager(am) {}
 
       void visit(ptr<Statement<Block> >::type stmt);
-      void visit(ptr<Statement<IfThen> >::type stmt);
-      void visit(ptr<Statement<IfElse> >::type stmt);
-      void visit(ptr<Statement<While> >::type stmt);
-      void visit(ptr<Statement<DoWhile> >::type stmt);
-      void visit(ptr<Statement<Switch> >::type stmt);
-      void visit(ptr<Statement<Case> >::type stmt);
-      void visit(ptr<Statement<CaseBlock> >::type stmt);
       void visit(ptr<Statement<Before> >::type stmt);
       void visit(ptr<Statement<After> >::type stmt);
       void visit(ptr<Statement<Goto> >::type stmt);

@@ -31,6 +31,10 @@ namespace mirv {
          typedef DimensionVector::iterator DimensionIterator;
          typedef DimensionVector::const_iterator ConstDimensionIterator;
 
+         typedef DimensionVector::reverse_iterator ReverseDimensionIterator;
+         typedef DimensionVector::const_reverse_iterator
+         ConstReverseDimensionIterator;
+
          void setElementType(ChildPtr c) {
             if (empty()) {
                push_back(c);
@@ -47,13 +51,22 @@ namespace mirv {
             return(front());
          }
 
-	/// Get the start of the dimension sequence.
-         DimensionIterator dimensionBegin(void) {
-            return(dimensions.begin());
-         }
+       /// Get the start of the dimension sequence.
+       DimensionIterator dimensionBegin(void) {
+         return(dimensions.begin());
+       }
 	/// Get the start of the dimension sequence.
          ConstDimensionIterator dimensionBegin(void) const {
             return(dimensions.begin());
+         }
+
+       /// Get the start of the reversed dimension sequence.
+       ReverseDimensionIterator dimensionRBegin(void) {
+         return(dimensions.rbegin());
+       }
+	/// Get the start of the reversed dimension sequence.
+         ConstReverseDimensionIterator dimensionRBegin(void) const {
+            return(dimensions.rbegin());
          }
 
 	/// Get the end of the dimension sequence.
@@ -63,6 +76,15 @@ namespace mirv {
 	/// Get the end of the dimension sequence.
          ConstDimensionIterator dimensionEnd(void) const {
             return(dimensions.end());
+         }
+
+	/// Get the end of the reversed dimension sequence.
+         ReverseDimensionIterator dimensionREnd(void) {
+            return(dimensions.rend());
+         }
+	/// Get the end of the reversed dimension sequence.
+         ConstReverseDimensionIterator dimensionREnd(void) const {
+            return(dimensions.rend());
          }
 
 	/// Add a dimension.

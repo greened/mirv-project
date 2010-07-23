@@ -4,35 +4,118 @@
 #include <mirv/Core/Utility/Cast.hpp>
 
 namespace mirv {
+  llvm::Type LLVMCodegenFilter::
+  InheritedAttribute::getType(ptr<Symbol<Type<TypeBase> > >::type type) const
+  {
+    TypeCreator creator;
+    type->accept(creator);
+    return creator.type();
+  }
+
+  void LLVMCodegenFilter::InheritedAttribute::
+  TypeCreator::visit(ptr<Symbol<Type<Integral> > >::type type) 
+  {
+    TheType = llvm::IntegerType::get(Context, type->bitsize());
+  }
+
+  void LLVMCodegenFilter::InheritedAttribute::
+  TypeCreator::visit(ptr<Symbol<Type<Floating> > >::type type) 
+  {
+    checkInvariant(type->bitsize() == 32
+      || type->bitsize() == 64,
+      "Unexpected floating type");
+    TheType = type->bitsize() == 32 ?
+      llvm::Type::getFloatTy(Context) :   
+      llvm::Type::getDoubleTy(Context);
+  }
+
+  void LLVMCodegenFilter::InheritedAttribute::
+  TypeCreator::visit(ptr<Symbol<Type<Array> > >::type type) 
+  {
+    // TODO: See about making some of these vector types.
+    // Get the element type.
+    type->getElementType()->accept(*this);
+
+    llvm::Type elementType = TheType;
+
+    // Construct series of LLVM ArrayTypes, one for each dimension.
+    for (auto d = type->dimensionsRBegin();
+         d != type->dimensionsREnd();
+         ++d) {
+      elementType = llvm::ArrayType::get(elementType, *d);
+    }
+
+    TheType = elementType;
+  }
+
+  void LLVMCodegenFilter::InheritedAttribute::
+  TypeCreator::visit(ptr<Symbol<Type<Pointer> > >::type type) 
+  {
+    type->getBaseType()->accept(*this);
+    llvm::Type baseType = TheType;
+    TheType = llvm::PointerType::getUnqual(baseType);
+  }
+
+  void LLVMCodegenFilter::InheritedAttribute::
+  TypeCreator::visit(ptr<Symbol<Type<FunctionType> > >::type type) 
+  {
+    type->getReturnType()->accept(*this);
+    llvm::Type returnType = TheType;
+
+    std::vector<llvm::Type *> parameterTypes;
+    for (auto p = type->parameterBegin();
+         p != type->parameterEnd();
+         ++p) {
+      (*p)->accept(*this);
+      parameterTypes.push_back(TheType);
+    }
+
+    // TODO: Handle vararg.
+    TheType = llvm::FunctionType::get(returnType, parameterTypes, false);
+  }
+
+  void LLVMCodegenFilter::InheritedAttribute::
+  TypeCreator::visit(ptr<Symbol<Type<StructType> > >::type type) 
+  {
+    std::vector<llvm::Type *> memberTypes;
+    for (auto m = type->memberBegin();
+         m != type->memberEnd();
+         ++m) {
+      (*m)->accept(*this);
+      memberTypes.push_back(TheType);
+    }
+
+    TheType = llvm::StructType::get(Context, memberTypes);
+  }
+  
+  void LLVMCodegenFilter::
+  EnterDeclSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
+  {
+    attributeManager.
+      setInheritedAttribute(InheritedAttribute(getInheritedAttribute()).
+                            createModule(sym->name()));
+  }
+
+  void LLVMCodegenFilter::
+  EnterDeclSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
+  {
+    attributeManager.
+      setInheritedAttribute(InheritedAttribute(getInheritedAttribute()).
+                            createFunction(sym->name(), sym->type()));
+  }
+
+  void LLVMCodegenFilter::
+  EnterDeclSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
+  {
+    getInheritedAttribute().createVariable(sym->name(), sym->type());
+  }
+  
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
   {
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<IfThen> >::type stmt)
-  {
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<IfElse> >::type stmt)
-  {
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<While> >::type stmt)
-  {
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<DoWhile> >::type stmt)
-  {
+    getInheritedAttribute().createBlock();
   }
 
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Switch> >::type stmt)
-  {
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Case> >::type stmt)
-  {
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<CaseBlock> >::type stmt)
   {
   }
 
