@@ -9,6 +9,12 @@
 #include <mirv/Core/Filter/Action.hpp>
 #include <mirv/Core/IR/Node.hpp>
 
+#include <llvm/Module.h>
+#include <llvm/Function.h>
+#include <llvm/BasicBlock.h>
+#include <llvm/Instruction.h>
+#include <llvm/Support/IRBuilder.h>
+
 namespace mirv {
   /// This is a filter to translate from MIRV IR to LLVM IR.
   class LLVMCodegenFilter
@@ -22,6 +28,7 @@ namespace mirv {
       ptr<llvm::IRBuilder>::type Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
+      llvm::BasicBlock *TheBlock;
       llvm::Value *value;n
       bool ReturnValue;
 
@@ -31,6 +38,7 @@ namespace mirv {
               Builder(new llvm::IRBuilder(Context)),
               TheModule(0),
               TheFunction(0),
+              TheBlock(0),
               value(v),
               ReturnValue(isReturn) {}
 
@@ -44,6 +52,11 @@ namespace mirv {
       bool hasReturnValue(void) const {
         return ReturnValue;
       }
+
+      llvm::Value *getBlock(void) const {
+        checkInvariant(TheBlock, "No block");
+        return TheBlock;
+      }
     };
 
     class InheritedAttribute {
@@ -52,6 +65,7 @@ namespace mirv {
       ptr<llvm::IRBuilder>::type Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
+      llvm::Function *TheBlock;
       llvm::Value *TheValue;
       bool ReturnValue;
       bool GenerateAddress;
@@ -85,6 +99,7 @@ namespace mirv {
               Builder(new llvm::IRBuilder(Context)),
               TheModule(0),
               TheFunction(0),
+              TheBlock(0),
               TheValue(0),
               ReturnValue(false),
               GenerateAddress(false) {}
@@ -94,6 +109,7 @@ namespace mirv {
               Builder(other.Builder),
               TheModule(other.TheModule),
               TheFunction(other.TheFunction),
+              TheBlock(other.TheBlock),
               TheValue(other.TheValue),
               ReturnValue(other.ReturnValue),
               GenerateAddress(address) {}
@@ -103,6 +119,7 @@ namespace mirv {
               Builder(synthesized.Builder),
               TheModule(synthesized.TheModule),
               TheFunction(synthesized.TheFunction),
+              TheBlock(synthesized.TheBlock),
               TheValue(synthesized.value),
               ReturnValue(synthesized.ReturnValue),
               GenerateAddress(false) {}
@@ -143,12 +160,13 @@ namespace mirv {
       void createVariable(const std::string &name,
                           ptr<Symbol<Type<TypeBase> > > type);
 
-      void createBlock(const std::string &name) {
+      llvm::BasicBlock *createBlock(const std::string &name) {
         checkInvariant(TheFunction, "No function for block");
         llvm::BasicBlock *block = llvm::BasicBlock::Create(Context,
                                                            name,
                                                            TheFunction);
         builder()->setInsertPt(block);
+        return block;
       }
     };
 
@@ -270,6 +288,12 @@ namespace mirv {
       void visit(ptr<Statement<Before> >::type stmt);
       void visit(ptr<Statement<After> >::type stmt);
       void visit(ptr<Statement<Goto> >::type stmt);
+      void visit(ptr<Statement<Return> >::type stmt);
+      void visit(ptr<Statement<Assignment> >::type stmt);
+      void visit(ptr<Statement<IfElse> >::type stmt);
+      void visit(ptr<Statement<IfThen> >::type stmt);
+      void visit(ptr<Statement<While> >::type stmt);
+      void visit(ptr<Statement<DoWhile> >::type stmt);
     };
 
     class LeaveStatementAction : public VisitAction<LeaveStatementVisitor> {
