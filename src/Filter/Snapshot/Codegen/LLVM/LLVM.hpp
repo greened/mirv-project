@@ -2,6 +2,7 @@
 #define mirv_Filter_Snapshot_Codegen_LLVM_hpp
 
 #include <mirv/Core/Filter/AttributeFlow.hpp>
+#include <mirv/Core/Filter/ConstSymbolVisitor.hpp>
 #include <mirv/Core/Filter/ForwardFlow.hpp>
 #include <mirv/Core/Filter/ExpressionFlow.hpp>
 #include <mirv/Core/Filter/Filter.hpp>
@@ -74,7 +75,7 @@ namespace mirv {
       bool ReturnValue;
       bool GenerateAddress;
 
-      class TypeCreator : public SymbolVisitor {
+      class TypeCreator : public ConstSymbolVisitor {
       private:
         llvm::LLVMContext &Context;
         const llvm::Type *TheType;
@@ -83,12 +84,12 @@ namespace mirv {
         TypeCreator(llvm::LLVMContext &context) 
             : Context(context) {}
 
-        virtual void visit(ptr<Symbol<Type<Integral> > >::type);
-        virtual void visit(ptr<Symbol<Type<Floating> > >::type);
-        virtual void visit(ptr<Symbol<Type<Array> > >::type);
-        virtual void visit(ptr<Symbol<Type<Pointer> > >::type);
-        virtual void visit(ptr<Symbol<Type<FunctionType> > >::type);
-        virtual void visit(ptr<Symbol<Type<StructType> > >::type);
+        virtual void visit(ptr<Symbol<Type<Integral> > >::const_type);
+        virtual void visit(ptr<Symbol<Type<Floating> > >::const_type);
+        virtual void visit(ptr<Symbol<Type<Array> > >::const_type);
+        virtual void visit(ptr<Symbol<Type<Pointer> > >::const_type);
+        virtual void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
+        virtual void visit(ptr<Symbol<Type<StructType> > >::const_type);
 
         const llvm::Type *type(void) const {
           return TheType;
