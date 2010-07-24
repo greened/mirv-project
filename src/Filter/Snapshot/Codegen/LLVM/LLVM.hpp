@@ -24,18 +24,20 @@ namespace mirv {
 
     class SynthesizedAttribute {
     private:
-      llvm::Context Context;
-      ptr<llvm::IRBuilder>::type Builder;
+      friend class InheritedAttribute;
+
+      llvm::LLVMContext &Context;
+      ptr<llvm::IRBuilder<> >::type Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
       llvm::BasicBlock *TheBlock;
-      llvm::Value *value;n
+      llvm::Value *value;
       bool ReturnValue;
 
     public:
       SynthesizedAttribute(llvm::Value *v = 0, bool isReturn = false) 
           : Context(llvm::getGlobalContext()),
-              Builder(new llvm::IRBuilder(Context)),
+              Builder(new llvm::IRBuilder<>(Context)),
               TheModule(0),
               TheFunction(0),
               TheBlock(0),
@@ -61,22 +63,24 @@ namespace mirv {
 
     class InheritedAttribute {
     private:
-      llvm::Context &Context;
-      ptr<llvm::IRBuilder>::type Builder;
+      friend class SynthesizedAttribute;
+
+      llvm::LLVMContext &Context;
+      ptr<llvm::IRBuilder<> >::type Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
-      llvm::Function *TheBlock;
+      llvm::BasicBlock *TheBlock;
       llvm::Value *TheValue;
       bool ReturnValue;
       bool GenerateAddress;
 
       class TypeCreator : public SymbolVisitor {
       private:
-        llvm::Context &Context;
-        llvm::Type *TheType;
+        llvm::LLVMContext &Context;
+        const llvm::Type *TheType;
 
       public:
-        TypeCreator(llvm::Context &context) 
+        TypeCreator(llvm::LLVMContext &context) 
             : Context(context) {}
 
         virtual void visit(ptr<Symbol<Type<Integral> > >::type);
@@ -86,17 +90,18 @@ namespace mirv {
         virtual void visit(ptr<Symbol<Type<FunctionType> > >::type);
         virtual void visit(ptr<Symbol<Type<StructType> > >::type);
 
-        llvm::Type *type(void) const {
+        const llvm::Type *type(void) const {
           return TheType;
         }
       };
 
-      llvm::Type *getType(ptr<Symbol<Type<TypeBase> > >::type) const;
+      const llvm::Type *
+      getType(ptr<Symbol<Type<TypeBase> > >::const_type) const;
 
     public:
       InheritedAttribute(void) 
           : Context(llvm::getGlobalContext()),
-              Builder(new llvm::IRBuilder(Context)),
+              Builder(new llvm::IRBuilder<>(Context)),
               TheModule(0),
               TheFunction(0),
               TheBlock(0),
@@ -124,7 +129,7 @@ namespace mirv {
               ReturnValue(synthesized.ReturnValue),
               GenerateAddress(false) {}
 
-      ptr<llvm::IRBuilder>::type builder(void) {
+      ptr<llvm::IRBuilder<> >::type builder(void) {
         return Builder;
       }
 
@@ -150,22 +155,22 @@ namespace mirv {
       }
 
       void createModule(const std::string &name) {
-        checkInvariant(Module == 0, "Module already exists");
-        TheModule = new llvm::Module(name, getGlobalContext());
+        checkInvariant(TheModule == 0, "Module already exists");
+        TheModule = new llvm::Module(name, Context);
       }
 
       void createFunction(const std::string &name,
-                          ptr<Symbol<Type<TypeBase> > > type);
+                          ptr<Symbol<Type<TypeBase> > >::const_type type);
 
       void createVariable(const std::string &name,
-                          ptr<Symbol<Type<TypeBase> > > type);
+                          ptr<Symbol<Type<TypeBase> > >::const_type type);
 
       llvm::BasicBlock *createBlock(const std::string &name) {
         checkInvariant(TheFunction, "No function for block");
         llvm::BasicBlock *block = llvm::BasicBlock::Create(Context,
                                                            name,
                                                            TheFunction);
-        builder()->setInsertPt(block);
+        builder()->SetInsertPoint(block);
         return block;
       }
     };
@@ -380,30 +385,7 @@ namespace mirv {
           : BaseType(InheritedAttribute()) {}
 
       LLVMCodegenExpressionFlow(FlowAttributeManagerType &)
-          : BaseType(InheritedAttribute()) {}        
-
-      // We need to reverse the order in which we visit the assignment
-      // operands.  This makes it easier to tell the lhs to generate
-      // an address because with this flow we visit it first and can
-      // set the address control upon assignment statement entry.  If
-      // we visited it after the rhs we would need a complicated
-      // action to run between expressions.  Since there is no
-      // between-expression action when flowing through statements
-      // (assignment is the only multiple-expression statement and we
-      // don't want to special-case it) we solve the problem this way.
-      void visit(ptr<Statement<Assignment> >::type stmt) {
-        this->doEnter(stmt);
-
-        this->doBeforeExpression(stmt, stmt->getLeftExpression());
-        this->doExpression(stmt, stmt->getLeftExpression());
-        this->doAfterExpression(stmt, stmt->getLeftExpression());
-
-        this->doBeforeExpression(stmt, stmt->getRightExpression());
-        this->doExpression(stmt, stmt->getRightExpression());
-        this->doAfterExpression(stmt, stmt->getRightExpression());
-
-        this->doLeave(stmt);
-      }
+          : BaseType(InheritedAttribute()) {}
     };
 
     /// This is the flow for translating statements.
@@ -434,17 +416,46 @@ namespace mirv {
         ForwardFlowGenerator,
 	EnterStatementAction,
 	LeaveStatementAction,
-	NullAction,
+        AttributeFlowSynthesizedToInheritedAction<
+          NullAction,
+          FlowAttributeManagerType
+        >,
 	NullAction,
 	NullAction,
 	NullJoinAction,
-	NullAction,
+        AttributeFlowSynthesizedToInheritedAction<
+          NullAction,
+          FlowAttributeManagerType
+          >,
         FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
 	NullAction> BaseType;
 
     public:
       LLVMCodegenFlow()
           : BaseType(InheritedAttribute()) {}
+
+      // We need to reverse the order in which we visit the assignment
+      // operands.  This makes it easier to tell the lhs to generate
+      // an address because with this flow we visit it first and can
+      // set the address control upon assignment statement entry.  If
+      // we visited it after the rhs we would need a complicated
+      // action to run between expressions.  Since there is no
+      // between-expression action when flowing through statements
+      // (assignment is the only multiple-expression statement and we
+      // don't want to special-case it) we solve the problem this way.
+      void visit(ptr<Statement<Assignment> >::type stmt) {
+        this->doEnter(stmt);
+
+        this->doBeforeExpression(stmt, stmt->getLeftExpression());
+        this->doExpression(stmt, stmt->getLeftExpression());
+        this->doAfterExpression(stmt, stmt->getLeftExpression());
+
+        this->doBeforeExpression(stmt, stmt->getRightExpression());
+        this->doExpression(stmt, stmt->getRightExpression());
+        this->doAfterExpression(stmt, stmt->getRightExpression());
+
+        this->doLeave(stmt);
+      }
     };
 
   public:
