@@ -106,8 +106,14 @@ namespace mirv {
   void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<FunctionType> > >::const_type type) 
   {
-    type->getReturnType()->accept(*this);
-    const llvm::Type *returnType = TheType;
+    const llvm::Type *returnType = 0;
+    if (type->getReturnType()) {
+      type->getReturnType()->accept(*this);
+      returnType = TheType;
+    }
+    else {
+      returnType = llvm::Type::getVoidTy(Context);
+    }
 
     std::vector<const llvm::Type *> parameterTypes;
     for (auto p = type->parameterBegin();
