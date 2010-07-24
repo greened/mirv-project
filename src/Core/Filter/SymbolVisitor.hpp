@@ -1,5 +1,5 @@
-#ifndef mirv_Core_Filter_Visitor_hpp
-#define mirv_Core_Filter_Visitor_hpp
+#ifndef mirv_Core_Filter_SymbolVisitor_hpp
+#define mirv_Core_Filter_SymbolVisitor_hpp
 
 #include <Visitor.hpp>
  
