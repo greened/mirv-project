@@ -5,61 +5,51 @@
 
 namespace mirv {
   LLVMCodegenFilter::SynthesizedAttribute::
-  SynthesizedAttribute(const InheritedAttribute &inherited) 
+  SynthesizedAttribute(const InheritedAttribute &inherited,
+                       llvm::Value *v, bool isReturn) 
       : Context(inherited.Context),
           Builder(inherited.Builder),
           TheModule(inherited.TheModule),
           TheFunction(inherited.TheFunction),
-          value(inherited.TheValue),
-          ReturnValue(inherited.ReturnValue) {}  
+          value(v != 0 ? v : inherited.TheValue),
+          ReturnValue(isReturn) {}  
 
   void LLVMCodegenFilter::
-  InheritedAttribute::createFunction(const std::string &name,
-                                     ptr<Symbol<Type<TypeBase> > > type)
+  InheritedAttribute::
+  createFunction(const std::string &name,
+                 ptr<Symbol<Type<TypeBase> > >::const_type type)
   {
-    checkInvariant(Function == 0, "Function already exists");
-
-    ptr<Symbol<Type<FunctionType> > > functionType = 
-      safe_cast<Symbol<Type<FunctionType> > >(type);
-        
-    llvm::Type *returnType = getType(type->getReturnType());
-    std::vector<const llvm::Type *> llvmParameterTypes;
-
-    for(auto p = type->parametersBegin();
-        p != type->parametersEnd();
-        ++p) {
-      llvmParameterTypes.push_back(getType(*p));
-    }
-
-    llvm::FunctionType *llvmFunctionType =
-      llvm::FunctionType::get(llvmReturnType,
-                              llvmParameterTypes);
-
+    checkInvariant(TheFunction == 0, "Function already exists");
+    const llvm::FunctionType *llvmFunctionType =
+      llvm::cast<const llvm::FunctionType>(getType(type));
     TheFunction = llvm::Function::Create(llvmFunctionType,
-                                         linkage,
+                                         // FIXME: Handle linkage.
+                                         llvm::GlobalValue::ExternalLinkage,
                                          name,
                                          TheModule);
   }
 
   void LLVMCodegenFilter::
-  InheritedAttribute::createVariable(const std::string &name,
-                                     ptr<Symbol<Type<TypeBase> > > type)
+  InheritedAttribute::
+  createVariable(const std::string &name,
+                 ptr<Symbol<Type<TypeBase> > >::const_type type)
   {
     if (TheFunction) {
-      llvm::Type *llvmType = getType(type);
+      const llvm::Type *llvmType = getType(type);
       builder()->CreateAlloca(llvmType, 0, name);
     }
     else {
       checkInvariant(TheModule, "No module for global variable");
-      llvm::Type *llvmType = getType(type);
+      const llvm::Type *llvmType = getType(type);
       TheModule->getOrInsertGlobal(name, llvmType);
     }
   }
 
-  llvm::Type LLVMCodegenFilter::
-  InheritedAttribute::getType(ptr<Symbol<Type<TypeBase> > >::type type) const
+  const llvm::Type *LLVMCodegenFilter::
+  InheritedAttribute::
+  getType(ptr<Symbol<Type<TypeBase> > >::const_type type) const
   {
-    TypeCreator creator;
+    TypeCreator creator(Context);
     type->accept(creator);
     return creator.type();
   }
@@ -88,11 +78,11 @@ namespace mirv {
     // Get the element type.
     type->getElementType()->accept(*this);
 
-    llvm::Type elementType = TheType;
+    const llvm::Type *elementType = TheType;
 
     // Construct series of LLVM ArrayTypes, one for each dimension.
-    for (auto d = type->dimensionsRBegin();
-         d != type->dimensionsREnd();
+    for (auto d = type->dimensionRBegin();
+         d != type->dimensionREnd();
          ++d) {
       elementType = llvm::ArrayType::get(elementType, *d);
     }
@@ -104,7 +94,7 @@ namespace mirv {
   TypeCreator::visit(ptr<Symbol<Type<Pointer> > >::type type) 
   {
     type->getBaseType()->accept(*this);
-    llvm::Type baseType = TheType;
+    const llvm::Type *baseType = TheType;
     TheType = llvm::PointerType::getUnqual(baseType);
   }
 
@@ -112,9 +102,9 @@ namespace mirv {
   TypeCreator::visit(ptr<Symbol<Type<FunctionType> > >::type type) 
   {
     type->getReturnType()->accept(*this);
-    llvm::Type returnType = TheType;
+    const llvm::Type *returnType = TheType;
 
-    std::vector<llvm::Type *> parameterTypes;
+    std::vector<const llvm::Type *> parameterTypes;
     for (auto p = type->parameterBegin();
          p != type->parameterEnd();
          ++p) {
@@ -129,7 +119,7 @@ namespace mirv {
   void LLVMCodegenFilter::InheritedAttribute::
   TypeCreator::visit(ptr<Symbol<Type<StructType> > >::type type) 
   {
-    std::vector<llvm::Type *> memberTypes;
+    std::vector<const llvm::Type *> memberTypes;
     for (auto m = type->memberBegin();
          m != type->memberEnd();
          ++m) {
@@ -143,32 +133,33 @@ namespace mirv {
   void LLVMCodegenFilter::
   EnterDeclSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
   {
-    attributeManager.
-      setInheritedAttribute(InheritedAttribute(attributeManager.
-                                               getInheritedAttribute()).
-                            createModule(sym->name()));
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    inh.createModule(sym->name());
+    attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::
   EnterDeclSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
   {
-    attributeManager.
-      setInheritedAttribute(InheritedAttribute(attributeManager.
-                                               getInheritedAttribute()).
-                            createFunction(sym->name(), sym->type()));
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    inh.createFunction(sym->name(), sym->type());
+    attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::
   EnterDeclSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
-    attributeManager.getInheritedAttribute().createVariable(sym->name(),
-                                                            sym->type());
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    inh.createVariable(sym->name(), sym->type());
+    attributeManager.setInheritedAttribute(inh);
   }
   
   void LLVMCodegenFilter::
   EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
   {
-    attributeManager.getInheritedAttribute().createBlock("Block");
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    inh.createBlock("B");
+    attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Before> >::type stmt)
