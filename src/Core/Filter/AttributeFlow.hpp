@@ -68,6 +68,13 @@ namespace mirv {
       attributeManager.setInheritedAttribute(attributeManager.
                                              getLastSynthesizedAttribute());
     }
+
+    template<typename Arg1, typename Arg2>
+    void operator()(const Arg1 &a1, const Arg2 &a2) {
+      action(a1, a2);
+      attributeManager.setInheritedAttribute(attributeManager.
+                                             getLastSynthesizedAttribute());
+    }
   };
 
   /// This is a flow that adds attribute management to a base flow.

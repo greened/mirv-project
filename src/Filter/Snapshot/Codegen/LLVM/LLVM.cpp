@@ -4,18 +4,8 @@
 #include <mirv/Core/Utility/Cast.hpp>
 
 namespace mirv {
-  LLVMCodegenFilter::SynthesizedAttribute::
-  SynthesizedAttribute(const InheritedAttribute &inherited,
-                       llvm::Value *v, bool isReturn) 
-      : Context(inherited.Context),
-          Builder(inherited.Builder),
-          TheModule(inherited.TheModule),
-          TheFunction(inherited.TheFunction),
-          value(v != 0 ? v : inherited.TheValue),
-          ReturnValue(isReturn) {}  
-
   void LLVMCodegenFilter::
-  InheritedAttribute::
+  FlowAttribute::
   createFunction(const std::string &name,
                  ptr<Symbol<Type<TypeBase> > >::const_type type)
   {
@@ -30,7 +20,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::
-  InheritedAttribute::
+  FlowAttribute::
   createVariable(const std::string &name,
                  ptr<Symbol<Type<TypeBase> > >::const_type type)
   {
@@ -45,22 +35,37 @@ namespace mirv {
     }
   }
 
+  llvm::Value *LLVMCodegenFilter::
+  FlowAttribute::
+  getVariable(const std::string &name)
+  {
+    if (FunctionMap) {
+      auto v = FunctionMap->find(name);
+      if (v != FunctionMap->end()) {
+        return v->second;
+      }
+    }
+    auto v = ModuleMap->find(name);
+    checkInvariant(v != ModuleMap->end(), "Cannot find variable");
+    return v->second;
+  }
+
   const llvm::Type *LLVMCodegenFilter::
-  InheritedAttribute::
+  FlowAttribute::
   getType(ptr<Symbol<Type<TypeBase> > >::const_type type) const
   {
-    TypeCreator creator(Context);
+    TypeCreator creator(*Context);
     type->accept(creator);
     return creator.type();
   }
 
-  void LLVMCodegenFilter::InheritedAttribute::
+  void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<Integral> > >::const_type type) 
   {
     TheType = llvm::IntegerType::get(Context, type->bitsize());
   }
 
-  void LLVMCodegenFilter::InheritedAttribute::
+  void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<Floating> > >::const_type type) 
   {
     checkInvariant(type->bitsize() == 32
@@ -71,7 +76,7 @@ namespace mirv {
       llvm::Type::getDoubleTy(Context);
   }
 
-  void LLVMCodegenFilter::InheritedAttribute::
+  void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<Array> > >::const_type type) 
   {
     // TODO: See about making some of these vector types.
@@ -90,7 +95,7 @@ namespace mirv {
     TheType = elementType;
   }
 
-  void LLVMCodegenFilter::InheritedAttribute::
+  void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<Pointer> > >::const_type type) 
   {
     type->getBaseType()->accept(*this);
@@ -98,7 +103,7 @@ namespace mirv {
     TheType = llvm::PointerType::getUnqual(baseType);
   }
 
-  void LLVMCodegenFilter::InheritedAttribute::
+  void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<FunctionType> > >::const_type type) 
   {
     type->getReturnType()->accept(*this);
@@ -116,7 +121,7 @@ namespace mirv {
     TheType = llvm::FunctionType::get(returnType, parameterTypes, false);
   }
 
-  void LLVMCodegenFilter::InheritedAttribute::
+  void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<StructType> > >::const_type type)
   {
     std::vector<const llvm::Type *> memberTypes;
@@ -133,7 +138,7 @@ namespace mirv {
   void LLVMCodegenFilter::
   EnterDeclSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
   {
-    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    FlowAttribute inh(attributeManager.getInheritedAttribute());
     inh.createModule(sym->name());
     attributeManager.setInheritedAttribute(inh);
   }
@@ -141,7 +146,7 @@ namespace mirv {
   void LLVMCodegenFilter::
   EnterDeclSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
   {
-    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    FlowAttribute inh(attributeManager.getInheritedAttribute());
     inh.createFunction(sym->name(), sym->type());
     attributeManager.setInheritedAttribute(inh);
   }
@@ -149,7 +154,7 @@ namespace mirv {
   void LLVMCodegenFilter::
   EnterDeclSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
-    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    FlowAttribute inh(attributeManager.getInheritedAttribute());
     inh.createVariable(sym->name(), sym->type());
     attributeManager.setInheritedAttribute(inh);
   }
@@ -157,7 +162,7 @@ namespace mirv {
   void LLVMCodegenFilter::
   EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
   {
-    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    FlowAttribute inh(attributeManager.getInheritedAttribute());
     inh.createBlock("B");
     attributeManager.setInheritedAttribute(inh);
   }
@@ -165,7 +170,6 @@ namespace mirv {
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Before> >::type stmt)
   {
     error("unimplemented");
-    attributeManager.getInheritedAttribute().createBlock("Before");
   }
 
   void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Before> >::type stmt)
@@ -195,22 +199,25 @@ namespace mirv {
 
   void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Return> >::type stmt)
   {
+    FlowAttribute syn(attributeManager.getInheritedAttribute());
+
     llvm::Value *inst = 
       attributeManager.getInheritedAttribute().hasReturnValue() ?
-      builder()->CreateRet(attributeManager.
-                           getInheritedAttribute().getValue()) :
-      builder()->CreateRetVoid();
+      syn.builder()->
+      CreateRet(attributeManager.getInheritedAttribute().getValue()) :
+      syn.builder()->CreateRetVoid();
 
-    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(inst));
+    syn.setValue(inst);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::
   EnterStatementVisitor::visit(ptr<Statement<Assignment> >::type stmt)
   {
     // Make lhs return an address.
-    attributeManager.
-      setInheritedAttribute(InheritedAttribute(attributeManager.
-                                               getInheritedAttribute(), true));
+    FlowAttribute inh(attributeManager.getInheritedAttribute(), true);
+    attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Assignment> >::type stmt)
@@ -220,8 +227,12 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(1).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(0).getValue();
 
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     // This assumes lhs is already an address.
-    attributeMannager.getInheritedAttribute().builder()->CreateStore(rhs, lhs);
+    llvm::Value *inst = syn.builder()->CreateStore(rhs, lhs);
+    syn.setValue(inst);
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::
@@ -233,24 +244,22 @@ namespace mirv {
     llvm::BasicBlock *thn = attributeManager.getSynthesizedAttribute(1).
       getBlock();
 
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     // Start a new block after the then block.
-    llvm::BasicBlock *after = 
-      attributeMannager.getInheritedAttribute().builder()->createBlock("at");
+    llvm::BasicBlock *after = syn.createBlock("at");
 
     // Create the terminator for the if block.
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(cond->getParent());
-    attributeMannager.getInheritedAttribute().builder()->
-      CreateCondBr(cond, thn, after);
+    syn.builder()->SetInsertPoint(cond->getParent());
+    syn.builder()->CreateCondBr(cond, thn, after);
 
     // Create the terminator for the then block.
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(thn);
-    attributeMannager.getInheritedAttribute().builder()->
-      CreateBr(after);
+    syn.builder()->SetInsertPoint(thn);
+    syn.builder()->CreateBr(after);
 
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(after);
+    syn.builder()->SetInsertPoint(after);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::
@@ -264,30 +273,26 @@ namespace mirv {
     llvm::BasicBlock *els = attributeManager.getSynthesizedAttribute(2).
       getBlock();
 
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+
     // Start a new block after the else block.
-    llvm::BasicBlock *after = 
-      attributeMannager.getInheritedAttribute().builder()->createBlock("ae");
+    llvm::BasicBlock *after = syn.createBlock("ae");
 
     // Create the terminator for the if block.
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(cond->getParent());
-    attributeMannager.getInheritedAttribute().builder()->
-      CreateCondBr(cond, thn, els);
+    syn.builder()->SetInsertPoint(cond->getParent());
+    syn.builder()->CreateCondBr(cond, thn, els);
 
     // Create the terminator for the then block.
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(thn);
-    attributeMannager.getInheritedAttribute().builder()->
-      CreateBr(after);
+    syn.builder()->SetInsertPoint(thn);
+    syn.builder()->CreateBr(after);
 
     // Create the terminator for the else block.
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(els);
-    attributeMannager.getInheritedAttribute().builder()->
-      CreateBr(after);
+    syn.builder()->SetInsertPoint(els);
+    syn.builder()->CreateBr(after);
 
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(after);
+    syn.builder()->SetInsertPoint(after);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::
@@ -305,18 +310,18 @@ namespace mirv {
     llvm::BasicBlock *body = attributeManager.getSynthesizedAttribute(0).
       getBlock();
 
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     // Start a new block after the cond/body block.
-    llvm::BasicBlock *after = 
-      attributeMannager.getInheritedAttribute().builder()->createBlock("ab");
+    llvm::BasicBlock *after = syn.createBlock("ab");
 
     // Create the terminator for the cond/body block.
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(body);
-    attributeMannager.getInheritedAttribute().builder()->
-      CreateCondBr(cond, body, after);
+    syn.builder()->SetInsertPoint(body);
+    syn.builder()->CreateCondBr(cond, body, after);
 
-    attributeMannager.getInheritedAttribute().builder()->
-      SetInsertPoint(after);
+    syn.builder()->SetInsertPoint(after);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::
@@ -324,71 +329,92 @@ namespace mirv {
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFAdd(rhs, lhs, "r") :
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateAdd(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateFAdd(rhs, lhs, "r") :
+      syn.builder()->CreateAdd(rhs, lhs, "r");
+
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Subtract> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFSub(rhs, lhs, "r") :
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateSub(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateFSub(rhs, lhs, "r") :
+      syn.builder()->CreateSub(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Multiply> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
-    llvm::Value *result = lhs->getType()->isFloatingPoint() ?
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFMul(rhs, lhs, "r") :
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateMul(rhs, lhs, "r");
-    setValue(value);
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
+    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+      syn.builder()->CreateFMul(rhs, lhs, "r") :
+      syn.builder()->CreateMul(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Divide> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFDiv(rhs, lhs, "r") :
+      syn.builder()->CreateFDiv(rhs, lhs, "r") :
       // TODO: Support unsigned division and exact division.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateSDiv(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateSDiv(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Modulus> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFRem(rhs, lhs, "r") :
+      syn.builder()->CreateFRem(rhs, lhs, "r") :
       // TODO: Support unsigned remainder.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateSRem(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateSRem(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Negate> >::type expr)
   {
-    llvm::Value *op = attributeMangager.getSynthesizedAttribute(0).getValue();
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
-      attributeMannager.getInheritedAttribute().builder()->CreateFNeg(op, "r") :
-      attributeMannager.getInheritedAttribute().builder()->CreateNeg(op, "r");
-    setValue(value);
+    llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+
+    llvm::Value *value = op->getType()->isFloatingPoint() ?
+      syn.builder()->CreateFNeg(op, "r") :
+      syn.builder()->CreateNeg(op, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::type expr)
@@ -396,147 +422,189 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     // TODO: Do we require this to result in 1 if true?
-    llvm::Value *value = attributeMannager.getInheritedAttribute().builder()->
-      CreateAnd(rhs, lhs, "r");
-    setValue(value);
+    llvm::Value *value = syn.builder()->CreateAnd(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LogicalOr> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     // TODO: Do we require this to result in 1 if true?
-    llvm::Value *value = attributeMannager.getInheritedAttribute().builder()->
-      CreateOr(rhs, lhs, "r");
-    setValue(value);
+    llvm::Value *value = syn.builder()->CreateOr(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LogicalNot> >::type expr)
   {
     llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+
     // TODO: Do we require this to result in 1 if true?
-    llvm::Value *value = attributeMannager.getInheritedAttribute().builder()->
-      CreateNot(op, "r");
-    setValue(value);
+    llvm::Value *value = syn.builder()->CreateNot(op, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
-    llvm::Value *value = attributeMannager.getInheritedAttribute().builder()->
-      CreateAnd(rhs, lhs, "r");
-    setValue(value);
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
+    llvm::Value *value = syn.builder()->CreateAnd(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
-    llvm::Value *value = attributeMannager.getInheritedAttribute().builder()->
-      CreateOr(rhs, lhs, "r");
-    setValue(value);
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
+    llvm::Value *value = syn.builder()->CreateOr(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type expr)
   {
     llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
-    llvm::Value *value = attributeMannager.getInheritedAttribute().builder()->
-      CreateNot(op, "r");
-    setValue(value);
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+
+    llvm::Value *value = syn.builder()->CreateNot(op, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LessThan> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFCmpOLT(rhs, lhs, "r") :
+      syn.builder()->CreateFCmpOLT(rhs, lhs, "r") :
       // TODO: Handle unsigned.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateICmpSLT(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateICmpSLT(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFCmpOLE(rhs, lhs, "r") :
+      syn.builder()->CreateFCmpOLE(rhs, lhs, "r") :
       // TODO: Handle unsigned.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateICmpSLE(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateICmpSLE(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Equal> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFCmpOEQ(rhs, lhs, "r") :
-      // TODO: Handle unsigned.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateICmpSEQ(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateFCmpOEQ(rhs, lhs, "r") :
+      syn.builder()->CreateICmpEQ(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<NotEqual> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFCmpONE(rhs, lhs, "r") :
-      // TODO: Handle unsigned.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateICmpSNE(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateFCmpONE(rhs, lhs, "r") :
+      syn.builder()->CreateICmpNE(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<GreaterThan> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFCmpOGT(rhs, lhs, "r") :
+      syn.builder()->CreateFCmpOGT(rhs, lhs, "r") :
       // TODO: Handle unsigned.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateICmpSGT(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateICmpSGT(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::type expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateFCmpOGE(rhs, lhs, "r") :
+      syn.builder()->CreateFCmpOGE(rhs, lhs, "r") :
       // TODO: Handle unsigned.
-      attributeMannager.getInheritedAttribute().builder()->
-      CreateICmpSGE(rhs, lhs, "r");
-    setValue(value);
+      syn.builder()->CreateICmpSGE(rhs, lhs, "r");
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::type expr)
   {
+    FlowAttribute syn(attributeManager.getInheritedAttribute());
+
     // Get the alloca or global for this variable.
-    llvm::Value *value = attributeManager.getInheritedAttribute().
-      lookupVariable(expr->getSymbol()->getName());
-    setValue(value);
+    llvm::Value *value = syn.getVariable(expr->getSymbol()->name());
+    syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::operator()(ptr<Node<Base> >::type node)
