@@ -237,7 +237,6 @@ namespace mirv {
       LeaveStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Statement<Block> >::type stmt);
       void visit(ptr<Statement<Before> >::type stmt);
       void visit(ptr<Statement<After> >::type stmt);
       void visit(ptr<Statement<Goto> >::type stmt);
