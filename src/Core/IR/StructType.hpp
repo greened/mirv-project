@@ -73,6 +73,9 @@ namespace mirv {
       virtual void accept(mirv::SymbolVisitor &) {
         error("StructType::accept called");
       }
+      virtual void accept(mirv::ConstSymbolVisitor &) const {
+        error("StructType::accept called");
+      }
     };
 
   public:

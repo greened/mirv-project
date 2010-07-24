@@ -167,6 +167,9 @@ namespace mirv {
 	virtual void accept(mirv::SymbolVisitor &) {
 	  error("FunctionType::accept called");
 	}
+	virtual void accept(mirv::ConstSymbolVisitor &) const {
+	  error("FunctionType::accept called");
+	}
       };
 
    public:

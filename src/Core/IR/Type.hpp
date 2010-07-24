@@ -102,6 +102,7 @@ namespace mirv {
 
     typedef Symbol<Type<TypeBase> > VisitorBaseType;
     virtual void accept(SymbolVisitor &V);
+    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   class InnerTypeBase : public Symbol<Type<Inner<detail::InnerTypeTraits> > > {
@@ -126,6 +127,7 @@ namespace mirv {
     InnerType(const std::string &name) : BaseType(name) {}
 
     virtual void accept(SymbolVisitor &V);
+    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   /// A type with no children that has a specific bit size, for
