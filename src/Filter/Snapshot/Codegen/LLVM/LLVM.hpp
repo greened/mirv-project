@@ -34,7 +34,8 @@ namespace mirv {
               value(v),
               ReturnValue(isReturn) {}
 
-      SynthesizedAttribute(const InheritedAttribute &inherited);
+      SynthesizedAttribute(const InheritedAttribute &inherited,
+                           llvm::Value *v = 0, bool isReturn = false);
 
       llvm::Value *getValue(void) const {
         checkInvariant(value, "No value");
@@ -79,24 +80,23 @@ namespace mirv {
       llvm::Type *getType(ptr<Symbol<Type<TypeBase> > >::type) const;
 
     public:
-      InheritedAttribute(bool address = false) 
+      InheritedAttribute(void) 
           : Context(llvm::getGlobalContext()),
               Builder(new llvm::IRBuilder(Context)),
               TheModule(0),
               TheFunction(0),
               TheValue(0),
               ReturnValue(false),
-              GenerateAddress(address) {}
+              GenerateAddress(false) {}
 
-      InheritedAttribute(const InheritedAttribute &other) 
+      InheritedAttribute(const InheritedAttribute &other, bool address) 
           : Context(other.Context),
               Builder(other.Builder),
               TheModule(other.TheModule),
               TheFunction(other.TheFunction),
               TheValue(other.TheValue),
               ReturnValue(other.ReturnValue),
-              // Do not inherit this property.
-              GenerateAddress(false) {}
+              GenerateAddress(address) {}
 
       InheritedAttribute(const SynthesizedAttribute &synthesized) 
           : Context(synthesized.Context),
@@ -248,6 +248,7 @@ namespace mirv {
       void visit(ptr<Statement<Before> >::type stmt);
       void visit(ptr<Statement<After> >::type stmt);
       void visit(ptr<Statement<Goto> >::type stmt);
+      void visit(ptr<Statement<Assignment> >::type stmt);
     };
 
     class EnterStatementAction : public VisitAction<EnterStatementVisitor> {
@@ -281,6 +282,14 @@ namespace mirv {
     class LeaveExpressionVisitor : public ExpressionVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
+
+      void setValue(llvm::Value *v) const {
+        checkInvariant(v, "Null value");
+        attributeManager.
+          setSynthesizedAttribute(SynthesizedAttribute(attributeManager.
+                                                       getInheritedAttribute(),
+                                                       v));
+      }
 
     public:
       LeaveExpressionVisitor(FlowAttributeManagerType &am)
@@ -322,7 +331,10 @@ namespace mirv {
       LeaveExpressionAction,
       NullAction,
       NullAction,
-      AttributeFlowBetweenAction<NullAction, FlowAttributeManagerType>
+      AttributeFlowSynthesizedToInheritedAction<
+        NullAction,
+        FlowAttributeManagerType
+        >
       > {
     private:
       typedef AttributeFlow<
@@ -333,7 +345,10 @@ namespace mirv {
       LeaveExpressionAction,
       NullAction,
       NullAction,
-      AttributeFlowBetweenAction<NullAction, FlowAttributeManagerType>
+      AttributeFlowSynthesizedToInheritedAction<
+        NullAction,
+        FlowAttributeManagerType
+        >
       > BaseType;
 
     public:
@@ -342,6 +357,29 @@ namespace mirv {
 
       LLVMCodegenExpressionFlow(FlowAttributeManagerType &)
           : BaseType(InheritedAttribute()) {}        
+
+      // We need to reverse the order in which we visit the assignment
+      // operands.  This makes it easier to tell the lhs to generate
+      // an address because with this flow we visit it first and can
+      // set the address control upon assignment statement entry.  If
+      // we visited it after the rhs we would need a complicated
+      // action to run between expressions.  Since there is no
+      // between-expression action when flowing through statements
+      // (assignment is the only multiple-expression statement and we
+      // don't want to special-case it) we solve the problem this way.
+      void visit(ptr<Statement<Assignment> >::type stmt) {
+        this->doEnter(stmt);
+
+        this->doBeforeExpression(stmt, stmt->getLeftExpression());
+        this->doExpression(stmt, stmt->getLeftExpression());
+        this->doAfterExpression(stmt, stmt->getLeftExpression());
+
+        this->doBeforeExpression(stmt, stmt->getRightExpression());
+        this->doExpression(stmt, stmt->getRightExpression());
+        this->doAfterExpression(stmt, stmt->getRightExpression());
+
+        this->doLeave(stmt);
+      }
     };
 
     /// This is the flow for translating statements.
@@ -352,12 +390,18 @@ namespace mirv {
       EnterStatementAction,
       LeaveStatementAction,
       // Transfer synthesized to inherited before statements.
-      AttributeFlowBetweenAction<NullAction, FlowAttributeManagerType>,
+      AttributeFlowSynthesizedToInheritedAction<
+        NullAction,
+        FlowAttributeManagerType
+        >,
       NullAction,
       NullAction,
       NullJoinAction,
       // Transfer synthesized to inherited before expressions.
-      AttributeFlowBetweenAction<NullAction, FlowAttributeManagerType>,
+      AttributeFlowSynthesizedToInheritedAction<
+        NullAction,
+        FlowAttributeManagerType
+        >,
       FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
       NullAction> {
       typedef AttributeFlow<
