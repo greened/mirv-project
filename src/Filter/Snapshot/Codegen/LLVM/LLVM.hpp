@@ -322,7 +322,7 @@ namespace mirv {
       LeaveExpressionAction,
       NullAction,
       NullAction,
-      NullAction
+      AttributeFlowBetweenAction<NullAction, FlowAttributeManagerType>
       > {
     private:
       typedef AttributeFlow<
@@ -333,7 +333,7 @@ namespace mirv {
       LeaveExpressionAction,
       NullAction,
       NullAction,
-      NullAction
+      AttributeFlowBetweenAction<NullAction, FlowAttributeManagerType>
       > BaseType;
 
     public:
@@ -351,11 +351,13 @@ namespace mirv {
       ForwardFlowGenerator,
       EnterStatementAction,
       LeaveStatementAction,
-      NullAction,
+      // Transfer synthesized to inherited before statements.
+      AttributeFlowBetweenAction<NullAction, FlowAttributeManagerType>,
       NullAction,
       NullAction,
       NullJoinAction,
-      NullAction,
+      // Transfer synthesized to inherited before expressions.
+      AttributeFlowBetweenAction<NullAction, FlowAttributeManagerType>,
       FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
       NullAction> {
       typedef AttributeFlow<
