@@ -121,6 +121,9 @@ namespace mirv {
        virtual void accept(mirv::SymbolVisitor &) {
 	 error("Module::Base::accept called");
        }
+       virtual void accept(mirv::ConstSymbolVisitor &) const {
+	 error("Module::Base::accept called");
+       }
      };
    public:
      typedef Interface BaseType;

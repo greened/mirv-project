@@ -38,6 +38,9 @@ namespace mirv {
       virtual void accept(mirv::SymbolVisitor &) {
         error("Pointer::accept called");
       }
+      virtual void accept(mirv::ConstSymbolVisitor &) const {
+        error("Pointer::accept called");
+      }
     };
 
   public:

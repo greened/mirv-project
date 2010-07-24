@@ -19,12 +19,27 @@ namespace mirv {
     error("Symbol<Base>::accept called");
   }
 
+  void Symbol<Base>::accept(ConstSymbolVisitor &V) const
+  {
+    error("Symbol<Base>::accept called");
+  }
+
   void InnerSymbol::accept(SymbolVisitor &V)
   {
     error("InnerSymbol::accept called");
   }
 
+  void InnerSymbol::accept(ConstSymbolVisitor &V) const
+  {
+    error("InnerSymbol::accept called");
+  }
+
   void LeafSymbol::accept(SymbolVisitor &V)
+  {
+    error("LeafSymbol::accept called");
+  }
+
+  void LeafSymbol::accept(ConstSymbolVisitor &V) const
   {
     error("LeafSymbol::accept called");
   }

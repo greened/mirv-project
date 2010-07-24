@@ -12,6 +12,7 @@
 
 namespace mirv {
   struct SymbolVisitor;
+  struct ConstSymbolVisitor;
 
   /// This is the symbol implementation for all symbol types.  Each
   /// symbol type is an instance of this template (Symbol<Variable>,
@@ -58,6 +59,7 @@ namespace mirv {
     }
 
     virtual void accept(SymbolVisitor &V);
+    virtual void accept(ConstSymbolVisitor &V) const;
 
      template<typename Arg>
      static std::string getName(Arg &a) {
@@ -75,6 +77,7 @@ namespace mirv {
   class Symbol<Base> : public Node<Base> { 
   public:
     virtual void accept(SymbolVisitor &V);
+    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   /// This is a function object to allow searching on sets of symbols by name.
@@ -102,6 +105,7 @@ namespace mirv {
   public:
     typedef Symbol<Base> VisitorBaseType;
     virtual void accept(SymbolVisitor &V);
+    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   /// This is a symbol with no children.
@@ -109,6 +113,7 @@ namespace mirv {
   public:
     typedef Symbol<Base> VisitorBaseType;
     virtual void accept(SymbolVisitor &V);
+    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   /// A symbol that has a type associated with it.
@@ -131,6 +136,9 @@ namespace mirv {
 	return(theType);
       }
       virtual void accept(mirv::SymbolVisitor &) {
+	error("Typed::accept called");
+      }
+      virtual void accept(mirv::ConstSymbolVisitor &) const {
 	error("Typed::accept called");
       }
     };
@@ -157,6 +165,9 @@ namespace mirv {
 	return(the_name);
       }
       virtual void accept(mirv::SymbolVisitor &) {
+	error("Named::accept called");
+      }
+      virtual void accept(mirv::ConstSymbolVisitor &) const {
 	error("Named::accept called");
       }
     };
