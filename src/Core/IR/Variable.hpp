@@ -20,6 +20,9 @@ namespace mirv {
        virtual void accept(mirv::SymbolVisitor &) {
 	 error("Variable::Base::accept called");
        }
+       virtual void accept(mirv::ConstSymbolVisitor &) const {
+	 error("Variable::Base::accept called");
+       }
      };
 
    public:
