@@ -55,13 +55,13 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::InheritedAttribute::
-  TypeCreator::visit(ptr<Symbol<Type<Integral> > >::type type) 
+  TypeCreator::visit(ptr<Symbol<Type<Integral> > >::const_type type) 
   {
     TheType = llvm::IntegerType::get(Context, type->bitsize());
   }
 
   void LLVMCodegenFilter::InheritedAttribute::
-  TypeCreator::visit(ptr<Symbol<Type<Floating> > >::type type) 
+  TypeCreator::visit(ptr<Symbol<Type<Floating> > >::const_type type) 
   {
     checkInvariant(type->bitsize() == 32
       || type->bitsize() == 64,
@@ -72,7 +72,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::InheritedAttribute::
-  TypeCreator::visit(ptr<Symbol<Type<Array> > >::type type) 
+  TypeCreator::visit(ptr<Symbol<Type<Array> > >::const_type type) 
   {
     // TODO: See about making some of these vector types.
     // Get the element type.
@@ -91,7 +91,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::InheritedAttribute::
-  TypeCreator::visit(ptr<Symbol<Type<Pointer> > >::type type) 
+  TypeCreator::visit(ptr<Symbol<Type<Pointer> > >::const_type type) 
   {
     type->getBaseType()->accept(*this);
     const llvm::Type *baseType = TheType;
@@ -99,7 +99,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::InheritedAttribute::
-  TypeCreator::visit(ptr<Symbol<Type<FunctionType> > >::type type) 
+  TypeCreator::visit(ptr<Symbol<Type<FunctionType> > >::const_type type) 
   {
     type->getReturnType()->accept(*this);
     const llvm::Type *returnType = TheType;
@@ -117,7 +117,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::InheritedAttribute::
-  TypeCreator::visit(ptr<Symbol<Type<StructType> > >::type type) 
+  TypeCreator::visit(ptr<Symbol<Type<StructType> > >::const_type type)
   {
     std::vector<const llvm::Type *> memberTypes;
     for (auto m = type->memberBegin();
