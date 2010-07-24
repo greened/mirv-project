@@ -177,12 +177,27 @@ namespace mirv {
     attributeManager.getInheritedAttribute().createBlock("Before");
   }
 
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Before> >::type stmt)
+  {
+    error("unimplemented");
+  }
+
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<After> >::type stmt)
   {
     error("unimplemented");
   }
 
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<After> >::type stmt)
+  {
+    error("unimplemented");
+  }
+
   void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Goto> >::type stmt)
+  {
+    error("unimplemented");
+  }
+
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Goto> >::type stmt)
   {
     error("unimplemented");
   }
@@ -216,6 +231,101 @@ namespace mirv {
 
     // This assumes lhs is already an address.
     attributeMannager.getInheritedAttribute().builder()->CreateStore(rhs, lhs);
+  }
+
+  void LLVMCodegenFilter::
+  LeaveStatementVisitor::visit(ptr<Statement<IfThen> >::type stmt)
+  {
+    llvm::Instruction *cond = 
+      llvm::cast<llvm::Instruction>(attributeManager.getSynthesizedAttribute(0).
+                                    getValue());
+    llvm::BasicBlock *thn = attributeManager.getSynthesizedAttribute(1).
+      getBlock();
+
+    // Start a new block after the then block.
+    llvm::BasicBlock *after = 
+      attributeMannager.getInheritedAttribute().builder()->createBlock("at");
+
+    // Create the terminator for the if block.
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(cond->getParent());
+    attributeMannager.getInheritedAttribute().builder()->
+      CreateCondBr(cond, thn, after);
+
+    // Create the terminator for the then block.
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(thn);
+    attributeMannager.getInheritedAttribute().builder()->
+      CreateBr(after);
+
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(after);
+  }
+
+  void LLVMCodegenFilter::
+  LeaveStatementVisitor::visit(ptr<Statement<IfElse> >::type stmt)
+  {
+    llvm::Instruction *cond = 
+      llvm::cast<llvm::Instruction>(attributeManager.getSynthesizedAttribute(0).
+                                    getValue());
+    llvm::BasicBlock *thn = attributeManager.getSynthesizedAttribute(1).
+      getBlock();
+    llvm::BasicBlock *els = attributeManager.getSynthesizedAttribute(2).
+      getBlock();
+
+    // Start a new block after the else block.
+    llvm::BasicBlock *after = 
+      attributeMannager.getInheritedAttribute().builder()->createBlock("ae");
+
+    // Create the terminator for the if block.
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(cond->getParent());
+    attributeMannager.getInheritedAttribute().builder()->
+      CreateCondBr(cond, thn, els);
+
+    // Create the terminator for the then block.
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(thn);
+    attributeMannager.getInheritedAttribute().builder()->
+      CreateBr(after);
+
+    // Create the terminator for the else block.
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(els);
+    attributeMannager.getInheritedAttribute().builder()->
+      CreateBr(after);
+
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(after);
+  }
+
+  void LLVMCodegenFilter::
+  LeaveStatementVisitor::visit(ptr<Statement<While> >::type stmt)
+  {
+    error("Unimplemented");
+  }
+
+  void LLVMCodegenFilter::
+  LeaveStatementVisitor::visit(ptr<Statement<DoWhile> >::type stmt)
+  {
+    llvm::Instruction *cond = 
+      llvm::cast<llvm::Instruction>(attributeManager.getSynthesizedAttribute(1).
+                                    getValue());
+    llvm::BasicBlock *body = attributeManager.getSynthesizedAttribute(0).
+      getBlock();
+
+    // Start a new block after the cond/body block.
+    llvm::BasicBlock *after = 
+      attributeMannager.getInheritedAttribute().builder()->createBlock("ab");
+
+    // Create the terminator for the cond/body block.
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(body);
+    attributeMannager.getInheritedAttribute().builder()->
+      CreateCondBr(cond, body, after);
+
+    attributeMannager.getInheritedAttribute().builder()->
+      SetInsertPoint(after);
   }
 
   void LLVMCodegenFilter::
