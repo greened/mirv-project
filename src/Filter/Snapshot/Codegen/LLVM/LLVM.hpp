@@ -21,52 +21,9 @@ namespace mirv {
   class LLVMCodegenFilter
       : public Filter<Node<Base> > {
   private:
-    class InheritedAttribute;
-
-    class SynthesizedAttribute {
+    class FlowAttribute {
     private:
-      friend class InheritedAttribute;
-
-      llvm::LLVMContext &Context;
-      ptr<llvm::IRBuilder<> >::type Builder;
-      llvm::Module *TheModule;
-      llvm::Function *TheFunction;
-      llvm::BasicBlock *TheBlock;
-      llvm::Value *value;
-      bool ReturnValue;
-
-    public:
-      SynthesizedAttribute(llvm::Value *v = 0, bool isReturn = false) 
-          : Context(llvm::getGlobalContext()),
-              Builder(new llvm::IRBuilder<>(Context)),
-              TheModule(0),
-              TheFunction(0),
-              TheBlock(0),
-              value(v),
-              ReturnValue(isReturn) {}
-
-      SynthesizedAttribute(const InheritedAttribute &inherited,
-                           llvm::Value *v = 0, bool isReturn = false);
-
-      llvm::Value *getValue(void) const {
-        checkInvariant(value, "No value");
-        return value;
-      }
-      bool hasReturnValue(void) const {
-        return ReturnValue;
-      }
-
-      llvm::Value *getBlock(void) const {
-        checkInvariant(TheBlock, "No block");
-        return TheBlock;
-      }
-    };
-
-    class InheritedAttribute {
-    private:
-      friend class SynthesizedAttribute;
-
-      llvm::LLVMContext &Context;
+      llvm::LLVMContext *Context;
       ptr<llvm::IRBuilder<> >::type Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
@@ -75,6 +32,10 @@ namespace mirv {
       bool ReturnValue;
       bool GenerateAddress;
 
+      typedef Map<std::string, llvm::Value *>::type VariableMap;
+      ptr<VariableMap>::type ModuleMap;
+      ptr<VariableMap>::type FunctionMap;
+      
       class TypeCreator : public ConstSymbolVisitor {
       private:
         llvm::LLVMContext &Context;
@@ -96,21 +57,20 @@ namespace mirv {
         }
       };
 
-      const llvm::Type *
-      getType(ptr<Symbol<Type<TypeBase> > >::const_type) const;
-
     public:
-      InheritedAttribute(void) 
-          : Context(llvm::getGlobalContext()),
-              Builder(new llvm::IRBuilder<>(Context)),
+      FlowAttribute(void) 
+          : Context(&llvm::getGlobalContext()),
+              Builder(new llvm::IRBuilder<>(*Context)),
               TheModule(0),
               TheFunction(0),
               TheBlock(0),
               TheValue(0),
               ReturnValue(false),
-              GenerateAddress(false) {}
+              GenerateAddress(false),
+              ModuleMap(new VariableMap),
+              FunctionMap(new VariableMap) {}
 
-      InheritedAttribute(const InheritedAttribute &other, bool address) 
+      FlowAttribute(const FlowAttribute &other, bool address) 
           : Context(other.Context),
               Builder(other.Builder),
               TheModule(other.TheModule),
@@ -118,19 +78,27 @@ namespace mirv {
               TheBlock(other.TheBlock),
               TheValue(other.TheValue),
               ReturnValue(other.ReturnValue),
-              GenerateAddress(address) {}
+              GenerateAddress(address),
+              ModuleMap(other.ModuleMap),
+              FunctionMap(other.FunctionMap) {}
 
-      InheritedAttribute(const SynthesizedAttribute &synthesized) 
+      FlowAttribute(const FlowAttribute &synthesized) 
           : Context(synthesized.Context),
               Builder(synthesized.Builder),
               TheModule(synthesized.TheModule),
               TheFunction(synthesized.TheFunction),
               TheBlock(synthesized.TheBlock),
-              TheValue(synthesized.value),
+              TheValue(synthesized.TheValue),
               ReturnValue(synthesized.ReturnValue),
-              GenerateAddress(false) {}
+              GenerateAddress(false),
+              ModuleMap(synthesized.ModuleMap),
+              FunctionMap(synthesized.FunctionMap) {}
 
-      ptr<llvm::IRBuilder<> >::type builder(void) {
+      void clearFunctionMap(void) {
+        FunctionMap->clear();
+      }
+
+      ptr<llvm::IRBuilder<> >::type builder(void) const {
         return Builder;
       }
 
@@ -139,17 +107,23 @@ namespace mirv {
         return TheValue;
       }
 
-      void setValue(llvm::Value *v, bool isReturn = false) {
-        checkInvariant(v, "No value");
+      void setValue(llvm::Value *v) {
+        checkInvariant(TheValue == 0, "Value already set");
+        checkInvariant(v != 0, "Null value");
         TheValue = v;
-        if (isReturn) {
-          ReturnValue = true;
-        }
       }
 
       bool hasReturnValue(void) const {
         return ReturnValue;
       }
+
+      llvm::BasicBlock *getBlock(void) const {
+        checkInvariant(TheBlock, "No block");
+        return TheBlock;
+      }
+
+      const llvm::Type *
+      getType(ptr<Symbol<Type<TypeBase> > >::const_type) const;
 
       bool generateAddress(void) const {
         return GenerateAddress;
@@ -157,7 +131,7 @@ namespace mirv {
 
       void createModule(const std::string &name) {
         checkInvariant(TheModule == 0, "Module already exists");
-        TheModule = new llvm::Module(name, Context);
+        TheModule = new llvm::Module(name, *Context);
       }
 
       void createFunction(const std::string &name,
@@ -166,19 +140,22 @@ namespace mirv {
       void createVariable(const std::string &name,
                           ptr<Symbol<Type<TypeBase> > >::const_type type);
 
+      llvm::Value *getVariable(const std::string &name);
+
       llvm::BasicBlock *createBlock(const std::string &name) {
         checkInvariant(TheFunction, "No function for block");
-        llvm::BasicBlock *block = llvm::BasicBlock::Create(Context,
+        llvm::BasicBlock *block = llvm::BasicBlock::Create(*Context,
                                                            name,
                                                            TheFunction);
         builder()->SetInsertPoint(block);
+        TheBlock = block;
         return block;
       }
     };
 
     typedef FlowAttributeManager<
-      InheritedAttribute,
-      SynthesizedAttribute
+      FlowAttribute,
+      FlowAttribute
       > FlowAttributeManagerType;
 
     /// Entering each symbol
@@ -219,25 +196,6 @@ namespace mirv {
           : VisitAction<EnterDefSymbolVisitor>(attributeManager) {}
     };
 
-    /// Leaving each symbol declaration.
-    class LeaveDeclSymbolVisitor : public SymbolVisitor {
-    private:
-      FlowAttributeManagerType &attributeManager;
-
-    public:
-      LeaveDeclSymbolVisitor(FlowAttributeManagerType &am)
-	  : attributeManager(am) {}
-
-      /// Print the final newline after each symbol declaration.
-      void visit(ptr<Symbol<Base> >::type sym) {}
-    };
-
-    class LeaveDeclSymbolAction : public VisitAction<LeaveDeclSymbolVisitor> {
-    public:
-      LeaveDeclSymbolAction(FlowAttributeManagerType &attributeManager) 
-          : VisitAction<LeaveDeclSymbolVisitor>(attributeManager) {}
-    };
-
     /// Leaving each symbol definition.
     class LeaveDefSymbolVisitor : public SymbolVisitor {
     private:
@@ -247,10 +205,11 @@ namespace mirv {
       LeaveDefSymbolVisitor(FlowAttributeManagerType &am)
 	  : attributeManager(am) {}
 
-      /// Print the final newline after each symbol definition.
-      void visit(ptr<Symbol<Variable> >::type sym) {}
-      void visit(ptr<Symbol<Module> >::type sym);
-      void visit(ptr<Symbol<Function> >::type sym);
+      void visit(ptr<Symbol<Function> >::type sym) {
+        FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+        syn.clearFunctionMap();
+        attributeManager.setSynthesizedAttribute(syn);
+      }
     };
 
     class LeaveDefSymbolAction : public VisitAction<LeaveDefSymbolVisitor> {
@@ -313,14 +272,6 @@ namespace mirv {
     private:
       FlowAttributeManagerType &attributeManager;
 
-      void setValue(llvm::Value *v) const {
-        checkInvariant(v, "Null value");
-        attributeManager.
-          setSynthesizedAttribute(SynthesizedAttribute(attributeManager.
-                                                       getInheritedAttribute(),
-                                                       v));
-      }
-
     public:
       LeaveExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
@@ -354,8 +305,8 @@ namespace mirv {
 
     /// This is the flow for translating expressions.
     class LLVMCodegenExpressionFlow : public AttributeFlow<
-      InheritedAttribute,
-      SynthesizedAttribute,
+      FlowAttribute,
+      FlowAttribute,
       ForwardExpressionFlowGenerator,
       NullAction,
       LeaveExpressionAction,
@@ -368,8 +319,8 @@ namespace mirv {
       > {
     private:
       typedef AttributeFlow<
-      InheritedAttribute,
-      SynthesizedAttribute,
+      FlowAttribute,
+      FlowAttribute,
       ForwardExpressionFlowGenerator,
       NullAction,
       LeaveExpressionAction,
@@ -383,16 +334,16 @@ namespace mirv {
 
     public:
       LLVMCodegenExpressionFlow()
-          : BaseType(InheritedAttribute()) {}
+          : BaseType(FlowAttribute()) {}
 
       LLVMCodegenExpressionFlow(FlowAttributeManagerType &)
-          : BaseType(InheritedAttribute()) {}
+          : BaseType(FlowAttribute()) {}
     };
 
     /// This is the flow for translating statements.
     class LLVMCodegenFlow : public AttributeFlow<
-      InheritedAttribute,
-      SynthesizedAttribute,
+      FlowAttribute,
+      FlowAttribute,
       ForwardFlowGenerator,
       EnterStatementAction,
       LeaveStatementAction,
@@ -412,8 +363,8 @@ namespace mirv {
       FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
       NullAction> {
       typedef AttributeFlow<
-        InheritedAttribute,
-        SynthesizedAttribute,
+        FlowAttribute,
+        FlowAttribute,
         ForwardFlowGenerator,
 	EnterStatementAction,
 	LeaveStatementAction,
@@ -433,7 +384,7 @@ namespace mirv {
 
     public:
       LLVMCodegenFlow()
-          : BaseType(InheritedAttribute()) {}
+          : BaseType(FlowAttribute()) {}
 
       // We need to reverse the order in which we visit the assignment
       // operands.  This makes it easier to tell the lhs to generate
