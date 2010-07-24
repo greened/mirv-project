@@ -8,6 +8,7 @@
 #include <mirv/Core/Filter/Filter.hpp>
 #include <mirv/Core/Filter/FlowAction.hpp>
 #include <mirv/Core/Filter/Action.hpp>
+#include <mirv/Core/Filter/SymbolFlow.hpp>
 #include <mirv/Core/IR/Node.hpp>
 
 #include <llvm/Module.h>
@@ -134,6 +135,11 @@ namespace mirv {
         TheModule = new llvm::Module(name, *Context);
       }
 
+      llvm::Module *getModule(void) const {
+        checkInvariant(TheModule, "Null module");
+        return TheModule;
+      }
+
       void createFunction(const std::string &name,
                           ptr<Symbol<Type<TypeBase> > >::const_type type);
 
@@ -159,12 +165,12 @@ namespace mirv {
       > FlowAttributeManagerType;
 
     /// Entering each symbol
-    class EnterDeclSymbolVisitor : public SymbolVisitor {
+    class EnterSymbolVisitor : public SymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
     public:
-      EnterDeclSymbolVisitor(FlowAttributeManagerType &am)
+      EnterSymbolVisitor(FlowAttributeManagerType &am)
 	  : attributeManager(am) {}
 
       void visit(ptr<Symbol<Module> >::type sym);
@@ -172,37 +178,19 @@ namespace mirv {
       void visit(ptr<Symbol<Variable> >::type sym);
     };
 
-    class EnterDeclSymbolAction : public VisitAction<EnterDeclSymbolVisitor> {
+    class EnterSymbolAction : public VisitAction<EnterSymbolVisitor> {
     public:
-      EnterDeclSymbolAction(FlowAttributeManagerType &attributeManager) 
-          : VisitAction<EnterDeclSymbolVisitor>(attributeManager) {}
-    };
-
-    class EnterDefSymbolVisitor : public SymbolVisitor {
-    private:
-      FlowAttributeManagerType &attributeManager;
-
-    public:
-      EnterDefSymbolVisitor(FlowAttributeManagerType &am)
-	  : attributeManager(am) {}
-
-      void visit(ptr<Symbol<Function> >::type sym);
-      void visit(ptr<Symbol<Variable> >::type sym);
-    };
-
-    class EnterDefSymbolAction : public VisitAction<EnterDefSymbolVisitor> {
-    public:
-      EnterDefSymbolAction(FlowAttributeManagerType &attributeManager) 
-          : VisitAction<EnterDefSymbolVisitor>(attributeManager) {}
+      EnterSymbolAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<EnterSymbolVisitor>(attributeManager) {}
     };
 
     /// Leaving each symbol definition.
-    class LeaveDefSymbolVisitor : public SymbolVisitor {
+    class LeaveSymbolVisitor : public SymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
     public:
-      LeaveDefSymbolVisitor(FlowAttributeManagerType &am)
+      LeaveSymbolVisitor(FlowAttributeManagerType &am)
 	  : attributeManager(am) {}
 
       void visit(ptr<Symbol<Function> >::type sym) {
@@ -212,10 +200,10 @@ namespace mirv {
       }
     };
 
-    class LeaveDefSymbolAction : public VisitAction<LeaveDefSymbolVisitor> {
+    class LeaveSymbolAction : public VisitAction<LeaveSymbolVisitor> {
     public:
-      LeaveDefSymbolAction(FlowAttributeManagerType &attributeManager) 
-          : VisitAction<LeaveDefSymbolVisitor>(attributeManager) {}
+      LeaveSymbolAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<LeaveSymbolVisitor>(attributeManager) {}
     };
 
     /// Entering each statement
@@ -301,6 +289,34 @@ namespace mirv {
     public:
       LeaveExpressionAction(FlowAttributeManagerType &attributeManager) 
           : VisitAction<LeaveExpressionVisitor>(attributeManager) {}
+    };
+
+    /// This is the flow to codegen a module.
+    class LLVMCodegenSymbolFlow : public AttributeFlow<
+      FlowAttribute,
+      FlowAttribute,
+      SymbolFlowGenerator,
+      EnterSymbolAction,
+      LeaveSymbolAction,
+      NullAction,
+      NullAction,
+      NullAction,
+      NullAction> {
+    private:
+      typedef AttributeFlow<
+      FlowAttribute,
+      FlowAttribute,
+      SymbolFlowGenerator,
+      EnterSymbolAction,
+      LeaveSymbolAction,
+      NullAction,
+      NullAction,
+      NullAction,
+      NullAction> BaseType;
+
+    public:
+      LLVMCodegenSymbolFlow(void)
+          : BaseType(FlowAttribute()) {}
     };
 
     /// This is the flow for translating expressions.
@@ -410,11 +426,18 @@ namespace mirv {
       }
     };
 
+    llvm::Module *TheModule;
+
   public:
-    LLVMCodegenFilter(void) : Filter<Node<Base> >() {}
+    LLVMCodegenFilter(void) : Filter<Node<Base> >(), TheModule(0) {}
 
     /// Translate an IR tree.
     void operator()(ptr<Node<Base> >::type node);
+
+    llvm::Module *getModule(void) const {
+      checkInvariant(TheModule, "Null module");
+      return TheModule;
+    }
   };
 }
 

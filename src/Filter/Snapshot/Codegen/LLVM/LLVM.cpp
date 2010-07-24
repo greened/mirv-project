@@ -136,7 +136,7 @@ namespace mirv {
   }
   
   void LLVMCodegenFilter::
-  EnterDeclSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
+  EnterSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
   {
     FlowAttribute inh(attributeManager.getInheritedAttribute());
     inh.createModule(sym->name());
@@ -144,7 +144,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::
-  EnterDeclSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
+  EnterSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
   {
     FlowAttribute inh(attributeManager.getInheritedAttribute());
     inh.createFunction(sym->name(), sym->type());
@@ -152,7 +152,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::
-  EnterDeclSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
+  EnterSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
     FlowAttribute inh(attributeManager.getInheritedAttribute());
     inh.createVariable(sym->name(), sym->type());
@@ -609,6 +609,17 @@ namespace mirv {
 
   void LLVMCodegenFilter::operator()(ptr<Node<Base> >::type node)
   {
+    if (ptr<Symbol<Module> >::type s =
+        boost::dynamic_pointer_cast<Symbol<Module> >(node)) {
+      ptr<LLVMCodegenSymbolFlow>::type flow(new LLVMCodegenSymbolFlow());
+      s->accept(*flow);
+      TheModule =
+        flow->getAttributeManager().getLastSynthesizedAttribute().getModule();
+    }
+    else {
+      error("Can only codegen complete modules");
+    }
+
     //if (ptr<Statement<Base> >::type s = dyn_cast<Statement<Base> >(node)) {
     if (ptr<Statement<Base> >::type s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
       ptr<LLVMCodegenFlow>::type flow(new LLVMCodegenFlow());
