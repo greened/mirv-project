@@ -52,19 +52,19 @@ namespace mirv {
   /// from purely top-down/bottom-up to one that tracks an attribute
   /// value through program control (for example, dataflow).
   template<typename Action, typename FlowAttributeManager>
-  class AttributeFlowBetweenAction {
+  class AttributeFlowSynthesizedToInheritedAction {
   private:
-    Action between;
+    Action action;
     FlowAttributeManager &attributeManager;
 
   public:
     typedef void result_type;
 
-    AttributeFlowBetweenAction(FlowAttributeManager &am)
-        : between(am), attributeManager(am) {}
+    AttributeFlowSynthesizedToInheritedAction(FlowAttributeManager &am)
+        : action(am), attributeManager(am) {}
     template<typename Arg>
     void operator()(const Arg &a) {
-      between(a);
+      action(a);
       attributeManager.setInheritedAttribute(attributeManager.
                                              getLastSynthesizedAttribute());
     }
