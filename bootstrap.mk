@@ -66,6 +66,7 @@ else
 .PHONY: clean
 clean:
 	rm -rf $(FINAL_BUILDDIR)
+	rm -rf $(shell find $(SRCDIR) -name "*~")
 
 endif  # MAKECMDGOALS
 
