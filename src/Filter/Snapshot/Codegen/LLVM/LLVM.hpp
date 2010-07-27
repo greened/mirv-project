@@ -58,6 +58,11 @@ namespace mirv {
         }
       };
 
+    protected:
+      void setValueUnchecked(llvm::Value *v) {
+        TheValue = v;
+      }
+
     public:
       FlowAttribute(void) 
           : Context(&llvm::getGlobalContext()),
@@ -83,17 +88,17 @@ namespace mirv {
               ModuleMap(other.ModuleMap),
               FunctionMap(other.FunctionMap) {}
 
-      FlowAttribute(const FlowAttribute &synthesized) 
-          : Context(synthesized.Context),
-              Builder(synthesized.Builder),
-              TheModule(synthesized.TheModule),
-              TheFunction(synthesized.TheFunction),
-              TheBlock(synthesized.TheBlock),
-              TheValue(synthesized.TheValue),
-              ReturnValue(synthesized.ReturnValue),
+      FlowAttribute(const FlowAttribute &other) 
+          : Context(other.Context),
+              Builder(other.Builder),
+              TheModule(other.TheModule),
+              TheFunction(other.TheFunction),
+              TheBlock(other.TheBlock),
+              TheValue(other.TheValue),
+              ReturnValue(other.ReturnValue),
               GenerateAddress(false),
-              ModuleMap(synthesized.ModuleMap),
-              FunctionMap(synthesized.FunctionMap) {}
+              ModuleMap(other.ModuleMap),
+              FunctionMap(other.FunctionMap) {}
 
       void clearFunctionMap(void) {
         FunctionMap->clear();
@@ -109,7 +114,6 @@ namespace mirv {
       }
 
       void setValue(llvm::Value *v) {
-        checkInvariant(TheValue == 0, "Value already set");
         checkInvariant(v != 0, "Null value");
         TheValue = v;
       }
@@ -159,9 +163,49 @@ namespace mirv {
       }
     };
 
+    class SynthesizedAttribute;
+
+    class InheritedAttribute 
+        : public FlowAttribute {
+    public:
+      InheritedAttribute(void) = default;
+
+      InheritedAttribute(const InheritedAttribute &inherited, bool address)
+          : FlowAttribute(inherited, address) {}
+
+      InheritedAttribute(const SynthesizedAttribute &synthesized) 
+          : FlowAttribute(synthesized) {
+        // Do not inherited this property.
+        setValueUnchecked(0);
+      }
+
+      InheritedAttribute &operator=(const SynthesizedAttribute &synthesized) {
+        InheritedAttribute temp(synthesized);
+        std::swap(temp, *this);
+        return *this;
+      }
+    };
+
+    class SynthesizedAttribute 
+        : public FlowAttribute {
+    public:
+      SynthesizedAttribute(void) = default;
+
+      SynthesizedAttribute(const InheritedAttribute &inherited) 
+          : FlowAttribute(inherited) {}
+
+      SynthesizedAttribute &operator=(const InheritedAttribute &inherited) {
+        SynthesizedAttribute temp(inherited);
+        std::swap(temp, *this);
+        return *this;
+      }
+    };
+
+  public:
+
     typedef FlowAttributeManager<
-      FlowAttribute,
-      FlowAttribute
+      InheritedAttribute,
+      SynthesizedAttribute
       > FlowAttributeManagerType;
 
     /// Entering each symbol
@@ -175,7 +219,6 @@ namespace mirv {
 
       void visit(ptr<Symbol<Module> >::type sym);
       void visit(ptr<Symbol<Function> >::type sym);
-      void visit(ptr<Symbol<Variable> >::type sym);
     };
 
     class EnterSymbolAction : public VisitAction<EnterSymbolVisitor> {
@@ -194,10 +237,12 @@ namespace mirv {
 	  : attributeManager(am) {}
 
       void visit(ptr<Symbol<Function> >::type sym) {
-        FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+        SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(0));
         syn.clearFunctionMap();
         attributeManager.setSynthesizedAttribute(syn);
       }
+      // We put this here so it can set a synthesized attribute.
+      void visit(ptr<Symbol<Variable> >::type sym);
     };
 
     class LeaveSymbolAction : public VisitAction<LeaveSymbolVisitor> {
@@ -290,41 +335,16 @@ namespace mirv {
           : VisitAction<LeaveExpressionVisitor>(attributeManager) {}
     };
 
-    /// This is the flow to codegen a module.
-    class LLVMCodegenSymbolFlow : public AttributeFlow<
-      FlowAttribute,
-      FlowAttribute,
-      SymbolFlowGenerator,
-      EnterSymbolAction,
-      LeaveSymbolAction,
-      NullAction,
-      NullAction,
-      NullAction,
-      NullAction> {
-    private:
-      typedef AttributeFlow<
-      FlowAttribute,
-      FlowAttribute,
-      SymbolFlowGenerator,
-      EnterSymbolAction,
-      LeaveSymbolAction,
-      NullAction,
-      NullAction,
-      NullAction,
-      NullAction> BaseType;
-
-    public:
-      LLVMCodegenSymbolFlow(void)
-          : BaseType(FlowAttribute()) {}
-    };
-
     /// This is the flow for translating expressions.
     class LLVMCodegenExpressionFlow : public AttributeFlow<
-      FlowAttribute,
-      FlowAttribute,
+      InheritedAttribute,
+      SynthesizedAttribute,
       ForwardExpressionFlowGenerator,
       NullAction,
-      LeaveExpressionAction,
+      AttributeFlowInheritedToSynthesizedAction<
+        LeaveExpressionAction,
+        FlowAttributeManagerType
+        >,
       NullAction,
       NullAction,
       AttributeFlowSynthesizedToInheritedAction<
@@ -334,11 +354,14 @@ namespace mirv {
       > {
     private:
       typedef AttributeFlow<
-      FlowAttribute,
-      FlowAttribute,
+      InheritedAttribute,
+      SynthesizedAttribute,
       ForwardExpressionFlowGenerator,
       NullAction,
-      LeaveExpressionAction,
+      AttributeFlowInheritedToSynthesizedAction<
+        LeaveExpressionAction,
+        FlowAttributeManagerType
+        >,
       NullAction,
       NullAction,
       AttributeFlowSynthesizedToInheritedAction<
@@ -349,19 +372,22 @@ namespace mirv {
 
     public:
       LLVMCodegenExpressionFlow()
-          : BaseType(FlowAttribute()) {}
+          : BaseType(InheritedAttribute()) {}
 
       LLVMCodegenExpressionFlow(FlowAttributeManagerType &)
-          : BaseType(FlowAttribute()) {}
+          : BaseType(InheritedAttribute()) {}
     };
 
     /// This is the flow for translating statements.
     class LLVMCodegenFlow : public AttributeFlow<
-      FlowAttribute,
-      FlowAttribute,
+      InheritedAttribute,
+      SynthesizedAttribute,
       ForwardFlowGenerator,
       EnterStatementAction,
-      LeaveStatementAction,
+      AttributeFlowInheritedToSynthesizedAction<
+        LeaveStatementAction,
+        FlowAttributeManagerType
+        >,
       // Transfer synthesized to inherited before statements.
       AttributeFlowSynthesizedToInheritedAction<
         NullAction,
@@ -376,13 +402,17 @@ namespace mirv {
         FlowAttributeManagerType
         >,
       FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
-      NullAction> {
+      NullAction>,
+        public boost::enable_shared_from_this<LLVMCodegenFlow> {
       typedef AttributeFlow<
-        FlowAttribute,
-        FlowAttribute,
+        InheritedAttribute,
+        SynthesizedAttribute,
         ForwardFlowGenerator,
 	EnterStatementAction,
-	LeaveStatementAction,
+        AttributeFlowInheritedToSynthesizedAction<
+          LeaveStatementAction,
+          FlowAttributeManagerType
+          >,
         AttributeFlowSynthesizedToInheritedAction<
           NullAction,
           FlowAttributeManagerType
@@ -399,7 +429,14 @@ namespace mirv {
 
     public:
       LLVMCodegenFlow()
-          : BaseType(FlowAttribute()) {}
+          : BaseType(InheritedAttribute()) {
+        expression().setParentFlow(this);
+      }
+
+      LLVMCodegenFlow(const FlowAttributeManagerType &)
+          : BaseType(InheritedAttribute()) {
+        expression().setParentFlow(this);
+      }
 
       // We need to reverse the order in which we visit the assignment
       // operands.  This makes it easier to tell the lhs to generate
@@ -422,6 +459,45 @@ namespace mirv {
         this->doAfterExpression(stmt, stmt->getRightExpression());
 
         this->doLeave(stmt);
+      }
+    };
+
+    /// This is the flow to codegen a module.
+    class LLVMCodegenSymbolFlow : public AttributeFlow<
+      InheritedAttribute,
+      SynthesizedAttribute,
+      SymbolFlowGenerator,
+      EnterSymbolAction,
+      AttributeFlowInheritedToSynthesizedAction<
+        LeaveSymbolAction,
+        FlowAttributeManagerType
+        >,
+      NullAction,
+      NullAction,
+      NullAction,
+      FlowAction<LLVMCodegenSymbolFlow, LLVMCodegenFlow>
+      >,
+         public boost::enable_shared_from_this<LLVMCodegenSymbolFlow> {
+    private:
+      typedef AttributeFlow<
+      InheritedAttribute,
+      SynthesizedAttribute,
+      SymbolFlowGenerator,
+      EnterSymbolAction,
+      AttributeFlowInheritedToSynthesizedAction<
+        LeaveSymbolAction,
+        FlowAttributeManagerType
+        >,
+      NullAction,
+      NullAction,
+      NullAction,
+      FlowAction<LLVMCodegenSymbolFlow, LLVMCodegenFlow>
+      > BaseType;
+
+    public:
+      LLVMCodegenSymbolFlow(void)
+          : BaseType(InheritedAttribute()) {
+        statement().setParentFlow(this);
       }
     };
 

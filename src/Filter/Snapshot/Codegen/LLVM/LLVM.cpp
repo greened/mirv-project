@@ -26,12 +26,20 @@ namespace mirv {
   {
     if (TheFunction) {
       const llvm::Type *llvmType = getType(type);
-      builder()->CreateAlloca(llvmType, 0, name);
+      llvm::Value *var = builder()->CreateAlloca(llvmType, 0, name);
+      VariableMap::iterator pos;
+      bool inserted;
+      std::tie(pos, inserted) = FunctionMap->insert(std::make_pair(name, var));
+      checkInvariant(inserted, "Variable already exists");
     }
     else {
       checkInvariant(TheModule, "No module for global variable");
       const llvm::Type *llvmType = getType(type);
-      TheModule->getOrInsertGlobal(name, llvmType);
+      llvm::Value *var = TheModule->getOrInsertGlobal(name, llvmType);
+      VariableMap::iterator pos;
+      bool inserted;
+      std::tie(pos, inserted) = ModuleMap->insert(std::make_pair(name, var));
+      checkInvariant(inserted, "Variable already exists");
     }
   }
 
@@ -144,7 +152,7 @@ namespace mirv {
   void LLVMCodegenFilter::
   EnterSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
   {
-    FlowAttribute inh(attributeManager.getInheritedAttribute());
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
     inh.createModule(sym->name());
     attributeManager.setInheritedAttribute(inh);
   }
@@ -152,23 +160,23 @@ namespace mirv {
   void LLVMCodegenFilter::
   EnterSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
   {
-    FlowAttribute inh(attributeManager.getInheritedAttribute());
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
     inh.createFunction(sym->name(), sym->type());
     attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::
-  EnterSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
+  LeaveSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
-    FlowAttribute inh(attributeManager.getInheritedAttribute());
-    inh.createVariable(sym->name(), sym->type());
-    attributeManager.setInheritedAttribute(inh);
+    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+    syn.createVariable(sym->name(), sym->type());
+    attributeManager.setSynthesizedAttribute(syn);
   }
   
   void LLVMCodegenFilter::
   EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
   {
-    FlowAttribute inh(attributeManager.getInheritedAttribute());
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
     inh.createBlock("B");
     attributeManager.setInheritedAttribute(inh);
   }
@@ -205,7 +213,7 @@ namespace mirv {
 
   void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Return> >::type stmt)
   {
-    FlowAttribute syn(attributeManager.getInheritedAttribute());
+    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
     llvm::Value *inst = 
       attributeManager.getInheritedAttribute().hasReturnValue() ?
@@ -222,18 +230,21 @@ namespace mirv {
   EnterStatementVisitor::visit(ptr<Statement<Assignment> >::type stmt)
   {
     // Make lhs return an address.
-    FlowAttribute inh(attributeManager.getInheritedAttribute(), true);
+    InheritedAttribute inh(attributeManager.getInheritedAttribute(), true);
     attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Assignment> >::type stmt)
   {
     // TODO: Handle return assignment.
-    // Forward flow visits rhs first, so it is at index 0.
-    llvm::Value *lhs = attributeManager.getSynthesizedAttribute(1).getValue();
-    llvm::Value *rhs = attributeManager.getSynthesizedAttribute(0).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    // See LLVMCodeGenFlow::visit(...<Assignment>...) to see how we
+    // changed the order of visitation from normal forward flow.  This
+    // is why the lhs and rhs indices are reversed.
+    llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
+    llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     // This assumes lhs is already an address.
     llvm::Value *inst = syn.builder()->CreateStore(rhs, lhs);
@@ -250,7 +261,7 @@ namespace mirv {
     llvm::BasicBlock *thn = attributeManager.getSynthesizedAttribute(1).
       getBlock();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     // Start a new block after the then block.
     llvm::BasicBlock *after = syn.createBlock("at");
@@ -279,7 +290,7 @@ namespace mirv {
     llvm::BasicBlock *els = attributeManager.getSynthesizedAttribute(2).
       getBlock();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(0));
 
     // Start a new block after the else block.
     llvm::BasicBlock *after = syn.createBlock("ae");
@@ -316,7 +327,7 @@ namespace mirv {
     llvm::BasicBlock *body = attributeManager.getSynthesizedAttribute(0).
       getBlock();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     // Start a new block after the cond/body block.
     llvm::BasicBlock *after = syn.createBlock("ab");
@@ -336,7 +347,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       syn.builder()->CreateFAdd(rhs, lhs, "r") :
@@ -352,7 +363,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       syn.builder()->CreateFSub(rhs, lhs, "r") :
@@ -367,7 +378,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       syn.builder()->CreateFMul(rhs, lhs, "r") :
@@ -382,7 +393,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       syn.builder()->CreateFDiv(rhs, lhs, "r") :
@@ -398,7 +409,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       syn.builder()->CreateFRem(rhs, lhs, "r") :
@@ -413,7 +424,7 @@ namespace mirv {
   {
     llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(0));
 
     llvm::Value *value = op->getType()->isFloatingPoint() ?
       syn.builder()->CreateFNeg(op, "r") :
@@ -428,7 +439,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     // TODO: Do we require this to result in 1 if true?
     llvm::Value *value = syn.builder()->CreateAnd(rhs, lhs, "r");
@@ -442,7 +453,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     // TODO: Do we require this to result in 1 if true?
     llvm::Value *value = syn.builder()->CreateOr(rhs, lhs, "r");
@@ -455,7 +466,7 @@ namespace mirv {
   {
     llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(0));
 
     // TODO: Do we require this to result in 1 if true?
     llvm::Value *value = syn.builder()->CreateNot(op, "r");
@@ -469,7 +480,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = syn.builder()->CreateAnd(rhs, lhs, "r");
     syn.setValue(value);
@@ -482,7 +493,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = syn.builder()->CreateOr(rhs, lhs, "r");
     syn.setValue(value);
@@ -494,7 +505,7 @@ namespace mirv {
   {
     llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(0));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(0));
 
     llvm::Value *value = syn.builder()->CreateNot(op, "r");
     syn.setValue(value);
@@ -507,7 +518,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
@@ -524,7 +535,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
@@ -541,7 +552,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
@@ -557,7 +568,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
@@ -573,7 +584,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
@@ -590,7 +601,7 @@ namespace mirv {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
 
-    FlowAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
     llvm::Value *value = lhs->getType()->isFloatingPoint() ?
       // TODO: Handle unordered compares.
@@ -604,10 +615,16 @@ namespace mirv {
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::type expr)
   {
-    FlowAttribute syn(attributeManager.getInheritedAttribute());
+    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
-    // Get the alloca or global for this variable.
+    // Get the alloca or global for this variable.  This is an address
+    // so we need to load it if required.
     llvm::Value *value = syn.getVariable(expr->getSymbol()->name());
+
+    if (!attributeManager.getInheritedAttribute().generateAddress()) {
+      value = attributeManager.getInheritedAttribute().builder()->
+        CreateLoad(value, "vref");
+    }
     syn.setValue(value);
 
     attributeManager.setSynthesizedAttribute(syn);
