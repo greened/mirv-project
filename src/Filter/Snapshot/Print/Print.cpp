@@ -477,7 +477,8 @@ namespace mirv {
 
   void PrintFilter::LeaveExpressionVisitor::visit(ptr<Expression<Base> >::type expr)
   {
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   attributeManager.setLastSynthesizedAttribute()
+        && !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
@@ -485,7 +486,8 @@ namespace mirv {
 
   void PrintFilter::LeaveExpressionVisitor::visit(ptr<InnerExpression>::type expr)
   {
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   attributeManager.setLastSynthesizedAttribute()
+        && !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));

@@ -65,15 +65,57 @@ namespace mirv {
     template<typename Arg>
     void operator()(const Arg &a) {
       action(a);
-      attributeManager.setInheritedAttribute(attributeManager.
-                                             getLastSynthesizedAttribute());
+      if (attributeManager.setLastSynthesizedAttribute()) {
+        attributeManager.setInheritedAttribute(attributeManager.
+                                               getLastSynthesizedAttribute());
+      }
     }
 
     template<typename Arg1, typename Arg2>
     void operator()(const Arg1 &a1, const Arg2 &a2) {
       action(a1, a2);
-      attributeManager.setInheritedAttribute(attributeManager.
-                                             getLastSynthesizedAttribute());
+      if (attributeManager.setLastSynthesizedAttribute()) {
+        attributeManager.setInheritedAttribute(attributeManager.
+                                               getLastSynthesizedAttribute());
+      }
+    }
+  };
+
+  // This action transers an inherited attribute to a synthesized
+  // attribute.  It is useful for leaf nodes and other constructs
+  // where no explicit synthesized attribute is set but we would like
+  // to carry forward some information from the inherited attribute.
+  template<typename Action, typename FlowAttributeManager>
+  class AttributeFlowInheritedToSynthesizedAction {
+  private:
+    Action action;
+    FlowAttributeManager &attributeManager;
+
+  public:
+    typedef void result_type;
+
+    AttributeFlowInheritedToSynthesizedAction(FlowAttributeManager &am)
+        : action(am), attributeManager(am) {}
+    template<typename Arg>
+    void operator()(const Arg &a) {
+      action(a);
+      // If we didn't set a synthesized attribute and we didn't get
+      // one from a child, then propagate the inherited attribute as
+      // our synthesized attribute.
+      if (   !attributeManager.setLastSynthesizedAttribute()
+          && !attributeManager.setLastSynthesizedAttributeForParent()) {
+        attributeManager.setSynthesizedAttribute(attributeManager.
+                                                 getInheritedAttribute());
+      }
+    }
+
+    template<typename Arg1, typename Arg2>
+    void operator()(const Arg1 &a1, const Arg2 &a2) {
+      action(a1, a2);
+      if (!attributeManager.setSynthesized()) {
+        attributeManager.setSynthesizedAttribute(attributeManager.
+                                                 getInheritedAttribute());
+      }
     }
   };
 
