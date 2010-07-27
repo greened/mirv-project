@@ -64,7 +64,8 @@ namespace mirv {
   /// Print the final newline after each symbol declaration.
   void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Base> >::type)
   {
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
@@ -80,7 +81,8 @@ namespace mirv {
       /// Print the final newline after struct types.
   void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::type)
   {
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
@@ -116,7 +118,8 @@ namespace mirv {
 
   void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
@@ -134,7 +137,8 @@ namespace mirv {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
 
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       out << "\n";
     }
     out << indent(ind) << "}\n";
@@ -261,7 +265,8 @@ namespace mirv {
 
   void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Base> >::type stmt)
   {
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
@@ -271,7 +276,8 @@ namespace mirv {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
 
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       out << "\n";
     }
     out << indent(ind) << "}\n";
@@ -281,7 +287,8 @@ namespace mirv {
   void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Return> >::type stmt) {
     Stream &out = attributeManager.getInheritedAttribute().out();
 
-    if (!attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       out << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
@@ -477,8 +484,8 @@ namespace mirv {
 
   void PrintFilter::LeaveExpressionVisitor::visit(ptr<Expression<Base> >::type expr)
   {
-    if (   attributeManager.setLastSynthesizedAttribute()
-        && !attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
@@ -486,8 +493,8 @@ namespace mirv {
 
   void PrintFilter::LeaveExpressionVisitor::visit(ptr<InnerExpression>::type expr)
   {
-    if (   attributeManager.setLastSynthesizedAttribute()
-        && !attributeManager.getLastSynthesizedAttribute().justLeft()) {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
