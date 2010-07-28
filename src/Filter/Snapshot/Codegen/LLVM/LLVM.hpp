@@ -122,6 +122,10 @@ namespace mirv {
         return ReturnValue;
       }
 
+      bool hasBlock(void) const {
+        return TheBlock != 0;
+      }
+
       llvm::BasicBlock *getBlock(void) const {
         checkInvariant(TheBlock, "No block");
         return TheBlock;
