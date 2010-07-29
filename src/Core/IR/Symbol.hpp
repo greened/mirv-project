@@ -2,6 +2,7 @@
 #define mirv_Core_IR_Symbol_hpp
 
 #include <mirv/Core/IR/Base.hpp>
+#include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 
