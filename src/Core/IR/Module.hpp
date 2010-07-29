@@ -118,7 +118,7 @@ namespace mirv {
 			     std::tr1::bind(SymbolByName<Type<TypeBase> >(), std::tr1::placeholders::_1, name));
        }
 
-       ptr<Node<Base>>::type getSharedHandle(void) const {
+       ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
        }
 

@@ -111,7 +111,7 @@ namespace mirv {
        return result;
      }
  
-     ptr<Node<Base>>::type getSharedHandle(void) const {
+     ptr<Node<Base>>::type getSharedHandle(void) {
        return fast_cast<Node<Base>>(this->shared_from_this());
      }
 

@@ -2,8 +2,6 @@
 #define mirv_Core_IR_Node_hpp
 
 #include <mirv/Core/IR/Base.hpp>
-#include <mirv/Core/IR/Property.hpp>
-#include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
@@ -26,7 +24,7 @@ namespace mirv {
    public:
      virtual ~Node<Base>(void);
 
-     virtual ptr<Node<Base>>::type getSharedHandle(void) const = 0;
+     virtual ptr<Node<Base>>::type getSharedHandle(void) = 0;
 
      template<typename NodeType>
      typename ptr<NodeType>::type parent(void) const {

@@ -165,8 +165,8 @@ namespace mirv {
 	  return end();
 	}
 
-       ptr<Node<Base>>::type getSharedHandle(void) const {
-         return fast_cast<Node<Base>>(shared_from_this));
+       ptr<Node<Base>>::type getSharedHandle(void) {
+         return fast_cast<Node<Base>>(shared_from_this());
        }
 
 	virtual void accept(mirv::SymbolVisitor &) {

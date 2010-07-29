@@ -17,7 +17,7 @@ namespace mirv {
 		 ConstTypePtr t)
 	   : Symbol<Typed>(t), Symbol<Named>(n){};
 
-       ptr<Node<Base>>::type getSharedHandle(void) const {
+       ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
        };
 
