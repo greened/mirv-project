@@ -97,6 +97,10 @@ namespace mirv {
 	 return StatementBaseType::empty();
        }
 
+       ptr<Node<Base>>::type getSharedHandle(void) const {
+         return fast_cast<Node<Base>>(shared_from_this());
+       }
+
        virtual void accept(mirv::SymbolVisitor &) {
 	 error("Function::Base::accept called");
        }

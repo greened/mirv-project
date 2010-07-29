@@ -17,6 +17,10 @@ namespace mirv {
 		 ConstTypePtr t)
 	   : Symbol<Typed>(t), Symbol<Named>(n){};
 
+       ptr<Node<Base>>::type getSharedHandle(void) const {
+         return fast_cast<Node<Base>>(shared_from_this());
+       };
+
        virtual void accept(mirv::SymbolVisitor &) {
 	 error("Variable::Base::accept called");
        }

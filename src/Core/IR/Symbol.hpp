@@ -43,19 +43,28 @@ namespace mirv {
     template<typename A1>
     static typename ptr<Symbol<Tag> >::type
     make(A1 a1) {
-      return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1));
+      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1));
+      a1->setParent(result);
+      return result;
     }
 
     template<typename A1, typename A2>
     static typename ptr<Symbol<Tag> >::type
     make(A1 a1, A2 a2) {
-      return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1, a2));
+      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2));
+      a1->setParent(result);
+      a2->setParent(result);
+      return result;
     }
 
     template<typename A1, typename A2, typename A3>
     static typename ptr<Symbol<Tag> >::type
     make(A1 a1, A2 a2, A3 a3) {
-      return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>(a1, a2, a3));
+      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2, a3));
+      a1->setParent(result);
+      a2->setParent(result);
+      a3->setParent(result);
+      return result;
     }
 
     virtual void accept(SymbolVisitor &V);

@@ -5,6 +5,7 @@
 #include <mirv/Core/IR/Property.hpp>
 #include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/Memory/Heap.hpp>
+#include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/mpl/vector.hpp>
@@ -19,10 +20,32 @@ namespace mirv {
   /// This is the base class for all IR constructs.
    template<>
    class Node<Base> {
+   private:
+     ptr<Node<Base>>::weak_type theParent;
+
    public:
      virtual ~Node<Base>(void);
-   };
 
+     virtual ptr<Node<Base>>::type getSharedHandle(void) const = 0;
+
+     template<typename NodeType>
+     typename ptr<NodeType>::type parent(void) const {
+       ptr<Node<Base> >::type result(theParent.lock());
+       if (!result) {
+         return result;
+       }
+       typename ptr<NodeType>::type casted = safe_cast<NodeType>(result);
+       if (casted) {
+         return casted;
+       }
+       return result->template parent<NodeType>();
+     }
+
+     void setParent(ptr<Node<Base>>::weak_type parent) {
+       theParent = parent;
+     }
+   };
+   
   /// This is a tag for all IR constructs that have child elements.
   /// It is an abstrat interface that may be inherited virtually
   /// without introducing initialiation issues and contains no state
@@ -148,10 +171,12 @@ namespace mirv {
  
       /// Add a child to the front of the child sequence.
       void push_front(ChildPtr c) {
+        c->setParent(this->getSharedHandle());
          children.push_front(c);
       }
       /// Add a child to the back of the child sequence.
       void push_back(ChildPtr c) {
+        c->setParent(this->getSharedHandle());
          children.push_back(c);
       }
 

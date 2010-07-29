@@ -164,6 +164,11 @@ namespace mirv {
 	const_iterator parameterEnd(void) const {
 	  return end();
 	}
+
+       ptr<Node<Base>>::type getSharedHandle(void) const {
+         return fast_cast<Node<Base>>(shared_from_this));
+       }
+
 	virtual void accept(mirv::SymbolVisitor &) {
 	  error("FunctionType::accept called");
 	}

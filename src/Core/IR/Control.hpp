@@ -23,6 +23,10 @@ namespace mirv {
 	 Interface(A1 a1) : InterfaceBaseType(a1)  {}
 	 template<typename A1, typename A2>
 	 Interface(A1 a1, A2 a2) : InterfaceBaseType(a1, a2)  {}
+
+       ptr<Node<Base>>::type getSharedHandle(void) const {
+         return fast_cast<Node<Base>>(shared_from_this());
+       };
       };
 
    public:
@@ -68,6 +72,10 @@ namespace mirv {
 	  
 	  return(this->front());
 	}
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
       };
 
    public:
@@ -147,6 +155,10 @@ namespace mirv {
                             "Attempt to get missing statement from block");
             return(this->back());
          };
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
       };
 
    public:
@@ -182,6 +194,10 @@ namespace mirv {
          ConstExpressionPtr getCondition(void) const {
             return(this->getExpression());
          };
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
       };
 
    public:
@@ -200,6 +216,10 @@ namespace mirv {
        template<typename S, typename E>
        Interface(E e, S s) : Statement<SingleCondition>(e),
 			     Statement<SingleBlock>(s) {}
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("IfThen::Base::accept called");
@@ -223,6 +243,10 @@ namespace mirv {
        Interface(E e, S1 s1, S2 s2) : Statement<SingleCondition>(e),
 				      Statement<DualBlock>(s1, s2) {}
 
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("IfElse::Base::accept called");
        }
@@ -244,6 +268,10 @@ namespace mirv {
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleCondition>(e),
 			       Statement<SingleBlock>(s1) {}
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("While::Base::accept called");
@@ -267,6 +295,10 @@ namespace mirv {
        Interface(E e, S1 s1) : Statement<SingleCondition>(e),
 			       Statement<SingleBlock>(s1) {}
 
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("DoWhile::Base::accept called");
        }
@@ -288,6 +320,10 @@ namespace mirv {
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleCondition>(e),
 			       Statement<SingleBlock>(s1) {}
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Case::Base::accept called");
@@ -318,6 +354,10 @@ namespace mirv {
            //                  "Attempt to insert non-case statement in case block");
             InterfaceBaseType::push_back(c);
          };
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
       };
 
    public:
@@ -336,6 +376,10 @@ namespace mirv {
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleCondition>(e),
 			       Statement<CaseBlock>(s1) {}
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Switch::Base::accept called");
@@ -377,6 +421,10 @@ namespace mirv {
          ConstExpressionPtr getLabel(void) const {
             return this->getExpression();
          };
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
       };
 
    public:
@@ -398,6 +446,10 @@ namespace mirv {
        template<typename S1, typename E>
        Interface(E e, S1 s1) : Statement<SingleLabel>(e),
 			       Statement<SingleBlock>(s1) {}
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Before::Base::accept called");
@@ -425,6 +477,10 @@ namespace mirv {
        Interface(E e, S1 s1) : Statement<SingleLabel>(e),
 			       Statement<SingleBlock>(s1) {}
 
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
+
        virtual void accept(mirv::StatementVisitor &) {
 	 error("After::Base::accept called");
        }
@@ -438,7 +494,7 @@ namespace mirv {
 
   /// This is an arbitrary goto statement.  It should not appear in
   /// normalized IR but is necessary to handle translation from
-  /// hitgher level languages.  A filter will eliminate gotos and
+  /// higher level languages.  A filter will eliminate gotos and
   /// restructure the IR to be fully structured.
    class Goto {
    private:
@@ -449,6 +505,10 @@ namespace mirv {
        template<typename E>
        Interface(E e) : Statement<SingleLabel>(e),
 			LeafStatement() {}
+
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
 
        virtual void accept(mirv::StatementVisitor &) {
 	 error("Goto::Base::accept called");
@@ -465,6 +525,19 @@ namespace mirv {
    /// a special location determines the return value.  This separates
    /// changes in data state from changes in control state.
    class Return {
+   private:
+     class Interface : public LeafStatement,
+                       public boost::enable_shared_from_this<Statement<Return> > {
+     public:
+        ptr<Node<Base>>::type getSharedHandle(void) const {
+          return fast_cast<Node<Base>>(shared_from_this());
+        }
+
+       virtual void accept(mirv::StatementVisitor &) {
+	 error("Return::Base::accept called");
+       }
+     };
+
    public:
       typedef boost::mpl::vector<> Properties;
      typedef LeafStatement VisitorBaseType;

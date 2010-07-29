@@ -23,6 +23,10 @@ namespace mirv {
      typedef Interface BaseType;
      typedef Symbol<Type<Simple> > VisitorBaseType;
 
+     ptr<Node<Base>>::type getSharedHandle(void) const {
+       return fast_cast<Node<Base>>(shared_from_this());
+     }
+
      static std::string getName(Interface::BitSizeType size) {
        return "int" + boost::lexical_cast<std::string>(size);
      }

@@ -35,6 +35,11 @@ namespace mirv {
       ConstChildPtr getBaseType(void) const {
         return(front());
       }
+
+      ptr<Node<Base>>::type getSharedHandle(void) const {
+        return fast_cast<Node<Base>>(shared_from_this());
+      }
+
       virtual void accept(mirv::SymbolVisitor &) {
         error("Pointer::accept called");
       }

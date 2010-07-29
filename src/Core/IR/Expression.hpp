@@ -97,16 +97,25 @@ namespace mirv {
      template<typename A1>
      static typename ptr<Expression<Op> >::type
      make(A1 a1) {
-       return typename ptr<Expression<Op> >::type(new Expression<Op>(a1));
+       typename ptr<Expression<Op> >::type result(new Expression<Op>(a1));
+       a1->setParent(result);
+       return result;
      }
 
      template<typename A1, typename A2>
      static typename ptr<Expression<Op> >::type
      make(A1 a1, A2 a2) {
-       return typename ptr<Expression<Op> >::type(new Expression<Op>(a1, a2));
+       typename ptr<Expression<Op> >::type result(new Expression<Op>(a1, a2));
+       a1->setParent(result);
+       a2->setParent(result);
+       return result;
+     }
+ 
+     ptr<Node<Base>>::type getSharedHandle(void) const {
+       return fast_cast<Node<Base>>(this->shared_from_this());
      }
 
-     virtual void accept(ExpressionVisitor &V);
+    virtual void accept(ExpressionVisitor &V);
    };
 
   /// A specialization for base expressions.  No property information
