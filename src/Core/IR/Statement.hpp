@@ -99,6 +99,7 @@ namespace mirv {
      static typename ptr<Statement<Tag> >::type
      make(A1 a1) {
        typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1));
+       a1->setParent(p);
        return p;
      }
 
@@ -106,6 +107,8 @@ namespace mirv {
      static typename ptr<Statement<Tag> >::type
      make(A1 a1, A2 a2) {
        typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2));
+       a1->setParent(p);
+       a2->setParent(p);
        return p;
      }
 
@@ -113,6 +116,9 @@ namespace mirv {
      static typename ptr<Statement<Tag> >::type
      make(A1 a1, A2 a2, A3 a3) {
        typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2, a3));
+       a1->setParent(p);
+       a2->setParent(p);
+       a3->setParent(p);
 	return p;
      }
 

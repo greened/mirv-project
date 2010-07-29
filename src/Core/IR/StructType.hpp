@@ -82,6 +82,10 @@ namespace mirv {
     typedef Interface BaseType;
     typedef Symbol<Type<Derived> > VisitorBaseType;
 
+    ptr<Node<Base>>::type getSharedHandle(void) const {
+      return fast_cast<Node<Base>>(shared_from_this());
+    }
+
     static std::string getName(std::string &name) {
       return name;
     }
