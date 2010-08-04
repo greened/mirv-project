@@ -45,7 +45,6 @@ namespace mirv {
     static typename ptr<Symbol<Tag> >::type
     make(A1 a1) {
       typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1));
-      a1->setParent(result);
       return result;
     }
 
@@ -53,8 +52,6 @@ namespace mirv {
     static typename ptr<Symbol<Tag> >::type
     make(A1 a1, A2 a2) {
       typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2));
-      a1->setParent(result);
-      a2->setParent(result);
       return result;
     }
 
@@ -62,9 +59,6 @@ namespace mirv {
     static typename ptr<Symbol<Tag> >::type
     make(A1 a1, A2 a2, A3 a3) {
       typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2, a3));
-      a1->setParent(result);
-      a2->setParent(result);
-      a3->setParent(result);
       return result;
     }
 

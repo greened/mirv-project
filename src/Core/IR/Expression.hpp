@@ -111,10 +111,6 @@ namespace mirv {
        return result;
      }
  
-     ptr<Node<Base>>::type getSharedHandle(void) {
-       return fast_cast<Node<Base>>(this->shared_from_this());
-     }
-
     virtual void accept(ExpressionVisitor &V);
    };
 
@@ -414,10 +410,30 @@ namespace mirv {
     /// The metafunction result.
     typedef typename Properties<PropertyExpressionGenerator, Root, Sequence,
       VisitedInherit2<ExpressionVisitor> >::type HierarchyType;
-  public:
+
     typedef typename VisitedInherit2<ExpressionVisitor>::template apply<
     HierarchyType,
-    boost::enable_shared_from_this<Expression<Tag> > >::type type;
+    boost::enable_shared_from_this<Expression<Tag> > >::type BaseType;
+
+  public:
+    class ExpressionInterface : public BaseType {
+    public:
+      ExpressionInterface(void) {}
+
+      template<typename A1>
+      ExpressionInterface(A1 a1) : BaseType(a1) {}
+
+      template<typename A1, typename A2>
+      ExpressionInterface(A1 a1, A2 a2) : BaseType(a1, a2) {}
+
+      template<typename A1, typename A2, typename A3>
+      ExpressionInterface(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
+
+      ptr<Node<Base>>::type getSharedHandle(void) {
+        return fast_cast<Node<Base>>(this->shared_from_this());
+      }
+    };
+    typedef ExpressionInterface type;
   };
 }
 
