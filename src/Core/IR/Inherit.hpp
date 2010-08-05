@@ -181,10 +181,10 @@ namespace mirv {
       template<typename A1, typename A2, typename A3>
       VisitedType2(A1 a1, A2 a2, A3 a3) : T1(a1, a2, a3) {}
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
-        error("Inherit::getSharedHandle called");
-        return ptr<Node<Base>>::type();
-      }
+      // ptr<Node<Base>>::type getSharedHandle(void) {
+      //   error("Inherit::getSharedHandle called");
+      //   return ptr<Node<Base>>::type();
+      // }
 
       void accept(Visitor &V) {
 	error("Inherit::accept called");

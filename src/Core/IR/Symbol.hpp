@@ -101,11 +101,56 @@ namespace mirv {
     }
   };
 
+   namespace detail {
+     /// A traits class to define various properties of inner
+     /// expressions such as child type, iterator types and other
+     /// things.
+     class InnerSymbolTraits {
+     public:
+       typedef Symbol<Base> Child;
+       typedef Symbol<Base> BaseType;
+
+     private:
+       typedef ptr<Child>::type ChildPtr;
+       typedef std::list<ChildPtr> ChildList;
+
+     public:
+       /// Make this compatible with certain standard algorithms.
+       typedef ChildPtr value_type;
+       typedef const ChildPtr & const_reference;
+
+       typedef ChildList::iterator iterator;
+       typedef ChildList::reverse_iterator reverse_iterator;
+       typedef ChildList::const_iterator const_iterator;
+       typedef ChildList::const_reverse_iterator const_reverse_iterator;
+
+       typedef ChildList::size_type size_type;
+     };
+   }
+
+  /// This is an inner symbol abstract interface.  It exists because
+  /// we need to be able to inherit virtually from inner expressions
+  /// (to override push_front and push_back so they do not set parent
+  /// points) but we do not want to force subclasses to explicitly
+  /// initialize the inner expression object.  Separating the
+  /// interface from the implementation solves that problem.
+    template<>
+    class Symbol<Inner<detail::InnerSymbolTraits> > : public Inner<detail::InnerSymbolTraits>::BaseType {
+    public:
+      typedef Symbol<Base> VisitorBaseType;
+      virtual void accept(SymbolVisitor &V);
+      virtual void accept(ConstSymbolVisitor &V) const;
+   };
+
+  class InnerSymbolBase : public Symbol<Inner<detail::InnerSymbolTraits> > {};
+
   /// This is the implementation of inner symbols.  It is
   /// inherited from once in the hierarchy for any inner symbols.
   /// This holds the child pointers and other data necessary for inner
   /// symbols.
-  class InnerSymbol : public InnerImpl<Symbol<Base>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
+  // TODO: Fix TrackParent use.
+  class InnerSymbol : public InnerImpl<Symbol<Base>,
+    VisitedInherit1<SymbolVisitor>::apply<Virtual<InnerSymbolBase> >::type> {
   public:
     typedef Symbol<Base> VisitorBaseType;
     virtual void accept(SymbolVisitor &V);

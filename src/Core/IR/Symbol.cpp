@@ -24,6 +24,16 @@ namespace mirv {
     error("Symbol<Base>::accept called");
   }
 
+  void Symbol<Inner<detail::InnerSymbolTraits> >::accept(SymbolVisitor &V)
+  {
+    error("Symbol<Inner>::accept called");
+  }
+
+  void Symbol<Inner<detail::InnerSymbolTraits> >::accept(ConstSymbolVisitor &V) const
+  {
+    error("Symbol<Inner>::accept called");
+  }
+
   void InnerSymbol::accept(SymbolVisitor &V)
   {
     error("InnerSymbol::accept called");

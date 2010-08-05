@@ -117,11 +117,14 @@ namespace mirv {
   /// pointers and other data necessary for inner types.
   class InnerType : public InnerImpl<
     Symbol<Type<TypeBase> >,
-    VisitedInherit1<SymbolVisitor>::apply<InnerTypeBase>::type> {
+    VisitedInherit1<SymbolVisitor>::apply<InnerTypeBase>::type,
+    // TODO: Avoid TrackParent use.
+    false> {
   private:
     typedef InnerImpl<
     Symbol<Type<TypeBase> >,
-    VisitedInherit1<SymbolVisitor>::apply<InnerTypeBase>::type> BaseType;
+    VisitedInherit1<SymbolVisitor>::apply<InnerTypeBase>::type,
+    false> BaseType;
 
   public:
     InnerType(const std::string &name) : BaseType(name) {}

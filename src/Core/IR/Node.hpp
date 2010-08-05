@@ -45,7 +45,7 @@ namespace mirv {
    };
    
   /// This is a tag for all IR constructs that have child elements.
-  /// It is an abstrat interface that may be inherited virtually
+  /// It is an abstract interface that may be inherited virtually
   /// without introducing initialiation issues and contains no state
   /// so that virtual inheritance can be relatively cheap.
   template<typename Traits>
@@ -70,6 +70,9 @@ namespace mirv {
      typedef typename Traits::const_reverse_iterator const_reverse_iterator;
 
       typedef typename Traits::size_type size_type;
+
+      // TODO: These need not be virtual.  Reference implementations
+      // from an implementation template type.
 
       /// Get the start of the child sequence.
       virtual iterator begin(void) = 0;
@@ -120,7 +123,8 @@ namespace mirv {
   /// contains the sequence state and should never be inherited
   /// virtually.  A class hierarchy instance should inherit this once
   /// throughout the instance.  It may inherit from Inner<> multiply.
-    template<typename Child, typename BaseType>
+     // TODO: TrackParent is a big hack.  Fix with the above TODO.
+     template<typename Child, typename BaseType, bool TrackParent = true>
     class InnerImpl : public BaseType {
     public:
       typedef typename boost::shared_ptr<Child> ChildPtr;
@@ -169,13 +173,17 @@ namespace mirv {
  
       /// Add a child to the front of the child sequence.
       void push_front(ChildPtr c) {
-        c->setParent(this->getSharedHandle());
-         children.push_front(c);
+        if (TrackParent) {
+          c->setParent(this->getSharedHandle());
+        }
+        children.push_front(c);
       }
       /// Add a child to the back of the child sequence.
       void push_back(ChildPtr c) {
-        c->setParent(this->getSharedHandle());
-         children.push_back(c);
+        if (TrackParent) {
+          c->setParent(this->getSharedHandle());
+        }
+        children.push_back(c);
       }
 
       /// Get the front of the child sequence.
