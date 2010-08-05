@@ -97,6 +97,11 @@ namespace mirv {
                                    getElementType()->bitsize(),
                                    std::multiplies<size_type>()));
 	 }
+
+       ptr<Node<Base>>::type getSharedHandle(void) {
+         return fast_cast<Node<Base>>(shared_from_this());
+       }
+
 	virtual void accept(mirv::SymbolVisitor &) {
 	  error("Array::accept called");
 	}
