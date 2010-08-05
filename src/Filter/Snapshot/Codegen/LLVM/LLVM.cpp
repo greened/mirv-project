@@ -178,10 +178,11 @@ namespace mirv {
   {
     InheritedAttribute inh(attributeManager.getInheritedAttribute());
 
+    llvm::BasicBlock *prevBlock = inh.hasBlock() ? inh.getBlock() : 0;
+
     llvm::BasicBlock *thisBlock = inh.createBlock("B");
 
-    if (ptr<Statement<Block> >::type parentBlock = stmt->getParentBlock()) {
-      llvm::BasicBlock *prevBlock = inh.getBlock(parentBlock);
+    if (prevBlock) {
       inh.builder()->SetInsertPoint(prevBlock);
       inh.builder()->CreateBr(thisBlock);
       inh.builder()->SetInsertPoint(thisBlock);
