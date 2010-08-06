@@ -183,6 +183,8 @@ namespace mirv {
     llvm::BasicBlock *thisBlock = inh.createBlock("B");
 
     if (prevBlock) {
+      llvm::TerminatorInst *terminator = prevBlock->getTerminator();
+      checkInvariant(!terminator, "Unexpected terminator");
       inh.builder()->SetInsertPoint(prevBlock);
       inh.builder()->CreateBr(thisBlock);
       inh.builder()->SetInsertPoint(thisBlock);
@@ -278,12 +280,33 @@ namespace mirv {
     llvm::BasicBlock *after = syn.createBlock("at");
 
     // Create the terminator for the if block.
-    syn.builder()->SetInsertPoint(cond->getParent());
-    syn.builder()->CreateCondBr(cond, thn, after);
+    llvm::TerminatorInst *terminator = cond->getParent()->getTerminator();
+    if (!terminator) {
+      // If this is an unconditional branch pointing to the then
+      // block, make it point to the after block.
+      if (llvm::BranchInst *branch = 
+          llvm::dyn_cast<llvm::BranchInst>(terminator)) {
+        if (branch->isUnconditional() && branch->getSuccessor(0) == thn) {
+          branch->setSuccessor(0, after);
+        }
+      }
+    } else {
+      syn.builder()->SetInsertPoint(cond->getParent());
+      syn.builder()->CreateCondBr(cond, thn, after);
+    }
 
-    // Create the terminator for the then block.
-    syn.builder()->SetInsertPoint(thn);
-    syn.builder()->CreateBr(after);
+    // Create the terminator for the then block.  If there already is
+    // a terminator it must be the result of a return, goto or other
+    // branching behavior we don't want to disturb.
+
+    // FIXME: What if the user inserted a goto to the then block?  We
+    // don't want to assume structured control flow here because we
+    // want to do debug dumps.
+    terminator = thn->getTerminator();
+    if (!terminator) {
+      syn.builder()->SetInsertPoint(thn);
+      syn.builder()->CreateBr(after);
+    }
 
     syn.builder()->SetInsertPoint(after);
 
@@ -308,17 +331,60 @@ namespace mirv {
     llvm::BasicBlock *after = syn.createBlock("ae");
 
     // Create the terminator for the if block.
-    syn.builder()->SetInsertPoint(cond->getParent());
-    syn.builder()->CreateCondBr(cond, thn, els);
+    llvm::TerminatorInst *terminator = cond->getParent()->getTerminator();
+    if (terminator) {
+      // If this is an unconditional branch pointing to the then
+      // block, make it a conditional branch pointing to the then and
+      // else blocks.
+
+      // FIXME: What if the user inserted a goto to the then block?  We
+      // don't want to assume structured control flow here because we
+      // want to do debug dumps.
+      if (llvm::BranchInst *branch = 
+          llvm::dyn_cast<llvm::BranchInst>(terminator)) {
+        if (branch->isUnconditional() && branch->getSuccessor(0) == thn) {
+          // We can't make an unconditional branch into a conditional
+          // one so just remove it.
+          terminator->removeFromParent();
+          terminator = 0;
+        }
+      }
+    }
+    if (!terminator) {
+      syn.builder()->SetInsertPoint(cond->getParent());
+      syn.builder()->CreateCondBr(cond, thn, els);
+    }
 
     // Create the terminator for the then block.
-    syn.builder()->SetInsertPoint(thn);
-    syn.builder()->CreateBr(after);
+    terminator = thn->getTerminator();
+    if (terminator) {
+      // If this is an unconditional branch pointing to the else
+      // block, make it point to the after block.
 
-    // Create the terminator for the else block.
-    syn.builder()->SetInsertPoint(els);
-    syn.builder()->CreateBr(after);
+      // FIXME: What if the user inserted a goto to the else block?  We
+      // don't want to assume structured control flow here because we
+      // want to do debug dumps.
+      if (llvm::BranchInst *branch = 
+          llvm::dyn_cast<llvm::BranchInst>(terminator)) {
+        if (branch->isUnconditional() && branch->getSuccessor(0) == els) {
+          branch->setSuccessor(0, after);
+        }
+      }
+    }
+    else {
+      syn.builder()->SetInsertPoint(thn);
+      syn.builder()->CreateBr(after);
+    }
 
+    // Create the terminator for the else block.  If there already is
+    // a terminator it must be the result of a return, goto or other
+    // branching behavior we don't want to disturb.
+    terminator = els->getTerminator();
+    if (!terminator) {
+      syn.builder()->SetInsertPoint(els);
+      syn.builder()->CreateBr(after);
+    }
+    
     syn.builder()->SetInsertPoint(after);
 
     attributeManager.setSynthesizedAttribute(syn);
@@ -347,9 +413,14 @@ namespace mirv {
     // Start a new block after the cond/body block.
     llvm::BasicBlock *after = syn.createBlock("adw");
 
-    // Create the terminator for the cond/body block.
-    syn.builder()->SetInsertPoint(bodyend);
-    syn.builder()->CreateCondBr(cond, bodybegin, after);
+    // Create the terminator for the cond/body block.  If there
+    // already is a terminator it must be the result of a return, goto
+    // or other branching behavior we don't want to disturb.
+    llvm::TerminatorInst *terminator = bodyend->getTerminator();
+    if (!terminator) {
+      syn.builder()->SetInsertPoint(bodyend);
+      syn.builder()->CreateCondBr(cond, bodybegin, after);
+    }
 
     syn.builder()->SetInsertPoint(after);
 
