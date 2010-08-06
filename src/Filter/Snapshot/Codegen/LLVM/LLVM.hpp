@@ -240,11 +240,7 @@ namespace mirv {
       LeaveSymbolVisitor(FlowAttributeManagerType &am)
 	  : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Function> >::type sym) {
-        SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(0));
-        syn.clearFunctionMap();
-        attributeManager.setSynthesizedAttribute(syn);
-      }
+      void visit(ptr<Symbol<Function> >::type sym);
       // We put this here so it can set a synthesized attribute.
       void visit(ptr<Symbol<Variable> >::type sym);
     };

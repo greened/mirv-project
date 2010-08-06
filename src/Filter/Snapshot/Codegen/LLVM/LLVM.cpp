@@ -166,6 +166,21 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::
+  LeaveSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
+  {
+    SynthesizedAttribute syn(attributeManager.getLastSynthesizedAttribute());
+    // Add a return if necessary.
+    llvm::BasicBlock *body = syn.getBlock();
+    if (!body->getTerminator()) {
+      syn.builder()->SetInsertPoint(body);
+      syn.builder()->CreateRetVoid();
+    }
+
+    syn.clearFunctionMap();
+    attributeManager.setSynthesizedAttribute(syn);
+  }
+
+  void LLVMCodegenFilter::
   LeaveSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
