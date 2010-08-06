@@ -77,7 +77,30 @@ namespace mirv {
   public:
     typedef boost::mpl::vector<> Properties;
     typedef InnerExpression VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, InnerExpression,
+
+    class Interface : public InnerExpression {
+    public:
+      // Require a function reference to construct.
+      Interface(ChildPtr Var) : InnerExpression(Var) {}
+
+      // By convention, the first child is the expression referencing
+      // the function.
+      ChildPtr function(void) {
+        checkInvariant(!empty(), "No function for call");
+        return front();
+      }
+
+      iterator argumentBegin(void) {
+        checkInvariant(!empty(), "No function for call");
+        iterator start = begin();
+        std::advance(start, 1);
+        return start;
+      }
+      iterator argumentEnd(void) {
+        return end();
+      }
+    };
+    typedef ExpressionBaseGenerator<Properties, Interface,
       Call>::type BaseType;
    };
 }
