@@ -24,7 +24,7 @@ namespace mirv {
      /// Define a terminal type for module symbols.
      typedef Wrapper<boost::proto::terminal<keyword::module>::type> ModuleTerminal;
      /// Define a terminal type for function symbols.
-     typedef Wrapper<boost::proto::terminal<keyword::function>::type> FunctionTerminal;
+     typedef Wrapper<boost::proto::terminal<keyword::func>::type> FuncTerminal;
    }
 }
 

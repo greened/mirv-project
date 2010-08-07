@@ -88,7 +88,7 @@ namespace mirv {
       /// A function "operator."  This is a protoized object that
       /// implements the subscript operator to kick off function
       /// symbol generation.
-      const FunctionTerminal function = {{}};
+      const FuncTerminal func = {{}};
     }    
   }
 }
