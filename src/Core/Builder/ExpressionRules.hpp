@@ -14,7 +14,7 @@ namespace mirv {
    namespace Builder {
      /// Define a convenient way to talk about variable reference
      /// expressions.
-     typedef Wrapper<boost::proto::terminal<std::string>::type > VariableTermina
+     typedef Wrapper<boost::proto::terminal<std::string>::type > VariableTerminal;
 
      /// Define a convenient way to talk about function reference
      /// expressions.
