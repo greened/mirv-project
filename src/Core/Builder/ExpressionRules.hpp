@@ -6,6 +6,7 @@
 #include <mirv/Core/Builder/GrammarFwd.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Function.hpp>
 
 #include <boost/proto/proto.hpp>
 
@@ -13,7 +14,11 @@ namespace mirv {
    namespace Builder {
      /// Define a convenient way to talk about variable reference
      /// expressions.
-     typedef Wrapper<boost::proto::terminal<std::string>::type > VariableTerminal;
+     typedef Wrapper<boost::proto::terminal<std::string>::type > VariableTermina
+
+     /// Define a convenient way to talk about function reference
+     /// expressions.
+     typedef Wrapper<boost::proto::terminal<std::string>::type > FunctionTerminal;
 
      // Unary expressions
 
