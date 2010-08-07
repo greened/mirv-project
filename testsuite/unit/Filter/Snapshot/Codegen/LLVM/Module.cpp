@@ -41,7 +41,7 @@ using mirv::make;
 namespace Builder = mirv::Builder;
 
 using Builder::var;
-using Builder::function;
+using Builder::func;
 using Builder::module;
 using Builder::void_;
 using Builder::int_;
@@ -61,7 +61,7 @@ int main(void)
 	var[a].type[int_(32)],
 	var[b].type[int_(32)],
 
-        function["testfunc"].type[void_()] [
+        func["testfunc"].type[void_()] [
           var[c].type[int_(32)],
           var[d].type[int_(32)],
 

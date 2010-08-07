@@ -49,7 +49,7 @@ namespace mirv {
        boost::proto::subscript<
 	 boost::proto::member<
 	   boost::proto::subscript<
-	     FunctionTerminal,
+	     FuncTerminal,
 	     StringTerminal
 	     >,
 	   TypeTerminal

@@ -42,7 +42,7 @@ using mirv::make;
 namespace Builder = mirv::Builder;
 
 using Builder::var;
-using Builder::function;
+using Builder::func;
 using Builder::module;
 using Builder::void_;
 using Builder::int_;
@@ -52,7 +52,7 @@ int main(void)
   ptr<Node<Base> >::type code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
-        function["testfunc"].type[void_()] [
+        func["testfunc"].type[void_()] [
   	  var["a"].type[int_(32)]
         ]
       ]

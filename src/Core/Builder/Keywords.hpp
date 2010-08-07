@@ -13,9 +13,9 @@ namespace mirv {
       };
       /// This is a proto tag to build a terminal symbol to kick off
       /// function construction.
-      struct function {
-        friend std::ostream& operator<<(std::ostream& sout, function) {
-          return sout << "function";
+      struct func {
+        friend std::ostream& operator<<(std::ostream& sout, func) {
+          return sout << "func";
         }
       };
       /// This is a proto tag to build a terminal symbol to kick off
