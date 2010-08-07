@@ -43,11 +43,22 @@ namespace mirv {
         >(LookupSymbol<Symbol<Variable> >(boost::proto::_data,
                                           boost::proto::_value))
       > {};
+
+    struct FunctionRefBuilder : boost::proto::when<
+      FunctionTerminal,
+      ConstructUnary<
+        Expression<Reference<Function> >
+        >(LookupSymbol<Symbol<Function> >(boost::proto::_data,
+                                          boost::proto::_value))
+      > {};
     
     /// This is the grammar for all terminal expressions.
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::terminal>
-        : boost::proto::or_<VariableRefBuilder> {};
+        : boost::proto::or_<
+      VariableRefBuilder,
+      FunctionRefBuilder
+      > {};
 
     /// This is the grammar for negate expressions.
     struct NegateBuilder : detail::UnaryBuilder<NegateRule, Negate> {};
