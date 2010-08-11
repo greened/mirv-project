@@ -3,6 +3,8 @@
 
 namespace mirv {
   namespace Builder {
+    /// This is the grammar for function declarations.
+    struct FunctionDeclBuilder;
     /// This is the grammar for function symbols.
     struct FunctionBuilder;
   }

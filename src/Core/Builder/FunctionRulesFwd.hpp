@@ -3,6 +3,7 @@
 
 namespace mirv {
    namespace Builder {
+     struct FunctionDeclRule;
      struct FunctionRule;
    }
 }
