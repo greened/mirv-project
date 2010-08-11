@@ -34,6 +34,16 @@ namespace mirv {
           >(ConstructExpressionGrammar(boost::proto::_left),
             ConstructExpressionGrammar(boost::proto::_right))
         > {};
+
+      template<typename Rule, typename Tag>
+      struct NaryBuilder :  boost::proto::when<
+        Rule,
+        ConstructNary<
+          Expression<Tag>
+          >(boost::proto::_data,
+            boost::proto::_left,
+            boost::proto::_expr)
+        > {};
     }
 
     struct VariableRefBuilder : boost::proto::when<
@@ -253,6 +263,14 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::subscript>
         : SubscriptBuilder {};
+
+    /// This is the grammar for function call expressions.
+    struct CallBuilder 
+        : detail::NaryBuilder<CallRule, ArrayRef> {};
+
+    template<>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::function>
+        : CallBuilder {};
 
   //         ConstructNary<CallRule, Call>
 

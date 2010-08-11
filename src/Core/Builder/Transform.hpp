@@ -322,8 +322,7 @@ namespace mirv {
 #if 0
       // Transform for an n-ary expression
       template<typename NodeType, typename Dummy = boost::proto::callable>
-      struct ConstructNary
-            : boost::proto::callable {
+      struct ConstructNary : boost::proto::callable {
          template<typename Sig>
          struct result;
 
