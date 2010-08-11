@@ -61,6 +61,24 @@ namespace mirv {
 	 >
        > {};
 
+    /// This is the grammar for function declarations.
+    struct FunctionDeclBuilder : boost::proto::when<
+      FunctionDeclRule,
+      GetFunction(
+        boost::proto::_data,
+        SetFunction(
+          boost::proto::_data,
+          BinaryConstructSymbol<Symbol<Function> >(
+            boost::proto::_data,
+            // Function name
+            boost::proto::_value(
+              boost::proto::_right(
+                boost::proto::_left(boost::proto::_left))),
+            // Function type
+            FunctionTypeAccessBuilder(
+              boost::proto::_right))))
+      > {};
+
     /// This is the grammar for function symbols.
     struct FunctionBuilder : boost::proto::when<
       FunctionRule,

@@ -15,6 +15,7 @@ namespace mirv {
     struct ConstructSymbolGrammar : boost::proto::or_<
       ModuleBuilder,
       FunctionBuilder,
+      FunctionDeclBuilder,
       VariableBuilder,
       TypeBuilder
       > {};

@@ -43,9 +43,22 @@ namespace mirv {
 	 >
        > {};
 
+     /// This is the rule to match function declarations.  It
+     /// matches function["name"].type["name"|type].
+     struct FunctionDeclRule : boost::proto::subscript<
+       boost::proto::member<
+         boost::proto::subscript<
+           FunctionTerminal,
+           StringTerminal
+           >,
+         TypeTerminal
+         >,
+           FunctionTypeAccessRule
+           > {};
+
      /// This is the rule to match function symbols.  It matches
      /// function["name"].type["name"|type][body].
-  struct FunctionRule : boost::proto::subscript<
+     struct FunctionRule : boost::proto::subscript<
        boost::proto::subscript<
 	 boost::proto::member<
 	   boost::proto::subscript<
