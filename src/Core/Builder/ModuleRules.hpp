@@ -21,6 +21,7 @@ namespace mirv {
   /// Define a rule to match a function, variable or type.
      struct FunctionVariableType : boost::proto::or_<
     FunctionRule,
+    FunctionDeclRule,
     VariableRule,
     TypeRule
        > {};

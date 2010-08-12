@@ -28,7 +28,8 @@ namespace mirv {
     struct VariableTypeOrFunctionBuilder : boost::proto::or_<
       VariableBuilder,
       TypeBuilder,
-      FunctionBuilder
+      FunctionBuilder,
+      FunctionDeclBuilder
       > {};
 
     /// This is the grammar for module bodies.  It can contain
