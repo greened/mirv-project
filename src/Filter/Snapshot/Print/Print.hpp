@@ -418,23 +418,7 @@ namespace mirv {
 
       /// We only want to visit functions here since we already
       /// declared module-level types and variables.
-      void visit(ptr<Symbol<Module> >::type sym) {
-        this->doEnter(sym);
-        // Visit functions
-        for(Symbol<Module>::FunctionIterator f = sym->functionBegin(),
-              fend = sym->functionEnd();
-            f != fend;
-            /* NULL */) {
-          this->doBefore(sym, *f);
-          (*f)->accept(*this);
-          this->doAfter(sym, *f);
-          Symbol<Module>::FunctionIterator prev = f;
-          if (++f != fend) {
-            this->doBetween(sym, *prev, *f);
-          }
-        }
-        this->doLeave(sym);
-      }
+      void visit(ptr<Symbol<Module> >::type sym);
     };
 
   public:
