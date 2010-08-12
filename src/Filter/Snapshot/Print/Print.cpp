@@ -99,12 +99,14 @@ namespace mirv {
 
   void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
   {
-    Stream &out = attributeManager.getInheritedAttribute().out();
-    Indent ind = attributeManager.getInheritedAttribute().indent();
+    if (!sym->statementEmpty()) {
+      Stream &out = attributeManager.getInheritedAttribute().out();
+      Indent ind = attributeManager.getInheritedAttribute().indent();
 
-    out << indent(ind) << "fdef " << sym->name() << " {\n";
-    attributeManager.setInheritedAttribute(
-      InheritedAttribute(ind + IndentFactor, out));
+      out << indent(ind) << "fdef " << sym->name() << " {\n";
+      attributeManager.setInheritedAttribute(
+        InheritedAttribute(ind + IndentFactor, out));
+    }
   }
 
   void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
@@ -119,7 +121,7 @@ namespace mirv {
   void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
-        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
+           || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
@@ -134,15 +136,17 @@ namespace mirv {
   }
 
   void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Function> >::type sym) {
-    Stream &out = attributeManager.getInheritedAttribute().out();
-    Indent ind = attributeManager.getInheritedAttribute().indent();
+    if (!sym->statementEmpty()) {
+      Stream &out = attributeManager.getInheritedAttribute().out();
+      Indent ind = attributeManager.getInheritedAttribute().indent();
 
-    if (   !attributeManager.setLastSynthesizedAttribute()
-        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-      out << "\n";
+      if (   !attributeManager.setLastSynthesizedAttribute()
+          || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
+        out << "\n";
+      }
+      out << indent(ind) << "}\n";
+      attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
-    out << indent(ind) << "}\n";
-    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
   void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
@@ -498,6 +502,30 @@ namespace mirv {
       attributeManager.getInheritedAttribute().out() << "\n";
     }
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
+
+  void PrintFilter::PrintDefSymbolFlow::visit(ptr<Symbol<Module>>::type sym) {
+    // We only want to visit functions here since we already
+    // declared module-level types and variables.
+    this->doEnter(sym);
+    // Visit functions
+    for(Symbol<Module>::FunctionIterator f = sym->functionBegin(),
+          fend = sym->functionEnd();
+        f != fend;
+        /* NULL */) {
+      if (!(*f)->statementEmpty()) {
+        this->doBefore(sym, *f);
+        (*f)->accept(*this);
+        this->doAfter(sym, *f);
+      }
+      Symbol<Module>::FunctionIterator prev = f;
+      if (++f != fend) {
+        if (!(*prev)->statementEmpty() && !(*f)->statementEmpty()) {
+          this->doBetween(sym, *prev, *f);
+        }
+      }
+    }
+    this->doLeave(sym);
   }
 
   void PrintFilter::operator()(ptr<Node<Base> >::type node)

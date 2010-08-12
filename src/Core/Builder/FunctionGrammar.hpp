@@ -18,10 +18,6 @@ namespace mirv {
       template<typename T>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab, T) {
 	result_type function = symtab->getFunction();
-	if (function->statementEmpty()) {
-	  function->statementPushBack(make<Statement<Block> >());
-	}
-	checkInvariant(function->getStatement(), "No function statement");
 	return function;
       }
     };
@@ -38,6 +34,21 @@ namespace mirv {
       }
     };
 
+    /// This is a callable transform to add a block statement to a
+    /// function.
+    struct AddFunctionBodyForVariable : boost::proto::callable {
+      typedef ptr<Symbol<Function> >::type result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             boost::shared_ptr<Symbol<Variable>>) {
+	result_type function = symtab->getFunction();
+        if (function->statementEmpty()) {
+          function->statementPushBack(make<Statement<Block>>());
+        }
+	return function;
+      }
+    };
+
     struct FunctionStatementBuilder : boost::proto::when<
       ConstructStatementGrammar,
       AddFunctionStatement(boost::proto::_data,
@@ -45,7 +56,11 @@ namespace mirv {
       > {};
 
     struct VariableOrStatementBuilder : boost::proto::or_<
-      VariableBuilder,
+      boost::proto::when<
+        VariableRule,
+        AddFunctionBodyForVariable(boost::proto::_data,
+                                   VariableBuilder)
+        >,
       FunctionStatementBuilder
       > {};
 
@@ -60,6 +75,24 @@ namespace mirv {
 	 VariableOrStatementBuilder
 	 >
        > {};
+
+    /// This is the grammar for function declarations.
+    struct FunctionDeclBuilder : boost::proto::when<
+      FunctionDeclRule,
+      GetFunction(
+        boost::proto::_data,
+        SetFunction(
+          boost::proto::_data,
+          BinaryConstructSymbol<Symbol<Function> >(
+            boost::proto::_data,
+            // Function name
+            boost::proto::_value(
+              boost::proto::_right(
+                boost::proto::_left(boost::proto::_left))),
+            // Function type
+            FunctionTypeAccessBuilder(
+              boost::proto::_right))))
+      > {};
 
     /// This is the grammar for function symbols.
     struct FunctionBuilder : boost::proto::when<
