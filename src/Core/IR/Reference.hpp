@@ -3,6 +3,14 @@
 
 #include <mirv/Core/IR/Symbol.hpp>
 
+#include <boost/bind.hpp>
+
+#include <boost/fusion/iterator.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <boost/fusion/include/front.hpp>
+#include <boost/fusion/include/pop_front.hpp>
+#include <boost/fusion/include/size.hpp>
+
 namespace mirv {
   /// Specify the interface for nodes that reference symbols.
    template<typename SymbolType>
@@ -71,38 +79,6 @@ namespace mirv {
     typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
       ArrayRef>::type BaseType;
   };
-
-  /// Specify the interface for function call expressions.
-  class Call {
-  public:
-    typedef boost::mpl::vector<> Properties;
-    typedef InnerExpression VisitorBaseType;
-
-    class Interface : public InnerExpression {
-    public:
-      // Require a function reference to construct.
-      Interface(ChildPtr Var) : InnerExpression(Var) {}
-
-      // By convention, the first child is the expression referencing
-      // the function.
-      ChildPtr function(void) {
-        checkInvariant(!empty(), "No function for call");
-        return front();
-      }
-
-      iterator argumentBegin(void) {
-        checkInvariant(!empty(), "No function for call");
-        iterator start = begin();
-        std::advance(start, 1);
-        return start;
-      }
-      iterator argumentEnd(void) {
-        return end();
-      }
-    };
-    typedef ExpressionBaseGenerator<Properties, Interface,
-      Call>::type BaseType;
-   };
 }
 
 #endif

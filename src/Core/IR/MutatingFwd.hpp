@@ -4,6 +4,7 @@
 namespace mirv {
   class DualExpression;
   class Assignment;
+  class Call;
 }
 
 #endif

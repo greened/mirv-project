@@ -9,6 +9,8 @@
 #include <mirv/Core/IR/Function.hpp>
 
 #include <boost/proto/proto.hpp>
+#include <boost/fusion/iterator.hpp>
+#include <boost/fusion/include/transform.hpp>
 
 #include <iterator>
 #include <algorithm>
@@ -27,7 +29,7 @@ namespace mirv {
 
     public:
       SymbolTable(ModulePointer m, FunctionPointer f)
-	: module(m), function(f) {}
+          : module(m), function(f) {}
 
       static ptr<SymbolTable>::type make(ModulePointer m) {
         ptr<SymbolTable>::type result(new SymbolTable(m, FunctionPointer()));
@@ -198,7 +200,7 @@ namespace mirv {
 
     /// This is a callable transform to lookup a symbol.
     template<typename SymbolType,
-	     typename Dummy = boost::proto::callable>
+      typename Dummy = boost::proto::callable>
     struct LookupSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
@@ -216,7 +218,7 @@ namespace mirv {
     /// This is a callable transform to lookup a symbol and add it to
     /// the current scope if it does not exist.
     template<typename SymbolType,
-	     typename Dummy = boost::proto::callable>
+      typename Dummy = boost::proto::callable>
     struct LookupAndAddSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
@@ -239,7 +241,7 @@ namespace mirv {
     /// This is a callable transform to add a symbol at the current
     /// scope.  If the symbol already exists, it is an error.
     template<typename SymbolType,
-	     typename Dummy = boost::proto::callable>
+      typename Dummy = boost::proto::callable>
     struct AddAtCurrentScope : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
@@ -251,131 +253,112 @@ namespace mirv {
     };
 #endif
 
-      /// Transform a one-operand node into a single-child IR node.
-     template<typename NodeType,
-	      typename Child = typename NodeType::ChildPtr,
-	      typename Dummy = boost::proto::callable>
-      struct ConstructUnary : boost::proto::callable {
-	typedef typename ptr<NodeType>::type result_type;
+    /// Transform a one-operand node into a single-child IR node.
+    template<typename NodeType,
+      typename Child = typename NodeType::ChildPtr,
+      typename Dummy = boost::proto::callable>
+    struct ConstructUnary : boost::proto::callable {
+      typedef typename ptr<NodeType>::type result_type;
 
-	result_type operator()(Child child) {
-	  return make<NodeType>(child);
-	}
-      };
+      result_type operator()(Child child) {
+        return make<NodeType>(child);
+      }
+    };
+  
+    /// Transform a two-operand node to a two-child IR node.
+    template<typename NodeType,
+      typename Child1 = typename NodeType::ChildPtr,
+      typename Child2 = typename NodeType::ChildPtr,
+      typename Dummy = boost::proto::callable>
+    struct ConstructBinary : boost::proto::callable {
+      typedef typename ptr<NodeType>::type result_type;
 
-     /// Transform a two-operand node to a two-child IR node.
-      template<typename NodeType,
-	       typename Child1 = typename NodeType::ChildPtr,
-	       typename Child2 = typename NodeType::ChildPtr,
-	       typename Dummy = boost::proto::callable>
-      struct ConstructBinary : boost::proto::callable {
-	typedef typename ptr<NodeType>::type result_type;
+      result_type operator()(Child1 left, Child2 right) {
+        return make<NodeType>(left, right);
+      }
+    };
 
-	result_type operator()(Child1 left, Child2 right) {
-	  return make<NodeType>(left, right);
-         }
-      };
+    /// This is a specialization for block statements to add the
+    /// child to a block if it already exists.
+    template<>
+    struct ConstructBinary<Statement<Block>,
+      Statement<Block>::ChildPtr,
+      Statement<Block>::ChildPtr,
+      boost::proto::callable> : boost::proto::callable {
+      typedef ptr<Statement<Block> >::type result_type;
 
-     /// This is a specialization for block statements to add the
-     /// child to a block if it already exists.
-     template<>
-     struct ConstructBinary<Statement<Block>,
-			    Statement<Block>::ChildPtr,
-			    Statement<Block>::ChildPtr,
-			    boost::proto::callable> : boost::proto::callable {
-       typedef ptr<Statement<Block> >::type result_type;
+      result_type operator()(Statement<Block>::ChildPtr left,
+                             Statement<Block>::ChildPtr right) {
+        if (ptr<Statement<Block> >::type lb =
+            dyn_cast<Statement<Block> >(left)) {
+          if (ptr<Statement<Block> >::type rb =
+              dyn_cast<Statement<Block> >(right)) {
+            std::copy(rb->begin(), rb->end(), std::back_inserter(*lb));
+          }
+          lb->push_back(right);
+          return lb;
+        }
+        else if (ptr<Statement<Block> >::type rb =
+                 dyn_cast<Statement<Block> >(right)) {
+          rb->push_front(left);
+          return rb;
+        }
+        return make<Statement<Block> >(left, right);
+      }
+    };
 
-       result_type operator()(Statement<Block>::ChildPtr left,
-			      Statement<Block>::ChildPtr right) {
-	 if (ptr<Statement<Block> >::type lb =
-	     dyn_cast<Statement<Block> >(left)) {
-	   if (ptr<Statement<Block> >::type rb =
-	       dyn_cast<Statement<Block> >(right)) {
-	     std::copy(rb->begin(), rb->end(), std::back_inserter(*lb));
-	   }
-	   lb->push_back(right);
-	   return lb;
-	 }
-	 else if (ptr<Statement<Block> >::type rb =
-		  dyn_cast<Statement<Block> >(right)) {
-	   rb->push_front(left);
-	   return rb;
-	 }
-	 return make<Statement<Block> >(left, right);
-       }
-     };
+    /// Transform a three-operand node to a three-child IR node.
+    template<typename NodeType,
+      typename Child1 = typename NodeType::ChildPtr,
+      typename Child2 = typename NodeType::ChildPtr,
+      typename Child3 = typename NodeType::ChildPtr,
+      typename Dummy = boost::proto::callable>
+    struct ConstructTernary : boost::proto::callable {
+      typedef typename ptr<NodeType>::type result_type;
 
-     /// Transform a three-operand node to a three-child IR node.
-     template<typename NodeType,
-	      typename Child1 = typename NodeType::ChildPtr,
-	      typename Child2 = typename NodeType::ChildPtr,
-	      typename Child3 = typename NodeType::ChildPtr,
-	      typename Dummy = boost::proto::callable>
-     struct ConstructTernary : boost::proto::callable {
-       typedef typename ptr<NodeType>::type result_type;
+      result_type operator()(Child1 child1, Child2 child2, Child3 child3) {
+        return make<NodeType>(child1, child2, child3);
+      }
+    };
+  
+    /// This is a callable transform to translate a proto expression
+    /// to a mirv expression.
+    template<typename ExpressionType>
+    class TranslateToExpression : boost::proto::callable {
+    private:
+      boost::shared_ptr<SymbolTable> symtab;
 
-	result_type operator()(Child1 child1, Child2 child2, Child3 child3) {
-	  return make<NodeType>(child1, child2, child3);
-         }
-      };
+    public:
+      TranslateToExpression<ExpressionType>(boost::shared_ptr<SymbolTable> s)
+      : symtab(s) {}
 
-#if 0
-      // Transform for an n-ary expression
-      template<typename NodeType, typename Dummy = boost::proto::callable>
-      struct ConstructNary : boost::proto::callable {
-         template<typename Sig>
-         struct result;
+      typedef typename ptr<ExpressionType>::type result_type;
 
-         template<typename This, typename Expr, typename State, typename Visitor>
-         struct result<This(Expr, State, Visitor)> {
-            typedef Ptr<NodeType>::type type;
-         };
+      template<typename Expr>
+      result_type operator()(const Expr &e) const {
+        //std::cout << "Translating:\n";
+        //boost::proto::display_expr(e);
+        return safe_cast<ExpressionType>(translate(e, symtab));
+      }
+    };
 
-         template<typename Expr, typename State, typename Visitor>
-         struct add_arg {
-
-         private:
-            typedef  typename result<ConstructNary<NodeType, Dummy>, Expr, State, Visitor>::type call_type;
-
-            typedef typename Grammar::apply<Expr, State, Visitor>::type
-            transformed_type;
-
-         public:
-            add_arg(call_type &c,
-                    transformed_type &e)
-                  : call(c), transformed_expr(e) {};
-            template<typename T>
-            void operator()(T) {
-               call->addOperand(
-                  boost::proto::arg<T::value>(transformed_expr));
-            }
-
-         private:
-            call_type &call;
-            transformed_type &transformed_expr;
-         };
-
-         template<typename Expr, typename State, typename Visitor>
-         static typename result<ConstructNary<NodeType, Dummy>, Expr, State, Visitor>::type
-         operator()(Expr const &expr, State const &state, Visitor &visitor) {
-            typedef typename result<ConstructNary<NodeType, Dummy>, Expr, State, Visitor>::type ptr_type;
-
-            ptr_type result(new NodeType(
-                               // Function
-                               boost::proto::_arg0));
-
-            // Call FCall::addOperand for each operand
-            typedef boost::mpl::range_c<
-            int,
-               1,
-               boost::proto::arity_of<Expr>::value> args;
-            boost::mpl::for_each<args>(
-               add_arg<Expr, State, Visitor>(result, transformed_expr));
-            return(result);
-         }
-      };
-#endif
-   }
+    // Transform for an n-ary expression
+    template<typename NodeType, typename Dummy = boost::proto::callable>
+    struct ConstructNary : boost::proto::callable {
+      typedef typename ptr<NodeType>::type result_type;
+        
+      template<typename Arg1, typename Arg2>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Arg1 a1,
+                             const Arg2 &a2) {
+        TranslateToExpression<Expression<Base>> translator(symtab);
+        return mirv::make<NodeType>(a1,
+                                    boost::fusion::transform(
+                                      boost::fusion::pop_front(a2),
+                                      translator));
+      }
+    };
+  }
 }
 
 #endif

@@ -1,18 +1,9 @@
 // Test building of function calls.
-//
-// STDOUT: mdef testmodule {
-// STDOUT:    vdecl a int32
-// STDOUT:    vdecl b int32
-// STDOUT:    fdecl foo
-// STDOUT:    fdecl testfunc
-// STDOUT:    fdef testfunc {
-// STDOUT:       vdecl c int32
-// STDOUT:       vdecl d int32
-// STDOUT:       {
-// STDOUT:          call
-// STDOUT:             fref foo
-// STDOUT:             vref c
-// STDOUT:       }
+// STDOUT: fdef testfunc {
+// STDOUT:    {
+// STDOUT:       call
+// STDOUT:          fref foo
+// STDOUT:          vref b
 // STDOUT:    }
 // STDOUT: }
 
@@ -61,39 +52,40 @@ using Builder::if_;
 
 int main(void)
 {
+  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+
+  
+  ptr<Symbol<Type<TypeBase> > >::type inttype =
+    make<Symbol<Type<Integral> > >(32);
+  module->typePushBack(inttype);
+
+  std::vector<ptr<Symbol<Type<TypeBase> > >::type> argTypes;
+  argTypes.push_back(inttype);
+
+  ptr<Symbol<Type<TypeBase> > >::type functype =
+    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >::type(),
+                                       argTypes.begin(),
+                                       argTypes.end());
+  module->typePushBack(functype);
+
+  ptr<Symbol<Variable> >::type asym = make<Symbol<Variable> >("a", inttype);
+  module->variablePushBack(asym);
+
+  ptr<Symbol<Variable> >::type bsym = make<Symbol<Variable> >("b", inttype);
+  module->variablePushBack(bsym);
+
+  ptr<Symbol<Function> >::type fsym = make<Symbol<Function> >("foo", functype);
+  module->functionPushBack(fsym);
+
   Builder::VariableTerminal a = {{"a"}};
   Builder::VariableTerminal b = {{"b"}};
-  Builder::VariableTerminal c = {{"c"}};
-  Builder::VariableTerminal d = {{"d"}};
 
   Builder::FunctionTerminal foo = {{"foo"}};
-#if 0
-  auto expr = 
-      module["testmodule"] [
-	var[a].type[int_(32)],
-	var[b].type[int_(32)],
-        func["foo"].type[void_(int_(32))],
-        func["testfunc"].type[void_()] [
-          var[c].type[int_(32)],
-          var[d].type[int_(32)],
-          foo(c)
-        ]
-      ];
-
-  Builder::checkMatch<Builder::ModuleBuilder>(expr);
-#endif
 
   ptr<Node<Base> >::type code =
-    Builder::translateWithGrammar<Builder::ModuleBuilder>(
-      module["testmodule"] [
-	var[a].type[int_(32)],
-	var[b].type[int_(32)],
-        func["foo"].type[void_(int_(32))],
-        func["testfunc"].type[void_()] [
-          var[c].type[int_(32)],
-          var[d].type[int_(32)],
-          foo(c)
-        ]
+    Builder::translateWithGrammar<Builder::FunctionBuilder>(module,
+      func["testfunc"].type[void_()] [
+        foo(b)
       ]
     );
 

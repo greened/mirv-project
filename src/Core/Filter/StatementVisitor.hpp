@@ -43,7 +43,8 @@ namespace mirv {
 	ptr<Statement<After> >::type,
 	ptr<Statement<Goto> >::type,
 	ptr<Statement<Return> >::type,
-	ptr<Statement<Assignment> >::type
+	ptr<Statement<Assignment> >::type,
+	ptr<Statement<Call> >::type
 	> > {
   public:
     virtual result_type visit(ptr<Statement<Base> >::type);
@@ -67,6 +68,7 @@ namespace mirv {
     virtual result_type visit(ptr<Statement<Goto> >::type);
     virtual result_type visit(ptr<Statement<Return> >::type);
     virtual result_type visit(ptr<Statement<Assignment> >::type);
+    virtual result_type visit(ptr<Statement<Call> >::type);
   };
 }
 

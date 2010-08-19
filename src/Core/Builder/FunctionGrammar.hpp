@@ -3,6 +3,8 @@
 
 #include <mirv/Core/Builder/FunctionRules.hpp>
 #include <mirv/Core/Builder/VariableGrammar.hpp>
+#include <mirv/Core/Builder/ExpressionGrammar.hpp>
+#include <mirv/Core/Builder/CallExpressionGrammar.hpp>
 #include <mirv/Core/Builder/TypeLookupGrammar.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
 #include <mirv/Core/IR/Function.hpp>
@@ -34,6 +36,19 @@ namespace mirv {
       }
     };
 
+    /// This is a callable transform to add a statement-level call to
+    /// a function.
+    struct AddCallAsStatement : boost::proto::callable {
+      typedef ptr<Symbol<Function> >::type result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             boost::shared_ptr<Statement<Call> > call) {
+	result_type function = symtab->getFunction();
+	function->statementPushBack(call);
+	return function;
+      }
+    };
+
     /// This is a callable transform to add a block statement to a
     /// function.
     struct AddFunctionBodyForVariable : boost::proto::callable {
@@ -55,12 +70,21 @@ namespace mirv {
                            ConstructStatementGrammar(boost::proto::_))
       > {};
 
-    struct VariableOrStatementBuilder : boost::proto::or_<
-      boost::proto::when<
-        VariableRule,
-        AddFunctionBodyForVariable(boost::proto::_data,
-                                   VariableBuilder)
-        >,
+    struct FunctionCallBuilder : boost::proto::when<
+      CallRule,
+      AddCallAsStatement(boost::proto::_data,
+                         CallBuilder(boost::proto::_))
+      > {};
+
+    struct FunctionVariableBuilder : boost::proto::when<
+      VariableRule,
+      AddFunctionBodyForVariable(boost::proto::_data,
+                                 VariableBuilder)
+      > {};
+
+    struct VariableCallOrStatementBuilder : boost::proto::or_<
+      FunctionVariableBuilder,
+      FunctionCallBuilder,
       FunctionStatementBuilder
       > {};
 
@@ -69,10 +93,10 @@ namespace mirv {
     /// statements as we find them.  Variables are handled by the
     /// variable rule so we need only worry about statements.
     struct FunctionBodyBuilder : boost::proto::or_<
-       VariableOrStatementBuilder,
+       VariableCallOrStatementBuilder,
        boost::proto::comma<
 	 FunctionBodyBuilder,
-	 VariableOrStatementBuilder
+	 VariableCallOrStatementBuilder
 	 >
        > {};
 

@@ -99,7 +99,9 @@ namespace mirv {
      static typename ptr<Statement<Tag> >::type
      make(A1 a1) {
        typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1));
-       a1->setParent(p);
+       for (auto i = p->begin(); i != p->end(); ++i) {
+         (*i)->setParent(p);
+       }
        return p;
      }
 
@@ -107,8 +109,9 @@ namespace mirv {
      static typename ptr<Statement<Tag> >::type
      make(A1 a1, A2 a2) {
        typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2));
-       a1->setParent(p);
-       a2->setParent(p);
+       for (auto i = p->begin(); i != p->end(); ++i) {
+         (*i)->setParent(p);
+       }
        return p;
      }
 
@@ -116,10 +119,10 @@ namespace mirv {
      static typename ptr<Statement<Tag> >::type
      make(A1 a1, A2 a2, A3 a3) {
        typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2, a3));
-       a1->setParent(p);
-       a2->setParent(p);
-       a3->setParent(p);
-	return p;
+       for (auto i = p->begin(); i != p->end(); ++i) {
+         (*i)->setParent(p);
+       }
+       return p;
      }
 
      virtual void accept(StatementVisitor &V);
@@ -263,6 +266,10 @@ namespace mirv {
 	  typedef ExpressionList::iterator ExpressionIterator;
 	  typedef ExpressionList::const_iterator ConstExpressionIterator;
 
+	  typedef ExpressionList::reverse_iterator ReverseExpressionIterator;
+         typedef ExpressionList::const_reverse_iterator
+         ConstReverseExpressionIterator;
+
 	  ExpressionIterator expressionBegin(void) {
 	     return(expressions.begin());
 	  };
@@ -270,11 +277,25 @@ namespace mirv {
 	     return(expressions.begin());
 	  };
 
+	  ReverseExpressionIterator expressionRBegin(void) {
+	     return(expressions.rbegin());
+	  };
+	  ConstReverseExpressionIterator expressionRBegin(void) const {
+	     return(expressions.rbegin());
+	  };
+
 	  ExpressionIterator expressionEnd(void) {
 	     return(expressions.end());
 	  };
 	  ConstExpressionIterator expressionEnd(void) const {
 	     return(expressions.end());
+	  };
+
+	  ReverseExpressionIterator expressionREnd(void) {
+	     return(expressions.rend());
+	  };
+	  ConstReverseExpressionIterator expressionREnd(void) const {
+	     return(expressions.rend());
 	  };
 
 	  void expressionPushBack(ExpressionPtr c) {

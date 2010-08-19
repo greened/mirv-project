@@ -1,6 +1,7 @@
 // Test building of function declaration.
 //
 // STDOUT: mdef testmodule {
+// STDOUT:    vdecl g int32
 // STDOUT:    fdecl foo
 // STDOUT:    fdecl testfunc
 // STDOUT:    fdef testfunc {
@@ -54,6 +55,7 @@ int main(void)
   ptr<Node<Base> >::type code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
+        var["g"].type[int_(32)],
         func["foo"].type[void_(int_(32))],
         func["testfunc"].type[void_()] [
   	  var["a"].type[int_(32)]

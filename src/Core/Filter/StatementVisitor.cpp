@@ -106,4 +106,9 @@ namespace mirv {
     ptr<Statement<Assignment>::VisitorBaseType>::type p = fast_cast<Statement<Assignment>::VisitorBaseType>(s);
     visit(p);
   }
+
+  StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Call> >::type s) {
+    ptr<Statement<Assignment>::VisitorBaseType>::type p = fast_cast<Statement<Call>::VisitorBaseType>(s);
+    visit(p);
+  }
 }
