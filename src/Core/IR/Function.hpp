@@ -29,16 +29,14 @@ namespace mirv {
        typedef StatementBaseType::ChildPtr StatementPtr;
        typedef VariableBaseType::ChildPtr VariablePtr;
 
-       Interface(const std::string &n,
-		 ConstTypePtr t)
-	 : NamedBaseType(n),
-	   TypedBaseType(t) {}
+       Interface(const std::string &n, TypePtr t)
+	 : NamedBaseType(n), TypedBaseType(t) {}
 
        Interface(const std::string &n,
-		 ConstTypePtr t,
+		 TypePtr t,
 		 StatementPtr s)
-	 : NamedBaseType(n),
-	   TypedBaseType(t),
+           : NamedBaseType(n),
+             TypedBaseType(t),
 	   // If the statement is not a block, make it one.
 	   StatementBaseType(dyn_cast<Statement<Block> >(s) ?
 			     s : boost::static_pointer_cast<Statement<Base> >(mirv::make<Statement<Block> >(s))) {};

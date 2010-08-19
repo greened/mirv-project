@@ -13,8 +13,7 @@ namespace mirv {
 		       public LeafSymbol,
                        public boost::enable_shared_from_this<Symbol<Variable> > {
       public:
-       Interface(const std::string &n,
-		 ConstTypePtr t)
+       Interface(const std::string &n, TypePtr t)
 	   : Symbol<Typed>(t), Symbol<Named>(n){};
 
        ptr<Node<Base>>::type getSharedHandle(void) {

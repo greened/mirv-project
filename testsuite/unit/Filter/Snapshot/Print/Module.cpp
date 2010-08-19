@@ -81,12 +81,14 @@ using mirv::make;
 
 int main(void)
 {
+  auto type = make<Symbol<Type<Integral> > >(32);
+
   ptr<Symbol<Variable> >::type a =
-    Symbol<Variable>::make("a", make<Symbol<Type<Integral> > >(32));
+    Symbol<Variable>::make("a", type);
   ptr<Symbol<Variable> >::type b =
-    Symbol<Variable>::make("b", make<Symbol<Type<Integral> > >(32));
+    Symbol<Variable>::make("b", type);
   ptr<Symbol<Variable> >::type c =
-    Symbol<Variable>::make("c", make<Symbol<Type<Integral> > >(32));
+    Symbol<Variable>::make("c", type);
 
   ptr<Statement<Base> >::type dowhile =
     Statement<DoWhile>::make(
@@ -128,7 +130,7 @@ int main(void)
   ptr<Symbol<Module> >::type m =
     Symbol<Module>::make("Test");
 
-  m->typePushBack(make<Symbol<Type<Integral> > >(32));
+  m->typePushBack(type);
   m->typePushBack(ftype);
   m->functionPushBack(f);
   m->variablePushBack(c);

@@ -3,6 +3,7 @@
 
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/Property.hpp>
+#include <mirv/Core/IR/Type.hpp>
 
 #include <mirv/Core/Memory/Heap.hpp>
 
@@ -119,7 +120,11 @@ namespace mirv {
     template<>
     class Expression<Base> : public Node<Base> {
     public:
-     virtual void accept(ExpressionVisitor &V);
+      typedef ptr<Symbol<Type<TypeBase>>>::const_type TypePtr;
+      Expression<Base>(void) {}
+
+      virtual void accept(ExpressionVisitor &V);
+      virtual TypePtr type(void) const = 0;
    };
 
    namespace detail {
@@ -160,6 +165,9 @@ namespace mirv {
     public:
       typedef Expression<Base> VisitorBaseType;
      virtual void accept(ExpressionVisitor &V);
+      TypePtr type(void) const {
+        return (*begin())->type();
+      }
    };
 
   class InnerExpressionBase : public Expression<Inner<detail::InnerExpressionTraits> > {};
@@ -249,10 +257,15 @@ namespace mirv {
       class Interface : public InterfaceBaseType {
       public:
 	Interface(ChildPtr Child1,
-		  ChildPtr Child2) : InterfaceBaseType(Child1, Child2) {}
+		  ChildPtr Child2) : InterfaceBaseType(Child1, Child2) {
+          checkInvariant(Child1->type() == Child2->type(),
+                         "Expression type mismatch");
+        }
 
 	/// Set the left child expression.
 	void setLeftOperand(ChildPtr c) {
+          checkInvariant(c->type() == getLeftOperand()->type(),
+                         "Expression type mismatch");
             if (empty()) {
                push_back(c);
             }

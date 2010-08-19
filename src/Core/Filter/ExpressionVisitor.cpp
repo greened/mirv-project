@@ -6,6 +6,8 @@
 #include <mirv/Core/IR/Logical.hpp>
 #include <mirv/Core/IR/Bitwise.hpp>
 #include <mirv/Core/IR/Reference.hpp>
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
 
 namespace mirv {
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Base> >::type e) {}

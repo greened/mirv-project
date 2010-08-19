@@ -20,6 +20,7 @@ namespace mirv {
      class Interface : public InterfaceBaseType {
       public:
        typedef Symbol<SymbolType> ChildType;
+       typedef typename ChildType::TypePtr TypePtr;
        typedef typename ptr<ChildType>::type ChildPtr;
        typedef typename ptr<ChildType>::const_type ConstChildPtr;
 
@@ -41,6 +42,10 @@ namespace mirv {
        ConstChildPtr getSymbol(void) const {
 	 return this->front();
        }
+
+       TypePtr type(void) const {
+         return (*this->begin())->type();
+       }
      };
 
    public:
@@ -59,6 +64,7 @@ namespace mirv {
     typedef Expression<Unary> VisitorBaseType;
     typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
       AddressOf>::type BaseType;
+    // TODO: Override type().
   };
 
   /// Dereference the address provided by some expression.
@@ -68,6 +74,7 @@ namespace mirv {
     typedef Expression<Unary> VisitorBaseType;
     typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
       Dereference>::type BaseType;
+    // TODO: Override type().
   };
 
   /// Specify the interface for array index expressions.
@@ -78,6 +85,7 @@ namespace mirv {
     typedef Expression<Binary> VisitorBaseType;
     typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
       ArrayRef>::type BaseType;
+    // TODO: Override type().
   };
 }
 
