@@ -172,16 +172,15 @@ namespace mirv {
 
     class Interface : public InterfaceBaseType { 
     public:
-      typedef ptr<Symbol<Type<TypeBase> > >::const_type ConstTypePtr;
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
 
     private:
-      ConstTypePtr theType;
+      TypePtr theType;
 
     public:
-      Interface(ConstTypePtr t)
-	: theType(t) {};
+      Interface(TypePtr t) : theType(t) {};
 
-      ConstTypePtr type(void) const {
+      TypePtr type(void) const {
 	return(theType);
       }
       virtual void accept(mirv::SymbolVisitor &) {
@@ -207,8 +206,7 @@ namespace mirv {
       std::string the_name;
 
     public:
-      Interface(const std::string &n)
-	: the_name(n) {};
+      Interface(const std::string &n) : the_name(n) {};
 
       const std::string &name(void) const {
 	return(the_name);
