@@ -296,6 +296,23 @@ namespace mirv {
 
       this->doLeave(stmt);
     }
+
+    /// Visit Call statements.
+    void visit(ptr<Statement<Call> >::type stmt) {
+      this->doEnter(stmt);
+
+      this->doBeforeExpression(stmt, stmt->function());
+      this->doExpression(stmt, stmt->function());
+      this->doAfterExpression(stmt, stmt->function());
+
+      for (auto e = stmt->argumentBegin(); e != stmt->argumentEnd(); ++e) {
+        this->doBeforeExpression(stmt, *e);
+        this->doExpression(stmt, *e);
+        this->doAfterExpression(stmt, *e);
+      }
+
+      this->doLeave(stmt);
+    }
   };
 
   /// This is a type generator to create forward flow types.

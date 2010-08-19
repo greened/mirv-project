@@ -340,4 +340,9 @@ ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Binary> >
     ptr<Expression<Reference<Variable> >::VisitorBaseType>::type p = fast_cast<Expression<Reference<Variable> >::VisitorBaseType>(e);
     visit(p);
   }
+
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::type e) {
+    ptr<Expression<Reference<Function> >::VisitorBaseType>::type p = fast_cast<Expression<Reference<Function> >::VisitorBaseType>(e);
+    visit(p);
+  }
 }

@@ -113,10 +113,40 @@ namespace mirv {
           return name.str();
         }
 
+        template<typename Iterator>
+        std::string constructName(ChildPtr ReturnType,
+                                  Iterator start,
+                                  Iterator end) {
+          std::stringstream name;
+          if (ReturnType) {
+            name << ReturnType->name() << " (";
+          }
+          else {
+            name << "void (";
+          }
+
+          while (start != end) {
+            name << (*start)->name();
+            if (++start != end) {
+              name << ", ";
+            }
+          }
+          name << ")";
+          return name.str();
+        }
+
       public:
 	Interface(ChildPtr returnType)
             : InterfaceBaseType(constructName(returnType)) {
 	  setReturnType(returnType);
+        }
+
+        template<typename Iterator>
+	Interface(ChildPtr returnType, Iterator start, Iterator end)
+            : InterfaceBaseType(constructName(returnType, start, end)) {
+	  setReturnType(returnType);
+          // Add the parameter types.
+          std::copy(start, end, std::back_inserter(*this));
         }
 
         template<typename Sequence>

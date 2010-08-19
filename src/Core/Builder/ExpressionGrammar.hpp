@@ -4,12 +4,14 @@
 #include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
 
 #include <mirv/Core/Builder/ExpressionRules.hpp>
+#include <mirv/Core/Builder/CallExpressionGrammar.hpp>
+#include <mirv/Core/Builder/Transform.hpp>
 
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
   namespace Builder {
-    /// Define the rules for the expression builder grammar.
+     /// Define the rules for the expression builder grammar.
     struct ConstructExpressionGrammarCases {
       /// This is the default case.  It matches nothing so that
       /// illegal constructs will flag an error.
@@ -33,16 +35,6 @@ namespace mirv {
           Expression<Tag>
           >(ConstructExpressionGrammar(boost::proto::_left),
             ConstructExpressionGrammar(boost::proto::_right))
-        > {};
-
-      template<typename Rule, typename Tag>
-      struct NaryBuilder :  boost::proto::when<
-        Rule,
-        ConstructNary<
-          Expression<Tag>
-          >(boost::proto::_data,
-            boost::proto::_left,
-            boost::proto::_expr)
         > {};
     }
 
@@ -263,10 +255,6 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::subscript>
         : SubscriptBuilder {};
-
-    /// This is the grammar for function call expressions.
-    struct CallBuilder 
-        : detail::NaryBuilder<CallRule, ArrayRef> {};
 
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::function>

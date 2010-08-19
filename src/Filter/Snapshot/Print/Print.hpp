@@ -174,6 +174,7 @@ namespace mirv {
       void visit(ptr<Statement<Goto> >::type stmt);
       void visit(ptr<Statement<Return> >::type stmt);
       void visit(ptr<Statement<Assignment> >::type stmt);
+      void visit(ptr<Statement<Call> >::type stmt);
     };
 
     class EnterStatementAction : public VisitAction<EnterStatementVisitor> {
@@ -230,6 +231,7 @@ namespace mirv {
       void visit(ptr<Expression<GreaterThan> >::type expr);
       void visit(ptr<Expression<GreaterThanOrEqual> >::type expr);
       void visit(ptr<Expression<Reference<Variable> > >::type expr);
+      void visit(ptr<Expression<Reference<Function> > >::type expr);
     };
 
     class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {

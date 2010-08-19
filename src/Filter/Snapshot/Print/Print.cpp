@@ -267,6 +267,16 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Call> >::type stmt)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "call\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
   void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Base> >::type stmt)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
@@ -484,6 +494,14 @@ namespace mirv {
     Indent ind = attributeManager.getInheritedAttribute().indent();
 
     out << indent(ind) << "vref " << expr->getSymbol()->name();
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "fref " << expr->getSymbol()->name();
   }
 
   void PrintFilter::LeaveExpressionVisitor::visit(ptr<Expression<Base> >::type expr)

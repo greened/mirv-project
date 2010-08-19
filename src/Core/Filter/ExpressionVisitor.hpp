@@ -59,7 +59,8 @@ namespace mirv {
 	ptr<Expression<GreaterThanOrEqual> >::type,
 	ptr<Expression<GreaterThan> >::type,
 
-	ptr<Expression<Reference<Variable> > >::type
+	ptr<Expression<Reference<Variable> > >::type,
+	ptr<Expression<Reference<Function> > >::type
 	> > {
   public:
     virtual result_type visit(ptr<Expression<Base> >::type);
@@ -96,6 +97,7 @@ namespace mirv {
     virtual result_type visit(ptr<Expression<GreaterThanOrEqual> >::type);
     virtual result_type visit(ptr<Expression<GreaterThan> >::type);
     virtual result_type visit(ptr<Expression<Reference<Variable> > >::type);
+    virtual result_type visit(ptr<Expression<Reference<Function> > >::type);
   };
 }
 
