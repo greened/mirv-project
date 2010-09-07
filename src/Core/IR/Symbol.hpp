@@ -74,6 +74,11 @@ namespace mirv {
      static std::string getName(Arg1 &a1, Arg2 &a2) {
        return Tag::getName(a1, a2);
      }
+
+    template<typename Arg1, typename Arg2, typename Arg3>
+    static std::string getName(Arg1 &a1, Arg2 &a2, Arg3 &a3) {
+      return Tag::getName(a1, a2, a3);
+     }
   };
 
   /// A specialization for base symbols.

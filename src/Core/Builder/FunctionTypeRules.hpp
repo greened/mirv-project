@@ -10,14 +10,22 @@
 
 namespace mirv {
    namespace Builder {
-     /// This is the rule to match function type symbols.  It matches
+     typedef Wrapper<boost::proto::terminal<keyword::vararg>::type> VarargTerminal;
+
+     // TODO: More strictly enforce that vararg should be at the end.
+     struct ArgTypeRule : boost::proto::or_<
+       TypeRule,
+       VarargTerminal
+       > {};
+
+     /// This is therule to match function type symbols.  It matches
      /// Type|void_(TypeList)
      struct FunctionTypeRule : boost::proto::function<
        boost::proto::or_<
 	 VoidTerminal,
-	 TypeRule
+	 ArgTypeRule
 	 >,
-       boost::proto::vararg<TypeRule>
+       boost::proto::vararg<ArgTypeRule>
        > {};
 
      // typedef boost::proto::function<

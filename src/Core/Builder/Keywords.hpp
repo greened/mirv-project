@@ -62,6 +62,14 @@ namespace mirv {
           return sout << "void_";
         }
       };
+      /// This is a proto tag to build a terminal symbol to represent
+      /// a vararg function argument.
+      struct vararg {
+        friend std::ostream& operator<<(std::ostream& sout,
+                                        vararg) {
+          return sout << "vararg";
+        }
+      };
       /// This is a proto tag to build a terminal symbol to kick off
       /// if-then and if-else statement construction.
       struct if_ {

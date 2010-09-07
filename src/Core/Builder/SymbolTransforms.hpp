@@ -69,6 +69,37 @@ namespace mirv {
       }
     };
 
+    /// This is a callable transform to construct a symbol.  If the
+    /// symbol exists at the current scope, it is an error.
+    template<typename SymbolType,
+	     typename Dummy = boost::proto::callable>
+    struct TernaryConstructSymbol : boost::proto::callable {
+      typedef typename ptr<SymbolType>::type result_type;
+
+      template<typename Arg1, typename Arg2, typename Arg3>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+			     Arg1 a1,
+			     Arg2 a2,
+                             Arg3 a3) {
+	std::string name = SymbolType::getName(a1, a2, a3);
+
+	// Make sure we're not already in the symbol table at the current scope.
+	ptr<Symbol<Base> >::type exists =
+          symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
+	if (exists) {
+          if (boost::is_base_and_derived<Symbol<Type<TypeBase> >,
+              SymbolType>::value) {
+            // It's ok to have a type already declared.
+            return safe_cast<SymbolType>(exists);
+          }
+	  error("Symbol exists");
+	}
+      result_type result = mirv::make<SymbolType>(a1, a2, a3);
+	symtab->addAtCurrentScope(result);
+	return result;
+      }
+    };
+
     /// This is a callable transform to translate a proto expression
     /// to a symbol.
     template<typename SymbolType>

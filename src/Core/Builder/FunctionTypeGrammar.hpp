@@ -18,6 +18,44 @@
 
 namespace mirv {
   namespace Builder {
+    namespace detail {
+      /// This is a helper class so we don't do illegal fusion
+      /// operations when we don't have a vararg specifier.
+      template<bool Vararg>
+      struct Helper {
+        typedef ptr<Symbol<Type<FunctionType> > >::type result_type;
+        template<typename Arg1, typename Arg2>
+        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                               Arg1 a1,
+                               const Arg2 &a2) {
+        TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
+        return TernaryConstructSymbol<Symbol<Type<FunctionType> > >()(
+          symtab, a1, boost::fusion::transform(
+            boost::fusion::pop_front(a2), translator),
+          Symbol<Type<FunctionType>>::VarargMark::NotVararg);
+        }
+      };
+
+      template<>
+      struct Helper<true> {
+        typedef ptr<Symbol<Type<FunctionType> > >::type result_type;
+        template<typename Arg1, typename Arg2>
+        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                               Arg1 a1,
+                               const Arg2 &a2) {
+          TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
+          return TernaryConstructSymbol<Symbol<Type<FunctionType> > >()(
+            symtab,
+            a1,
+            boost::fusion::transform(
+              boost::fusion::pop_front(
+                boost::fusion::pop_back(a2)),
+              translator),
+            Symbol<Type<FunctionType>>::VarargMark::Vararg);
+        }
+      };
+    }
+    
     /// This is a callable transform to construct a function type.
     struct ConstructFunctionTypeSymbol : boost::proto::callable {
       typedef ptr<Symbol<Type<FunctionType> > >::type result_type;
@@ -26,10 +64,17 @@ namespace mirv {
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              Arg1 a1,
                              const Arg2 &a2) {
-        TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
-        return BinaryConstructSymbol<Symbol<Type<FunctionType> > >()(
-          symtab, a1, boost::fusion::transform(
-            boost::fusion::pop_front(a2), translator));
+        // Check vararg information.
+        return detail::Helper<
+          std::is_same<
+            VarargTerminal,
+            typename std::remove_const<
+              typename std::remove_reference<
+                typename boost::fusion::result_of::back<Arg2>::type
+                >::type
+              >::type
+            >::value
+          >()(symtab, a1, a2);
       }
     };
 
@@ -68,6 +113,13 @@ namespace mirv {
           FunctionReturnTypeBuilder(boost::proto::_left),
           boost::proto::_expr))
       > {};
+
+    namespace {
+      /// A vararg "operator."  This is a protoized object that
+      /// implements the function operator to construct a vararg
+      /// parameter.
+      const VarargTerminal vararg = {{}};
+    }
   }
 }
 
