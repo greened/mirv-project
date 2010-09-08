@@ -3,7 +3,7 @@
 // STDOUT: mdef testmodule {
 // STDOUT:    vdecl a int32
 // STDOUT:    vdecl b int32
-// STDOUT:    fdecl testfunc
+// STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
 // STDOUT:       vdecl c int32
 // STDOUT:       vdecl d int32

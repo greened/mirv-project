@@ -2,7 +2,7 @@
 //
 // STDOUT: mdef Test {
 // STDOUT:    vdecl c int32
-// STDOUT:    fdecl foo
+// STDOUT:    fdecl foo void ()
 // STDOUT:    fdef foo {
 // STDOUT:       vdecl a int32
 // STDOUT:       vdecl b int32
