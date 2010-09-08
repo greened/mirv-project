@@ -22,7 +22,8 @@ namespace mirv {
     Indent ind = attributeManager.getInheritedAttribute().indent();
 
     // Just declarations.
-    out << indent(ind) << "fdecl " << sym->name();
+    out << indent(ind) << "fdecl " << sym->name() << ' '
+      << sym->type()->name();
   }
 
   void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)

@@ -1,7 +1,7 @@
 // Test building of function types.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    fdecl testfunc
+// STDOUT:    fdecl testfunc void (int32, int16)
 // STDOUT:    fdef testfunc {
 // STDOUT:       vdecl a int32
 // STDOUT:       {

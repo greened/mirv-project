@@ -122,7 +122,7 @@ namespace mirv {
           name << ReturnType->name() << " (";
         }
         else {
-          name << "void ";
+          name << "void (";
         }
 
         detail::OutputArgs<
