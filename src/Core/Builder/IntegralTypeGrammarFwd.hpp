@@ -1,4 +1,4 @@
-#ifndef mirv_Core_Builder_IntegralTypeGrammar_hpp
+#ifndef mirv_Core_Builder_IntegralTypeGrammarFwd_hpp
 #define mirv_Core_Builder_IntegralTypeGrammarFwd_hpp
 
 namespace mirv {
