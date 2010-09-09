@@ -14,7 +14,10 @@ namespace mirv {
     class Interface : public InterfaceBaseType,
                       public boost::enable_shared_from_this<Symbol<Type<Pointer> > > {
     public:
-      Interface(const std::string &name) : InterfaceBaseType(name) {}
+      Interface(ptr<Symbol<Type<TypeBase>>>::type base)
+          : InterfaceBaseType(base->name() + "*") {
+        setBaseType(base);
+      }
       typedef Symbol<Type<TypeBase> > ChildType;
       typedef ptr<ChildType>::type ChildPtr;
       typedef ptr<ChildType>::const_type ConstChildPtr;
@@ -40,6 +43,11 @@ namespace mirv {
         return fast_cast<Node<Base>>(shared_from_this());
       }
 
+      // FIXME: This is target-dependent.
+      BitSizeType bitsize(void) const {
+        return 64;
+      }
+
       virtual void accept(mirv::SymbolVisitor &) {
         error("Pointer::accept called");
       }
@@ -51,6 +59,10 @@ namespace mirv {
   public:
     typedef Interface BaseType;
     typedef Symbol<Type<Derived> > VisitorBaseType;
+
+    static std::string getName(ptr<Symbol<Type<TypeBase>>>::type base) {
+      return base->name() + "*";
+    }
   };
 }
 
