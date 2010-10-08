@@ -11,6 +11,8 @@
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
+#include <cstdint>
+
 namespace mirv {
   /// This is a filter to print MIRV IR in textual form.
   class PrintFilter : public Filter<Node<Base> > {
@@ -208,6 +210,9 @@ namespace mirv {
     private:
       FlowAttributeManagerType &attributeManager;
 
+      template<typename ValueType>
+      void visitConstant(boost::shared_ptr<Expression<Reference<Constant<ValueType> > > > expr);
+
     public:
       EnterExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
@@ -232,6 +237,17 @@ namespace mirv {
       void visit(ptr<Expression<GreaterThanOrEqual> >::type expr);
       void visit(ptr<Expression<Reference<Variable> > >::type expr);
       void visit(ptr<Expression<Reference<Function> > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::uint16_t> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::int32_t> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::uint32_t> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::int64_t> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<float> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<double> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<Base> > > >::type expr);
     };
 
     class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {

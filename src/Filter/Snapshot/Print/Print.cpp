@@ -497,6 +497,72 @@ namespace mirv {
     out << indent(ind) << "vref " << expr->getSymbol()->name();
   }
 
+  template<typename ValueType>
+  void PrintFilter::EnterExpressionVisitor::visitConstant(boost::shared_ptr<Expression<Reference<Constant<ValueType> > > > expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "cref "
+      << expr->getSymbol()->type()->name()
+      << ' ' << expr->getSymbol()->valueString();
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<Base> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint16_t> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int32_t> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint32_t> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int64_t> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<float> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<double> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
   void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();

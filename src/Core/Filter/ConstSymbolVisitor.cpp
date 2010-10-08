@@ -61,12 +61,67 @@ namespace mirv {
       fast_cast<const Symbol<Variable>::VisitorBaseType>(s);
     visit(p);
   }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<Base> > >::const_type s) {
+    ptr<Symbol<Constant<Base> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<Base> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::int8_t> > >::const_type s) {
+    ptr<Symbol<Constant<std::int8_t> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<std::int8_t> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type s) {
+    ptr<Symbol<Constant<std::uint8_t> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<std::uint8_t> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::int16_t> > >::const_type s) {
+    ptr<Symbol<Constant<std::int16_t> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<std::int16_t> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type s) {
+    ptr<Symbol<Constant<std::uint16_t> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<std::uint16_t> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::int32_t> > >::const_type s) {
+    ptr<Symbol<Constant<std::int32_t> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<std::int32_t> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type s) {
+    ptr<Symbol<Constant<std::uint32_t> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<std::uint32_t> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::int64_t> > >::const_type s) {
+    ptr<Symbol<Constant<std::int64_t> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<std::int64_t> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type s) {
+    ptr<Symbol<Constant<std::uint64_t> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<std::uint64_t> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<float> > >::const_type s) {
+    ptr<Symbol<Constant<float> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<float> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<double> > >::const_type s) {
+    ptr<Symbol<Constant<double> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<double> >::VisitorBaseType>(s);
+    visit(p);
+  }
   ConstSymbolVisitor::result_type
   ConstSymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::const_type s) {
     ptr<Symbol<Type<TypeBase> >::VisitorBaseType>::const_type p =
       fast_cast<const Symbol<Type<TypeBase> >::VisitorBaseType>(s);
     visit(p);
-  }
+  } 
   ConstSymbolVisitor::result_type
   ConstSymbolVisitor::visit(ptr<InnerType>::const_type s) {
     ptr<InnerType::VisitorBaseType>::const_type p =

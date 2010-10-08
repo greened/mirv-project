@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_Module_hpp
 #define mirv_Core_IR_Module_hpp
 
+#include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 
