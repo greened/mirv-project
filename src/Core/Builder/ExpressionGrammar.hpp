@@ -5,6 +5,7 @@
 
 #include <mirv/Core/Builder/ExpressionRules.hpp>
 #include <mirv/Core/Builder/CallExpressionGrammar.hpp>
+#include <mirv/Core/Builder/ConstantGrammar.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
 
 #include <boost/proto/proto.hpp>
@@ -53,13 +54,21 @@ namespace mirv {
         >(LookupSymbol<Symbol<Function> >(boost::proto::_data,
                                           boost::proto::_value))
       > {};
+
+    struct ConstantRefBuilder : boost::proto::when<
+      ConstantBuilder,
+      ConstructUnary<
+        Expression<Reference<Constant<Base> > >
+        >(ConstantBuilder(boost::proto::_))
+      > {};
     
     /// This is the grammar for all terminal expressions.
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::terminal>
         : boost::proto::or_<
       VariableRefBuilder,
-      FunctionRefBuilder
+      FunctionRefBuilder,
+      ConstantRefBuilder
       > {};
 
     /// This is the grammar for negate expressions.

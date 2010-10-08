@@ -29,6 +29,10 @@ namespace mirv {
        operator const std::string &(void) const {
          return name;
        }
+
+       friend std::ostream& operator<<(std::ostream& sout, SymbolTerminal<Symbol> sym) {
+         return sout << std::string(sym);
+       }
      };
 
      /// Define a convenient way to talk about variable reference

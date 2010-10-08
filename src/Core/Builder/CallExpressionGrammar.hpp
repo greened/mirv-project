@@ -5,13 +5,14 @@
 
 #include <mirv/Core/Builder/CallExpressionRules.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/IR/Function.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/fusion/include/pop_front.hpp>
 
 namespace mirv {
   namespace Builder {
-    /// This is the grammar for function call expressions.
+    /// This is the grammar for function call statements.
     struct CallBuilder :  boost::proto::when<
       CallRule,
       ConstructNary<

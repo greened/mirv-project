@@ -7,6 +7,7 @@
 #include <mirv/Core/Builder/IfElseGrammar.hpp>
 #include <mirv/Core/Builder/WhileGrammar.hpp>
 #include <mirv/Core/Builder/DoWhileGrammar.hpp>
+#include <mirv/Core/Builder/CallStatementGrammar.hpp>
 
 namespace mirv {
   namespace Builder {
@@ -19,7 +20,8 @@ namespace mirv {
       IfBuilder,
       IfElseBuilder,
       WhileBuilder,
-      DoWhileBuilder
+      DoWhileBuilder,
+      CallStatementBuilder
       > {};
   }
 }

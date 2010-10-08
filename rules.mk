@@ -9,13 +9,13 @@ DFLAGS = -DBOOST_MPL_LIMIT_VECTOR_SIZE=40 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADER
 #debug_CXXFLAGS := -g -Wall -Werror
 debug_CFLAGS := -g -Wall
 debug_CXXFLAGS := -g -Wall -std=c++0x
-debug_CPPFLAGS = -DDEBUG $(IFLAGS) $(DFLAGS)
+debug_CPPFLAGS = -DDEBUG $(IFLAGS) $(DFLAGS) -std=c++0x
 
 #opt_CFLAGS := -O2 -Wall -Werror
 #opt_CXXFLAGS := -O2 -Wall -Werror
 opt_CFLAGS := -O2 -Wall
 opt_CXXFLAGS := -O2 -Wall -std=c++0x
-opt_CPPFLAGS = -O2 $(IFLAGS) $(DFLAGS)
+opt_CPPFLAGS = -O2 $(IFLAGS) $(DFLAGS) -std=c++0x
 
 INCLUDE_LINK = $(FINAL_BUILDDIR)/include/mirv
 

@@ -5,6 +5,7 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/Expression.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Logical.hpp>

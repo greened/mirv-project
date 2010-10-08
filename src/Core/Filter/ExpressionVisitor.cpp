@@ -7,6 +7,7 @@
 #include <mirv/Core/IR/Bitwise.hpp>
 #include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 
 namespace mirv {
@@ -345,6 +346,11 @@ ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Binary> >
 
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::type e) {
     ptr<Expression<Reference<Function> >::VisitorBaseType>::type p = fast_cast<Expression<Reference<Function> >::VisitorBaseType>(e);
+    visit(p);
+  }
+
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Reference<Constant<Base> > > >::type e) {
+    ptr<Expression<Reference<Constant<Base> > >::VisitorBaseType>::type p = fast_cast<Expression<Reference<Constant<Base> > >::VisitorBaseType>(e);
     visit(p);
   }
 }
