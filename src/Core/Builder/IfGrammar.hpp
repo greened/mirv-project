@@ -13,11 +13,14 @@ namespace mirv {
     /// This is the grammar for if statements.
     struct IfBuilder : boost::proto::when<
       IfRule,
-      ConstructBinary<
-        Statement<IfThen>,
-        ptr<Expression<Base> >::type,
-        ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
-                                     ConstructStatementGrammar(boost::proto::_right))
+      ClearPendingStatements<Statement<IfThen> >(
+        boost::proto::_data,
+        ConstructBinary<
+          Statement<IfThen>,
+          ptr<Expression<Base> >::type,
+          ptr<Statement<Base> >::type>(boost::proto::_data,
+                                       ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
+                                       ConstructStatementGrammar(boost::proto::_right)))
       > {};
   }
 }

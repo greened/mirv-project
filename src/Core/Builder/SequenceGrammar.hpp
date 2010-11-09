@@ -9,7 +9,8 @@ namespace mirv {
     /// role of the semicolon in C-like languages.
     struct SequenceBuilder : boost::proto::when<
       CommaRule,
-      ConstructBinary<Statement<Block> >(ConstructStatementGrammar(boost::proto::_left),
+      ConstructBinary<Statement<Block> >(boost::proto::_data,
+                                         ConstructStatementGrammar(boost::proto::_left),
                                          ConstructStatementGrammar(boost::proto::_right))> {};
   }
 }

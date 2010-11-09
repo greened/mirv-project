@@ -57,9 +57,9 @@ namespace mirv {
         return val;
       }
 
-                  std::string valueString(void) {
-                    return boost::lexical_cast<std::string>(value());
-                  }
+      std::string valueString(void) {
+        return boost::lexical_cast<std::string>(value());
+      }
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(this->shared_from_this());

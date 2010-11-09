@@ -9,15 +9,21 @@ namespace mirv {
   namespace Builder {
     struct WhileBuilder : boost::proto::when<
       WhileRule,
-      ConstructBinary<
-        Statement<IfThen>,
-        ptr<Expression<Base> >::type,
-        ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
-                                     ConstructBinary<
-                                     Statement<DoWhile>,
-                                     ptr<Expression<Base> >::type,
-                                     ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
-                                                                  ConstructStatementGrammar(boost::proto::_right)))
+      // Since there is not while statement, indicate a while by
+      // specializing on the grammar rule.
+      ClearPendingStatements<WhileRule> (
+        boost::proto::_data,
+        ConstructBinary<
+          Statement<IfThen>,
+          ptr<Expression<Base> >::type,
+          ptr<Statement<Base> >::type>(boost::proto::_data,
+                                       ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
+                                       ConstructBinary<
+                                       Statement<DoWhile>,
+                                       ptr<Expression<Base> >::type,
+                                       ptr<Statement<Base> >::type>(boost::proto::_data,
+                                                                    ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
+                                                                    ConstructStatementGrammar(boost::proto::_right))))
       > {};
   }
 }

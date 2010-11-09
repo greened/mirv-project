@@ -9,13 +9,16 @@ namespace mirv {
   namespace Builder {
     struct IfElseBuilder : boost::proto::when<
       IfElseRule,
-      ConstructTernary<
-        Statement<IfElse>,
-        ptr<Expression<Base> >::type,
-        ptr<Statement<Base> >::type,
-        ptr<Statement<Base> >::type>(ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
-                                     ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
-                                     ConstructStatementGrammar(boost::proto::_right))
+      ClearPendingStatements<Statement<IfElse> >(
+        boost::proto::_data,
+        ConstructTernary<
+          Statement<IfElse>,
+          ptr<Expression<Base> >::type,
+          ptr<Statement<Base> >::type,
+          ptr<Statement<Base> >::type>(boost::proto::_data,
+                                       ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
+                                       ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
+                                       ConstructStatementGrammar(boost::proto::_right)))
       > {};
   }
 }

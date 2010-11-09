@@ -54,6 +54,7 @@ namespace mirv {
           SetModule(
             boost::proto::_data,
             ConstructUnary<Symbol<Module>, const std::string &>(
+              boost::proto::_data,
               boost::proto::_value(boost::proto::_right(
                                      boost::proto::_left))))))
       > {};
