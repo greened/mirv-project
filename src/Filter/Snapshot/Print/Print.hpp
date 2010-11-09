@@ -362,7 +362,7 @@ namespace mirv {
         this->doAfterExpression(stmt, stmt->getRightExpression());
 
         this->doLeave(stmt);
-      } 
+      }
     };
 
     /// This is the flow to print symbol declarations.  It prints the

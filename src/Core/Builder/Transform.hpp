@@ -26,14 +26,22 @@ namespace mirv {
       ModulePointer module;
       typedef ptr<Symbol<Function> >::type FunctionPointer;
       FunctionPointer function;
+      typedef ptr<Statement<Base> >::type StatementPointer;
+      typedef std::list<StatementPointer> StatementList;
+      StatementList pendingStatements;
+      unsigned int tempNum;
 
     public:
       SymbolTable(ModulePointer m, FunctionPointer f)
-          : module(m), function(f) {}
+          : module(m), function(f), tempNum(0) {}
 
       static ptr<SymbolTable>::type make(ModulePointer m) {
         ptr<SymbolTable>::type result(new SymbolTable(m, FunctionPointer()));
         return result;
+      }
+
+      unsigned int getNextTempNum(void) {
+        return tempNum++;
       }
 
       void setModule(ModulePointer m) {
@@ -54,6 +62,25 @@ namespace mirv {
       }
       FunctionPointer getFunction(void) const {
 	return function;
+      }
+
+      void addPendingStatment(StatementPointer s) {
+        pendingStatements.push_back(s);
+      }
+      void clearPendingStatements(void) {
+        pendingStatements.clear();
+      }
+
+      typedef StatementList::iterator StatementIterator;
+      StatementIterator pendingStatementsBegin(void) {
+        return pendingStatements.begin();
+      }
+      StatementIterator pendingStatementsEnd(void) {
+        return pendingStatements.end();
+      }
+
+      bool pendingStatementsEmpty(void) const {
+        return pendingStatements.empty();
       }
 
       /// Get the variable symbol at the current scope only.  Return a
@@ -253,6 +280,98 @@ namespace mirv {
     };
 #endif
 
+    // Bundle any pending statements created from child expressions
+    // with this statement.
+    template<typename StatementType>
+    struct ClearPendingStatements : boost::proto::callable {
+      typedef ptr<Statement<Base> >::type StatementPointer;
+      typedef StatementPointer result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             StatementPointer stmt) {
+        // Add the pending statements to the function.
+
+        // TODO: Should use splice but it exposes the symtab statement
+        // list.
+        for (SymbolTable::StatementIterator s =
+               symtab->pendingStatementsBegin();
+             s != symtab->pendingStatementsEnd();
+             ++s) {
+          symtab->getFunction()->statementPushBack(*s);
+        }
+        
+        symtab->clearPendingStatements();
+
+        // This will get added by the caller.
+        return stmt;
+      }
+    };
+
+    // Loops need to be handled specially.
+    template<>
+    struct ClearPendingStatements<Statement<DoWhile> > : boost::proto::callable {
+      typedef ptr<Statement<DoWhile> >::type StatementPointer;
+      typedef StatementPointer result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             StatementPointer stmt) {
+        // Add the pending statements to the loop body.
+
+        // TODO: Should use splice but it exposes the symtab statement
+        // lst.
+        for (SymbolTable::StatementIterator s =
+               symtab->pendingStatementsBegin();
+             s != symtab->pendingStatementsEnd();
+             ++s) {
+          safe_cast<Statement<Block> >(stmt->getChildStatement())->
+            push_back(*s);
+        }
+        
+        symtab->clearPendingStatements();
+
+        // This will get added by the caller.
+        return stmt;
+      }
+    };
+
+    // Since there is no while statement, indicate a while by
+    // specializing on the grammar rule.
+    struct WhileRule;
+
+    template<>
+    struct ClearPendingStatements<WhileRule> : boost::proto::callable {
+      typedef ptr<Statement<IfThen> >::type StatementPointer;
+      typedef StatementPointer result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             StatementPointer stmt) {
+        for (SymbolTable::StatementIterator s =
+               symtab->pendingStatementsBegin();
+             s != symtab->pendingStatementsEnd();
+             ++s) {
+          // Add the pending statements before the top test.
+          safe_cast<Statement<Block> >(stmt->parent<Statement<Base> >())->
+            push_back(*s);
+
+          // Add the pending statements to the loop body.
+          safe_cast<Statement<Block> > (
+            safe_cast<Statement<DoWhile> >(
+              *(safe_cast<Statement<Block> >
+                (
+                  stmt->getChildStatement()
+                )->begin()
+               )
+            )->
+            getChildStatement())->push_back((*s)->clone());
+      }
+
+      symtab->clearPendingStatements();
+
+      // This will get added by the caller.
+      return stmt;
+    }
+    };
+
     /// Transform a one-operand node into a single-child IR node.
     template<typename NodeType,
       typename Child = typename NodeType::ChildPtr,
@@ -260,7 +379,8 @@ namespace mirv {
     struct ConstructUnary : boost::proto::callable {
       typedef typename ptr<NodeType>::type result_type;
 
-      result_type operator()(Child child) {
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Child child) {
         return make<NodeType>(child);
       }
     };
@@ -273,7 +393,8 @@ namespace mirv {
     struct ConstructBinary : boost::proto::callable {
       typedef typename ptr<NodeType>::type result_type;
 
-      result_type operator()(Child1 left, Child2 right) {
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Child1 left, Child2 right) {
         return make<NodeType>(left, right);
       }
     };
@@ -287,7 +408,8 @@ namespace mirv {
       boost::proto::callable> : boost::proto::callable {
       typedef ptr<Statement<Block> >::type result_type;
 
-      result_type operator()(Statement<Block>::ChildPtr left,
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Statement<Block>::ChildPtr left,
                              Statement<Block>::ChildPtr right) {
         if (ptr<Statement<Block> >::type lb =
             dyn_cast<Statement<Block> >(left)) {
@@ -316,7 +438,8 @@ namespace mirv {
     struct ConstructTernary : boost::proto::callable {
       typedef typename ptr<NodeType>::type result_type;
 
-      result_type operator()(Child1 child1, Child2 child2, Child3 child3) {
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Child1 child1, Child2 child2, Child3 child3) {
         return make<NodeType>(child1, child2, child3);
       }
     };
@@ -355,6 +478,19 @@ namespace mirv {
         return mirv::make<NodeType>(a1,
                                     boost::fusion::transform(
                                       boost::fusion::pop_front(a2),
+                                      translator));
+      }
+
+      template<typename Arg1, typename Arg2, typename Expr>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Arg1 a1,
+                             Arg2 a2,
+                             const Expr &expr) {
+        TranslateToExpression<Expression<Base>> translator(symtab);
+        return mirv::make<NodeType>(a1,
+                                    a2,
+                                    boost::fusion::transform(
+                                      boost::fusion::pop_front(expr),
                                       translator));
       }
     };

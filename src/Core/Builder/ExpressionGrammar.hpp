@@ -26,7 +26,8 @@ namespace mirv {
         Rule,
         ConstructUnary<
           Expression<Tag>
-          >(ConstructExpressionGrammar(boost::proto::_child))
+          >(boost::proto::_data,
+            ConstructExpressionGrammar(boost::proto::_child))
         > {};
 
       template<typename Rule, typename Tag>
@@ -34,7 +35,8 @@ namespace mirv {
         Rule,
         ConstructBinary<
           Expression<Tag>
-          >(ConstructExpressionGrammar(boost::proto::_left),
+          >(boost::proto::_data,
+            ConstructExpressionGrammar(boost::proto::_left),
             ConstructExpressionGrammar(boost::proto::_right))
         > {};
     }
@@ -43,7 +45,8 @@ namespace mirv {
       VariableTerminal,
       ConstructUnary<
         Expression<Reference<Variable> >
-        >(LookupSymbol<Symbol<Variable> >(boost::proto::_data,
+        >(boost::proto::_data,
+          LookupSymbol<Symbol<Variable> >(boost::proto::_data,
                                           boost::proto::_value))
       > {};
 
@@ -51,7 +54,8 @@ namespace mirv {
       FunctionTerminal,
       ConstructUnary<
         Expression<Reference<Function> >
-        >(LookupSymbol<Symbol<Function> >(boost::proto::_data,
+        >(boost::proto::_data,
+          LookupSymbol<Symbol<Function> >(boost::proto::_data,
                                           boost::proto::_value))
       > {};
 
@@ -59,7 +63,7 @@ namespace mirv {
       ConstantBuilder,
       ConstructUnary<
         Expression<Reference<Constant<Base> > >
-        >(ConstantBuilder(boost::proto::_))
+        >(boost::proto::_data, ConstantBuilder(boost::proto::_))
       > {};
     
     /// This is the grammar for all terminal expressions.
@@ -267,7 +271,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
 
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::function>
-        : CallBuilder {};
+        : CallExpressionBuilder {};
 
   //         ConstructNary<CallRule, Call>
 
