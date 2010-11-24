@@ -18,14 +18,14 @@
 #include <boost/mpl/int.hpp>
 
 namespace mirv {
-   namespace detail {
-     /// Provide an ordering for properties.  This ensures that class
-     /// hierarchies are the same everywhere and thus that a
-     /// particular property always has the same superclass tree.
-     template<typename T1, typename T2>
-     struct ExpressionPropertyLess :
-       public boost::mpl::less<typename T1::Order, typename T2::Order> {};
-   }
+  namespace detail {
+    /// Provide an ordering for properties.  This ensures that class
+    /// hierarchies are the same everywhere and thus that a
+    /// particular property always has the same superclass tree.
+    template<typename T1, typename T2>
+    struct ExpressionPropertyLess :
+        public boost::mpl::less<typename T1::Order, typename T2::Order> {};
+  }
 
   /// This is a metafunction class (generator) to transform a property
   /// tag into a property expression.  It is more convenient to reason
@@ -41,7 +41,7 @@ namespace mirv {
     };
   };
 
-   struct ExpressionVisitor;
+  struct ExpressionVisitor;
 
   /// This is the expression implementation for all expression types.
   /// Each expression type is an instance of this template
@@ -49,110 +49,118 @@ namespace mirv {
   /// property and visitor logic in one place, hiding the gory details
   /// from the expression type tags and specific expression type
   /// interfaces.
-    template<typename Op>
-    class Expression : public Op::BaseType {
-    public:
-      /// The immediate base type of this expression, distinct from
-      /// the base type that will be visited by an ExpressionVisitor.
-      typedef typename Op::BaseType BaseType;
+  template<typename Op>
+  class Expression : public Op::BaseType {
+  public:
+    /// The immediate base type of this expression, distinct from
+    /// the base type that will be visited by an ExpressionVisitor.
+    typedef typename Op::BaseType BaseType;
 
-      /// A list of sorted property tags.
-      typedef typename boost::mpl::sort<
-	typename Op::Properties,
-	detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
-	>::type Properties;
+    /// A list of sorted property tags.
+    typedef typename boost::mpl::sort<
+      typename Op::Properties,
+      detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
+      >::type Properties;
 
-    private:
-      /// A list of property expressions generated from the list of
-      /// property tags.  This defines the visitation order for
-      /// property expressions.
-      typedef typename boost::mpl::transform<Properties, PropertyExpressionGenerator>::type PropertyExpressions;
+  private:
+    /// A list of property expressions generated from the list of
+    /// property tags.  This defines the visitation order for
+    /// property expressions.
+    typedef typename boost::mpl::transform<Properties, PropertyExpressionGenerator>::type PropertyExpressions;
 
-    public:
-      // If there are properties, visit those first, otherwise visit
-      // the specified visitor base type.
+  public:
+    // If there are properties, visit those first, otherwise visit
+    // the specified visitor base type.
 
-      /// The base type visited if the visit action for this
-      /// expression is not implemented.  This is distinct from the
-      /// expression's base type because there may be various
-      /// intermediate glue base types (scattered inheritance
-      /// generators, etc.) used to implement the expression class
-      /// hierarchy.
-      typedef typename boost::mpl::eval_if<
-	boost::mpl::empty<Properties>,
-	boost::mpl::identity<typename Op::VisitorBaseType>,
-	boost::mpl::deref<typename boost::mpl::begin<PropertyExpressions>::type>
-	>::type VisitorBaseType;
+    /// The base type visited if the visit action for this
+    /// expression is not implemented.  This is distinct from the
+    /// expression's base type because there may be various
+    /// intermediate glue base types (scattered inheritance
+    /// generators, etc.) used to implement the expression class
+    /// hierarchy.
+    typedef typename boost::mpl::eval_if<
+    boost::mpl::empty<Properties>,
+    boost::mpl::identity<typename Op::VisitorBaseType>,
+    boost::mpl::deref<typename boost::mpl::begin<PropertyExpressions>::type>
+    >::type VisitorBaseType;
 
-      /// The root type for all expressions.
-      //typedef Expression<Base> RootType;
+    /// The root type for all expressions.
+    //typedef Expression<Base> RootType;
 
-    protected:
-      Expression(void) {}
-      template<typename A1>
-      Expression(A1 a1) : BaseType(a1) {}
-      template<typename A1, typename A2>
-      Expression(A1 a1, A2 a2) : BaseType(a1, a2) {}
+  protected:
+    Expression(void) {}
+    template<typename A1>
+    Expression(A1 a1) : BaseType(a1) {}
+    template<typename A1, typename A2>
+    Expression(A1 a1, A2 a2) : BaseType(a1, a2) {}
 
-    public:
-     template<typename A1>
-     static typename ptr<Expression<Op> >::type
-     make(A1 a1) {
-       typename ptr<Expression<Op> >::type result(new Expression<Op>(a1));
-       a1->setParent(result);
-       return result;
-     }
+  public:
+    template<typename A1>
+    static typename ptr<Expression<Op> >::type
+    make(A1 a1) {
+      typename ptr<Expression<Op> >::type result(new Expression<Op>(a1));
+      result->setParents();
+      return result;
+    }
 
-     template<typename A1, typename A2>
-     static typename ptr<Expression<Op> >::type
-     make(A1 a1, A2 a2) {
-       typename ptr<Expression<Op> >::type result(new Expression<Op>(a1, a2));
-       a1->setParent(result);
-       a2->setParent(result);
-       return result;
-     }
- 
+    template<typename A1, typename A2>
+    static typename ptr<Expression<Op> >::type
+    make(A1 a1, A2 a2) {
+      typename ptr<Expression<Op> >::type result(new Expression<Op>(a1, a2));
+      result->setParents();
+      return result;
+    } 
+
     virtual void accept(ExpressionVisitor &V);
-   };
+  };
 
   /// A specialization for base expressions.  No property information
   /// is available.
-    template<>
-    class Expression<Base> : public Node<Base> {
+  template<>
+  class Expression<Base> : public Node<Base> {
+  private:
+    //virtual Expression<Base> *cloneImpl(void) = 0;
+
+  public:
+    typedef ptr<Symbol<Type<TypeBase>>>::const_type TypePtr;
+    Expression<Base>(void) {}
+
+    ptr<Expression<Base> >::type clone(void) {
+      //ptr<Expression<Base> >::type expr(cloneImpl());
+      //return expr;
+      return ptr<Expression<Base> >::type();
+    }
+
+    virtual void accept(ExpressionVisitor &V);
+    virtual TypePtr type(void) const = 0;
+  };
+
+  namespace detail {
+    /// A traits class to define various properties of inner
+    /// expressions such as child type, iterator types and other
+    /// things.
+    class InnerExpressionTraits {
     public:
-      typedef ptr<Symbol<Type<TypeBase>>>::const_type TypePtr;
-      Expression<Base>(void) {}
+      typedef Expression<Base> Child;
+      typedef Expression<Base> BaseType;
 
-      virtual void accept(ExpressionVisitor &V);
-      virtual TypePtr type(void) const = 0;
-   };
+    private:
+      typedef ptr<Child>::type ChildPtr;
+      typedef std::list<ChildPtr> ChildList;
 
-   namespace detail {
-     /// A traits class to define various properties of inner
-     /// expressions such as child type, iterator types and other
-     /// things.
-     class InnerExpressionTraits {
-     public:
-       typedef Expression<Base> Child;
-       typedef Expression<Base> BaseType;
+    public:
+      /// Make this compatible with certain standard algorithms.
+      typedef ChildPtr value_type;
+      typedef const ChildPtr & const_reference;
 
-     private:
-       typedef ptr<Child>::type ChildPtr;
-       typedef std::list<ChildPtr> ChildList;
+      typedef ChildList::iterator iterator;
+      typedef ChildList::reverse_iterator reverse_iterator;
+      typedef ChildList::const_iterator const_iterator;
+      typedef ChildList::const_reverse_iterator const_reverse_iterator;
 
-     public:
-       /// Make this compatible with certain standard algorithms.
-       typedef ChildPtr value_type;
-       typedef const ChildPtr & const_reference;
-
-       typedef ChildList::iterator iterator;
-       typedef ChildList::reverse_iterator reverse_iterator;
-       typedef ChildList::const_iterator const_iterator;
-       typedef ChildList::const_reverse_iterator const_reverse_iterator;
-
-       typedef ChildList::size_type size_type;
-     };
-   }
+      typedef ChildList::size_type size_type;
+    };
+  }
 
   /// This is an inner expression abstract interface.  It exists
   /// because we need to be able to inherit virtually from inner
@@ -160,15 +168,15 @@ namespace mirv {
   /// operands) but we do not want to force subclasses to explicitly
   /// initialize the inner expression object.  Separating the
   /// interface from the implementation solves that problem.
-    template<>
-    class Expression<Inner<detail::InnerExpressionTraits> > : public Inner<detail::InnerExpressionTraits>::BaseType {
-    public:
-      typedef Expression<Base> VisitorBaseType;
-     virtual void accept(ExpressionVisitor &V);
-      TypePtr type(void) const {
-        return (*begin())->type();
-      }
-   };
+  template<>
+  class Expression<Inner<detail::InnerExpressionTraits> > : public Inner<detail::InnerExpressionTraits>::BaseType {
+  public:
+    typedef Expression<Base> VisitorBaseType;
+    virtual void accept(ExpressionVisitor &V);
+    TypePtr type(void) const {
+      return (*begin())->type();
+    }
+  };
 
   class InnerExpressionBase : public Expression<Inner<detail::InnerExpressionTraits> > {};
   
@@ -177,12 +185,21 @@ namespace mirv {
   /// This holds the child pointers and other data necessary for inner
   /// expressions.
   class InnerExpression : public InnerImpl<Expression<Base>, VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type> {
-   private:
-     typedef InnerImpl<
-       Expression<Base>,
-      VisitedInherit1<ExpressionVisitor>::apply<
-	Virtual<InnerExpressionBase>
+  private:
+    typedef InnerImpl<
+    Expression<Base>,
+    VisitedInherit1<ExpressionVisitor>::apply<
+      Virtual<InnerExpressionBase>
       >::type> BaseType;
+
+  protected:
+    void setParents(void) {
+      for (iterator i = begin();
+           i != end();
+           ++i) {
+        (*i)->setParent(getSharedHandle());
+      }
+    }
 
   public:
     typedef Expression<Base> VisitorBaseType;
@@ -203,216 +220,216 @@ namespace mirv {
 
   /// The unary expression tag.  This implements the interface for
   /// unary expressions.
-   class Unary {
-   private:
-      typedef InnerExpression InterfaceBaseType;
+  class Unary {
+  private:
+    typedef InnerExpression InterfaceBaseType;
 
-     /// The base class for unary expressions, providing the interface
-     /// and implementation for them.
-      class Interface : public InterfaceBaseType {
-      public:
-	typedef Expression<Base> ChildType;
-         typedef ptr<ChildType>::type ChildPtr;
-         typedef ptr<ChildType>::const_type ConstChildPtr;
+    /// The base class for unary expressions, providing the interface
+    /// and implementation for them.
+    class Interface : public InterfaceBaseType {
+    public:
+      typedef Expression<Base> ChildType;
+      typedef ptr<ChildType>::type ChildPtr;
+      typedef ptr<ChildType>::const_type ConstChildPtr;
 
-	Interface(ChildPtr Child) : InterfaceBaseType(Child) {}
+      Interface(ChildPtr Child) : InterfaceBaseType(Child) {}
 
-	/// Set the child expression.
-	void setOperand(ChildPtr c) {
-            if (empty()) {
-               push_back(c);
-            }
-            else {
-               *begin() = c;
-            }
-         };
-
-	/// Get the child expression.
-         ChildPtr getOperand(void) {
-            return(front());
-         };
-
-	/// Get the child expression.
-         ConstChildPtr getOperand(void) const {
-            return(front());
-         };
-
-	virtual void accept(ExpressionVisitor &V);
+      /// Set the child expression.
+      void setOperand(ChildPtr c) {
+        if (empty()) {
+          push_back(c);
+        }
+        else {
+          *begin() = c;
+        }
       };
 
-   public:
-     typedef Interface BaseType;
-     typedef InnerExpression VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+      /// Get the child expression.
+      ChildPtr getOperand(void) {
+        return(front());
+      };
+
+      /// Get the child expression.
+      ConstChildPtr getOperand(void) const {
+        return(front());
+      };
+
+      virtual void accept(ExpressionVisitor &V);
+    };
+
+  public:
+    typedef Interface BaseType;
+    typedef InnerExpression VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// The binary expression tag.  This provides the interface and
   /// implementation for binary expressions.  Convention: First list
   /// element is left operand, second is right operand
-   class Binary {
-   private:
-      typedef InnerExpression InterfaceBaseType;
+  class Binary {
+  private:
+    typedef InnerExpression InterfaceBaseType;
 
-     /// The interface and implementation for binary expressions.
-      class Interface : public InterfaceBaseType {
-      public:
-	Interface(ChildPtr Child1,
-		  ChildPtr Child2) : InterfaceBaseType(Child1, Child2) {
-          checkInvariant(Child1->type() == Child2->type(),
-                         "Expression type mismatch");
+    /// The interface and implementation for binary expressions.
+    class Interface : public InterfaceBaseType {
+    public:
+      Interface(ChildPtr Child1,
+                ChildPtr Child2) : InterfaceBaseType(Child1, Child2) {
+        checkInvariant(Child1->type() == Child2->type(),
+                       "Expression type mismatch");
+      }
+
+      /// Set the left child expression.
+      void setLeftOperand(ChildPtr c) {
+        checkInvariant(c->type() == getLeftOperand()->type(),
+                       "Expression type mismatch");
+        if (empty()) {
+          push_back(c);
         }
+        else {
+          *begin() = c;
+        }
+      }
 
-	/// Set the left child expression.
-	void setLeftOperand(ChildPtr c) {
-          checkInvariant(c->type() == getLeftOperand()->type(),
-                         "Expression type mismatch");
-            if (empty()) {
-               push_back(c);
-            }
-            else {
-               *begin() = c;
-            }
-         }
+      /// Set the right child expression.
+      void setRightOperand(ChildPtr c) {
+        if (empty()) {
+          push_back(ChildPtr());  // Placeholder for left operand
+          push_back(c);
+        }
+        else {
+          *--end() = c;
+        }
+      }
 
-	/// Set the right child expression.
-         void setRightOperand(ChildPtr c) {
-            if (empty()) {
-               push_back(ChildPtr());  // Placeholder for left operand
-               push_back(c);
-            }
-            else {
-               *--end() = c;
-            }
-         }
+      /// Get the left child expression.
+      ChildPtr getLeftOperand(void) {
+        checkInvariant(!empty(),
+                       "Attempt to get operand from empty expression");
+        return(front());
+      }
 
-	/// Get the left child expression.
-         ChildPtr getLeftOperand(void) {
-            checkInvariant(!empty(),
-			   "Attempt to get operand from empty expression");
-            return(front());
-         }
+      /// Get the left child expression.
+      ConstChildPtr getLeftOperand(void) const {
+        checkInvariant(!empty(),
+                       "Attempt to get operand from empty expression");
+        return(front());
+      }
 
-	/// Get the left child expression.
-         ConstChildPtr getLeftOperand(void) const {
-            checkInvariant(!empty(),
-			   "Attempt to get operand from empty expression");
-            return(front());
-         }
+      /// Get the right child expression.
+      ChildPtr getRightOperand(void) {
+        checkInvariant(size() > 1 && back(),
+                       "Attempt to get missing operand from expression");
+        return(back());
+      }
 
-	/// Get the right child expression.
-         ChildPtr getRightOperand(void) {
-            checkInvariant(size() > 1 && back(),
-			   "Attempt to get missing operand from expression");
-            return(back());
-         }
+      /// Get the right child expression.
+      ConstChildPtr getRightOperand(void) const {
+        checkInvariant(size() > 1 && back(),
+                       "Attempt to get missing operand from expression");
+        return(back());
+      }
+      virtual void accept(ExpressionVisitor &V);
+    };
 
-	/// Get the right child expression.
-         ConstChildPtr getRightOperand(void) const {
-	   checkInvariant(size() > 1 && back(),
-			   "Attempt to get missing operand from expression");
-            return(back());
-         }
-	virtual void accept(ExpressionVisitor &V);
-      };
+  public:
+    typedef Interface BaseType;
+    typedef InnerExpression VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
-   public:
-     typedef Interface BaseType;
-     typedef InnerExpression VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
-
-   // Expression property semantics
+  // Expression property semantics
 
   /// Categorize all arithmetic expressions.
-   class Arithmetic {
-   public:
-     typedef boost::mpl::int_<0> Order;
+  class Arithmetic {
+  public:
+    typedef boost::mpl::int_<0> Order;
 
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// Categorize all logical expressions.
-   class Logical {
-   public:
-     typedef boost::mpl::int_<1> Order;
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+  class Logical {
+  public:
+    typedef boost::mpl::int_<1> Order;
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// Categorize all bitwise expressions.
-   class Bitwise {
-   public:
-     typedef boost::mpl::int_<2> Order;
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+  class Bitwise {
+  public:
+    typedef boost::mpl::int_<2> Order;
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// Categorize all relational expressions.
-   class Relational {
-   public:
-     typedef boost::mpl::int_<0> Order;
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+  class Relational {
+  public:
+    typedef boost::mpl::int_<0> Order;
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// Categorize all reference expressions.
-   class Ref {
-   public:
-     typedef boost::mpl::int_<11> Order;
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+  class Ref {
+  public:
+    typedef boost::mpl::int_<11> Order;
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// Operands can be commuted.
-   class Commutative {
-   public:
-     typedef boost::mpl::int_<3> Order;
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+  class Commutative {
+  public:
+    typedef boost::mpl::int_<3> Order;
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// Operands can be reassociated.
-   class Associative {
-   public:
-     typedef boost::mpl::int_<5> Order;
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+  class Associative {
+  public:
+    typedef boost::mpl::int_<5> Order;
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// This expression is transitive (a op b && b op c => a op c)
   class Transitive {
-   public:
-     typedef boost::mpl::int_<7> Order;
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   };
+  public:
+    typedef boost::mpl::int_<7> Order;
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  };
 
   /// This expression is reflexive.
-   class Reflexive {
-   public:
-     typedef boost::mpl::int_<9> Order;
-     /// Inherit virtually from the inner expression abstract interface.
-     typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
-     typedef InnerExpressionBase VisitorBaseType;
-     typedef boost::mpl::vector<> Properties;
-   }; 
+  class Reflexive {
+  public:
+    typedef boost::mpl::int_<9> Order;
+    /// Inherit virtually from the inner expression abstract interface.
+    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef InnerExpressionBase VisitorBaseType;
+    typedef boost::mpl::vector<> Properties;
+  }; 
  
   /// This is a metafunction to generate a scattered base class
   /// hierarchy of property expressions.  The Sequence is a sorted
@@ -430,6 +447,19 @@ namespace mirv {
 
   public:
     class ExpressionInterface : public BaseType {
+    private:
+      Expression<Tag> *cloneImpl(void) {
+        typename ptr<Expression<Tag> >::type expr(Expression<Tag>::make());
+        for (typename Expression<Tag>::iterator i = this->begin();
+             i != this->end();
+             ++i) {
+          expr->push_back((*i)->clone());
+        }
+        Expression<Tag> *result = expr.get();
+        expr.reset();
+        return result;
+      }
+
     public:
       ExpressionInterface(void) {}
 
@@ -442,7 +472,7 @@ namespace mirv {
       template<typename A1, typename A2, typename A3>
       ExpressionInterface(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
       }
     };

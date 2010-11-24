@@ -18,6 +18,18 @@ namespace mirv {
    private:
      typedef InnerImpl<Symbol<SymbolType>, LeafExpression> InterfaceBaseType;
      class Interface : public InterfaceBaseType {
+     private:
+       Expression<Reference<SymbolType> > *cloneImpl(void) {
+         ptr<Expression<Reference<SymbolType> > > expr(
+           Expression<Reference<SymbolType> >::make(this->getSymbol()));
+         Expression<Reference<SymbolType> > *result = expr.get();
+         expr.reset();
+         return result;
+       }
+
+     protected:
+       void setParents(void) {}
+
       public:
        typedef Symbol<SymbolType> ChildType;
        typedef typename ChildType::TypePtr TypePtr;
