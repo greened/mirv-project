@@ -16,8 +16,34 @@ namespace mirv {
    template<typename SymbolType>
    class Reference { 
    private:
-     typedef InnerImpl<Symbol<SymbolType>, LeafExpression> InterfaceBaseType;
+     typedef InnerImpl<Symbol<SymbolType>, LeafExpression> RootType;
+     typedef boost::mpl::vector<> PropertiesList;
+
+    /// The metafunction result.
+     typedef typename Properties<
+       PropertyExpressionGenerator,
+       RootType,
+       PropertiesList,
+       VisitedInherit2<ExpressionVisitor>
+       >::type HierarchyType;
+     
+    typedef typename VisitedInherit2<ExpressionVisitor>::template apply<
+      HierarchyType,
+      boost::enable_shared_from_this<Expression<Reference<SymbolType> > > >::type InterfaceBaseType;
+
      class Interface : public InterfaceBaseType {
+     private:
+       Expression<Base> *cloneImpl(void) {
+         typename ptr<Expression<Reference<SymbolType> > >::type expr(
+           Expression<Reference<SymbolType> >::make(this->getSymbol()));
+         Expression<Reference<SymbolType> > *result = expr.get();
+         expr.reset();
+         return result;
+       }
+
+     protected:
+       void setParents(void) {}
+
       public:
        typedef Symbol<SymbolType> ChildType;
        typedef typename ChildType::TypePtr TypePtr;
@@ -25,6 +51,10 @@ namespace mirv {
        typedef typename ptr<ChildType>::const_type ConstChildPtr;
 
        Interface(ChildPtr Var) : InterfaceBaseType(Var) {}
+
+       ptr<Node<Base> >::type getSharedHandle(void) {
+         return fast_cast<Node<Base>>(this->shared_from_this());
+       }
 
        void setSymbol(ChildPtr c) {
 	 if (this->empty()) {
@@ -49,10 +79,9 @@ namespace mirv {
      };
 
    public:
-     typedef boost::mpl::vector<> Properties;
+     typedef PropertiesList Properties;
      typedef LeafExpression VisitorBaseType;
-     typedef typename ExpressionBaseGenerator<Properties, Interface,
-       Reference<SymbolType> >::type BaseType;
+     typedef Interface BaseType;
    };
 
   /// Take the address of an lvalue expression.

@@ -7,130 +7,137 @@
 namespace mirv {
   /// This is the interface to statements that have two child
   /// expressions.
-   class DualExpression {
-   public:
-      class Interface;
-      typedef Interface BaseType;
-      typedef Statement<Controlled> InterfaceBaseType;
-     typedef boost::mpl::vector<> Properties;
-     typedef Statement<Controlled> VisitorBaseType;
+  class DualExpression {
+  public:
+    class Interface;
+    typedef Interface BaseType;
+    typedef Statement<Controlled> InterfaceBaseType;
+    typedef boost::mpl::vector<> Properties;
+    typedef Statement<Controlled> VisitorBaseType;
 
-      class Interface : public InterfaceBaseType {
-      public:
-	template<typename E1, typename E2>
-	Interface(E1 e1, E2 e2) : Statement<Controlled>(e1, e2) {}
+    class Interface : public InterfaceBaseType {
+    public:
+      template<typename E1, typename E2>
+      Interface(E1 e1, E2 e2) : Statement<Controlled>(e1, e2) {}
 
-         typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
-         typedef InterfaceBaseType::ConstExpressionPtr 
-         ConstExpressionPtr;
+      typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
+      typedef InterfaceBaseType::ConstExpressionPtr 
+      ConstExpressionPtr;
          
-         void setLeftExpression(ExpressionPtr e) {
-            if (expressionEmpty()) {
-               expressionPushBack(e);
-            }
-            else {
-               *expressionBegin() = e;
-            }
-         };
+      void setLeftExpression(ExpressionPtr e) {
+        if (expressionEmpty()) {
+          expressionPushBack(e);
+        }
+        else {
+          *expressionBegin() = e;
+        }
+      }
 
-         void setRightExpression(ExpressionPtr e) {
-            if (expressionEmpty()) {
-               expressionPushBack(ExpressionPtr()); // Placeholder
-               expressionPushBack(e);
-            }
-            else {
-               *--expressionEnd() = e;
-            }
-         };
+      void setRightExpression(ExpressionPtr e) {
+        if (expressionEmpty()) {
+          expressionPushBack(ExpressionPtr()); // Placeholder
+          expressionPushBack(e);
+        }
+        else {
+          *--expressionEnd() = e;
+        }
+      }
          
-         ExpressionPtr getLeftExpression(void) {
-            checkInvariant(!expressionEmpty() && *expressionBegin(),
-			   "Attempt to get non-existent expression");
-            return(expressionFront());
-         };
+      ExpressionPtr getLeftExpression(void) {
+        checkInvariant(!expressionEmpty() && *expressionBegin(),
+                       "Attempt to get non-existent expression");
+        return(expressionFront());
+      }
 
-         ConstExpressionPtr getLeftExpression(void) const {
-            checkInvariant(!expressionEmpty() && *expressionBegin(),
-			   "Attempt to get non-existent expression");
-            return(expressionFront());
-         };
+      ConstExpressionPtr getLeftExpression(void) const {
+        checkInvariant(!expressionEmpty() && *expressionBegin(),
+                       "Attempt to get non-existent expression");
+        return(expressionFront());
+      }
 
-         ExpressionPtr getRightExpression(void) {
-            checkInvariant(expressionSize() > 1 && expressionBack(),
-			   "Attempt to get non-existent expression");
-            return(expressionBack());
-         };
+      ExpressionPtr getRightExpression(void) {
+        checkInvariant(expressionSize() > 1 && expressionBack(),
+                       "Attempt to get non-existent expression");
+        return(expressionBack());
+      }
 
-         ConstExpressionPtr getRightExpression(void) const {
-            checkInvariant(expressionSize() > 1 && expressionBack(),
-			   "Attempt to get non-existent expression");
-            return(expressionBack());
-         };
-      };
-   };
+      ConstExpressionPtr getRightExpression(void) const {
+        checkInvariant(expressionSize() > 1 && expressionBack(),
+                       "Attempt to get non-existent expression");
+        return(expressionBack());
+      }
+    };
+  };
 
   /// Specify the interface to assignment statements.  Assignments are
   /// statements only, not expressions.  This is to cleanly separate
   /// changes in program state from general computation.  Expression
   /// trees imply assignmnets to temporary variables at some level of
   /// translate, but we are not concerned about those.
-   class Assignment {
-   private:
-     class Interface : public Statement<DualExpression>,
-		       public LeafStatement,
-                       public boost::enable_shared_from_this<Statement<Assignment> > {
-     public:
-       typedef ExpressionIterator iterator;
-       typedef ConstExpressionIterator const_iterator;
-       typedef ReverseExpressionIterator reverse_iterator;
-       typedef ConstReverseExpressionIterator const_reverse_iterator;
+  class Assignment {
+  private:
+    class Interface : public Statement<DualExpression>,
+                      public LeafStatement,
+                      public boost::enable_shared_from_this<Statement<Assignment> > {
+      Statement<Base> *cloneImpl(void);
 
-       template<typename E1, typename E2>
-       Interface(E1 e1, E2 e2) : Statement<DualExpression>(e1, e2),
-				 LeafStatement() {}
-       typedef ExpressionPtr ChildPtr;
-       typedef ConstExpressionPtr ConstChildPtr;
+    protected:
+      void setParents(void) {
+        getLeftExpression()->setParent(getSharedHandle());
+        getRightExpression()->setParent(getSharedHandle());
+      }
 
-       ptr<Node<Base>>::type getSharedHandle(void) {
-          return fast_cast<Node<Base>>(shared_from_this());
-        }
+    public:
+      typedef ExpressionIterator iterator;
+      typedef ConstExpressionIterator const_iterator;
+      typedef ReverseExpressionIterator reverse_iterator;
+      typedef ConstReverseExpressionIterator const_reverse_iterator;
 
-       iterator begin(void) {
-         return expressionBegin();
-       }
-       const_iterator begin(void) const {
-         return expressionBegin();
-       }
-       reverse_iterator rbegin(void) {
-         return expressionRBegin();
-       }
-       const_reverse_iterator rbegin(void) const {
-         return expressionRBegin();
-       }
+      template<typename E1, typename E2>
+      Interface(E1 e1, E2 e2) : Statement<DualExpression>(e1, e2),
+                                  LeafStatement() {}
+      typedef ExpressionPtr ChildPtr;
+      typedef ConstExpressionPtr ConstChildPtr;
 
-       iterator end(void) {
-         return expressionEnd();
-       }
-       const_iterator end(void) const {
-         return expressionEnd();
-       }
-       reverse_iterator rend(void) {
-         return expressionREnd();
-       }
-       const_reverse_iterator rend(void) const {
-         return expressionREnd();
-       }
+      ptr<Node<Base> >::type getSharedHandle(void) {
+        return fast_cast<Node<Base> >(shared_from_this());
+      }
 
-       virtual void accept(mirv::StatementVisitor &) {
-	 error("Assignment::Base::accept called");
-       }
-     };
+      iterator begin(void) {
+        return expressionBegin();
+      }
+      const_iterator begin(void) const {
+        return expressionBegin();
+      }
+      reverse_iterator rbegin(void) {
+        return expressionRBegin();
+      }
+      const_reverse_iterator rbegin(void) const {
+        return expressionRBegin();
+      }
 
-   public:
-     typedef boost::mpl::vector<Mutating> Properties;
-     typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
-     typedef Statement<DualExpression> VisitorBaseType;
-   };
+      iterator end(void) {
+        return expressionEnd();
+      }
+      const_iterator end(void) const {
+        return expressionEnd();
+      }
+      reverse_iterator rend(void) {
+        return expressionREnd();
+      }
+      const_reverse_iterator rend(void) const {
+        return expressionREnd();
+      }
+
+      virtual void accept(mirv::StatementVisitor &) {
+        error("Assignment::Base::accept called");
+      }
+    };
+  public:
+    typedef boost::mpl::vector<Mutating> Properties;
+    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Statement<DualExpression> VisitorBaseType;
+  };
 
   /// Specify the interface for function call statements.
   class Call {
@@ -138,6 +145,18 @@ namespace mirv {
     class Interface  : public Statement<Controlled>,
 		       public LeafStatement,
                        public boost::enable_shared_from_this<Statement<Call> > {
+    private:
+      Statement<Base> *cloneImpl(void);
+
+    protected:
+      void setParents(void) {
+        for (ExpressionIterator i = expressionBegin();
+             i != expressionEnd();
+             ++i) {
+          (*i)->setParent(getSharedHandle());
+        }
+      }
+
     public:
       typedef ExpressionPtr ChildPtr;
       typedef ConstExpressionPtr ConstChildPtr;
@@ -172,6 +191,10 @@ namespace mirv {
                                 boost::bind(&Interface::expressionPushBack,
                                             this,
                                             _1));
+      }
+
+      ptr<Node<Base> >::type getSharedHandle(void) {
+        return fast_cast<Node<Base> >(shared_from_this());
       }
 
       // By convention, the first child is the expression referencing
@@ -245,15 +268,15 @@ namespace mirv {
         return argumentREnd();
       }
 
-       virtual void accept(mirv::StatementVisitor &) {
-	 error("Call::Base::accept called");
-       }
+      virtual void accept(mirv::StatementVisitor &) {
+        error("Call::Base::accept called");
+      }
     };
 
-   public:
-     typedef boost::mpl::vector<Mutating> Properties;
-     typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
-     typedef Statement<Controlled> VisitorBaseType;
+  public:
+    typedef boost::mpl::vector<Mutating> Properties;
+    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Statement<Controlled> VisitorBaseType;
   };
 }
 
