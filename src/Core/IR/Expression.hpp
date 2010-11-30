@@ -119,16 +119,15 @@ namespace mirv {
   template<>
   class Expression<Base> : public Node<Base> {
   private:
-    //virtual Expression<Base> *cloneImpl(void) = 0;
+    virtual Expression<Base> *cloneImpl(void) = 0;
 
   public:
     typedef ptr<Symbol<Type<TypeBase>>>::const_type TypePtr;
     Expression<Base>(void) {}
 
     ptr<Expression<Base> >::type clone(void) {
-      //ptr<Expression<Base> >::type expr(cloneImpl());
-      //return expr;
-      return ptr<Expression<Base> >::type();
+      ptr<Expression<Base> >::type expr(cloneImpl());
+      return expr;
     }
 
     virtual void accept(ExpressionVisitor &V);
@@ -228,6 +227,10 @@ namespace mirv {
     /// and implementation for them.
     class Interface : public InterfaceBaseType {
     public:
+      enum {
+        NumInitializers = 1
+      };
+
       typedef Expression<Base> ChildType;
       typedef ptr<ChildType>::type ChildPtr;
       typedef ptr<ChildType>::const_type ConstChildPtr;
@@ -273,6 +276,10 @@ namespace mirv {
     /// The interface and implementation for binary expressions.
     class Interface : public InterfaceBaseType {
     public:
+      enum {
+        NumInitializers = 2
+      };
+
       Interface(ChildPtr Child1,
                 ChildPtr Child2) : InterfaceBaseType(Child1, Child2) {
         checkInvariant(Child1->type() == Child2->type(),
@@ -430,7 +437,34 @@ namespace mirv {
     typedef InnerExpressionBase VisitorBaseType;
     typedef boost::mpl::vector<> Properties;
   }; 
- 
+
+  namespace detail {
+    template<int Num> struct constructor;
+
+    template<>
+    struct constructor<1> {
+      template<typename ExprType>
+      static typename ptr<ExprType>::type
+      construct(boost::shared_ptr<ExprType> prototype) {
+        typename ptr<ExprType>::type
+          expr(ExprType::make(prototype->getOperand()->clone()));
+        return expr;
+      }
+    };
+
+    template<>
+    struct constructor<2> {
+      template<typename ExprType>
+      static typename ptr<ExprType>::type
+      construct(boost::shared_ptr<ExprType> prototype) {
+        typename ptr<ExprType>::type
+          expr(ExprType::make( prototype->getLeftOperand()->clone(),
+                              prototype->getRightOperand()->clone()));
+        return expr;
+      }
+    };
+  }
+
   /// This is a metafunction to generate a scattered base class
   /// hierarchy of property expressions.  The Sequence is a sorted
   /// list of property tags and Root is the base type of the whole
@@ -448,13 +482,10 @@ namespace mirv {
   public:
     class ExpressionInterface : public BaseType {
     private:
-      Expression<Tag> *cloneImpl(void) {
-        typename ptr<Expression<Tag> >::type expr(Expression<Tag>::make());
-        for (typename Expression<Tag>::iterator i = this->begin();
-             i != this->end();
-             ++i) {
-          expr->push_back((*i)->clone());
-        }
+      Expression<Base> *cloneImpl(void) {
+        typename ptr<Expression<Tag> >::type
+          expr(detail::constructor<Expression<Tag>::NumInitializers>::
+               construct(this->shared_from_this()));
         Expression<Tag> *result = expr.get();
         expr.reset();
         return result;

@@ -18,7 +18,7 @@ namespace mirv {
     class Interface : public InterfaceBaseType,
                       public boost::enable_shared_from_this<Statement<Block> > {
     private:
-      Statement<Block> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -212,7 +212,7 @@ namespace mirv {
     class Interface : public Statement<SingleCondition>,
                       public Statement<SingleBlock>,
                       public boost::enable_shared_from_this<Statement<IfThen> > {
-      Statement<IfThen> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -246,7 +246,7 @@ namespace mirv {
     class Interface : public Statement<SingleCondition>,
                       public Statement<DualBlock>,
                       public boost::enable_shared_from_this<Statement<IfElse> > {
-      Statement<IfElse> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -281,7 +281,7 @@ namespace mirv {
     class Interface : public Statement<SingleCondition>,
                       public Statement<SingleBlock>,
                       public boost::enable_shared_from_this<Statement<While> > {
-      Statement<While> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -315,7 +315,7 @@ namespace mirv {
     class Interface : public Statement<SingleCondition>,
                       public Statement<SingleBlock>,
                       public boost::enable_shared_from_this<Statement<DoWhile> > {
-      Statement<DoWhile> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -349,7 +349,7 @@ namespace mirv {
     class Interface : public Statement<SingleCondition>,
                       public Statement<SingleBlock>,
                       public boost::enable_shared_from_this<Statement<Case> > {
-      Statement<Case> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -415,7 +415,7 @@ namespace mirv {
     class Interface : public Statement<SingleCondition>,
                       public Statement<SingleBlock>,
                       public boost::enable_shared_from_this<Statement<Switch> > {
-      Statement<Switch> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -489,7 +489,7 @@ namespace mirv {
     class Interface : public Statement<SingleLabel>,
                       public Statement<SingleBlock>,
                       public boost::enable_shared_from_this<Statement<Before> > {
-      Statement<Before> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -526,7 +526,7 @@ namespace mirv {
     class Interface : public Statement<SingleLabel>,
                       public Statement<SingleBlock>,
                       public boost::enable_shared_from_this<Statement<After> > {
-      Statement<After> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -563,7 +563,7 @@ namespace mirv {
     class Interface : public Statement<SingleLabel>,
                       public LeafStatement,
                       public boost::enable_shared_from_this<Statement<Goto> > {
-      Statement<Goto> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -597,7 +597,7 @@ namespace mirv {
   private:
     class Interface : public LeafStatement,
                       public boost::enable_shared_from_this<Statement<Return> > {
-      Statement<Return> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     public:
       ptr<Node<Base> >::type getSharedHandle(void) {

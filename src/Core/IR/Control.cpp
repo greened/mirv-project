@@ -1,7 +1,7 @@
 #include <mirv/Core/IR/Control.hpp>
 
 namespace mirv {
-  Statement<Block> *Block::Interface::cloneImpl(void)
+  Statement<Base> *Block::Interface::cloneImpl(void)
   {
     ptr<Statement<Block> >::type block(Statement<Block>::make());
     for (Statement<Block>::iterator i = begin();
@@ -14,7 +14,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<IfThen> *IfThen::Interface::cloneImpl(void)
+  Statement<Base> *IfThen::Interface::cloneImpl(void)
   {
     ptr<Statement<IfThen> >::type stmt(Statement<IfThen>::make(
                                          getCondition()->clone(),
@@ -24,7 +24,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<IfElse> *IfElse::Interface::cloneImpl(void)
+  Statement<Base> *IfElse::Interface::cloneImpl(void)
   {
     ptr<Statement<IfElse> >::type stmt(Statement<IfElse>::make(
                                          getCondition()->clone(),
@@ -35,7 +35,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<DoWhile> *DoWhile::Interface::cloneImpl(void)
+  Statement<Base> *DoWhile::Interface::cloneImpl(void)
   {
     ptr<Statement<DoWhile> >::type stmt(Statement<DoWhile>::make(
                                           getCondition()->clone(),
@@ -45,7 +45,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<While> *While::Interface::cloneImpl(void)
+  Statement<Base> *While::Interface::cloneImpl(void)
   {
     ptr<Statement<While> >::type stmt(Statement<While>::make(
                                         getCondition()->clone(),
@@ -55,7 +55,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<Case> *Case::Interface::cloneImpl(void)
+  Statement<Base> *Case::Interface::cloneImpl(void)
   {
     ptr<Statement<Case> >::type stmt(Statement<Case>::make(
                                        getCondition()->clone(),
@@ -65,7 +65,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<Switch> *Switch::Interface::cloneImpl(void)
+  Statement<Base> *Switch::Interface::cloneImpl(void)
   {
     ptr<Statement<Switch> >::type stmt(Statement<Switch>::make(
                                          getCondition()->clone(),
@@ -75,7 +75,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<Before> *Before::Interface::cloneImpl(void)
+  Statement<Base> *Before::Interface::cloneImpl(void)
   {
     ptr<Statement<Before> >::type stmt(Statement<Before>::make(
                                          getLabel()->clone(),
@@ -85,7 +85,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<After> *After::Interface::cloneImpl(void)
+  Statement<Base> *After::Interface::cloneImpl(void)
   {
     ptr<Statement<After> >::type stmt(Statement<After>::make(
                                         getLabel()->clone(),
@@ -95,7 +95,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<Goto> *Goto::Interface::cloneImpl(void)
+  Statement<Base> *Goto::Interface::cloneImpl(void)
   {
     ptr<Statement<Goto> >::type stmt(Statement<Goto>::make(
                                        getLabel()->clone()));
@@ -104,7 +104,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<Return> *Return::Interface::cloneImpl(void)
+  Statement<Base> *Return::Interface::cloneImpl(void)
   {
     ptr<Statement<Return> >::type stmt(Statement<Return>::make());
     Statement<Return> *result = stmt.get();

@@ -79,7 +79,7 @@ namespace mirv {
     class Interface : public Statement<DualExpression>,
                       public LeafStatement,
                       public boost::enable_shared_from_this<Statement<Assignment> > {
-      Statement<Assignment> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
@@ -146,7 +146,7 @@ namespace mirv {
 		       public LeafStatement,
                        public boost::enable_shared_from_this<Statement<Call> > {
     private:
-      Statement<Call> *cloneImpl(void);
+      Statement<Base> *cloneImpl(void);
 
     protected:
       void setParents(void) {
