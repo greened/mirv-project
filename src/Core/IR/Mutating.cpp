@@ -1,7 +1,7 @@
 #include <mirv/Core/IR/Mutating.hpp>
 
 namespace mirv {
-  Statement<Assignment> *Assignment::Interface::cloneImpl(void) 
+  Statement<Base> *Assignment::Interface::cloneImpl(void) 
   {
     ptr<Statement<Assignment> >::type stmt(Statement<Assignment>::make(
                                              getLeftExpression()->clone(),
@@ -11,7 +11,7 @@ namespace mirv {
     return result;
   }
 
-  Statement<Call> *Call::Interface::cloneImpl(void) 
+  Statement<Base> *Call::Interface::cloneImpl(void) 
   {
     ptr<Statement<Call> >::type stmt(Statement<Call>::make(this->function()->clone()));
     Statement<Call>::iterator i = this->begin();

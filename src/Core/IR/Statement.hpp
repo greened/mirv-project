@@ -127,13 +127,12 @@ namespace mirv {
   template<>
   class Statement<Base> : public Node<Base> {
   private:
-    //virtual Statement<Base> *cloneImpl(void) = 0;
+    virtual Statement<Base> *cloneImpl(void) = 0;
 
   public:
     ptr<Statement<Base> >::type clone(void) {
-    // ptr<Statement<Base> >::type stmt(cloneImpl());
-    // return stmt;
-      return ptr<Statement<Base> >::type();
+      ptr<Statement<Base> >::type stmt(cloneImpl());
+      return stmt;
     }
 
     virtual void accept(StatementVisitor &V);
