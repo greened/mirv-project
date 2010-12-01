@@ -282,7 +282,7 @@ namespace mirv {
 
     // Bundle any pending statements created from child expressions
     // with this statement.
-    template<typename StatementType>
+    template<typename StatementType, typename Dummy = boost::proto::callable>
     struct ClearPendingStatements : boost::proto::callable {
       typedef ptr<Statement<Base> >::type StatementPointer;
       typedef StatementPointer result_type;
@@ -309,7 +309,8 @@ namespace mirv {
 
     // Loops need to be handled specially.
     template<>
-    struct ClearPendingStatements<Statement<DoWhile> > : boost::proto::callable {
+    struct ClearPendingStatements<Statement<DoWhile>, boost::proto::callable>
+        : boost::proto::callable {
       typedef ptr<Statement<DoWhile> >::type StatementPointer;
       typedef StatementPointer result_type;
 
@@ -339,7 +340,8 @@ namespace mirv {
     struct WhileRule;
 
     template<>
-    struct ClearPendingStatements<WhileRule> : boost::proto::callable {
+    struct ClearPendingStatements<WhileRule, boost::proto::callable>
+        : boost::proto::callable {
       typedef ptr<Statement<IfThen> >::type StatementPointer;
       typedef StatementPointer result_type;
 
