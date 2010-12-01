@@ -30,7 +30,7 @@ namespace mirv {
      typename ptr<NodeType>::type parent(void) const {
        ptr<Node<Base> >::type result(theParent.lock());
        if (!result) {
-         return result;
+         return typename ptr<NodeType>::type();
        }
        typename ptr<NodeType>::type casted = safe_cast<NodeType>(result);
        if (casted) {
