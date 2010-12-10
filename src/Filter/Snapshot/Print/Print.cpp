@@ -309,6 +309,63 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
+  // Constant printing
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::int8_t> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::int16_t> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::int32_t> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::int64_t> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::float> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::double> > >::const_type sym) 
+  {
+    out << sym->getValue();
+  }
+  void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
+  visit(ptr<Symbol<Constant<std::string> > >::const_type sym) 
+  {
+    out << '"' << sym->getValue() << '"';
+  }
+
   void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Add> >::type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
@@ -505,7 +562,10 @@ namespace mirv {
 
     out << indent(ind) << "cref "
       << expr->getSymbol()->type()->name()
-      << ' ' << expr->getSymbol()->valueString();
+      << ' ';
+
+    ConstantValuePrinter valuePrinter(out);
+    expr->getSymbol()->accept(valuePrinter);
   }
 
   void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<Base> > > >::type expr)
@@ -559,6 +619,11 @@ namespace mirv {
   }
 
   void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<double> > > >::type expr)
+  {
+    visitConstant(expr);
+  }
+
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::string> > > >::type expr)
   {
     visitConstant(expr);
   }

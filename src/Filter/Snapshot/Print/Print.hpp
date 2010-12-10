@@ -210,6 +210,26 @@ namespace mirv {
     private:
       FlowAttributeManagerType &attributeManager;
 
+      class ConstantValuePrinter : ConstSymbolVisitor {
+      private:
+        Stream &out;
+
+      public:
+        ConstantValuePrinter(String &o) : out(o) {}
+
+        void visit(ptr<Symbol<Constant<std::int8_t> > >::const_type);
+        void visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type);
+        void visit(ptr<Symbol<Constant<std::int16_t> > >::const_type);
+        void visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type);
+        void visit(ptr<Symbol<Constant<std::int32_t> > >::const_type);
+        void visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type);
+        void visit(ptr<Symbol<Constant<std::int64_t> > >::const_type);   
+        void visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type);
+        void visit(ptr<Symbol<Constant<float> > >::const_type);
+        void visit(ptr<Symbol<Constant<double> > >::const_type);
+        void visit(ptr<Symbol<Constant<std::string> > >::const_type);
+      };
+
       template<typename ValueType>
       void visitConstant(boost::shared_ptr<Expression<Reference<Constant<ValueType> > > > expr);
 
@@ -247,6 +267,7 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::type expr);
       void visit(ptr<Expression<Reference<Constant<float> > > >::type expr);
       void visit(ptr<Expression<Reference<Constant<double> > > >::type expr);
+      void visit(ptr<Expression<Reference<Constant<std::string> > > >::type expr);
       void visit(ptr<Expression<Reference<Constant<Base> > > >::type expr);
     };
 
