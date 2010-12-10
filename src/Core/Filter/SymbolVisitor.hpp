@@ -40,6 +40,7 @@ namespace mirv {
 	ptr<Symbol<Constant<std::uint64_t> > >::type,
 	ptr<Symbol<Constant<float> > >::type,
 	ptr<Symbol<Constant<double> > >::type,
+	ptr<Symbol<Constant<std::string> > >::type,
 	ptr<Symbol<Type<TypeBase> > >::type,
 	ptr<LeafType>::type,
 	ptr<InnerType>::type,
@@ -75,6 +76,7 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Constant<std::uint64_t> > >::type);
     virtual void visit(ptr<Symbol<Constant<float> > >::type);
     virtual void visit(ptr<Symbol<Constant<double> > >::type);
+    virtual void visit(ptr<Symbol<Constant<std::string> > >::type);
     virtual void visit(ptr<Symbol<Type<TypeBase> > >::type);
     virtual void visit(ptr<LeafType>::type);
     virtual void visit(ptr<InnerType>::type);

@@ -109,6 +109,11 @@ namespace mirv {
       fast_cast<Symbol<Constant<double> >::VisitorBaseType>(s);
     visit(p);
   }
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::string> > >::type s) {
+    ptr<Symbol<Constant<std::string> >::VisitorBaseType>::type p =
+      fast_cast<Symbol<Constant<std::string> >::VisitorBaseType>(s);
+    visit(p);
+  }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::type s) {
     ptr<Symbol<Type<TypeBase> >::VisitorBaseType>::type p =
       fast_cast<Symbol<Type<TypeBase> >::VisitorBaseType>(s);
