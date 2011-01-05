@@ -3,10 +3,41 @@
 
 #include <mirv/Core/IR/Type.hpp>
 
+#include <boost/iterator/reverse_iterator.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <numeric>
 #include <vector>
 
 namespace mirv {
+  namespace detail {
+    // TODO: Make this a proper std function object.
+    class ToString {
+    public:
+      typedef std::string result_type;
+
+      std::string operator()(int value) const {
+        return boost::lexical_cast<std::string>(value);
+      }
+    };
+
+    template<typename InputIterator>
+    std::string stringizeDimensions(InputIterator start, InputIterator end) {
+      std::stringstream result;
+      // Print the most significant dimension first.
+      std::copy(boost::make_transform_iterator(
+                  boost::make_reverse_iterator(end), ToString()),
+                boost::make_transform_iterator(
+                  boost::make_reverse_iterator(start), ToString()),
+                std::ostream_iterator<std::string>(result, ","));
+      // Knock off the last delimiter.
+      // TODO: There must be a better way.
+      std::string resultString = result.str();
+      return resultString.substr(0, resultString.length() - 1);
+    }
+  }
+  
   /// An array type.  Array types are true multidimensional concepts.
    struct Array {
    private:
@@ -23,26 +54,25 @@ namespace mirv {
          DimensionVector dimensions;
 
       public:
-	Interface(const std::string &name) : InterfaceBaseType(name) {}
-	typedef Symbol<Type<TypeBase> > ChildType;
-	typedef ptr<ChildType>::type ChildPtr;
+       typedef Symbol<Type<TypeBase> > ChildType;
+       typedef ptr<ChildType>::type ChildPtr;
          typedef ptr<ChildType>::const_type ConstChildPtr;
 
+       template<typename InputIterator>
+       Interface(ChildPtr ElementType,
+                 InputIterator dimensionStart,
+                 InputIterator dimensionEnd) :
+           InterfaceBaseType(ElementType->name() + "["
+                             + detail::stringizeDimensions(dimensionStart,
+                                                           dimensionEnd)
+                             + "]"),
+             dimensions(dimensionStart, dimensionEnd) {}
          typedef DimensionVector::iterator DimensionIterator;
          typedef DimensionVector::const_iterator ConstDimensionIterator;
 
          typedef DimensionVector::reverse_iterator ReverseDimensionIterator;
          typedef DimensionVector::const_reverse_iterator
          ConstReverseDimensionIterator;
-
-         void setElementType(ChildPtr c) {
-            if (empty()) {
-               push_back(c);
-            }
-            else {
-               *begin() = c;
-            }
-         }
 
          ChildPtr getElementType(void) {
             return(front());
@@ -113,6 +143,16 @@ namespace mirv {
    public:
      typedef Interface BaseType;
      typedef Symbol<Type<Derived> > VisitorBaseType;
+
+     template<typename InputIterator>
+     static std::string getName(ptr<Symbol<Type<TypeBase> > >::type elementType,
+                                InputIterator start,
+                                InputIterator end) {
+       return elementType->name()
+         + "["
+         + detail::stringizeDimensions(start, end)
+         + "]";
+     }
    };
 }
 

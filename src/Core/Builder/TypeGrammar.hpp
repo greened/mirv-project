@@ -8,6 +8,7 @@
 #include <mirv/Core/Builder/FunctionTypeGrammar.hpp>
 #include <mirv/Core/Builder/StructTypeGrammar.hpp>
 #include <mirv/Core/Builder/PointerTypeGrammar.hpp>
+#include <mirv/Core/Builder/ArrayTypeGrammar.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
@@ -26,7 +27,8 @@ namespace mirv {
       FloatBuilder,
       FunctionTypeBuilder,
       StructTypeBuilder,
-      PointerTypeBuilder
+      PointerTypeBuilder,
+      ArrayTypeBuilder
       > {};
   }
 }
