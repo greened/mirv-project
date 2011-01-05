@@ -9,6 +9,7 @@
 #include <mirv/Core/Builder/StructTypeRulesFwd.hpp>
 #include <mirv/Core/Builder/FunctionTypeRulesFwd.hpp>
 #include <mirv/Core/Builder/PointerTypeRulesFwd.hpp>
+#include <mirv/Core/Builder/ArrayTypeRulesFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 
@@ -34,7 +35,8 @@ namespace mirv {
        FloatRule,
        StructTypeRule,
        FunctionTypeRule,
-       PointerTypeRule
+       PointerTypeRule,
+       ArrayTypeRule
        > {};
    }
 }
