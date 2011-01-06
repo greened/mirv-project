@@ -4,15 +4,20 @@
 // STDOUT:    fdecl printf int32 (int8 *, ...)
 // STDOUT:    vdecl __str0__ int8[15] "Hello, World!\n\0"
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl num int32
+// STDOUT:       vdecl i int32
+// STDOUT:       vdecl __ct0__ int32
+// STDOUT:       assign
+// STDOUT:          vref i
+// STDOUT:          cref 0
 // STDOUT:       {
 // STDOUT:          call
 // STDOUT:             fref printf
-// STDOUT:             vref num
+// STDOUT:             vref __ct0__
 // STDOUT:             addrOf
 // STDOUT:                aref
 // STDOUT:                   vref __str0__
 // STDOUT:                   cref 0
+// STDOUT:                vref i
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
@@ -59,17 +64,21 @@ using Builder::module;
 using Builder::void_;
 using Builder::int_;
 using Builder::do_;
+using Builder::vararg;
 
 int main(void)
 {
   Builder::VariableTerminal i = {{"i"}};
+  Builder::FunctionTerminal printf_ = {{"printf"}};
 
   ptr<Node<Base> >::type code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
+        func["printf"].type[int_(32)(*int_(8), vararg)],
         func["testfunc"].type[void_()] [
           var[i].type[int_(32)],
-          i = 0
+          i = 0,
+          printf_("i = %d", i)
         ]
       ]
     );

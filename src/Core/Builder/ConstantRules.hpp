@@ -53,6 +53,17 @@ namespace mirv {
        FloatConstantTerminal,
        DoubleConstantTerminal
        > {};
+
+     struct StringConstantTerminal 
+         : public boost::proto::terminal<
+           boost::proto::convertible_to<std::string>
+           >::type {};
+
+     /// This is the rule to match string constant symbols.  Strings
+     /// are really arrays of int8.  As a special case, we return the
+     /// address of the first array element to maintain a C-like
+     /// syntax.
+     struct StringConstantRule : StringConstantTerminal {};
    }
 }
 

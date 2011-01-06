@@ -313,57 +313,57 @@ namespace mirv {
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::int8_t> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::int16_t> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::int32_t> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::int64_t> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
-  visit(ptr<Symbol<Constant<std::float> > >::const_type sym) 
+  visit(ptr<Symbol<Constant<float> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
-  visit(ptr<Symbol<Constant<std::double> > >::const_type sym) 
+  visit(ptr<Symbol<Constant<double> > >::const_type sym) 
   {
-    out << sym->getValue();
+    out << sym->value();
   }
   void PrintFilter::EnterExpressionVisitor::ConstantValuePrinter::
   visit(ptr<Symbol<Constant<std::string> > >::const_type sym) 
   {
-    out << '"' << sym->getValue() << '"';
+    out << '"' << sym->value() << '"';
   }
 
   void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Add> >::type expr)
