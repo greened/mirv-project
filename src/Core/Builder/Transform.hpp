@@ -166,6 +166,18 @@ namespace mirv {
         return type;
       }
 
+      /// Get the variable symbol at the current scope only.  Return a
+      /// null pointer if the symbol does not exist.
+      ptr<Symbol<Variable> >::type
+      lookupAtModuleScope(const std::string &name,
+                          Symbol<Variable> *) const {
+	Symbol<Module>::VariableIterator i = module->variableFind(name);
+	if (i != module->variableEnd()) {
+	  return *i;
+	}
+        return ptr<Symbol<Variable> >::type();
+      } 
+
       void addAtCurrentScope(ptr<Symbol<Variable> >::type var) {
 	ptr<Symbol<Variable> >::type result =
 	  lookupAtCurrentScope(var->name(),
@@ -198,6 +210,16 @@ namespace mirv {
 	  error("Type already exists");
 	}
         module->typePushBack(type);
+      }
+
+      void addAtModuleScope(ptr<Symbol<Variable> >::type var) {
+	ptr<Symbol<Variable> >::type result =
+	  lookupAtModuleScope(var->name(),
+                              reinterpret_cast<Symbol<Variable> *>(0));
+        if (result) {
+	  error("Variable already exists");
+	}
+        module->variablePushBack(var);
       }
     };
     

@@ -20,7 +20,8 @@ namespace mirv {
           boost::proto::_value(boost::proto::_right(
                                  boost::proto::_left(boost::proto::_left))),
           // Variable type
-          TypeAccessBuilder(boost::proto::_right))
+          TypeAccessBuilder(boost::proto::_right),
+          CurrentScope)
       > {};
 
     namespace {

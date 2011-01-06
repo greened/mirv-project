@@ -28,7 +28,8 @@ namespace mirv {
             + boost::lexical_cast<std::string>(symtab->getNextTempNum())
             + "__",
             safe_cast<const Symbol<Type<FunctionType> > >(functionExpr->type())->
-          getReturnType());
+            getReturnType(),
+            CurrentScope);
 
       ptr<Expression<Reference<Variable> > >::type returnValue =
         make<Expression<Reference<Variable> > >(temp);

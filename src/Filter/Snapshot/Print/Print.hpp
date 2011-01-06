@@ -210,12 +210,12 @@ namespace mirv {
     private:
       FlowAttributeManagerType &attributeManager;
 
-      class ConstantValuePrinter : ConstSymbolVisitor {
+      class ConstantValuePrinter : public ConstSymbolVisitor {
       private:
         Stream &out;
 
       public:
-        ConstantValuePrinter(String &o) : out(o) {}
+        ConstantValuePrinter(Stream &o) : out(o) {}
 
         void visit(ptr<Symbol<Constant<std::int8_t> > >::const_type);
         void visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type);
