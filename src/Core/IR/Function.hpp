@@ -43,7 +43,8 @@ namespace mirv {
 
        /// Add a local variable to this function.
        void variablePushBack(VariablePtr v) {
-	 VariableBaseType::push_back(v);
+	 VariableBaseType::push_back(v); 
+         v->setParent(this->getSharedHandle());
        }
 
        typedef VariableBaseType::iterator VariableIterator;
