@@ -122,6 +122,11 @@ namespace mirv {
             dimensions.push_back(d);
          }
 
+       typedef typename DimensionList::size_type size_type;
+       size_type dimensionSize(void) const {
+         return dimensions.size();
+       }
+
          BitSizeType bitsize(void) const {
             return(std::accumulate(dimensionBegin(), dimensionEnd(),
                                    getElementType()->bitsize(),

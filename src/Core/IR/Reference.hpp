@@ -107,14 +107,63 @@ namespace mirv {
   };
 
   /// Specify the interface for array index expressions.
-  class ArrayRef { 
-  public:
-    typedef boost::mpl::vector<> Properties;
-    // TODO: Support multi-dimension arrays natively?
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      ArrayRef>::type BaseType;
-    // TODO: Override type().
+  struct Array {};
+  
+  template<>
+  class Reference<Array> { 
+  private:
+    // We need to manually define the interface to override
+    // InnerExpression's type() implementation.
+    typedef InnerExpression RootType;
+    typedef boost::mpl::vector<> PropertiesList;
+
+    /// The metafunction result.
+    typedef typename Properties<
+      PropertyExpressionGenerator,
+      RootType,
+      PropertiesList,
+      VisitedInherit2<ExpressionVisitor>
+      >::type HierarchyType;
+    
+    typedef typename VisitedInherit2<ExpressionVisitor>::template apply<
+      HierarchyType,
+      boost::enable_shared_from_this<
+        Expression<Reference<SymbolType> > > >::type InterfaceBaseType;
+
+    class Interface : public InterfaceBaseType {
+    public:
+      Interface(ChildPtr Base) : InterfaceBaseType(Base) {}
+
+      ptr<Node<Base> >::type getSharedHandle(void) {
+        return fast_cast<Node<Base>>(this->shared_from_this());
+      }
+
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
+      TypePtr type(void) const {
+        // The type is the type of the array with each dimension
+        // stripped off.
+        ptr<Symbol<Type<Array> > >::const_type arrayType =
+          safe_cast<Symbol<Type<Array> > >(*this->begin())->type();
+
+        if ((this->size() - 1) == arrayType->dimensionSize()) {
+          // We completely indexed the array.
+          return arrayType->getElementType();
+        }
+
+        Symbol<Type<Array> >::DimensionIterator dimStart =
+          arrayType->dimensionBegin();
+
+        Symbol<Type<Array> >::DimensionIterator dimEnd = dimStart;
+        std::advance(dimEnd, this->size() - 1);
+
+        
+      }
+    };
+
+   public:
+     typedef PropertiesList Properties;
+     typedef InnerExpression VisitorBaseType;
+     typedef Interface BaseType;
   };
 }
 
