@@ -29,6 +29,7 @@ namespace mirv {
        /// Add a function.
        void functionPushBack(FunctionPointer f) {
 	 FunctionBaseType::push_back(f);
+         f->setParent(this->getSharedHandle());
        }
  
        typedef FunctionBaseType::iterator FunctionIterator;
@@ -61,6 +62,7 @@ namespace mirv {
        /// Add a global variable.
        void variablePushBack(VariablePointer v) {
 	 VariableBaseType::push_back(v);
+         v->setParent(this->getSharedHandle());
        }
 
        typedef VariableBaseType::iterator VariableIterator;
@@ -93,6 +95,7 @@ namespace mirv {
        /// Add a type.
        void typePushBack(TypePointer t) {
 	 TypeBaseType::push_back(t);
+         t->setParent(this->getSharedHandle());
        }
 
        typedef TypeBaseType::iterator TypeIterator;
