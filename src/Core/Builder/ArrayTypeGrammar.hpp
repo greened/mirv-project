@@ -99,7 +99,8 @@ namespace mirv {
           symtab,
           subscripts.elementType(),
           subscripts.begin(),
-          subscripts.end());
+          subscripts.end(),
+          ModuleScope);
       }
     };
 

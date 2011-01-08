@@ -237,6 +237,7 @@ namespace mirv {
       void visit(ptr<Expression<GreaterThanOrEqual> >::type expr);
       void visit(ptr<Expression<Reference<Variable> > >::type expr);
       void visit(ptr<Expression<Reference<Function> > >::type expr);
+      void visit(ptr<Expression<Reference<Array> > >::type expr);
       void visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::type expr);
       void visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::type expr);
       void visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::type expr);

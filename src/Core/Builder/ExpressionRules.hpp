@@ -76,16 +76,16 @@ namespace mirv {
      typedef boost::proto::bitwise_and<ConstructExpressionGrammar, ConstructExpressionGrammar> BitwiseAndRule;
      typedef boost::proto::bitwise_xor<ConstructExpressionGrammar, ConstructExpressionGrammar> BitwiseXorRule;
 
-      // No comma
-
      typedef boost::proto::mem_ptr<ConstructExpressionGrammar, ConstructExpressionGrammar> MemPtrRule;
 
-      // No assign (statement)
-      // No op-assign
+     // Nary Rules
+     typedef boost::proto::subscript<ConstructExpressionGrammar,
+       boost::proto::vararg<ConstructExpressionGrammar> > SubscriptRule;
 
-     typedef boost::proto::subscript<ConstructExpressionGrammar, ConstructExpressionGrammar> SubscriptRule;
-
-      // No ?:
+     // No comma
+     // No assign (statement)
+     // No op-assign
+     // No ?:
    }
 }
 

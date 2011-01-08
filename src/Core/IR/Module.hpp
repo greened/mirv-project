@@ -12,7 +12,7 @@ namespace mirv {
    class Module {
    private:
      typedef InnerImpl<Symbol<Function>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> FunctionBaseType;
-     typedef InnerImpl<Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> TypeBaseType;
+     typedef InnerImpl<const Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> TypeBaseType;
      typedef InnerImpl<Symbol<Variable>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> VariableBaseType;
 
      class Interface : public Symbol<Named>,
@@ -90,7 +90,7 @@ namespace mirv {
        }
 
        // Access type information
-       typedef TypeBaseType::ChildPtr TypePointer;
+       typedef TypeBaseType::ConstChildPtr TypePointer;
 
        /// Add a type.
        void typePushBack(TypePointer t) {

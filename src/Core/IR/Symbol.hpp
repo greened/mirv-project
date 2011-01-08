@@ -21,7 +21,8 @@ namespace mirv {
   /// visitor logic in one place, hiding the gory details from the
   /// symbol type tags and specific symbol type interfaces.
   template<typename Tag>
-  class Symbol : public Tag::BaseType {
+  class Symbol : public Tag::BaseType,
+                 public Visitable<Symbol<Tag> > {
   public:
     typedef typename Tag::BaseType BaseType;
     typedef typename Tag::VisitorBaseType VisitorBaseType;
@@ -92,16 +93,16 @@ namespace mirv {
   /// This is a function object to allow searching on sets of symbols by name.
   template<typename SymbolTag>
   class SymbolByName :
-    public std::binary_function<boost::shared_ptr<Symbol<SymbolTag> >,
+    public std::binary_function<boost::shared_ptr<const Symbol<SymbolTag> >,
 				const std::string &,
 				bool> {
   private:
-    typedef std::binary_function<typename ptr<Symbol<SymbolTag> >::type,
+    typedef std::binary_function<typename ptr<Symbol<SymbolTag> >::const_type,
 				 const std::string &,
 				 bool> BaseType;
   public:
-    bool operator()(typename ptr<Symbol<SymbolTag> >::type symbol,
-		    const std::string &name) {
+    bool operator()(typename ptr<Symbol<SymbolTag> >::const_type symbol,
+		    const std::string &name) const {
       return symbol->name() == name;
     }
   };

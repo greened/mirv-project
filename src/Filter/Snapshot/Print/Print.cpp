@@ -571,6 +571,16 @@ namespace mirv {
     out << indent(ind) << "fref " << expr->getSymbol()->name();
   }
 
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Array> > >::type expr)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "aref\n";
+    attributeManager.setInheritedAttribute(
+      InheritedAttribute(ind + IndentFactor, out));
+  }
+
   void PrintFilter::LeaveExpressionVisitor::visit(ptr<Expression<Base> >::type expr)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()

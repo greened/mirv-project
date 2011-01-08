@@ -2,6 +2,15 @@
 #define mirv_Core_IR_Mutating_hpp
 
 #include <mirv/Core/IR/Statement.hpp>
+#include <mirv/Core/IR/Expression.hpp>
+
+#include <boost/bind.hpp>
+#include <boost/fusion/iterator.hpp>
+#include <boost/fusion/include/transform.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <boost/fusion/include/front.hpp>
+#include <boost/fusion/include/pop_front.hpp>
+#include <boost/fusion/include/size.hpp>
 #include <boost/mpl/vector.hpp>
 
 namespace mirv {

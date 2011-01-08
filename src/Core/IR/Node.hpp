@@ -19,7 +19,12 @@ namespace mirv {
    template<>
    class Node<Base> {
    private:
-     ptr<Node<Base>>::weak_type theParent;
+     // FIXME: This really shouldn't need to be mutable.  It is so
+     // that when we add a type to a module the module can set itself
+     // as the type's parent.  We really ought to pass the module to
+     // the type during construction because that's the only place it
+     // will ever live.
+     mutable ptr<Node<Base>>::weak_type theParent;
 
    public:
      virtual ~Node<Base>(void);
@@ -39,7 +44,7 @@ namespace mirv {
        return result->template parent<NodeType>();
      }
 
-     void setParent(ptr<Node<Base>>::weak_type parent) {
+     void setParent(ptr<Node<Base>>::weak_type parent) const {
        theParent = parent;
      }
    };
