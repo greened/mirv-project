@@ -4,6 +4,13 @@
 #include <mirv/Core/IR/Statement.hpp>
 #include <mirv/Core/IR/Control.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
+#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/IntegralType.hpp>
+#include <mirv/Core/IR/FloatingType.hpp>
+#include <mirv/Core/IR/ArrayType.hpp>
+#include <mirv/Core/IR/FloatingType.hpp>
+#include <mirv/Core/IR/FunctionType.hpp>
+#include <mirv/Core/IR/PointerType.hpp>
 
 namespace mirv {
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Base> >::type s) {};

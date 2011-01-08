@@ -353,4 +353,10 @@ ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Binary> >
     ptr<Expression<Reference<Constant<Base> > >::VisitorBaseType>::type p = fast_cast<Expression<Reference<Constant<Base> > >::VisitorBaseType>(e);
     visit(p);
   }
+
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Reference<Array> > >::type e) {
+    ptr<Expression<Reference<Array> >::VisitorBaseType>::type p =
+      fast_cast<Expression<Reference<Array> >::VisitorBaseType>(e);
+    visit(p);
+  }
 }

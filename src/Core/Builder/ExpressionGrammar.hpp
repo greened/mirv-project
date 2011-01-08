@@ -65,6 +65,14 @@ namespace mirv {
         Expression<Reference<Constant<Base> > >
         >(boost::proto::_data, ConstantBuilder(boost::proto::_))
       > {};
+
+    struct ArrayRefBuilder : boost::proto::when<
+      SubscriptRule,
+      ConstructNary<Expression<Reference<Array> > >(
+        boost::proto::_data,
+        ConstructExpressionGrammar(boost::proto::_left)
+        boost::proto::_expr)
+      > {};
     
     /// This is the grammar for all terminal expressions.
     template<>
@@ -72,7 +80,8 @@ namespace mirv {
         : boost::proto::or_<
       VariableRefBuilder,
       FunctionRefBuilder,
-      ConstantRefBuilder
+      ConstantRefBuilder,
+      ArrayRefBuilder
       > {};
 
     /// This is the grammar for negate expressions.

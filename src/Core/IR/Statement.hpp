@@ -3,7 +3,8 @@
 
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/IR/Node.hpp>
-#include <mirv/Core/IR/Expression.hpp>
+#include <mirv/Core/IR/Property.hpp>
+#include <mirv/Core/IR/ExpressionFwd.hpp>
 #include <mirv/Core/IR/Inherit.hpp>
 
 #include <boost/mpl/vector.hpp>
@@ -11,6 +12,7 @@
 #include <boost/mpl/sort.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/int.hpp>
+#include <boost/mpl/transform.hpp>
 
 namespace mirv {
   namespace detail {

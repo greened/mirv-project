@@ -55,11 +55,10 @@ namespace mirv {
 
       public:
        typedef Symbol<Type<TypeBase> > ChildType;
-       typedef ptr<ChildType>::type ChildPtr;
          typedef ptr<ChildType>::const_type ConstChildPtr;
 
        template<typename InputIterator>
-       Interface(ChildPtr ElementType,
+       Interface(ConstChildPtr ElementType,
                  InputIterator dimensionStart,
                  InputIterator dimensionEnd) :
            InterfaceBaseType(ElementType->name() + "["
@@ -74,9 +73,6 @@ namespace mirv {
          typedef DimensionVector::const_reverse_iterator
          ConstReverseDimensionIterator;
 
-         ChildPtr getElementType(void) {
-            return(front());
-         }
          ConstChildPtr getElementType(void) const {
             return(front());
          }
@@ -122,7 +118,7 @@ namespace mirv {
             dimensions.push_back(d);
          }
 
-       typedef typename DimensionList::size_type size_type;
+       typedef DimensionVector::size_type size_type;
        size_type dimensionSize(void) const {
          return dimensions.size();
        }
@@ -150,9 +146,10 @@ namespace mirv {
      typedef Symbol<Type<Derived> > VisitorBaseType;
 
      template<typename InputIterator>
-     static std::string getName(ptr<Symbol<Type<TypeBase> > >::type elementType,
-                                InputIterator start,
-                                InputIterator end) {
+     static std::string
+     getName(ptr<Symbol<Type<TypeBase> > >::const_type elementType,
+             InputIterator start,
+             InputIterator end) {
        return elementType->name()
          + "["
          + detail::stringizeDimensions(start, end)

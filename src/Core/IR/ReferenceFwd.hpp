@@ -8,7 +8,6 @@ namespace mirv {
   class Reference;
   class AddressOf;
   class Dereference;
-  class ArrayRef;
   class Call;
 }
 
