@@ -87,13 +87,6 @@ namespace mirv {
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
        }
-
-       virtual void accept(mirv::SymbolVisitor &) {
-	 error("Function::Base::accept called");
-       }
-       virtual void accept(mirv::ConstSymbolVisitor &) const {
-	 error("Function::Base::accept called");
-       }
      };
      typedef Interface BaseType;
      typedef TypedBaseType VisitorBaseType;

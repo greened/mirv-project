@@ -113,10 +113,6 @@ namespace mirv {
 
       template<typename A1, typename A2>
       VisitedType1(A1 a1, A2 a2) : T1(a1, a2) {}
-
-      void accept(Visitor &V) {
-	error("Inherit::accept called");
-      }
     };
 
     /// This is a specilaization to inherit virtually from one type.
@@ -130,10 +126,6 @@ namespace mirv {
 
       template<typename A1, typename A2>
       VisitedType1(A1 a1, A2 a2) : T1(a1, a2) {}
-
-      void accept(Visitor &V) {
-	error("Inherit::accept called");
-      }
     };
 
     /// This is a low-level type to inherit from two types and provide
@@ -158,10 +150,6 @@ namespace mirv {
       //  error("Inherit::getSharedHandle called");
       //  return ptr<Node<Base>>::type();
       //}
-
-      void accept(Visitor &V) {
-	error("Inherit::accept called");
-      }
     };
 
     /// This is a specialization to inherit virtually from one of two
@@ -185,10 +173,6 @@ namespace mirv {
       //   error("Inherit::getSharedHandle called");
       //   return ptr<Node<Base>>::type();
       // }
-
-      void accept(Visitor &V) {
-	error("Inherit::accept called");
-      }
     };
 
     /// This is a specialization to inherit virtually from one of two
@@ -212,10 +196,6 @@ namespace mirv {
       //  error("Inherit::getSharedHandle called");
       //  return ptr<Node<Base>>::type();
       //}
-
-      void accept(Visitor &V) {
-	error("Inherit::accept called");
-      }
     };
   }
 
