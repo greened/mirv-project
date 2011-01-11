@@ -26,13 +26,6 @@ namespace mirv {
       Interface(ptr<Symbol<Type<TypeBase> > >::type type) : Symbol<Typed>(type) {}
 
       virtual std::string valueString(void) = 0;
-
-       virtual void accept(mirv::SymbolVisitor &) {
-	 error("Constant::Base::accept called");
-       }
-       virtual void accept(mirv::ConstSymbolVisitor &) const {
-	 error("Constant::Base::accept called");
-       }
     };
 
   public:
@@ -64,13 +57,6 @@ namespace mirv {
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(this->shared_from_this());
        };
-
-       virtual void accept(mirv::SymbolVisitor &) {
-	 error("Constant::Base::accept called");
-       }
-       virtual void accept(mirv::ConstSymbolVisitor &) const {
-	 error("Constant::Base::accept called");
-       }
     };
 
   public:

@@ -97,7 +97,8 @@ namespace mirv {
   /// object.  Separating the interface from the implementation solves
   /// that problem.
   template<>
-  class Symbol<Type<Inner<detail::InnerTypeTraits> > > : public Inner<detail::InnerTypeTraits>::BaseType {
+  class Symbol<Type<Inner<detail::InnerTypeTraits> > >
+      : public Inner<detail::InnerTypeTraits>::BaseType {
   private:
     typedef Inner<detail::InnerTypeTraits>::BaseType BaseType;
 
@@ -106,8 +107,6 @@ namespace mirv {
     : BaseType(name) {}
 
     typedef Symbol<Type<TypeBase> > VisitorBaseType;
-    virtual void accept(SymbolVisitor &V);
-    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   class InnerTypeBase : public Symbol<Type<Inner<detail::InnerTypeTraits> > > {
@@ -133,9 +132,6 @@ namespace mirv {
 
   public:
     InnerType(const std::string &name) : BaseType(name) {}
-
-    virtual void accept(SymbolVisitor &V);
-    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   /// A type with no children that has a specific bit size, for

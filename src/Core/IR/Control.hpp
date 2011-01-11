@@ -228,10 +228,6 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("IfThen::Base::accept called");
-      }
     };
 
   public:
@@ -263,10 +259,6 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("IfElse::Base::accept called");
-      }
     };
 
   public:
@@ -296,10 +288,6 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
-      }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("While::Base::accept called");
       }
     };
 
@@ -331,10 +319,6 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("DoWhile::Base::accept called");
-      }
     };
 
   public:
@@ -364,10 +348,6 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
-      }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Case::Base::accept called");
       }
     };
 
@@ -430,10 +410,6 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
-      }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Switch::Base::accept called");
       }
     };
 
@@ -505,10 +481,6 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Before::Base::accept called");
-      }
     };
 
   public:
@@ -542,10 +514,6 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("After::Base::accept called");
-      }
     };
 
   public:
@@ -578,10 +546,6 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Goto::Base::accept called");
-      }
     };
 
   public:
@@ -602,10 +566,6 @@ namespace mirv {
     public:
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
-      }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Return::Base::accept called");
       }
     };
 

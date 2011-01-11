@@ -128,10 +128,6 @@ namespace mirv {
       const_reverse_iterator rend(void) const {
         return expressionREnd();
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Assignment::Base::accept called");
-      }
     };
   public:
     typedef boost::mpl::vector<Mutating> Properties;
@@ -266,10 +262,6 @@ namespace mirv {
       }
       const_reverse_iterator rend(void) const {
         return argumentREnd();
-      }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Call::Base::accept called");
       }
     };
 

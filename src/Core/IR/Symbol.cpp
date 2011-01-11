@@ -14,43 +14,21 @@
 #include <mirv/Core/Utility/Cast.hpp>
 
 namespace mirv {
-  void Symbol<Base>::accept(SymbolVisitor &V)
+  void
+  Visitable<
+    Symbol<Base>,
+    SymbolVisitor
+    >::accept(SymbolVisitor &V)
   {
     error("Symbol<Base>::accept called");
   }
 
-  void Symbol<Base>::accept(ConstSymbolVisitor &V) const
+  void
+  Visitable<
+    Symbol<Base>,
+    ConstSymbolVisitor
+    >::accept(ConstSymbolVisitor &V) const
   {
     error("Symbol<Base>::accept called");
-  }
-
-  void Symbol<Inner<detail::InnerSymbolTraits> >::accept(SymbolVisitor &V)
-  {
-    error("Symbol<Inner>::accept called");
-  }
-
-  void Symbol<Inner<detail::InnerSymbolTraits> >::accept(ConstSymbolVisitor &V) const
-  {
-    error("Symbol<Inner>::accept called");
-  }
-
-  void InnerSymbol::accept(SymbolVisitor &V)
-  {
-    error("InnerSymbol::accept called");
-  }
-
-  void InnerSymbol::accept(ConstSymbolVisitor &V) const
-  {
-    error("InnerSymbol::accept called");
-  }
-
-  void LeafSymbol::accept(SymbolVisitor &V)
-  {
-    error("LeafSymbol::accept called");
-  }
-
-  void LeafSymbol::accept(ConstSymbolVisitor &V) const
-  {
-    error("LeafSymbol::accept called");
   }
 }

@@ -5,6 +5,7 @@
 #include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
+#include <mirv/Core/IR/Visitable.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
 
@@ -14,6 +15,23 @@
 namespace mirv {
   struct SymbolVisitor;
   struct ConstSymbolVisitor;
+
+  // This is a specialization to provide an accept method for
+  // ConstSymbolVisitor.  We need to make the accept const which is
+  // why we need this specialization.
+  template<typename Symbol>
+  class Visitable<Symbol, ConstSymbolVisitor> {
+  public:
+    virtual void accept(ConstSymbolVisitor &V) const {
+      detail::AcceptImpl<Symbol,
+        boost::is_base_of<
+          boost::enable_shared_from_this<Symbol>,
+          Symbol
+          >::value
+      > impl;
+      impl(safe_cast<const Symbol>(this), V);
+    }
+  };
 
   /// This is the symbol implementation for all symbol types.  Each
   /// symbol type is an instance of this template (Symbol<Variable>,
@@ -62,9 +80,6 @@ namespace mirv {
       return result;
     }
 
-    virtual void accept(SymbolVisitor &V);
-    virtual void accept(ConstSymbolVisitor &V) const;
-
      template<typename Arg>
      static std::string getName(Arg &a) {
        return Tag::getName(a);
@@ -81,12 +96,27 @@ namespace mirv {
      }
   };
 
-  /// A specialization for base symbols.
   template<>
-  class Symbol<Base> : public Node<Base> { 
+  class Visitable<Symbol<Base>, SymbolVisitor> {
   public:
     virtual void accept(SymbolVisitor &V);
+  };
+
+  /// Specialize for ConstSymbolVisitor so accept can be const.
+  template<>
+  class Visitable<Symbol<Base>, ConstSymbolVisitor> {
+  public:
     virtual void accept(ConstSymbolVisitor &V) const;
+  };
+
+  /// A specialization for base symbols.
+  template<>
+  class Symbol<Base> : public Node<Base>,
+                       public Visitable<Symbol<Base>, SymbolVisitor>,
+                       public Visitable<Symbol<Base>, ConstSymbolVisitor> {
+  public:
+    using Visitable<Symbol<Base>, SymbolVisitor>::accept;
+    using Visitable<Symbol<Base>, ConstSymbolVisitor>::accept;
   };
 
   /// This is a function object to allow searching on sets of symbols by name.
@@ -140,12 +170,11 @@ namespace mirv {
   /// initialize the inner expression object.  Separating the
   /// interface from the implementation solves that problem.
     template<>
-    class Symbol<Inner<detail::InnerSymbolTraits> > : public Inner<detail::InnerSymbolTraits>::BaseType {
+    class Symbol<Inner<detail::InnerSymbolTraits> >
+        : public Inner<detail::InnerSymbolTraits>::BaseType {
     public:
       typedef Symbol<Base> VisitorBaseType;
-      virtual void accept(SymbolVisitor &V);
-      virtual void accept(ConstSymbolVisitor &V) const;
-   };
+    };
 
   class InnerSymbolBase : public Symbol<Inner<detail::InnerSymbolTraits> > {};
 
@@ -158,16 +187,12 @@ namespace mirv {
     VisitedInherit1<SymbolVisitor>::apply<Virtual<InnerSymbolBase> >::type> {
   public:
     typedef Symbol<Base> VisitorBaseType;
-    virtual void accept(SymbolVisitor &V);
-    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   /// This is a symbol with no children.
   class LeafSymbol : public LeafImpl<VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
   public:
     typedef Symbol<Base> VisitorBaseType;
-    virtual void accept(SymbolVisitor &V);
-    virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   /// A symbol that has a type associated with it.
@@ -187,12 +212,6 @@ namespace mirv {
 
       TypePtr type(void) const {
 	return(theType);
-      }
-      virtual void accept(mirv::SymbolVisitor &) {
-	error("Typed::accept called");
-      }
-      virtual void accept(mirv::ConstSymbolVisitor &) const {
-	error("Typed::accept called");
       }
     };
 
@@ -215,12 +234,6 @@ namespace mirv {
 
       const std::string &name(void) const {
 	return(the_name);
-      }
-      virtual void accept(mirv::SymbolVisitor &) {
-	error("Named::accept called");
-      }
-      virtual void accept(mirv::ConstSymbolVisitor &) const {
-	error("Named::accept called");
       }
     };
 

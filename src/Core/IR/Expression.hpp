@@ -4,6 +4,7 @@
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/Property.hpp>
 #include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/Visitable.hpp>
 
 #include <mirv/Core/Memory/Heap.hpp>
 
@@ -110,14 +111,20 @@ namespace mirv {
       result->setParents();
       return result;
     } 
+  };
 
+  /// This anchors the Expression virtual table.
+  template<>
+  class Visitable<Expression<Base>, ExpressionVisitor> {
+  public:
     virtual void accept(ExpressionVisitor &V);
   };
 
   /// A specialization for base expressions.  No property information
   /// is available.
   template<>
-  class Expression<Base> : public Node<Base> {
+  class Expression<Base> : public Node<Base>,
+                           public Visitable<Expression<Base>, ExpressionVisitor> {
   private:
     virtual Expression<Base> *cloneImpl(void) = 0;
 
@@ -130,7 +137,6 @@ namespace mirv {
       return expr;
     }
 
-    virtual void accept(ExpressionVisitor &V);
     virtual TypePtr type(void) const = 0;
   };
 
@@ -171,7 +177,6 @@ namespace mirv {
   class Expression<Inner<detail::InnerExpressionTraits> > : public Inner<detail::InnerExpressionTraits>::BaseType {
   public:
     typedef Expression<Base> VisitorBaseType;
-    virtual void accept(ExpressionVisitor &V);
     TypePtr type(void) const {
       return (*begin())->type();
     }
@@ -206,15 +211,12 @@ namespace mirv {
     InnerExpression(ChildPtr Child) : BaseType(Child) {}
     InnerExpression(ChildPtr Child1,
 		    ChildPtr Child2) : BaseType(Child1, Child2) {}
-    virtual void accept(ExpressionVisitor &V);
   };
 
   /// This is an expression with no children.
   class LeafExpression : public LeafImpl<Expression<Base> > {
   public:
     typedef Expression<Base> VisitorBaseType;
-
-    virtual void accept(ExpressionVisitor &V);
   };
 
   /// The unary expression tag.  This implements the interface for
@@ -256,8 +258,6 @@ namespace mirv {
       ConstChildPtr getOperand(void) const {
         return(front());
       };
-
-      virtual void accept(ExpressionVisitor &V);
     };
 
   public:
@@ -336,7 +336,6 @@ namespace mirv {
                        "Attempt to get missing operand from expression");
         return(back());
       }
-      virtual void accept(ExpressionVisitor &V);
     };
 
   public:

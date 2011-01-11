@@ -5,6 +5,7 @@
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/Expression.hpp>
 #include <mirv/Core/IR/Inherit.hpp>
+#include <mirv/Core/IR/Visitable.hpp>
 
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/bool.hpp>
@@ -118,14 +119,20 @@ namespace mirv {
       p->setParents();
       return p;
     }
-
-    virtual void accept(StatementVisitor &V);
   };
 
+  /// This anchors the Statement virtual table.
+  template<>
+  class Visitable<Statement<Base>, StatementVisitor> {
+  public:
+    virtual void accept(StatementVisitor &V);
+  };
+  
   /// A specialization for base statements.  No property information
   /// is available.
   template<>
-  class Statement<Base> : public Node<Base> {
+  class Statement<Base> : public Node<Base>,
+                          public Visitable<Statement<Base>, StatementVisitor> {
   private:
     virtual Statement<Base> *cloneImpl(void) = 0;
 
@@ -134,8 +141,6 @@ namespace mirv {
       ptr<Statement<Base> >::type stmt(cloneImpl());
       return stmt;
     }
-
-    virtual void accept(StatementVisitor &V);
   };
 
   namespace detail {
@@ -189,14 +194,11 @@ namespace mirv {
     InnerStatement(ChildPtr Child) : BaseType(Child) {}
     InnerStatement(ChildPtr Child1,
                    ChildPtr Child2) : BaseType(Child1, Child2) {}
-    virtual void accept(StatementVisitor &V);
   };
  
   /// This is a statement with no children.
   class LeafStatement : public LeafImpl<VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type> {
   public:
-    virtual void accept(StatementVisitor &V);
-
   };
 
   // Statement property semantics
