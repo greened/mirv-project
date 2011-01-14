@@ -154,8 +154,10 @@ namespace mirv {
   /// This holds the child pointers and other data necessary for inner
   /// symbols.
   // TODO: Fix TrackParent use.
-  class InnerSymbol : public InnerImpl<Symbol<Base>,
-    VisitedInherit1<SymbolVisitor>::apply<Virtual<InnerSymbolBase> >::type> {
+  class InnerSymbol : public InnerImpl<
+    Symbol<Base>,
+    Virtual<InnerSymbolBase>
+    > {
   public:
     typedef Symbol<Base> VisitorBaseType;
     virtual void accept(SymbolVisitor &V);
@@ -163,7 +165,7 @@ namespace mirv {
   };
 
   /// This is a symbol with no children.
-  class LeafSymbol : public LeafImpl<VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
+  class LeafSymbol : public LeafImpl<Virtual<Symbol<Base> > > {
   public:
     typedef Symbol<Base> VisitorBaseType;
     virtual void accept(SymbolVisitor &V);
@@ -173,9 +175,7 @@ namespace mirv {
   /// A symbol that has a type associated with it.
   class Typed {
   private:
-    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type InterfaceBaseType;
-
-    class Interface : public InterfaceBaseType { 
+    class Interface : public virtual Symbol<Base> { 
     public:
       typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
 
@@ -204,9 +204,7 @@ namespace mirv {
   /// A symbol that has a name associated with it.
   class Named {
   private:
-    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type InterfaceBaseType;
-
-    class Interface : public InterfaceBaseType { 
+    class Interface : public virtual Symbol<Base> { 
     private:
       std::string the_name;
 

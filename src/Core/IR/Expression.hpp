@@ -1,8 +1,8 @@
 #ifndef mirv_Core_IR_Expression_hpp
 #define mirv_Core_IR_Expression_hpp
 
+#include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
-#include <mirv/Core/IR/Property.hpp>
 #include <mirv/Core/IR/Type.hpp>
 
 #include <mirv/Core/Memory/Heap.hpp>
@@ -27,20 +27,6 @@ namespace mirv {
         public boost::mpl::less<typename T1::Order, typename T2::Order> {};
   }
 
-  /// This is a metafunction class (generator) to transform a property
-  /// tag into a property expression.  It is more convenient to reason
-  /// about property tags and this is the glue that makes that
-  /// possible.
-  template<typename Op> class Expression;
-  struct PropertyExpressionGenerator {
-    /// A metafunction to produce a property expression given a
-    /// property tag.
-    template<typename Property>
-    struct apply {
-      typedef Expression<Property> type;
-    };
-  };
-
   struct ExpressionVisitor;
 
   /// This is the expression implementation for all expression types.
@@ -55,37 +41,7 @@ namespace mirv {
     /// The immediate base type of this expression, distinct from
     /// the base type that will be visited by an ExpressionVisitor.
     typedef typename Op::BaseType BaseType;
-
-    /// A list of sorted property tags.
-    typedef typename boost::mpl::sort<
-      typename Op::Properties,
-      detail::ExpressionPropertyLess<boost::mpl::_1, boost::mpl::_2>
-      >::type Properties;
-
-  private:
-    /// A list of property expressions generated from the list of
-    /// property tags.  This defines the visitation order for
-    /// property expressions.
-    typedef typename boost::mpl::transform<Properties, PropertyExpressionGenerator>::type PropertyExpressions;
-
-  public:
-    // If there are properties, visit those first, otherwise visit
-    // the specified visitor base type.
-
-    /// The base type visited if the visit action for this
-    /// expression is not implemented.  This is distinct from the
-    /// expression's base type because there may be various
-    /// intermediate glue base types (scattered inheritance
-    /// generators, etc.) used to implement the expression class
-    /// hierarchy.
-    typedef typename boost::mpl::eval_if<
-    boost::mpl::empty<Properties>,
-    boost::mpl::identity<typename Op::VisitorBaseType>,
-    boost::mpl::deref<typename boost::mpl::begin<PropertyExpressions>::type>
-    >::type VisitorBaseType;
-
-    /// The root type for all expressions.
-    //typedef Expression<Base> RootType;
+    typedef typename Op::VisitorBaseType VisitorBaseType;
 
   protected:
     Expression(void) {}
@@ -183,13 +139,12 @@ namespace mirv {
   /// inherited from once in the hierarchy for any inner expressions.
   /// This holds the child pointers and other data necessary for inner
   /// expressions.
-  class InnerExpression : public InnerImpl<Expression<Base>, VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type> {
-  private:
-    typedef InnerImpl<
+  class InnerExpression : public InnerImpl<
     Expression<Base>,
-    VisitedInherit1<ExpressionVisitor>::apply<
-      Virtual<InnerExpressionBase>
-      >::type> BaseType;
+    Virtual<InnerExpressionBase>
+    > {
+  private:
+    typedef InnerImpl<Expression<Base>, Virtual<InnerExpressionBase> > BaseType;
 
   protected:
     void setParents(void) {
@@ -263,7 +218,6 @@ namespace mirv {
   public:
     typedef Interface BaseType;
     typedef InnerExpression VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// The binary expression tag.  This provides the interface and
@@ -342,7 +296,6 @@ namespace mirv {
   public:
     typedef Interface BaseType;
     typedef InnerExpression VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   // Expression property semantics
@@ -353,9 +306,8 @@ namespace mirv {
     typedef boost::mpl::int_<0> Order;
 
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// Categorize all logical expressions.
@@ -363,9 +315,8 @@ namespace mirv {
   public:
     typedef boost::mpl::int_<1> Order;
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// Categorize all bitwise expressions.
@@ -373,9 +324,8 @@ namespace mirv {
   public:
     typedef boost::mpl::int_<2> Order;
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// Categorize all relational expressions.
@@ -383,9 +333,8 @@ namespace mirv {
   public:
     typedef boost::mpl::int_<0> Order;
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// Categorize all reference expressions.
@@ -393,9 +342,8 @@ namespace mirv {
   public:
     typedef boost::mpl::int_<11> Order;
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// Operands can be commuted.
@@ -403,9 +351,8 @@ namespace mirv {
   public:
     typedef boost::mpl::int_<3> Order;
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// Operands can be reassociated.
@@ -413,9 +360,8 @@ namespace mirv {
   public:
     typedef boost::mpl::int_<5> Order;
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// This expression is transitive (a op b && b op c => a op c)
@@ -423,9 +369,8 @@ namespace mirv {
   public:
     typedef boost::mpl::int_<7> Order;
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// This expression is reflexive.
@@ -433,9 +378,8 @@ namespace mirv {
   public:
     typedef boost::mpl::int_<9> Order;
     /// Inherit virtually from the inner expression abstract interface.
-    typedef VisitedInherit1<ExpressionVisitor>::apply<Virtual<InnerExpressionBase> >::type BaseType;
+    typedef Virtual<InnerExpressionBase> BaseType;
     typedef InnerExpressionBase VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   }; 
 
   namespace detail {
@@ -469,18 +413,15 @@ namespace mirv {
   /// hierarchy of property expressions.  The Sequence is a sorted
   /// list of property tags and Root is the base type of the whole
   /// hierarchy.
-  template<typename Sequence, typename Root, typename Tag>
+  /// TODO: Get rid of this entirely and move it into Expression.
+  template<typename Root, typename Tag, typename ...Property>
   class ExpressionBaseGenerator {
-    /// The metafunction result.
-    typedef typename Properties<PropertyExpressionGenerator, Root, Sequence,
-      VisitedInherit2<ExpressionVisitor> >::type HierarchyType;
-
-    typedef typename VisitedInherit2<ExpressionVisitor>::template apply<
-    HierarchyType,
-    boost::enable_shared_from_this<Expression<Tag> > >::type BaseType;
+    typedef Root BaseType;
 
   public:
-    class ExpressionInterface : public BaseType {
+    class ExpressionInterface : public Root,
+                                public Expression<Property>...,
+                                public boost::enable_shared_from_this<Expression<Tag> > {
     private:
       Expression<Base> *cloneImpl(void) {
         typename ptr<Expression<Tag> >::type
@@ -502,6 +443,10 @@ namespace mirv {
 
       template<typename A1, typename A2, typename A3>
       ExpressionInterface(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
+
+      virtual void accept(ExpressionVisitor &) {
+        error("ExpressionInterface::accept called");
+      }
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
