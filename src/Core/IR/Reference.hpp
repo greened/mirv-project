@@ -16,22 +16,11 @@ namespace mirv {
    template<typename SymbolType>
    class Reference { 
    private:
-     typedef InnerImpl<Symbol<SymbolType>, LeafExpression> RootType;
-     typedef boost::mpl::vector<> PropertiesList;
+     typedef InnerImpl<Symbol<SymbolType>, LeafExpression> InterfaceBaseType;
 
-    /// The metafunction result.
-     typedef typename Properties<
-       PropertyExpressionGenerator,
-       RootType,
-       PropertiesList,
-       VisitedInherit2<ExpressionVisitor>
-       >::type HierarchyType;
-     
-    typedef typename VisitedInherit2<ExpressionVisitor>::template apply<
-      HierarchyType,
-      boost::enable_shared_from_this<Expression<Reference<SymbolType> > > >::type InterfaceBaseType;
-
-     class Interface : public InterfaceBaseType {
+     class Interface
+         : public InterfaceBaseType,
+           public boost::enable_shared_from_this<Expression<Reference<SymbolType> > > {
      private:
        Expression<Base> *cloneImpl(void) {
          typename ptr<Expression<Reference<SymbolType> > >::type expr(
@@ -79,7 +68,6 @@ namespace mirv {
      };
 
    public:
-     typedef PropertiesList Properties;
      typedef LeafExpression VisitorBaseType;
      typedef Interface BaseType;
    };
@@ -87,33 +75,26 @@ namespace mirv {
   /// Take the address of an lvalue expression.
   class AddressOf { 
   public:
-    typedef boost::mpl::vector<> Properties;
-
     // TODO: Interface that checks for lvalues.
+    typedef Expression<Unary> BaseType;
     typedef Expression<Unary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
-      AddressOf>::type BaseType;
     // TODO: Override type().
   };
 
   /// Dereference the address provided by some expression.
   class Dereference { 
   public:
-    typedef boost::mpl::vector<> Properties;
+    typedef Expression<Unary> BaseType;
     typedef Expression<Unary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
-      Dereference>::type BaseType;
     // TODO: Override type().
   };
 
   /// Specify the interface for array index expressions.
   class ArrayRef { 
   public:
-    typedef boost::mpl::vector<> Properties;
     // TODO: Support multi-dimension arrays natively?
+    typedef Expression<Binary> BaseType;
     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      ArrayRef>::type BaseType;
     // TODO: Override type().
   };
 }

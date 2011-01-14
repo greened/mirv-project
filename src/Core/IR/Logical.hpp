@@ -8,34 +8,40 @@ namespace mirv {
   /// Specify the interface for the logical and expression.
   class LogicalAnd { 
   public:
-    typedef boost::mpl::vector<Logical, Commutative,
-			       Associative, Transitive,
-			       Reflexive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      LogicalAnd>::type BaseType;
+    typedef Expression<Commutative> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      LogicalAnd,
+      Associative,
+      Commutative,
+      Logical,
+      Reflexive,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface for the logical or expression.
   class LogicalOr {
   public:
-    typedef boost::mpl::vector<Logical, Commutative,
-			       Associative, Transitive,
-			       Reflexive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      LogicalOr>::type BaseType;
+    typedef Expression<Commutative> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      LogicalOr,
+      Associative,
+      Commutative,
+      Logical,
+      Reflexive,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface for the logical not expression.
   class LogicalNot {
   public:
-    typedef boost::mpl::vector<Logical, Commutative,
-			       Associative, Transitive,
-			       Reflexive> Properties;
-    typedef Expression<Unary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
-      LogicalNot>::type BaseType;
+    typedef Expression<Reflexive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Unary>,
+      LogicalNot,
+      Logical,
+      Reflexive>::type BaseType;
   };
 };
 

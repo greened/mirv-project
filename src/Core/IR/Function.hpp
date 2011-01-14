@@ -16,8 +16,8 @@ namespace mirv {
      typedef Symbol<Named> NamedBaseType;
      typedef Symbol<Typed> TypedBaseType;
      
-     typedef InnerImpl<Statement<Base>, VisitedInherit1<StatementVisitor>::apply<Virtual<Symbol<Base> > >::type> StatementBaseType;
-     typedef InnerImpl<Symbol<Variable>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> VariableBaseType;
+     typedef InnerImpl<Statement<Base>, Virtual<Symbol<Base> > > StatementBaseType;
+     typedef InnerImpl<Symbol<Variable>, Virtual<Symbol<Base> > > VariableBaseType;
 
    public:
      class Interface : public NamedBaseType,
