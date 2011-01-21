@@ -23,10 +23,9 @@ namespace mirv {
       typedef boost::shared_ptr<ChildType> ChildPtr;
       typedef boost::shared_ptr<const ChildType> ConstChildPtr;
 
-    private:
     public:
       template<typename Sequence>
-      Interface(std::string &name, const Sequence &members)
+      Interface(const std::string &name, const Sequence &members)
           : InterfaceBaseType(name) {
         // Add the member types.
         //typedef typename boost::fusion::result_of::begin<Sequence>::type begType;
@@ -41,13 +40,13 @@ namespace mirv {
       }
 
       /// Construct a struct type with a single member.
-      Interface(std::string &name, ptr<Symbol<Type<TypeBase> > >::type member)
+      Interface(const std::string &name, ptr<Symbol<Type<TypeBase> > >::type member)
           : InterfaceBaseType(name) {
         push_back(member);
       }
 
       /// Construct a struct type with no members.
-      Interface(std::string &name) : InterfaceBaseType(name) {}
+      Interface(const std::string &name) : InterfaceBaseType(name) {}
 
       BitSizeType bitsize(void) const {
         // TODO: This depends on ABI rules.

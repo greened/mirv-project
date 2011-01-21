@@ -8,6 +8,7 @@
 #include <mirv/Core/IR/Visitable.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/mpl/empty_base.hpp>
 
 #include <functional>
 #include <string>
@@ -20,8 +21,19 @@ namespace mirv {
   // ConstSymbolVisitor.  We need to make the accept const which is
   // why we need this specialization.
   template<typename Symbol>
-  class Visitable<Symbol, ConstSymbolVisitor> {
+  class Visitable<Symbol, ConstSymbolVisitor>
+      : public Visitable<Symbol, SymbolVisitor> {
+  private:
+    typedef Visitable<Symbol, SymbolVisitor> BaseType;
+
   public:
+    Visitable<Symbol, ConstSymbolVisitor>(void) : BaseType() {}
+    template<typename ...Arg>
+    Visitable<Symbol, ConstSymbolVisitor>(const Arg &...arg)
+    : BaseType(arg...) {};
+
+    using Visitable<Symbol, SymbolVisitor>::accept;
+
     virtual void accept(ConstSymbolVisitor &V) const {
       detail::AcceptImpl<Symbol,
         boost::is_base_of<
@@ -39,19 +51,15 @@ namespace mirv {
   /// visitor logic in one place, hiding the gory details from the
   /// symbol type tags and specific symbol type interfaces.
   template<typename Tag>
-  class Symbol : public Tag::BaseType {
+  class Symbol : public Visitable<Symbol<Tag>, ConstSymbolVisitor> {
   public:
-    typedef typename Tag::BaseType BaseType;
+    typedef Visitable<Symbol<Tag>, ConstSymbolVisitor> BaseType;
     typedef typename Tag::VisitorBaseType VisitorBaseType;
 
   protected:
     Symbol(void) {}
-    template<typename A1>
-    Symbol(A1 a1) : BaseType(a1) {}
-    template<typename A1, typename A2>
-    Symbol(A1 a1, A2 a2) : BaseType(a1, a2) {}
-    template<typename A1, typename A2, typename A3>
-    Symbol(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
+    template<typename ...Args>
+    Symbol(Args ...args) : BaseType(args...) {}
 
   public:
     static typename ptr<Symbol<Tag> >::type
@@ -97,27 +105,36 @@ namespace mirv {
   };
 
   template<>
-  class Visitable<Symbol<Base>, SymbolVisitor> {
+  class Visitable<Symbol<Base>, SymbolVisitor, boost::mpl::empty_base> {
   public:
     virtual void accept(SymbolVisitor &V);
   };
 
   /// Specialize for ConstSymbolVisitor so accept can be const.
   template<>
-  class Visitable<Symbol<Base>, ConstSymbolVisitor> {
+  class Visitable<Symbol<Base>, ConstSymbolVisitor, boost::mpl::empty_base>
+      : public Visitable<Symbol<Base>, SymbolVisitor, boost::mpl::empty_base> {
   public:
+    using Visitable<
+    Symbol<Base>,
+    SymbolVisitor,
+    boost::mpl::empty_base
+    >::accept;
+
     virtual void accept(ConstSymbolVisitor &V) const;
   };
 
   /// A specialization for base symbols.
   template<>
-  class Symbol<Base> : public Node<Base>,
-                       public Visitable<Symbol<Base>, SymbolVisitor>,
-                       public Visitable<Symbol<Base>, ConstSymbolVisitor> {
-  public:
-    using Visitable<Symbol<Base>, SymbolVisitor>::accept;
-    using Visitable<Symbol<Base>, ConstSymbolVisitor>::accept;
-  };
+  class Symbol<Base>
+  // MI is the right thing here because Visitable doesn't inherit from
+  // anything of note.
+      : public Node<Base>,
+        public Visitable<
+    Symbol<Base>,
+    ConstSymbolVisitor,
+    boost::mpl::empty_base
+    > {};
 
   /// This is a function object to allow searching on sets of symbols by name.
   template<typename SymbolTag>
@@ -169,12 +186,12 @@ namespace mirv {
   /// points) but we do not want to force subclasses to explicitly
   /// initialize the inner expression object.  Separating the
   /// interface from the implementation solves that problem.
-    template<>
-    class Symbol<Inner<detail::InnerSymbolTraits> >
-        : public Inner<detail::InnerSymbolTraits>::BaseType {
-    public:
-      typedef Symbol<Base> VisitorBaseType;
-    };
+  template<>
+  class Symbol<Inner<detail::InnerSymbolTraits> >
+      : public virtual Inner<detail::InnerSymbolTraits>::BaseType {
+  public:
+    typedef Symbol<Base> VisitorBaseType;
+  };
 
   class InnerSymbolBase : public Symbol<Inner<detail::InnerSymbolTraits> > {};
 
@@ -183,14 +200,16 @@ namespace mirv {
   /// This holds the child pointers and other data necessary for inner
   /// symbols.
   // TODO: Fix TrackParent use.
-  class InnerSymbol : public InnerImpl<Symbol<Base>,
-    VisitedInherit1<SymbolVisitor>::apply<Virtual<InnerSymbolBase> >::type> {
+  class InnerSymbol : public InnerImpl<
+    Symbol<Base>,
+    Virtual<InnerSymbolBase>
+    > {
   public:
     typedef Symbol<Base> VisitorBaseType;
   };
 
   /// This is a symbol with no children.
-  class LeafSymbol : public LeafImpl<VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> {
+  class LeafSymbol : public LeafImpl<Virtual<Symbol<Base> > > {
   public:
     typedef Symbol<Base> VisitorBaseType;
   };
@@ -198,9 +217,7 @@ namespace mirv {
   /// A symbol that has a type associated with it.
   class Typed {
   private:
-    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type InterfaceBaseType;
-
-    class Interface : public InterfaceBaseType { 
+    class Interface : public virtual Symbol<Base> { 
     public:
       typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
 
@@ -223,9 +240,7 @@ namespace mirv {
   /// A symbol that has a name associated with it.
   class Named {
   private:
-    typedef Inherit1::apply<Virtual<Symbol<Base> > >::type InterfaceBaseType;
-
-    class Interface : public InterfaceBaseType { 
+    class Interface : public virtual Symbol<Base> { 
     private:
       std::string the_name;
 

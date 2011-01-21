@@ -130,8 +130,7 @@ namespace mirv {
       }
     };
   public:
-    typedef boost::mpl::vector<Mutating> Properties;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, Assignment, Mutating>::type BaseType;
     typedef Statement<DualExpression> VisitorBaseType;
   };
 
@@ -266,8 +265,7 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<Mutating> Properties;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, Call, Mutating>::type BaseType;
     typedef Statement<Controlled> VisitorBaseType;
   };
 }

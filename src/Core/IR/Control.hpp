@@ -45,7 +45,7 @@ namespace mirv {
     typedef boost::mpl::vector<> Properties;
     typedef InnerStatement VisitorBaseType;
 
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 
   /// This is a statement with only one child statement.  The child
@@ -87,11 +87,8 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef InnerStatement VisitorBaseType;
-    typedef Properties properties;
-
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 
   /// This is a statement with two child statements.  The children
@@ -166,10 +163,9 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef InnerStatement VisitorBaseType;
 
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 
   /// This is a statement with a single controlling condition
@@ -201,9 +197,8 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef Statement<SingleExpression> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 
   /// Specify the if-then statement Interface.
@@ -228,11 +223,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
+
+       // We need this to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(StatementVisitor &) {
+         error("IfThen::Interface::accept called!");
+       }
     };
 
   public:
-    typedef boost::mpl::vector<Conditional> Properties;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, IfThen, Conditional>::type BaseType;
     typedef Statement<SingleBlock> VisitorBaseType;
   };
   
@@ -259,12 +259,17 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+
+       // We need this to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(StatementVisitor &) {
+         error("IfElse::Interface::accept called!");
+       }
     };
 
   public:
-    typedef boost::mpl::vector<Conditional> Properties;
     typedef Statement<DualBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, IfElse, Conditional>::type BaseType;
   };
 
   /// Specify the while statement Interface.
@@ -289,12 +294,18 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+
+       // We need this to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(StatementVisitor &) {
+         error("While::Interface::accept called!");
+       }
     };
 
   public:
-    typedef boost::mpl::vector<Conditional, Iterative> Properties;
     typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, While, Conditional, Iterative>::type
+    BaseType;
   };
 
   /// Specify the do-while statement Interface.
@@ -319,12 +330,17 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+
+       // We need this to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(StatementVisitor &) {
+         error("DoWhile::Interface::accept called!");
+       }
     };
 
   public:
-    typedef boost::mpl::vector<Conditional> Properties;
     typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, DoWhile, Conditional>::type BaseType;
   };
 
   /// Specify the case statement Interface.
@@ -349,12 +365,17 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+
+       // We need this to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(StatementVisitor &) {
+         error("Case::Interface::accept called!");
+       }
     };
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
    
   /// This is a list of case statements.  It is the statement type
@@ -384,9 +405,8 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 
   /// Specify the switch statement Interface.
@@ -411,12 +431,17 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+
+       // We need this to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(StatementVisitor &) {
+         error("Switch::Interface::accept called!");
+       }
     };
 
   public:
-    typedef boost::mpl::vector<Conditional> Properties;
     typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, Switch, Conditional>::type BaseType;
   };
 
   /// This is a statement with a single label
@@ -451,9 +476,8 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef Statement<SingleExpression> VisitorBaseType;      
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 
   /// A before statement specifies a block statement with an entry
@@ -481,12 +505,17 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+
+       // We need this to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(StatementVisitor &) {
+         error("Before::Interface::accept called!");
+       }
     };
 
   public:
-    typedef boost::mpl::vector<Iterative> Properties;  // Of a sort
     typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, Before, Iterative>::type BaseType;
   };
 
   /// An after statement specifies a block with a label at the end.  A
@@ -514,12 +543,17 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+
+       // We need this to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(StatementVisitor &) {
+         error("After::Interface::accept called!");
+       }
     };
 
   public:
-    typedef boost::mpl::vector<Conditional> Properties;  // Of a sort
     typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, After, Conditional>::type BaseType;
   };
 
   /// This is an arbitrary goto statement.  It should not appear in
@@ -549,9 +583,8 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<Conditional> Properties;
     typedef LeafStatement VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, Goto, Conditional>::type BaseType;
   };
 
   /// A return does not return an expression.  Instead, assignment to
@@ -570,9 +603,8 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef LeafStatement VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 }
 

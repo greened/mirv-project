@@ -11,7 +11,8 @@ namespace mirv {
   void
   Visitable<
     Expression<Base>,
-    ExpressionVisitor
+    ExpressionVisitor,
+    boost::mpl::empty_base
     >::accept(ExpressionVisitor &V)
   {
     error("Expression<Base>::accept called");

@@ -16,8 +16,8 @@ namespace mirv {
      typedef Symbol<Named> NamedBaseType;
      typedef Symbol<Typed> TypedBaseType;
      
-     typedef InnerImpl<Statement<Base>, VisitedInherit1<StatementVisitor>::apply<Virtual<Symbol<Base> > >::type> StatementBaseType;
-     typedef InnerImpl<Symbol<Variable>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> VariableBaseType;
+     typedef InnerImpl<Statement<Base>, Virtual<Symbol<Base> > > StatementBaseType;
+     typedef InnerImpl<Symbol<Variable>, Virtual<Symbol<Base> > > VariableBaseType;
 
    public:
      class Interface : public NamedBaseType,
@@ -86,6 +86,15 @@ namespace mirv {
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
+       }
+
+       // We need these to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(SymbolVisitor &) {
+         error("Function::Interface::accept called!");
+       }
+       virtual void accept(ConstSymbolVisitor &) const {
+         error("Function::Interface::accept called!");
        }
      };
      typedef Interface BaseType;

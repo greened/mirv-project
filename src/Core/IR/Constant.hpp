@@ -18,19 +18,22 @@ namespace mirv {
 
   template<>
   class Constant<Base> {
+  public:
+    typedef LeafSymbol VisitorBaseType;
+
   private:
-    class Interface 
+    class Interface
         : public Symbol<Typed>,
           public LeafSymbol {
     public:
-      Interface(ptr<Symbol<Type<TypeBase> > >::type type) : Symbol<Typed>(type) {}
+      Interface(ptr<Symbol<Type<TypeBase> > >::type type)
+          : Symbol<Typed>(type) {}
 
       virtual std::string valueString(void) = 0;
     };
 
   public:
     typedef Interface BaseType;
-    typedef LeafSymbol VisitorBaseType;
   };    
 
   template<typename ValueType>

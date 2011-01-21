@@ -17,7 +17,8 @@ namespace mirv {
   void
   Visitable<
     Symbol<Base>,
-    SymbolVisitor
+    SymbolVisitor,
+    boost::mpl::empty_base
     >::accept(SymbolVisitor &V)
   {
     error("Symbol<Base>::accept called");
@@ -26,7 +27,8 @@ namespace mirv {
   void
   Visitable<
     Symbol<Base>,
-    ConstSymbolVisitor
+    ConstSymbolVisitor,
+    boost::mpl::empty_base
     >::accept(ConstSymbolVisitor &V) const
   {
     error("Symbol<Base>::accept called");
