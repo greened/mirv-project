@@ -6,7 +6,8 @@ namespace mirv{
   void
   Visitable<
     Statement<Base>,
-    StatementVisitor
+    StatementVisitor,
+    boost::mpl::empty_base
     >::accept(StatementVisitor &V) {
     error("Statement<Base>::accept called");
   }

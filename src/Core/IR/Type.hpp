@@ -61,6 +61,7 @@ namespace mirv {
   public:
     typedef LeafImpl<Symbol<Type<TypeBase> > > BaseType;
     typedef Symbol<Type<TypeBase> > VisitorBaseType;
+
     LeafType(const std::string &name) : BaseType(name) {}
   };
 
@@ -121,13 +122,13 @@ namespace mirv {
   /// pointers and other data necessary for inner types.
   class InnerType : public InnerImpl<
     Symbol<Type<TypeBase> >,
-    VisitedInherit1<SymbolVisitor>::apply<InnerTypeBase>::type,
+    InnerTypeBase,
     // TODO: Avoid TrackParent use.
     false> {
   private:
     typedef InnerImpl<
     Symbol<Type<TypeBase> >,
-    VisitedInherit1<SymbolVisitor>::apply<InnerTypeBase>::type,
+    InnerTypeBase,
     false> BaseType;
 
   public:
