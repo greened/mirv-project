@@ -2,14 +2,18 @@
 #define mirv_Core_IR_Statement_hpp
 
 #include <mirv/Core/Builder/Make.hpp>
+#include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
-#include <mirv/Core/IR/Property.hpp>
 #include <mirv/Core/IR/ExpressionFwd.hpp>
 #include <mirv/Core/IR/Inherit.hpp>
+#include <mirv/Core/IR/Expression.hpp>
+#include <mirv/Core/IR/Visitable.hpp>
 
+#include <boost/mpl/empty_base.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/sort.hpp>
+
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/transform.hpp>
@@ -28,19 +32,6 @@ namespace mirv {
 
   template<typename Tag> class Statement;
 
-  /// This is a metafunction class (generator) to transform a property
-  /// tag into a property statement.  It is more convenient to reason
-  /// about property tags and this is the glue that makes that
-  /// possible.
-  struct PropertyStatementGenerator {
-    /// A metafunction to produce a property statement given a
-    /// property tag.
-    template<typename Property>
-    struct apply {
-      typedef Statement<Property> type;
-    };
-  };
-
   /// This is the statement implementation for all statement types.
   /// Each statement type is an instance of this template
   /// (Statement<IfThen>, Statement<DoWhile>, etc.).  It keeps all of
@@ -48,38 +39,12 @@ namespace mirv {
   /// details from the statement type tags and specific statement type
   /// Interfaces.
   template<typename Tag>
-  class Statement: public Tag::BaseType {
+  class Statement : public Visitable<Statement<Tag>, StatementVisitor> {
   public:
     /// The immediate base type of this statement, distinct from
     /// the base type that will be visited by a StatementVisitor.
-    typedef typename Tag::BaseType BaseType;
-
-    /// A list of sorted property tags.
-    typedef typename boost::mpl::sort<
-      typename Tag::Properties,
-      detail::StatementPropertyLess<boost::mpl::_1, boost::mpl::_2>
-      >::type Properties;
-  private:
-    /// A list of property statements generated from the list of
-    /// property tags.  This defines the visitation order for
-    /// property statements.
-    typedef typename boost::mpl::transform<Properties, PropertyStatementGenerator>::type PropertyStatements;
-
-  public:
-    // If there are properties, visit those first, otherwise visit
-    // the specified visitor base type.
-
-    /// The base type visited if the visit action for this
-    /// statement is not implemented.  This is distinct from the
-    /// statement's base type because there may be various
-    /// intermediate glue base types (scattered inheritance
-    /// generators, etc.) used to implement the statement class
-    /// hierarchy.
-    typedef typename boost::mpl::eval_if<
-    boost::mpl::empty<Properties>,
-    boost::mpl::identity<typename Tag::VisitorBaseType>,
-    boost::mpl::deref<typename boost::mpl::begin<PropertyStatements>::type>
-    >::type VisitorBaseType;
+    typedef Visitable<Statement<Tag>, StatementVisitor> BaseType;
+    typedef typename Tag::VisitorBaseType VisitorBaseType;
 
   protected:
     Statement(void) {}
@@ -120,14 +85,27 @@ namespace mirv {
       p->setParents();
       return p;
     }
-
-    virtual void accept(StatementVisitor &V);
   };
 
+  /// This anchors the Statement virtual table.
+  template<>
+  class Visitable<Statement<Base>, StatementVisitor, boost::mpl::empty_base> {
+  public:
+    virtual void accept(StatementVisitor &V);
+  };
+  
   /// A specialization for base statements.  No property information
   /// is available.
   template<>
-  class Statement<Base> : public Node<Base> {
+  class Statement<Base>
+  // MI is the right thing here because Visitable doesn't inherit from
+  // anything.
+      : public Node<Base>,
+        public virtual Visitable<
+    Statement<Base>,
+    StatementVisitor,
+    boost::mpl::empty_base
+    > {
   private:
     virtual Statement<Base> *cloneImpl(void) = 0;
 
@@ -136,8 +114,6 @@ namespace mirv {
       ptr<Statement<Base> >::type stmt(cloneImpl());
       return stmt;
     }
-
-    virtual void accept(StatementVisitor &V);
   };
 
   namespace detail {
@@ -148,7 +124,7 @@ namespace mirv {
     public:
       typedef Statement<Base> Child;
       
-      typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type BaseType;
+      typedef Virtual<Statement<Base> > BaseType;
 
     private:
       typedef ptr<Child>::type ChildPtr;
@@ -180,25 +156,21 @@ namespace mirv {
   /// inherited from once in the hierarchy for any inner statements.
   /// This holds the child pointers and other data necessary for inner
   /// statements.
-  class InnerStatement : public InnerImpl<Statement<Base>, VisitedInherit1<StatementVisitor>::apply<Virtual<InnerStatementBase> >::type> {
-    typedef InnerImpl<
-      Statement<Base>,
-      VisitedInherit1<StatementVisitor>::apply<
-        Virtual<InnerStatementBase>
-        >::type> BaseType;
+  class InnerStatement : public InnerImpl<
+    Statement<Base>,
+    Virtual<InnerStatementBase>
+    > {
+    typedef InnerImpl<Statement<Base>, Virtual<InnerStatementBase> > BaseType;
   public:
     InnerStatement(void) : BaseType() {}
     InnerStatement(ChildPtr Child) : BaseType(Child) {}
     InnerStatement(ChildPtr Child1,
                    ChildPtr Child2) : BaseType(Child1, Child2) {}
-    virtual void accept(StatementVisitor &V);
   };
  
   /// This is a statement with no children.
-  class LeafStatement : public LeafImpl<VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type> {
+  class LeafStatement : public LeafImpl<Virtual<Statement<Base> > > {
   public:
-    virtual void accept(StatementVisitor &V);
-
   };
 
   // Statement property semantics
@@ -207,47 +179,53 @@ namespace mirv {
   class Conditional {
   public:
     typedef boost::mpl::int_<0> order;
-    typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type BaseType;
+    typedef Virtual<Statement<Base> > BaseType;
     typedef Statement<Base> VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// Child statements may be executed multiple times
   class Iterative {
   public:
     typedef boost::mpl::int_<1> order;
-    typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type BaseType;
+    typedef Virtual<Statement<Base> > BaseType;
     typedef Statement<Base> VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// Modifies program state
   class Mutating {
   public:
     typedef boost::mpl::int_<2> order;
-    typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type BaseType;
+    typedef Virtual<Statement<Base> > BaseType;
     typedef Statement<Base> VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
   };
 
   /// This is a metafunction to generate a scattered base class
   /// hierarchy of property statements.  The Sequence is a sorted
   /// list of property tags and Root is the base type of the whole
   /// hierarchy.
-  template<typename Sequence, typename Root>
+  template<typename Root, typename Tag, typename ...Property>
   class StatementBaseGenerator {
+    template<typename ...BaseProperty>
+    class StatementBase 
+        : public Root,
+          public Statement<BaseProperty>... {
+    public:
+      StatementBase(void) : Root() {}
+      template<typename ...Args>
+        StatementBase(const Args &...args) : Root(args...) {}
+      virtual void accept(StatementVisitor &) {
+        error("StatementBase::accept called!");
+      }
+    };
+
   public:
-    typedef typename Properties<PropertyStatementGenerator, Root, Sequence,
-    VisitedInherit2<StatementVisitor> >::type
-    type;
+    typedef StatementBase<Property...> type;
   };
 
   /// Statement semantics are somehow affected by expressions
   class Controlled {
   private:
-    typedef VisitedInherit1<StatementVisitor>::apply<Virtual<Statement<Base> > >::type InterfaceBaseType;
-
-    class Interface : public virtual InterfaceBaseType {
+    class Interface : public virtual Statement<Base> {
     protected:
       typedef ptr<Expression<Base> >::type ExpressionPtr;
       typedef ptr<Expression<Base> >::const_type ConstExpressionPtr;
@@ -337,9 +315,8 @@ namespace mirv {
     };
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef Statement<Base> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 
   /// A statement with a single expression child.  It may have one of
@@ -382,9 +359,8 @@ namespace mirv {
     }; 
 
   public:
-    typedef boost::mpl::vector<> Properties;
     typedef Statement<Controlled> VisitorBaseType;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef Interface BaseType;
   };
 }
 

@@ -137,14 +137,9 @@ namespace mirv {
       const_reverse_iterator rend(void) const {
         return expressionREnd();
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Assignment::Base::accept called");
-      }
     };
   public:
-    typedef boost::mpl::vector<Mutating> Properties;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, Assignment, Mutating>::type BaseType;
     typedef Statement<DualExpression> VisitorBaseType;
   };
 
@@ -276,15 +271,10 @@ namespace mirv {
       const_reverse_iterator rend(void) const {
         return argumentREnd();
       }
-
-      virtual void accept(mirv::StatementVisitor &) {
-        error("Call::Base::accept called");
-      }
     };
 
   public:
-    typedef boost::mpl::vector<Mutating> Properties;
-    typedef StatementBaseGenerator<Properties, Interface>::type BaseType;
+    typedef StatementBaseGenerator<Interface, Call, Mutating>::type BaseType;
     typedef Statement<Controlled> VisitorBaseType;
   };
 }

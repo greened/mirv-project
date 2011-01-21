@@ -11,9 +11,9 @@ namespace mirv {
   /// together.
    class Module {
    private:
-     typedef InnerImpl<Symbol<Function>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> FunctionBaseType;
-     typedef InnerImpl<const Symbol<Type<TypeBase> >, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> TypeBaseType;
-     typedef InnerImpl<Symbol<Variable>, VisitedInherit1<SymbolVisitor>::apply<Virtual<Symbol<Base> > >::type> VariableBaseType;
+     typedef InnerImpl<Symbol<Function>, Virtual<Symbol<Base> > > FunctionBaseType;
+     typedef InnerImpl<Symbol<Type<TypeBase> >, Virtual<Symbol<Base> > > TypeBaseType;
+     typedef InnerImpl<Symbol<Variable>, Virtual<Symbol<Base> > > VariableBaseType;
 
      class Interface : public Symbol<Named>,
                        public FunctionBaseType,
@@ -124,13 +124,6 @@ namespace mirv {
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
-       }
-
-       virtual void accept(mirv::SymbolVisitor &) {
-	 error("Module::Base::accept called");
-       }
-       virtual void accept(mirv::ConstSymbolVisitor &) const {
-	 error("Module::Base::accept called");
        }
      };
    public:

@@ -13,14 +13,6 @@
 #include <mirv/Core/Utility/Cast.hpp>
 
 namespace mirv {
-   template<typename Op>
-   void Expression<Op>::accept(ExpressionVisitor &V)
-   {
-     detail::AcceptImpl<Expression<Op>,
-       boost::is_base_of<boost::enable_shared_from_this<Expression<Op> >,
-       Expression<Op> >::value> impl;
-     impl(this, V);
-   }
 }
 
 #endif

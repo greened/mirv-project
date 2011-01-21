@@ -8,55 +8,67 @@ namespace mirv {
   /// Specify the interface for less-than expressions.
   class LessThan {
   public:
-    typedef boost::mpl::vector<Relational, Transitive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      LessThan>::type BaseType;
+    typedef Expression<Transitive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      LessThan,
+      Relational,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface for less-than-or-equal expressions.
   class LessThanOrEqual { 
   public:
-    typedef boost::mpl::vector<Relational, Transitive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      LessThanOrEqual>::type BaseType;
+    typedef Expression<Transitive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      LessThanOrEqual,
+      Relational,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface for equal expressions.
   class Equal {
   public:
-    typedef boost::mpl::vector<Relational, Transitive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      Equal>::type BaseType;
+    typedef Expression<Transitive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      Equal,
+      Relational,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface for not-equal expressions.
   class NotEqual {
   public:
-    typedef boost::mpl::vector<Relational, Transitive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      NotEqual>::type BaseType;
+    typedef Expression<Transitive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      NotEqual,
+      Relational,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface for greater-than-or-equal expressions.
   class GreaterThanOrEqual {
   public:
-    typedef boost::mpl::vector<Relational, Transitive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      GreaterThanOrEqual>::type BaseType;
+    typedef Expression<Transitive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      GreaterThanOrEqual,
+      Relational,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface for greater-than expressions.
   class GreaterThan { 
   public:
-    typedef boost::mpl::vector<Relational, Transitive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      GreaterThan>::type BaseType;
+    typedef Expression<Transitive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      GreaterThan,
+      Relational,
+      Transitive>::type BaseType;
   };
 }
 

@@ -115,7 +115,8 @@ namespace mirv {
   }
 
   StatementVisitor::result_type StatementVisitor::visit(ptr<Statement<Call> >::type s) {
-    ptr<Statement<Assignment>::VisitorBaseType>::type p = fast_cast<Statement<Call>::VisitorBaseType>(s);
+    ptr<Statement<Call>::VisitorBaseType>::type p =
+      fast_cast<Statement<Call>::VisitorBaseType>(s);
     visit(p);
   }
 }
