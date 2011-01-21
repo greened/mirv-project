@@ -15,33 +15,13 @@
 #include <mirv/Core/IR/PointerType.hpp>
 
 namespace mirv {
-  void Expression<Base>::accept(ExpressionVisitor &V)
+  void
+  Visitable<
+    Expression<Base>,
+    ExpressionVisitor,
+    boost::mpl::empty_base
+    >::accept(ExpressionVisitor &V)
   {
     error("Expression<Base>::accept called");
-  }
-
-  void Expression<Inner<detail::InnerExpressionTraits> >::accept(ExpressionVisitor &V)
-  {
-    error("Expression<Inner>::accept called");
-  }
-
-  void InnerExpression::accept(ExpressionVisitor &V)
-  {
-    error("InnerExpression::accept called");
-  }
-
-  void LeafExpression::accept(ExpressionVisitor &V)
-  {
-    error("LeafExpression::accept called");
-  }
-
-  void Unary::Interface::accept(ExpressionVisitor &V)
-  {
-    error("Unary::Interface::accept called");
-  }
-
-  void Binary::Interface::accept(ExpressionVisitor &V)
-  {
-    error("Binary::Interface::accept called");
   }
 }

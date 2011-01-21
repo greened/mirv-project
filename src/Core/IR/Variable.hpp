@@ -8,28 +8,35 @@ namespace mirv {
   /// type and a name.
    class Variable {
    private:
+     class Interface;
+
+   public:
+     typedef Interface BaseType;
+
+   private:
      class Interface : public Symbol<Typed>,
 		       public Symbol<Named>,
 		       public LeafSymbol,
                        public boost::enable_shared_from_this<Symbol<Variable> > {
       public:
        Interface(const std::string &n, TypePtr t)
-	   : Symbol<Typed>(t), Symbol<Named>(n){};
+	   : Symbol<Typed>(t), Symbol<Named>(n){}
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
-       };
-
-       virtual void accept(mirv::SymbolVisitor &) {
-	 error("Variable::Base::accept called");
        }
-       virtual void accept(mirv::ConstSymbolVisitor &) const {
-	 error("Variable::Base::accept called");
+
+       // We need these to be the final overriders for Symbol<Named>
+       // and Symbol<Typed> Visitable::accept functions.
+       virtual void accept(SymbolVisitor &) {
+         error("Variable::Interface::accept called!");
+       }
+       virtual void accept(ConstSymbolVisitor &) const {
+         error("Variable::Interface::accept called!");
        }
      };
 
    public:
-     typedef Interface BaseType;
      typedef LeafSymbol VisitorBaseType;
 
      static std::string getName(const std::string &name,

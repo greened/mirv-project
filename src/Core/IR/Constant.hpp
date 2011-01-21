@@ -18,26 +18,22 @@ namespace mirv {
 
   template<>
   class Constant<Base> {
+  public:
+    typedef LeafSymbol VisitorBaseType;
+
   private:
-    class Interface 
+    class Interface
         : public Symbol<Typed>,
           public LeafSymbol {
     public:
-      Interface(ptr<Symbol<Type<TypeBase> > >::type type) : Symbol<Typed>(type) {}
+      Interface(ptr<Symbol<Type<TypeBase> > >::type type)
+          : Symbol<Typed>(type) {}
 
       virtual std::string valueString(void) = 0;
-
-       virtual void accept(mirv::SymbolVisitor &) {
-	 error("Constant::Base::accept called");
-       }
-       virtual void accept(mirv::ConstSymbolVisitor &) const {
-	 error("Constant::Base::accept called");
-       }
     };
 
   public:
     typedef Interface BaseType;
-    typedef LeafSymbol VisitorBaseType;
   };    
 
   template<typename ValueType>
@@ -64,13 +60,6 @@ namespace mirv {
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(this->shared_from_this());
        };
-
-       virtual void accept(mirv::SymbolVisitor &) {
-	 error("Constant::Base::accept called");
-       }
-       virtual void accept(mirv::ConstSymbolVisitor &) const {
-	 error("Constant::Base::accept called");
-       }
     };
 
   public:
