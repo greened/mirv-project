@@ -3,7 +3,10 @@
 
 #include <Visitor.hpp>
  
+#include <mirv/Core/IR/Base.hpp>
+#include <mirv/Core/IR/ConstantFwd.hpp>
 #include <mirv/Core/IR/ExpressionFwd.hpp>
+#include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/IR/ArithmeticFwd.hpp>
 #include <mirv/Core/IR/LogicalFwd.hpp>
 #include <mirv/Core/IR/BitwiseFwd.hpp>
@@ -11,6 +14,7 @@
 #include <mirv/Core/IR/ReferenceFwd.hpp>
 
 #include <mirv/Core/IR/VariableFwd.hpp>
+#include <mirv/Core/Memory/Heap.hpp>
 
 #include <boost/mpl/vector.hpp>
 

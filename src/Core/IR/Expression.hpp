@@ -3,7 +3,8 @@
 
 #include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
-#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 #include <mirv/Core/IR/Visitable.hpp>
 
 #include <mirv/Core/Memory/Heap.hpp>
@@ -51,6 +52,8 @@ namespace mirv {
     Expression(A1 a1) : BaseType(a1) {}
     template<typename A1, typename A2>
     Expression(A1 a1, A2 a2) : BaseType(a1, a2) {}
+    template<typename A1, typename A2, typename A3>
+    Expression(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
 
   public:
     template<typename A1>
@@ -68,7 +71,27 @@ namespace mirv {
       result->setParents();
       return result;
     } 
+
+    template<typename A1, typename A2, typename A3>
+    static typename ptr<Expression<Op> >::type
+    make(A1 a1, A2 a2, A3 a3) {
+      typename ptr<Expression<Op> >::type
+        result(new Expression<Op>(a1, a2, a3));
+      result->setParents();
+      return result;
+    } 
   };
+
+  namespace detail {
+    template<typename Tag>
+    struct VisitorBase<Expression<Tag> > {
+      typedef typename Tag::VisitorBaseType VisitorBaseType;
+    };
+    template<typename Tag>
+    struct BaseTypeOf<Expression<Tag> > {
+      typedef typename Tag::BaseType BaseType;
+    };
+  }
 
   /// This anchors the Expression virtual table.
   template<>
@@ -93,7 +116,7 @@ namespace mirv {
     virtual Expression<Base> *cloneImpl(void) = 0;
 
   public:
-    typedef ptr<Symbol<Type<TypeBase>>>::const_type TypePtr;
+    typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
     Expression<Base>(void) {}
 
     ptr<Expression<Base> >::type clone(void) {
@@ -409,7 +432,7 @@ namespace mirv {
       static typename ptr<ExprType>::type
       construct(boost::shared_ptr<ExprType> prototype) {
         typename ptr<ExprType>::type
-          expr(ExprType::make( prototype->getLeftOperand()->clone(),
+          expr(ExprType::make(prototype->getLeftOperand()->clone(),
                               prototype->getRightOperand()->clone()));
         return expr;
       }
@@ -426,9 +449,10 @@ namespace mirv {
     typedef Root BaseType;
 
   public:
-    class ExpressionInterface : public Root,
-                                public Expression<Property>...,
-                                public boost::enable_shared_from_this<Expression<Tag> > {
+    class ExpressionInterface
+        : public Root,
+          public Expression<Property>...,
+          public boost::enable_shared_from_this<Expression<Tag> > {
     private:
       Expression<Base> *cloneImpl(void) {
         typename ptr<Expression<Tag> >::type

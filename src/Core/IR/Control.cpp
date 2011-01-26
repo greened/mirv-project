@@ -1,4 +1,7 @@
+#include <mirv/Core/Filter/StatementVisitor.hpp>
 #include <mirv/Core/IR/Control.hpp>
+#include <mirv/Core/IR/Expression.hpp>
+#include <mirv/Core/IR/Mutating.hpp>
 
 namespace mirv {
   Statement<Base> *Block::Interface::cloneImpl(void)
@@ -14,6 +17,15 @@ namespace mirv {
     return result;
   }
 
+  void Block::Interface::setParents(void)
+  {
+    for (iterator i = begin();
+         i != end();
+         ++i) {
+      (*i)->setParent(getSharedHandle());
+    }
+  }
+
   Statement<Base> *IfThen::Interface::cloneImpl(void)
   {
     ptr<Statement<IfThen> >::type stmt(Statement<IfThen>::make(
@@ -22,6 +34,12 @@ namespace mirv {
     Statement<IfThen> *result = stmt.get();
     stmt.reset();
     return result;
+  }
+
+  void IfThen::Interface::setParents(void)
+  {
+    getCondition()->setParent(getSharedHandle());
+    getChildStatement()->setParent(getSharedHandle());
   }
 
   Statement<Base> *IfElse::Interface::cloneImpl(void)
@@ -35,6 +53,13 @@ namespace mirv {
     return result;
   }
 
+  void IfElse::Interface::setParents(void)
+  {
+    getCondition()->setParent(getSharedHandle());
+    getLeftChildStatement()->setParent(getSharedHandle());
+    getRightChildStatement()->setParent(getSharedHandle());
+  }
+
   Statement<Base> *DoWhile::Interface::cloneImpl(void)
   {
     ptr<Statement<DoWhile> >::type stmt(Statement<DoWhile>::make(
@@ -43,6 +68,12 @@ namespace mirv {
     Statement<DoWhile> *result = stmt.get();
     stmt.reset();
     return result;
+  }
+
+  void DoWhile::Interface::setParents(void)
+  {
+    getCondition()->setParent(getSharedHandle());
+    getChildStatement()->setParent(getSharedHandle());
   }
 
   Statement<Base> *While::Interface::cloneImpl(void)
@@ -55,6 +86,12 @@ namespace mirv {
     return result;
   }
 
+  void While::Interface::setParents(void)
+  {
+    getCondition()->setParent(getSharedHandle());
+    getChildStatement()->setParent(getSharedHandle());
+  }
+
   Statement<Base> *Case::Interface::cloneImpl(void)
   {
     ptr<Statement<Case> >::type stmt(Statement<Case>::make(
@@ -63,6 +100,12 @@ namespace mirv {
     Statement<Case> *result = stmt.get();
     stmt.reset();
     return result;
+  }
+
+  void Case::Interface::setParents(void)
+  {
+    getCondition()->setParent(getSharedHandle());
+    getChildStatement()->setParent(getSharedHandle());
   }
 
   Statement<Base> *Switch::Interface::cloneImpl(void)
@@ -75,6 +118,12 @@ namespace mirv {
     return result;
   }
 
+  void Switch::Interface::setParents(void)
+  {
+    getCondition()->setParent(getSharedHandle());
+    getChildStatement()->setParent(getSharedHandle());
+  }
+
   Statement<Base> *Before::Interface::cloneImpl(void)
   {
     ptr<Statement<Before> >::type stmt(Statement<Before>::make(
@@ -83,6 +132,12 @@ namespace mirv {
     Statement<Before> *result = stmt.get();
     stmt.reset();
     return result;
+  }
+
+  void Before::Interface::setParents(void)
+  {
+    getLabel()->setParent(getSharedHandle());
+    getChildStatement()->setParent(getSharedHandle());
   }
 
   Statement<Base> *After::Interface::cloneImpl(void)
@@ -95,6 +150,12 @@ namespace mirv {
     return result;
   }
 
+  void After::Interface::setParents(void)
+  {
+    getLabel()->setParent(getSharedHandle());
+    getChildStatement()->setParent(getSharedHandle());
+  }
+
   Statement<Base> *Goto::Interface::cloneImpl(void)
   {
     ptr<Statement<Goto> >::type stmt(Statement<Goto>::make(
@@ -102,6 +163,11 @@ namespace mirv {
     Statement<Goto> *result = stmt.get();
     stmt.reset();
     return result;
+  }
+
+  void Goto::Interface::setParents(void)
+  {
+    getLabel()->setParent(getSharedHandle());
   }
 
   Statement<Base> *Return::Interface::cloneImpl(void)

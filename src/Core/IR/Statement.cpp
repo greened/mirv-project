@@ -1,3 +1,4 @@
+#include <mirv/Core/Filter/StatementVisitor.hpp>
 #include <mirv/Core/IR/Statement.hpp>
 #include <mirv/Core/IR/Control.hpp>
 #include <mirv/Core/IR/Mutating.hpp>

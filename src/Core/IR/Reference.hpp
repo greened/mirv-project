@@ -1,9 +1,8 @@
 #ifndef mirv_Core_IR_Reference_hpp
 #define mirv_Core_IR_Reference_hpp
 
+#include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
-#include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
 #include <mirv/Core/IR/Expression.hpp>
 
 #include <boost/bind.hpp>
@@ -13,6 +12,8 @@
 #include <boost/fusion/include/pop_front.hpp>
 #include <boost/fusion/include/size.hpp>
 
+#include <vector>
+
 namespace mirv {
   /// Specify the interface for nodes that reference symbols.
    template<typename SymbolType>
@@ -20,13 +21,11 @@ namespace mirv {
    private:
      typedef InnerImpl<Symbol<SymbolType>, LeafExpression> InterfaceBaseType;
 
-     class Interface
-         : public InterfaceBaseType,
-           public boost::enable_shared_from_this<Expression<Reference<SymbolType> > > {
+     class Interface : public InterfaceBaseType {
      private:
        Expression<Base> *cloneImpl(void) {
          typename ptr<Expression<Reference<SymbolType> > >::type expr(
-           Expression<Reference<SymbolType> >::make(this->getSymbol()));
+           make<Expression<Reference<SymbolType> > >(this->getSymbol()));
          Expression<Reference<SymbolType> > *result = expr.get();
          expr.reset();
          return result;
@@ -35,7 +34,7 @@ namespace mirv {
      protected:
        void setParents(void) {}
 
-      public:
+     public:
        typedef Symbol<SymbolType> ChildType;
        typedef typename ChildType::TypePtr TypePtr;
        typedef typename ptr<ChildType>::type ChildPtr;
@@ -97,34 +96,41 @@ namespace mirv {
   private:
     // We need to manually define the interface to override
     // InnerExpression's type() implementation.
-    typedef InnerExpression RootType;
-    typedef boost::mpl::vector<> PropertiesList;
+    class Interface
+        : public InnerExpression,
+          public Expression<Ref>,
+          public boost::enable_shared_from_this<Expression<Reference<Array> > > {
+    private:
+      Expression<Base> *cloneImpl(void) {
+        std::vector<ptr<Expression<Base> >::type> children;
 
-    /// The metafunction result.
-    typedef Properties<
-      PropertyExpressionGenerator,
-      RootType,
-      PropertiesList,
-      VisitedInherit2<ExpressionVisitor>
-      >::type HierarchyType;
-    
-    typedef VisitedInherit2<ExpressionVisitor>::apply<
-      HierarchyType,
-      boost::enable_shared_from_this<
-        Expression<Reference<Array> > > >::type InterfaceBaseType;
+        for (auto i = begin(); i != end(); ++i) {
+          children.push_back((*i)->clone());
+        }
 
-    class Interface : public InterfaceBaseType {
+        ptr<Expression<Reference<Array> > >::type expr(
+          mirv::make<Expression<Reference<Array> > >(*children.begin(),
+                                                     children.begin() + 1,
+                                                     children.end()));
+        Expression<Reference<Array> > *result = expr.get();
+        expr.reset();
+        return result;
+      }
+ 
+    protected:
+      void setParents(void) {}
+
     public:
       template<typename Sequence>
       Interface(ChildPtr Base, const Sequence &indices)
-          : InterfaceBaseType(Base) {
+          : InnerExpression(Base) {
         // Add the indices.
         boost::fusion::for_each(indices,
                                 boost::bind(&Interface::push_back, this, _1));
       }
       template<typename InputIterator>
       Interface(ChildPtr Base, InputIterator start, InputIterator end)
-          : InterfaceBaseType(Base) {
+          : InnerExpression(Base) {
         // Add the indices.
         std::for_each(start,
                       end,
@@ -136,51 +142,10 @@ namespace mirv {
       }
 
       typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
-      TypePtr type(void) const {
-        // The type is the type of the array with each dimension
-        // stripped off.
-        ptr<Symbol<Type<Array> > >::const_type arrayType =
-          safe_cast<const Symbol<Type<Array> > >((*this->begin())->type());
-
-        if ((this->size() - 1) == arrayType->dimensionSize()) {
-          // We completely indexed the array.
-          return arrayType->getElementType();
-        }
-
-        Symbol<Type<Array> >::ConstDimensionIterator dimStart =
-          arrayType->dimensionBegin();
-
-        Symbol<Type<Array> >::ConstDimensionIterator dimEnd = dimStart;
-        // Size of this expression includes the base object and we
-        // only want to count dimensions.
-        std::advance(dimEnd, arrayType->dimensionSize() - (this->size() - 1));
-
-        ptr<Symbol<Module> >::type module =
-          arrayType->parent<Symbol<Module> >();
-
-        checkInvariant(module, "Could not get parent module for type");
-
-        Symbol<Module>::TypeIterator arefType = module->
-          typeFind(Array::getName(arrayType->getElementType(),
-                                  dimStart,
-                                  dimEnd));
-        
-        if (arefType != module->typeEnd()) {
-          return *arefType;
-        }
-
-        // Create a new array type and add it to the module.
-        TypePtr result =
-          make<Symbol<Type<Array> > >(arrayType->getElementType(),
-          dimStart,
-          dimEnd);
-        module->typePushBack(result);
-        return result;
-      }
+      TypePtr type(void) const;
     };
 
    public:
-     typedef PropertiesList Properties;
      typedef InnerExpression VisitorBaseType;
      typedef Interface BaseType;
   };

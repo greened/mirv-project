@@ -5,7 +5,7 @@
 #include <mirv/Core/Filter/ForwardFlow.hpp>
 #include <mirv/Core/Filter/ExpressionFlow.hpp>
 #include <mirv/Core/Filter/FlowAction.hpp>
-#include <mirv/Core/Filter/SymbolFlow.hpp>
+#include <mirv/Core/Filter/ConstSymbolFlow.hpp>
 #include <mirv/Core/Filter/Filter.hpp>
 #include <mirv/Core/Filter/Action.hpp>
 #include <mirv/Core/IR/Node.hpp>
@@ -68,7 +68,7 @@ namespace mirv {
       > FlowAttributeManagerType;
 
     /// Entering each symbol
-    class EnterDeclSymbolVisitor : public SymbolVisitor {
+    class EnterDeclSymbolVisitor : public ConstSymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -76,11 +76,11 @@ namespace mirv {
       EnterDeclSymbolVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Module> >::type sym);
-      void visit(ptr<Symbol<Function> >::type sym);
-      void visit(ptr<Symbol<Variable> >::type sym);
-      void visit(ptr<Symbol<Type<TypeBase> > >::type sym);
-      void visit(ptr<Symbol<Type<StructType> > >::type sym);
+      void visit(ptr<Symbol<Module> >::const_type sym);
+      void visit(ptr<Symbol<Function> >::const_type sym);
+      void visit(ptr<Symbol<Variable> >::const_type sym);
+      void visit(ptr<Symbol<Type<TypeBase> > >::const_type sym);
+      void visit(ptr<Symbol<Type<StructType> > >::const_type sym);
     };
 
     class EnterDeclSymbolAction : public VisitAction<EnterDeclSymbolVisitor> {
@@ -89,7 +89,7 @@ namespace mirv {
           : VisitAction<EnterDeclSymbolVisitor>(attributeManager) {}
     };
 
-    class EnterDefSymbolVisitor : public SymbolVisitor {
+    class EnterDefSymbolVisitor : public ConstSymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -97,9 +97,9 @@ namespace mirv {
       EnterDefSymbolVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Module> >::type sym);
-      void visit(ptr<Symbol<Function> >::type sym);
-      void visit(ptr<Symbol<Variable> >::type sym);
+      void visit(ptr<Symbol<Module> >::const_type sym);
+      void visit(ptr<Symbol<Function> >::const_type sym);
+      void visit(ptr<Symbol<Variable> >::const_type sym);
     };
 
     class EnterDefSymbolAction : public VisitAction<EnterDefSymbolVisitor> {
@@ -109,7 +109,7 @@ namespace mirv {
     };
 
     /// Leaving each symbol declaration.
-    class LeaveDeclSymbolVisitor : public SymbolVisitor {
+    class LeaveDeclSymbolVisitor : public ConstSymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -118,13 +118,13 @@ namespace mirv {
           : attributeManager(am) {}
 
       /// Print the final newline after each symbol declaration.
-      void visit(ptr<Symbol<Base> >::type);
+      void visit(ptr<Symbol<Base> >::const_type);
 
       /// Do nothing for most types.
-      void visit(ptr<Symbol<Type<TypeBase> >  >::type);
+      void visit(ptr<Symbol<Type<TypeBase> >  >::const_type);
 
       /// Print the final newline after struct types.
-      void visit(ptr<Symbol<Type<StructType> > >::type);
+      void visit(ptr<Symbol<Type<StructType> > >::const_type);
     };
 
     class LeaveDeclSymbolAction : public VisitAction<LeaveDeclSymbolVisitor> {
@@ -134,7 +134,7 @@ namespace mirv {
     };
 
     /// Leaving each symbol definition.
-    class LeaveDefSymbolVisitor : public SymbolVisitor {
+    class LeaveDefSymbolVisitor : public ConstSymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -143,9 +143,9 @@ namespace mirv {
           : attributeManager(am) {}
 
       /// Print the final newline after each symbol definition.
-      void visit(ptr<Symbol<Variable> >::type sym);
-      void visit(ptr<Symbol<Module> >::type sym);
-      void visit(ptr<Symbol<Function> >::type sym);
+      void visit(ptr<Symbol<Variable> >::const_type sym);
+      void visit(ptr<Symbol<Module> >::const_type sym);
+      void visit(ptr<Symbol<Function> >::const_type sym);
     };
 
     class LeaveDefSymbolAction : public VisitAction<LeaveDefSymbolVisitor> {
@@ -372,7 +372,7 @@ namespace mirv {
     class PrintDeclSymbolFlow : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      SymbolFlowGenerator,
+      ConstSymbolFlowGenerator,
       EnterDeclSymbolAction,
       LeaveDeclSymbolAction,
       NullAction,
@@ -383,7 +383,7 @@ namespace mirv {
       typedef AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      SymbolFlowGenerator,
+      ConstSymbolFlowGenerator,
       EnterDeclSymbolAction,
       LeaveDeclSymbolAction,
       NullAction,
@@ -397,7 +397,7 @@ namespace mirv {
 
       // We just want the function declaration at this point so don't
       // visit children.
-      void visit(ptr<Symbol<Function> >::type sym) {
+      void visit(ptr<Symbol<Function> >::const_type sym) {
         this->doEnter(sym);
         this->doLeave(sym);
       }
@@ -407,7 +407,7 @@ namespace mirv {
     class PrintDefSymbolFlow : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      SymbolFlowGenerator,
+      ConstSymbolFlowGenerator,
       EnterDefSymbolAction,
       LeaveDefSymbolAction,
       NullAction,
@@ -420,7 +420,7 @@ namespace mirv {
       typedef AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      SymbolFlowGenerator,
+      ConstSymbolFlowGenerator,
       EnterDefSymbolAction,
       LeaveDefSymbolAction,
       NullAction,
@@ -437,7 +437,7 @@ namespace mirv {
 
       /// We only want to visit functions here since we already
       /// declared module-level types and variables.
-      void visit(ptr<Symbol<Module> >::type sym);
+      void visit(ptr<Symbol<Module> >::const_type sym);
     };
 
   public:
