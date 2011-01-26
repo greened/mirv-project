@@ -3,7 +3,6 @@
 
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/IR/Statement.hpp>
-#include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
@@ -21,13 +20,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        for (iterator i = begin();
-             i != end();
-             ++i) {
-          (*i)->setParent(getSharedHandle());
-        }
-      }
+      void setParents(void);
 
     public:
       Interface(void) : InterfaceBaseType() {}
@@ -210,10 +203,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S, typename E>
@@ -245,11 +235,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getLeftChildStatement()->setParent(getSharedHandle());
-        getRightChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename S2, typename E>
@@ -281,10 +267,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -317,10 +300,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -352,10 +332,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -418,10 +395,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -492,10 +466,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -530,10 +501,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -568,9 +536,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename E>

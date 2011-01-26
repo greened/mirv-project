@@ -2,7 +2,7 @@
 #define mirv_Core_IR_Mutating_hpp
 
 #include <mirv/Core/IR/Statement.hpp>
-#include <mirv/Core/IR/Expression.hpp>
+#include <mirv/Core/IR/ExpressionFwd.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/fusion/iterator.hpp>
@@ -91,10 +91,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLeftExpression()->setParent(getSharedHandle());
-        getRightExpression()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       typedef ExpressionIterator iterator;
@@ -153,13 +150,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        for (ExpressionIterator i = expressionBegin();
-             i != expressionEnd();
-             ++i) {
-          (*i)->setParent(getSharedHandle());
-        }
-      }
+      void setParents(void);
 
     public:
       typedef ExpressionPtr ChildPtr;

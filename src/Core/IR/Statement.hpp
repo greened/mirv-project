@@ -5,8 +5,6 @@
 #include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/ExpressionFwd.hpp>
-#include <mirv/Core/IR/Inherit.hpp>
-#include <mirv/Core/IR/Expression.hpp>
 #include <mirv/Core/IR/Visitable.hpp>
 
 #include <boost/mpl/empty_base.hpp>
@@ -86,6 +84,17 @@ namespace mirv {
       return p;
     }
   };
+
+  namespace detail {
+    template<typename Tag>
+    struct VisitorBase<Statement<Tag> > {
+      typedef typename Tag::VisitorBaseType VisitorBaseType;
+    };
+    template<typename Tag>
+    struct BaseTypeOf<Statement<Tag> > {
+      typedef typename Tag::BaseType BaseType;
+    };
+  }
 
   /// This anchors the Statement virtual table.
   template<>

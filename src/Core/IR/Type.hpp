@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_Type_hpp
 #define mirv_Core_IR_Type_hpp
 
+#include <mirv/Core/Filter/TypeNodeVisitor.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 
 namespace mirv {

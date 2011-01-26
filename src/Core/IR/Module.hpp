@@ -12,7 +12,7 @@ namespace mirv {
    class Module {
    private:
      typedef InnerImpl<Symbol<Function>, Virtual<Symbol<Base> > > FunctionBaseType;
-     typedef InnerImpl<Symbol<Type<TypeBase> >, Virtual<Symbol<Base> > > TypeBaseType;
+     typedef InnerImpl<const Symbol<Type<TypeBase> >, Virtual<Symbol<Base> > > TypeBaseType;
      typedef InnerImpl<Symbol<Variable>, Virtual<Symbol<Base> > > VariableBaseType;
 
      class Interface : public Symbol<Named>,

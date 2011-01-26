@@ -1,7 +1,7 @@
 #ifndef mirv_Core_Filter_ConstSymbolFlow_hpp
 #define mirv_Core_Filter_ConstSymbolFlow_hpp
 
-#include <mirv/Core/Filter/SymbolVisitor.hpp>
+#include <mirv/Core/Filter/ConstSymbolVisitor.hpp>
 #include <mirv/Core/Filter/Action.hpp>
 #include <mirv/Core/Filter/Dataflow.hpp>
 #include <mirv/Core/Filter/StatementFlow.hpp>
@@ -94,12 +94,12 @@ namespace mirv {
     };
 
   public:
-    SymbolFlow(const EnterAction &e,
-               const LeaveAction &l,
-               const BeforeAction &b,
-               const AfterAction &a,
-               const BetweenAction &t,
-               const StatementAction &smt)
+    ConstSymbolFlow(const EnterAction &e,
+                    const LeaveAction &l,
+                    const BeforeAction &b,
+                    const AfterAction &a,
+                    const BetweenAction &t,
+                    const StatementAction &smt)
 	: ent(e), lve(l), bfr(b), aft(a), bet(t), stmt(smt) {}
 
     // Allow in-place construction of actions.
@@ -114,14 +114,14 @@ namespace mirv {
     /// Visit an inner symbol, visiting all children.
     void visit(ptr<InnerSymbol>::const_type sym) {
       this->doEnter(sym);
-      for(InnerSymbol::iterator s = sym->begin(),
+      for(InnerSymbol::const_iterator s = sym->begin(),
             send = sym->end();
           s != send;
           /* NULL */) {
         this->doBefore(sym, *s);
         (*s)->accept(*this);
         this->doAfter(sym, *s);
-        InnerSymbol::iterator prev = s;
+        InnerSymbol::const_iterator prev = s;
         if (++s != send) {
           this->doBetween(sym, *prev, *s);
         }
@@ -145,42 +145,42 @@ namespace mirv {
       this->doEnter(sym);
 
       // Visit types
-      for(Symbol<Module>::TypeIterator t = sym->typeBegin(),
+      for(Symbol<Module>::ConstTypeIterator t = sym->typeBegin(),
             tend = sym->typeEnd();
           t != tend;
           /* NULL */) {
         this->doBefore(sym, *t);
         (*t)->accept(*this);
         this->doAfter(sym, *t);
-        Symbol<Module>::TypeIterator prev = t;
+        Symbol<Module>::ConstTypeIterator prev = t;
         if (++t != tend) {
           this->doBetween(sym, *prev, *t);
         }
       }
 
       // Visit variables
-      for(Symbol<Module>::VariableIterator v = sym->variableBegin(),
+      for(Symbol<Module>::ConstVariableIterator v = sym->variableBegin(),
             vend = sym->variableEnd();
           v != vend;
           /* NULL */) {
         this->doBefore(sym, *v);
         (*v)->accept(*this);
         this->doAfter(sym, *v);
-        Symbol<Module>::VariableIterator prev = v;
+        Symbol<Module>::ConstVariableIterator prev = v;
         if (++v != vend) {
           this->doBetween(sym, *prev, *v);
         }
       }
 
       // Visit functions
-      for(Symbol<Module>::FunctionIterator f = sym->functionBegin(),
+      for(Symbol<Module>::ConstFunctionIterator f = sym->functionBegin(),
             fend = sym->functionEnd();
           f != fend;
           /* NULL */) {
         this->doBefore(sym, *f);
         (*f)->accept(*this);
         this->doAfter(sym, *f);
-        Symbol<Module>::FunctionIterator prev = f;
+        Symbol<Module>::ConstFunctionIterator prev = f;
         if (++f != fend) {
           this->doBetween(sym, *prev, *f);
         }
@@ -193,14 +193,14 @@ namespace mirv {
     void visit(ptr<Symbol<Function> >::const_type sym) {
       this->doEnter(sym);
       // Visit variables
-      for(Symbol<Function>::VariableIterator v = sym->variableBegin(),
+      for(Symbol<Function>::ConstVariableIterator v = sym->variableBegin(),
             vend = sym->variableEnd();
           v != vend;
           /* NULL */) {
         this->doBefore(sym, *v);
         (*v)->accept(*this);
         this->doAfter(sym, *v);
-        Symbol<Function>::VariableIterator prev = v;
+        Symbol<Function>::ConstVariableIterator prev = v;
         if (++v != vend) {
           this->doBetween(sym, *prev, *v);
         }
@@ -213,16 +213,16 @@ namespace mirv {
     }
   };
 
-  typedef SymbolFlow<
+  typedef ConstSymbolFlow<
     NullAction,
     NullAction,
     NullAction,
     NullAction,
     NullAction,
-    NullStatementFlow> NullSymbolFlow;
+    NullStatementFlow> NullConstSymbolFlow;
 
   /// This is a type generator for symbol flows.
-  struct SymbolFlowGenerator {
+  struct ConstSymbolFlowGenerator {
     template<
       typename EnterAction,
       typename LeaveAction,
@@ -231,7 +231,7 @@ namespace mirv {
       typename BetweenAction,
       typename StatementAction>
     struct apply {
-      typedef SymbolFlow<EnterAction, LeaveAction, BeforeAction,
+      typedef ConstSymbolFlow<EnterAction, LeaveAction, BeforeAction,
         AfterAction, BetweenAction, StatementAction> type;
     };
   };
@@ -246,24 +246,24 @@ namespace mirv {
     typename AfterAction,
     typename BetweenAction,
     typename StatementAction>
-  typename ptr<SymbolFlow<EnterAction,
+  typename ptr<ConstSymbolFlow<EnterAction,
                  LeaveAction,
                  BeforeAction,
                  AfterAction,
                  BetweenAction,
                  StatementAction> >::type
-  makeSymbolFlow(const EnterAction &e,
-		 const LeaveAction &l,
-		 const BeforeAction &b,
-		 const AfterAction &a,
-		 const BetweenAction &t,
-		 const StatementAction &smt) {
-    typename ptr<SymbolFlow<EnterAction,
+  makeConstSymbolFlow(const EnterAction &e,
+                      const LeaveAction &l,
+                      const BeforeAction &b,
+                      const AfterAction &a,
+                      const BetweenAction &t,
+                      const StatementAction &smt) {
+    typename ptr<ConstSymbolFlow<EnterAction,
       LeaveAction,
       BeforeAction,
       AfterAction,
       BetweenAction,
-      StatementAction> >::type flow(new SymbolFlow<EnterAction,
+      StatementAction> >::type flow(new ConstSymbolFlow<EnterAction,
                                     LeaveAction,
                                     BeforeAction,
                                     AfterAction,

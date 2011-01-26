@@ -2,9 +2,6 @@
 #define mirv_Core_IR_Visitable_hpp
 
 #include <mirv/Core/Filter/NodeVisitor.hpp>
-#include <mirv/Core/IR/ExpressionFwd.hpp>
-#include <mirv/Core/IR/StatementFwd.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
 
 namespace mirv {
   namespace detail {
@@ -15,33 +12,6 @@ namespace mirv {
     template<typename Op>
     struct BaseTypeOf {
       typedef typename Op::BaseType BaseType;
-    };
-
-    template<typename Tag>
-    struct VisitorBase<Expression<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    template<typename Tag>
-    struct BaseTypeOf<Expression<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-
-    template<typename Tag>
-    struct VisitorBase<Statement<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    template<typename Tag>
-    struct BaseTypeOf<Statement<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-
-    template<typename Tag>
-    struct VisitorBase<Symbol<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    template<typename Tag>
-    struct BaseTypeOf<Symbol<Tag> > {
-      typedef typename Tag::BaseType BaseType;
     };
   }
 
@@ -63,7 +33,8 @@ namespace mirv {
     Visitable(const Arg &...arg) : BaseType(arg...) {};
 
     virtual void accept(Visitor &V) {
-      detail::AcceptImpl<NodeType,
+      detail::AcceptImpl<
+        NodeType,
         boost::is_base_of<
           boost::enable_shared_from_this<NodeType>,
           NodeType

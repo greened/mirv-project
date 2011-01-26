@@ -134,29 +134,11 @@ namespace mirv {
       this->doLeave(sym);
     }
 
-    void visit(ptr<Symbol<Type<TypeBase> > >::type sym) {
-      this->doEnter(sym);
-      this->doLeave(sym);
-    }
-
-    /// Visit a module, visiting contained types, variables and
-    /// functions.
+    /// Visit a module, visiting contained variables and functions.
+    /// We do not visit types as they are immutable.  See
+    /// ConstSymbolFlow.
     void visit(ptr<Symbol<Module> >::type sym) {
       this->doEnter(sym);
-
-      // Visit types
-      for(Symbol<Module>::TypeIterator t = sym->typeBegin(),
-            tend = sym->typeEnd();
-          t != tend;
-          /* NULL */) {
-        this->doBefore(sym, *t);
-        (*t)->accept(*this);
-        this->doAfter(sym, *t);
-        Symbol<Module>::TypeIterator prev = t;
-        if (++t != tend) {
-          this->doBetween(sym, *prev, *t);
-        }
-      }
 
       // Visit variables
       for(Symbol<Module>::VariableIterator v = sym->variableBegin(),
