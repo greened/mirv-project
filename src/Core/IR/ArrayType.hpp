@@ -131,13 +131,6 @@ namespace mirv {
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
        }
-
-	virtual void accept(mirv::SymbolVisitor &) {
-	  error("Array::accept called");
-	}
-	virtual void accept(mirv::ConstSymbolVisitor &) const {
-	  error("Array::accept called");
-	}
       };
 
    public:

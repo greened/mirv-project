@@ -10,66 +10,78 @@ namespace mirv {
   /// Specify the interface to an add expression.
   class Add {
   public:
-    typedef boost::mpl::vector<Arithmetic, Commutative, 
-			       Associative, Transitive, 
-			       Reflexive> Properties;
-     typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      Add>::type BaseType;
+    typedef Expression<Commutative> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      Add,
+      Arithmetic,
+      Associative,
+      Commutative,
+      Reflexive,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface to a subtract expression.
   class Subtract {
   public:
-    typedef boost::mpl::vector<Arithmetic, Associative,
-			       Transitive, 
-			       Reflexive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      Subtract>::type BaseType;
+    typedef Expression<Associative> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      Subtract,
+      Arithmetic,
+      Associative,
+      Reflexive,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface to a multiply expression.
   class Multiply {
   public:
-    typedef boost::mpl::vector<Arithmetic, Commutative, 
-			       Associative, Transitive, 
-			       Reflexive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      Multiply>::type BaseType;
+    typedef Expression<Commutative> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      Multiply,
+      Arithmetic,
+      Associative,
+      Commutative,
+      Reflexive,
+      Transitive
+      >::type BaseType;
   };
 
   /// Specify the interface to a divide expression.
   class Divide {
   public:
-    typedef boost::mpl::vector<Arithmetic,
-			       Associative, Transitive, 
-			       Reflexive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      Divide>::type BaseType;
+    typedef Expression<Transitive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      Divide,
+      Arithmetic,
+      Reflexive,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface to a modulo expression.
   class Modulus {
   public:
-    typedef boost::mpl::vector<Arithmetic, 
-			       Transitive, 
-			       Reflexive> Properties;
-    typedef Expression<Binary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Binary>,
-      Modulus>::type BaseType;
+    typedef Expression<Transitive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Binary>,
+      Modulus,
+      Arithmetic,
+      Reflexive,
+      Transitive>::type BaseType;
   };
 
   /// Specify the interface to a negate expression.
   class Negate {
   public:
-    typedef boost::mpl::vector<Arithmetic, 
-			       Reflexive> Properties;
-    typedef Expression<Unary> VisitorBaseType;
-    typedef ExpressionBaseGenerator<Properties, Expression<Unary>,
-      Negate>::type BaseType;
+    typedef Expression<Reflexive> VisitorBaseType;
+    typedef ExpressionBaseGenerator<
+      Expression<Unary>,
+      Negate,
+      Arithmetic,
+      Reflexive>::type BaseType;
   };
 };
 
