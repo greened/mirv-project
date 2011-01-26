@@ -32,7 +32,7 @@ namespace mirv {
        if (!result) {
          return typename ptr<NodeType>::type();
        }
-       typename ptr<NodeType>::type casted = safe_cast<NodeType>(result);
+       typename ptr<NodeType>::type casted = dyn_cast<NodeType>(result);
        if (casted) {
          return casted;
        }
