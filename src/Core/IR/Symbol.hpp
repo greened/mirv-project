@@ -17,33 +17,26 @@ namespace mirv {
   struct SymbolVisitor;
   struct ConstSymbolVisitor;
 
-  // This is a specialization to provide an accept method for
-  // ConstSymbolVisitor.  We need to make the accept const which is
-  // why we need this specialization.
-  template<typename Symbol>
-  class Visitable<Symbol, ConstSymbolVisitor>
-      : public Visitable<Symbol, SymbolVisitor> {
-  private:
-    typedef Visitable<Symbol, SymbolVisitor> BaseType;
-
-  public:
-    Visitable<Symbol, ConstSymbolVisitor>(void) : BaseType() {}
-    template<typename ...Arg>
-    Visitable<Symbol, ConstSymbolVisitor>(const Arg &...arg)
-    : BaseType(arg...) {};
-
-    using Visitable<Symbol, SymbolVisitor>::accept;
-
-    virtual void accept(ConstSymbolVisitor &V) const {
-      detail::AcceptImpl<Symbol,
-        boost::is_base_of<
-          boost::enable_shared_from_this<Symbol>,
-          Symbol
-          >::value
-      > impl;
-      impl(safe_cast<const Symbol>(this), V);
-    }
-  };
+  template<typename Tag> class Symbol;
+  
+  namespace detail {
+    template<typename Tag>
+    struct VisitorBase<Symbol<Tag> > {
+      typedef typename Tag::VisitorBaseType VisitorBaseType;
+    };
+    template<typename Tag>
+    struct BaseTypeOf<Symbol<Tag> > {
+      typedef typename Tag::BaseType BaseType;
+    };
+    template<>
+    struct VisitorBase<Symbol<Base> > {
+      typedef Node<Base> VisitorBaseType;
+    };
+    template<>
+    struct BaseTypeOf<Symbol<Base> > {
+      typedef Node<Base> BaseType;
+    };
+  }
 
   /// This is the symbol implementation for all symbol types.  Each
   /// symbol type is an instance of this template (Symbol<Variable>,
@@ -51,9 +44,14 @@ namespace mirv {
   /// visitor logic in one place, hiding the gory details from the
   /// symbol type tags and specific symbol type interfaces.
   template<typename Tag>
-  class Symbol : public Visitable<Symbol<Tag>, ConstSymbolVisitor> {
+  class Symbol
+      : public ConstVisitable<Symbol<Tag>, ConstSymbolVisitor, SymbolVisitor> {
   public:
-    typedef Visitable<Symbol<Tag>, ConstSymbolVisitor> BaseType;
+    typedef ConstVisitable<
+    Symbol<Tag>,
+    ConstSymbolVisitor,
+    SymbolVisitor
+    > BaseType;
     typedef typename Tag::VisitorBaseType VisitorBaseType;
 
   protected:
@@ -105,21 +103,19 @@ namespace mirv {
   };
 
   template<>
-  class Visitable<Symbol<Base>, SymbolVisitor, boost::mpl::empty_base> {
+  class Visitable<Symbol<Base>, SymbolVisitor> : public Node<Base> {
   public:
     virtual void accept(SymbolVisitor &V);
   };
 
-  /// Specialize for ConstSymbolVisitor so accept can be const.
   template<>
-  class Visitable<Symbol<Base>, ConstSymbolVisitor, boost::mpl::empty_base>
-      : public Visitable<Symbol<Base>, SymbolVisitor, boost::mpl::empty_base> {
-  public:
-    using Visitable<
+  class ConstVisitable<
     Symbol<Base>,
-    SymbolVisitor,
-    boost::mpl::empty_base
-    >::accept;
+    ConstSymbolVisitor,
+    SymbolVisitor
+    > : public Visitable<Symbol<Base>, SymbolVisitor> {
+  public:
+    using Visitable<Symbol<Base>, SymbolVisitor>::accept;
 
     virtual void accept(ConstSymbolVisitor &V) const;
   };
@@ -127,13 +123,10 @@ namespace mirv {
   /// A specialization for base symbols.
   template<>
   class Symbol<Base>
-  // MI is the right thing here because Visitable doesn't inherit from
-  // anything of note.
-      : public Node<Base>,
-        public Visitable<
+      : public ConstVisitable<
     Symbol<Base>,
     ConstSymbolVisitor,
-    boost::mpl::empty_base
+    SymbolVisitor
     > {};
 
   /// This is a function object to allow searching on sets of symbols by name.
@@ -200,17 +193,16 @@ namespace mirv {
   /// This holds the child pointers and other data necessary for inner
   /// symbols.
   // TODO: Fix TrackParent use.
-  class InnerSymbol : public InnerImpl<
-    Symbol<Base>,
-    Virtual<InnerSymbolBase>
-    > {
+  class InnerSymbol : public InnerImpl<Symbol<Base>, Virtual<InnerSymbolBase> > {
   public:
+    typedef InnerImpl<Symbol<Base>, Virtual<InnerSymbolBase> > BaseType;
     typedef Symbol<Base> VisitorBaseType;
   };
 
   /// This is a symbol with no children.
   class LeafSymbol : public LeafImpl<Virtual<Symbol<Base> > > {
   public:
+    typedef LeafImpl<Virtual<Symbol<Base> > > BaseType;
     typedef Symbol<Base> VisitorBaseType;
   };
 

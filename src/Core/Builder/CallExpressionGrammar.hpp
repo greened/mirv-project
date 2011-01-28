@@ -7,6 +7,7 @@
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
 #include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Mutating.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/fusion/include/pop_front.hpp>

@@ -84,6 +84,12 @@ namespace mirv {
 	  
         return(this->front());
       }
+      ConstChildPtr getChildStatement(void) const {
+        checkInvariant(!this->empty(), 
+                       "Attempt to get statement from empty block");
+	  
+        return(this->front());
+      }
     };
 
   public:
@@ -210,10 +216,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S, typename E>
@@ -227,6 +230,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("IfThen::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("IfThen::Interface::accept called!");
        }
     };
@@ -245,11 +251,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getLeftChildStatement()->setParent(getSharedHandle());
-        getRightChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename S2, typename E>
@@ -263,6 +265,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("IfElse::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("IfElse::Interface::accept called!");
        }
     };
@@ -281,10 +286,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -298,6 +300,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("While::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("While::Interface::accept called!");
        }
     };
@@ -317,10 +322,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -334,6 +336,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("DoWhile::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("DoWhile::Interface::accept called!");
        }
     };
@@ -352,10 +357,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -369,6 +371,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("Case::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("Case::Interface::accept called!");
        }
     };
@@ -388,9 +393,7 @@ namespace mirv {
       typedef InterfaceBaseType::ChildPtr ChildPtr;
 
     protected:
-      void setParents(void) {
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1>
@@ -418,10 +421,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -435,6 +435,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("Switch::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("Switch::Interface::accept called!");
        }
     };
@@ -492,10 +495,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -509,6 +509,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("Before::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("Before::Interface::accept called!");
        }
     };
@@ -530,10 +533,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -547,6 +547,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("After::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("After::Interface::accept called!");
        }
     };
@@ -568,9 +571,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename E>

@@ -1,6 +1,18 @@
+#include <mirv/Core/Filter/StatementVisitor.hpp>
+#include <mirv/Core/IR/Control.hpp>
 #include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
 
 namespace mirv {
+  Function::Interface::Interface(const std::string &n,
+                                 TypePtr t,
+                                 StatementPtr s)
+      : NamedBaseType(n),
+          TypedBaseType(t),
+          // If the statement is not a block, make it one.
+          StatementBaseType(dyn_cast<Statement<Block> >(s) ?
+                            s : boost::static_pointer_cast<Statement<Base> >(mirv::make<Statement<Block> >(s))) {}
+
   void Function::Interface::statementPushBack(StatementPtr stmt)
   {
     // If the statement is not a block, make it one.
@@ -16,5 +28,11 @@ namespace mirv {
       block->push_back(stmt);
       block->setParent(this->getSharedHandle());
     }
+  }
+
+  void Function::Interface::variablePushBack(VariablePtr v)
+  {
+    VariableBaseType::push_back(v); 
+    v->setParent(this->getSharedHandle());
   }
 }

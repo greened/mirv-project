@@ -2,10 +2,10 @@
 #define mirv_Filter_Snapshot_Print_hpp
 
 #include <mirv/Core/Filter/AttributeFlow.hpp>
-#include <mirv/Core/Filter/ForwardFlow.hpp>
-#include <mirv/Core/Filter/ExpressionFlow.hpp>
+#include <mirv/Core/Filter/ConstForwardStatementFlow.hpp>
+#include <mirv/Core/Filter/ConstExpressionFlow.hpp>
 #include <mirv/Core/Filter/FlowAction.hpp>
-#include <mirv/Core/Filter/SymbolFlow.hpp>
+#include <mirv/Core/Filter/ConstSymbolFlow.hpp>
 #include <mirv/Core/Filter/Filter.hpp>
 #include <mirv/Core/Filter/Action.hpp>
 #include <mirv/Core/IR/Node.hpp>
@@ -15,7 +15,7 @@
 
 namespace mirv {
   /// This is a filter to print MIRV IR in textual form.
-  class PrintFilter : public Filter<Node<Base> > {
+  class PrintFilter : public ConstFilter<Node<Base> > {
   private:
     typedef std::ostream Stream;
     typedef int Indent;
@@ -68,7 +68,7 @@ namespace mirv {
       > FlowAttributeManagerType;
 
     /// Entering each symbol
-    class EnterDeclSymbolVisitor : public SymbolVisitor {
+    class EnterDeclSymbolVisitor : public ConstSymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -76,11 +76,11 @@ namespace mirv {
       EnterDeclSymbolVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Module> >::type sym);
-      void visit(ptr<Symbol<Function> >::type sym);
-      void visit(ptr<Symbol<Variable> >::type sym);
-      void visit(ptr<Symbol<Type<TypeBase> > >::type sym);
-      void visit(ptr<Symbol<Type<StructType> > >::type sym);
+      void visit(ptr<Symbol<Module> >::const_type sym);
+      void visit(ptr<Symbol<Function> >::const_type sym);
+      void visit(ptr<Symbol<Variable> >::const_type sym);
+      void visit(ptr<Symbol<Type<TypeBase> > >::const_type sym);
+      void visit(ptr<Symbol<Type<StructType> > >::const_type sym);
     };
 
     class EnterDeclSymbolAction : public VisitAction<EnterDeclSymbolVisitor> {
@@ -89,7 +89,7 @@ namespace mirv {
           : VisitAction<EnterDeclSymbolVisitor>(attributeManager) {}
     };
 
-    class EnterDefSymbolVisitor : public SymbolVisitor {
+    class EnterDefSymbolVisitor : public ConstSymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -97,9 +97,9 @@ namespace mirv {
       EnterDefSymbolVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Module> >::type sym);
-      void visit(ptr<Symbol<Function> >::type sym);
-      void visit(ptr<Symbol<Variable> >::type sym);
+      void visit(ptr<Symbol<Module> >::const_type sym);
+      void visit(ptr<Symbol<Function> >::const_type sym);
+      void visit(ptr<Symbol<Variable> >::const_type sym);
     };
 
     class EnterDefSymbolAction : public VisitAction<EnterDefSymbolVisitor> {
@@ -109,7 +109,7 @@ namespace mirv {
     };
 
     /// Leaving each symbol declaration.
-    class LeaveDeclSymbolVisitor : public SymbolVisitor {
+    class LeaveDeclSymbolVisitor : public ConstSymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -118,13 +118,13 @@ namespace mirv {
           : attributeManager(am) {}
 
       /// Print the final newline after each symbol declaration.
-      void visit(ptr<Symbol<Base> >::type);
+      void visit(ptr<Symbol<Base> >::const_type);
 
       /// Do nothing for most types.
-      void visit(ptr<Symbol<Type<TypeBase> >  >::type);
+      void visit(ptr<Symbol<Type<TypeBase> >  >::const_type);
 
       /// Print the final newline after struct types.
-      void visit(ptr<Symbol<Type<StructType> > >::type);
+      void visit(ptr<Symbol<Type<StructType> > >::const_type);
     };
 
     class LeaveDeclSymbolAction : public VisitAction<LeaveDeclSymbolVisitor> {
@@ -134,7 +134,7 @@ namespace mirv {
     };
 
     /// Leaving each symbol definition.
-    class LeaveDefSymbolVisitor : public SymbolVisitor {
+    class LeaveDefSymbolVisitor : public ConstSymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -143,9 +143,9 @@ namespace mirv {
           : attributeManager(am) {}
 
       /// Print the final newline after each symbol definition.
-      void visit(ptr<Symbol<Variable> >::type sym);
-      void visit(ptr<Symbol<Module> >::type sym);
-      void visit(ptr<Symbol<Function> >::type sym);
+      void visit(ptr<Symbol<Variable> >::const_type sym);
+      void visit(ptr<Symbol<Module> >::const_type sym);
+      void visit(ptr<Symbol<Function> >::const_type sym);
     };
 
     class LeaveDefSymbolAction : public VisitAction<LeaveDefSymbolVisitor> {
@@ -155,7 +155,7 @@ namespace mirv {
     };
 
     /// Entering each statement
-    class EnterStatementVisitor : public StatementVisitor {
+    class EnterStatementVisitor : public ConstStatementVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -163,20 +163,20 @@ namespace mirv {
       EnterStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Statement<Block> >::type stmt);
-      void visit(ptr<Statement<IfThen> >::type stmt);
-      void visit(ptr<Statement<IfElse> >::type stmt);
-      void visit(ptr<Statement<While> >::type stmt);
-      void visit(ptr<Statement<DoWhile> >::type stmt);
-      void visit(ptr<Statement<Switch> >::type stmt);
-      void visit(ptr<Statement<Case> >::type stmt);
-      void visit(ptr<Statement<CaseBlock> >::type stmt);
-      void visit(ptr<Statement<Before> >::type stmt);
-      void visit(ptr<Statement<After> >::type stmt);
-      void visit(ptr<Statement<Goto> >::type stmt);
-      void visit(ptr<Statement<Return> >::type stmt);
-      void visit(ptr<Statement<Assignment> >::type stmt);
-      void visit(ptr<Statement<Call> >::type stmt);
+      void visit(ptr<Statement<Block> >::const_type stmt);
+      void visit(ptr<Statement<IfThen> >::const_type stmt);
+      void visit(ptr<Statement<IfElse> >::const_type stmt);
+      void visit(ptr<Statement<While> >::const_type stmt);
+      void visit(ptr<Statement<DoWhile> >::const_type stmt);
+      void visit(ptr<Statement<Switch> >::const_type stmt);
+      void visit(ptr<Statement<Case> >::const_type stmt);
+      void visit(ptr<Statement<CaseBlock> >::const_type stmt);
+      void visit(ptr<Statement<Before> >::const_type stmt);
+      void visit(ptr<Statement<After> >::const_type stmt);
+      void visit(ptr<Statement<Goto> >::const_type stmt);
+      void visit(ptr<Statement<Return> >::const_type stmt);
+      void visit(ptr<Statement<Assignment> >::const_type stmt);
+      void visit(ptr<Statement<Call> >::const_type stmt);
     };
 
     class EnterStatementAction : public VisitAction<EnterStatementVisitor> {
@@ -186,7 +186,7 @@ namespace mirv {
     };
 
     /// Leaving each statement
-    class LeaveStatementVisitor : public StatementVisitor {
+    class LeaveStatementVisitor : public ConstStatementVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -194,9 +194,9 @@ namespace mirv {
       LeaveStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Statement<Base> >::type stmt);
-      void visit(ptr<Statement<Block> >::type stmt);
-      void visit(ptr<Statement<Return> >::type stmt);
+      void visit(ptr<Statement<Base> >::const_type stmt);
+      void visit(ptr<Statement<Block> >::const_type stmt);
+      void visit(ptr<Statement<Return> >::const_type stmt);
     };
 
     class LeaveStatementAction : public VisitAction<LeaveStatementVisitor> {
@@ -206,48 +206,48 @@ namespace mirv {
     };
 
     /// Entering each expression
-    class EnterExpressionVisitor : public ExpressionVisitor {
+    class EnterExpressionVisitor : public ConstExpressionVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
       template<typename ValueType>
-      void visitConstant(boost::shared_ptr<Expression<Reference<Constant<ValueType> > > > expr);
+      void visitConstant(boost::shared_ptr<const Expression<Reference<Constant<ValueType> > > > expr);
 
     public:
       EnterExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Expression<Add> >::type expr);
-      void visit(ptr<Expression<Subtract> >::type expr);
-      void visit(ptr<Expression<Multiply> >::type expr);
-      void visit(ptr<Expression<Divide> >::type expr);
-      void visit(ptr<Expression<Modulus> >::type expr);
-      void visit(ptr<Expression<Negate> >::type expr);
-      void visit(ptr<Expression<LogicalAnd> >::type expr);
-      void visit(ptr<Expression<LogicalOr> >::type expr);
-      void visit(ptr<Expression<LogicalNot> >::type expr);
-      void visit(ptr<Expression<BitwiseAnd> >::type expr);
-      void visit(ptr<Expression<BitwiseOr> >::type expr);
-      void visit(ptr<Expression<BitwiseComplement> >::type expr);
-      void visit(ptr<Expression<LessThan> >::type expr);
-      void visit(ptr<Expression<LessThanOrEqual> >::type expr);
-      void visit(ptr<Expression<Equal> >::type expr);
-      void visit(ptr<Expression<NotEqual> >::type expr);
-      void visit(ptr<Expression<GreaterThan> >::type expr);
-      void visit(ptr<Expression<GreaterThanOrEqual> >::type expr);
-      void visit(ptr<Expression<Reference<Variable> > >::type expr);
-      void visit(ptr<Expression<Reference<Function> > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<std::uint16_t> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<std::int32_t> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<std::uint32_t> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<std::int64_t> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<float> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<double> > > >::type expr);
-      void visit(ptr<Expression<Reference<Constant<Base> > > >::type expr);
+      void visit(ptr<Expression<Add> >::const_type expr);
+      void visit(ptr<Expression<Subtract> >::const_type expr);
+      void visit(ptr<Expression<Multiply> >::const_type expr);
+      void visit(ptr<Expression<Divide> >::const_type expr);
+      void visit(ptr<Expression<Modulus> >::const_type expr);
+      void visit(ptr<Expression<Negate> >::const_type expr);
+      void visit(ptr<Expression<LogicalAnd> >::const_type expr);
+      void visit(ptr<Expression<LogicalOr> >::const_type expr);
+      void visit(ptr<Expression<LogicalNot> >::const_type expr);
+      void visit(ptr<Expression<BitwiseAnd> >::const_type expr);
+      void visit(ptr<Expression<BitwiseOr> >::const_type expr);
+      void visit(ptr<Expression<BitwiseComplement> >::const_type expr);
+      void visit(ptr<Expression<LessThan> >::const_type expr);
+      void visit(ptr<Expression<LessThanOrEqual> >::const_type expr);
+      void visit(ptr<Expression<Equal> >::const_type expr);
+      void visit(ptr<Expression<NotEqual> >::const_type expr);
+      void visit(ptr<Expression<GreaterThan> >::const_type expr);
+      void visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr);
+      void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
+      void visit(ptr<Expression<Reference<Function> > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::uint16_t> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::int32_t> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::uint32_t> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::int64_t> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<float> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<double> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
     };
 
     class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {
@@ -257,7 +257,7 @@ namespace mirv {
     };
 
     /// Leaving each expression
-    class LeaveExpressionVisitor : public ExpressionVisitor {
+    class LeaveExpressionVisitor : public ConstExpressionVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -265,8 +265,8 @@ namespace mirv {
       LeaveExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Expression<Base> >::type expr);
-      void visit(ptr<InnerExpression>::type expr);
+      void visit(ptr<Expression<Base> >::const_type expr);
+      void visit(ptr<InnerExpression>::const_type expr);
     };
 
     class LeaveExpressionAction : public VisitAction<LeaveExpressionVisitor> {
@@ -279,7 +279,7 @@ namespace mirv {
     class PrintExpressionFlow : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      ForwardExpressionFlowGenerator,
+      ConstForwardExpressionFlowGenerator,
       EnterExpressionAction,
       LeaveExpressionAction,
       NullAction,
@@ -290,7 +290,7 @@ namespace mirv {
       typedef AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      ForwardExpressionFlowGenerator,
+      ConstForwardExpressionFlowGenerator,
       EnterExpressionAction,
       LeaveExpressionAction,
       NullAction,
@@ -311,7 +311,7 @@ namespace mirv {
     class PrintFlow : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      ForwardFlowGenerator,
+      ConstForwardStatementFlowGenerator,
       EnterStatementAction,
       LeaveStatementAction,
       NullAction,
@@ -326,7 +326,7 @@ namespace mirv {
       typedef AttributeFlow<
         InheritedAttribute,
         SynthesizedAttribute,
-        ForwardFlowGenerator,
+        ConstForwardStatementFlowGenerator,
         EnterStatementAction,
         LeaveStatementAction,
         NullAction,
@@ -350,7 +350,7 @@ namespace mirv {
 
       // We need to reverse the order in which we visit the
       // assignment operands.
-      void visit(ptr<Statement<Assignment> >::type stmt) {
+      void visit(ptr<Statement<Assignment> >::const_type stmt) {
         this->doEnter(stmt);
 
         this->doBeforeExpression(stmt, stmt->getLeftExpression());
@@ -371,7 +371,7 @@ namespace mirv {
     class PrintDeclSymbolFlow : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      SymbolFlowGenerator,
+      ConstSymbolFlowGenerator,
       EnterDeclSymbolAction,
       LeaveDeclSymbolAction,
       NullAction,
@@ -382,7 +382,7 @@ namespace mirv {
       typedef AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      SymbolFlowGenerator,
+      ConstSymbolFlowGenerator,
       EnterDeclSymbolAction,
       LeaveDeclSymbolAction,
       NullAction,
@@ -396,7 +396,7 @@ namespace mirv {
 
       // We just want the function declaration at this point so don't
       // visit children.
-      void visit(ptr<Symbol<Function> >::type sym) {
+      void visit(ptr<Symbol<Function> >::const_type sym) {
         this->doEnter(sym);
         this->doLeave(sym);
       }
@@ -406,7 +406,7 @@ namespace mirv {
     class PrintDefSymbolFlow : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      SymbolFlowGenerator,
+      ConstSymbolFlowGenerator,
       EnterDefSymbolAction,
       LeaveDefSymbolAction,
       NullAction,
@@ -419,7 +419,7 @@ namespace mirv {
       typedef AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      SymbolFlowGenerator,
+      ConstSymbolFlowGenerator,
       EnterDefSymbolAction,
       LeaveDefSymbolAction,
       NullAction,
@@ -436,7 +436,7 @@ namespace mirv {
 
       /// We only want to visit functions here since we already
       /// declared module-level types and variables.
-      void visit(ptr<Symbol<Module> >::type sym);
+      void visit(ptr<Symbol<Module> >::const_type sym);
     };
 
   public:
@@ -463,7 +463,7 @@ namespace mirv {
       }
     };
 
-    void operator()(ptr<Node<Base> >::type node);
+    void operator()(ptr<Node<Base> >::const_type node);
   };
 
   /// This is the stream operator for the indent iostream manipulator.
