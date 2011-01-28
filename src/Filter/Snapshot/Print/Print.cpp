@@ -6,7 +6,7 @@
 namespace mirv {
   const int PrintFilter::IndentFactor = 3;
 
-  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Module> >::const_type sym)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -16,7 +16,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Function> >::const_type sym)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -26,7 +26,7 @@ namespace mirv {
       << sym->type()->name();
   }
 
-  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Variable> >::const_type sym)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -35,21 +35,21 @@ namespace mirv {
       << sym->type()->name();
   }
 
-  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::const_type sym)
   {
     // This is a type that doesn't need a declaration.  So tell the
     // printer not to print a newline after it.
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::type sym)
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::const_type sym)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
 
     out << indent(ind) << "tdecl " << sym->name();
     out << " {\n";
-    for (Symbol<Type<StructType> >::iterator p =
+    for (Symbol<Type<StructType> >::const_iterator p =
 	   sym->begin(), pend = sym->end();
 	 p != pend;
 	 /* NULL */) {
@@ -63,7 +63,7 @@ namespace mirv {
   }
 
   /// Print the final newline after each symbol declaration.
-  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Base> >::type)
+  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Base> >::const_type)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
         || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -72,7 +72,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::type)
+  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::const_type)
   {
     // Don't do anything since we didn't print anything for this
     // type.
@@ -80,7 +80,7 @@ namespace mirv {
   }
 
       /// Print the final newline after struct types.
-  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::type)
+  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::const_type)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
         || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -89,7 +89,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
+  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Module> >::const_type sym)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -98,7 +98,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Function> >::type sym)
+  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Function> >::const_type sym)
   {
     if (!sym->statementEmpty()) {
       Stream &out = attributeManager.getInheritedAttribute().out();
@@ -110,7 +110,7 @@ namespace mirv {
     }
   }
 
-  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
+  void PrintFilter::EnterDefSymbolVisitor::visit(ptr<Symbol<Variable> >::const_type sym)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -119,7 +119,7 @@ namespace mirv {
       << sym->type()->name();
   }
 
-  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Variable> >::type sym)
+  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Variable> >::const_type sym)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
            || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -128,7 +128,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Module> >::type sym) {
+  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Module> >::const_type sym) {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
 
@@ -136,7 +136,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Function> >::type sym) {
+  void PrintFilter::LeaveDefSymbolVisitor::visit(ptr<Symbol<Function> >::const_type sym) {
     if (!sym->statementEmpty()) {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -150,7 +150,7 @@ namespace mirv {
     }
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Block> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Block> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -160,7 +160,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<IfThen> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<IfThen> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -170,7 +170,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<IfElse> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<IfElse> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -180,7 +180,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<While> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<While> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -190,7 +190,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<DoWhile> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<DoWhile> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -200,7 +200,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Switch> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Switch> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -210,7 +210,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Case> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Case> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -218,7 +218,7 @@ namespace mirv {
     out << indent(ind) << "case";
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<CaseBlock> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<CaseBlock> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -226,7 +226,7 @@ namespace mirv {
     out << indent(ind) << "caseblock";
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Before> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Before> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -234,7 +234,7 @@ namespace mirv {
     out << indent(ind) << "before ";
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<After> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<After> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -242,7 +242,7 @@ namespace mirv {
     out << indent(ind) << "after ";
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Goto> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Goto> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -250,7 +250,7 @@ namespace mirv {
     out << indent(ind) << "goto ";
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Return> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Return> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -258,7 +258,7 @@ namespace mirv {
     out << indent(ind) << "return\n";
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Assignment> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Assignment> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -268,7 +268,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Call> >::type stmt)
+  void PrintFilter::EnterStatementVisitor::visit(ptr<Statement<Call> >::const_type stmt)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -278,7 +278,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Base> >::type stmt)
+  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Base> >::const_type stmt)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
         || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -287,7 +287,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Block> >::type stmt) {
+  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Block> >::const_type stmt) {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
 
@@ -299,7 +299,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Return> >::type stmt) {
+  void PrintFilter::LeaveStatementVisitor::visit(ptr<Statement<Return> >::const_type stmt) {
     Stream &out = attributeManager.getInheritedAttribute().out();
 
     if (   !attributeManager.setLastSynthesizedAttribute()
@@ -309,7 +309,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Add> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Add> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -319,7 +319,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Subtract> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Subtract> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -329,7 +329,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Multiply> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Multiply> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -339,7 +339,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Divide> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Divide> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -349,7 +349,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Modulus> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Modulus> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -359,7 +359,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Negate> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Negate> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -369,7 +369,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -379,7 +379,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalOr> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalOr> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -389,7 +389,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalNot> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalNot> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -399,7 +399,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -409,7 +409,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -419,7 +419,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -429,7 +429,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThan> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThan> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -439,7 +439,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -449,7 +449,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Equal> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Equal> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -459,7 +459,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<NotEqual> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<NotEqual> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -469,7 +469,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThan> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThan> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -479,7 +479,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -489,7 +489,7 @@ namespace mirv {
       InheritedAttribute(ind + IndentFactor, out));
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -498,7 +498,7 @@ namespace mirv {
   }
 
   template<typename ValueType>
-  void PrintFilter::EnterExpressionVisitor::visitConstant(boost::shared_ptr<Expression<Reference<Constant<ValueType> > > > expr)
+  void PrintFilter::EnterExpressionVisitor::visitConstant(boost::shared_ptr<const Expression<Reference<Constant<ValueType> > > > expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -508,62 +508,62 @@ namespace mirv {
       << ' ' << expr->getSymbol()->valueString();
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<Base> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint16_t> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint16_t> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int32_t> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int32_t> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint32_t> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint32_t> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int64_t> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::int64_t> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<float> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<float> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<double> > > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<double> > > >::const_type expr)
   {
     visitConstant(expr);
   }
 
-  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::type expr)
+  void PrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::const_type expr)
   {
     Stream &out = attributeManager.getInheritedAttribute().out();
     Indent ind = attributeManager.getInheritedAttribute().indent();
@@ -571,7 +571,7 @@ namespace mirv {
     out << indent(ind) << "fref " << expr->getSymbol()->name();
   }
 
-  void PrintFilter::LeaveExpressionVisitor::visit(ptr<Expression<Base> >::type expr)
+  void PrintFilter::LeaveExpressionVisitor::visit(ptr<Expression<Base> >::const_type expr)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
         || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -580,7 +580,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::LeaveExpressionVisitor::visit(ptr<InnerExpression>::type expr)
+  void PrintFilter::LeaveExpressionVisitor::visit(ptr<InnerExpression>::const_type expr)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
         || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -589,12 +589,12 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-  void PrintFilter::PrintDefSymbolFlow::visit(ptr<Symbol<Module>>::type sym) {
+  void PrintFilter::PrintDefSymbolFlow::visit(ptr<Symbol<Module>>::const_type sym) {
     // We only want to visit functions here since we already
     // declared module-level types and variables.
     this->doEnter(sym);
     // Visit functions
-    for(Symbol<Module>::FunctionIterator f = sym->functionBegin(),
+    for(Symbol<Module>::ConstFunctionIterator f = sym->functionBegin(),
           fend = sym->functionEnd();
         f != fend;
         /* NULL */) {
@@ -603,7 +603,7 @@ namespace mirv {
         (*f)->accept(*this);
         this->doAfter(sym, *f);
       }
-      Symbol<Module>::FunctionIterator prev = f;
+      Symbol<Module>::ConstFunctionIterator prev = f;
       if (++f != fend) {
         if (!(*prev)->statementEmpty() && !(*f)->statementEmpty()) {
           this->doBetween(sym, *prev, *f);
@@ -613,28 +613,28 @@ namespace mirv {
     this->doLeave(sym);
   }
 
-  void PrintFilter::operator()(ptr<Node<Base> >::type node)
+  void PrintFilter::operator()(ptr<Node<Base> >::const_type node)
   {
-    if (ptr<Symbol<Module> >::type s =
-        boost::dynamic_pointer_cast<Symbol<Module> >(node)) {
-      ptr<SymbolVisitor>::type declflow(new PrintDeclSymbolFlow(out));
+    if (ptr<Symbol<Module> >::const_type s =
+        boost::dynamic_pointer_cast<const Symbol<Module> >(node)) {
+      ptr<ConstSymbolVisitor>::type declflow(new PrintDeclSymbolFlow(out));
       s->accept(*declflow);
-      ptr<SymbolVisitor>::type defflow(new PrintDefSymbolFlow(out));
+      ptr<ConstSymbolVisitor>::type defflow(new PrintDefSymbolFlow(out));
       s->accept(*defflow);
     }
-    else if (ptr<Symbol<Base> >::type s =
-             boost::dynamic_pointer_cast<Symbol<Base> >(node)) {
-      ptr<SymbolVisitor>::type defflow(new PrintDefSymbolFlow(out));
+    else if (ptr<Symbol<Base> >::const_type s =
+             boost::dynamic_pointer_cast<const Symbol<Base> >(node)) {
+      ptr<ConstSymbolVisitor>::type defflow(new PrintDefSymbolFlow(out));
       s->accept(*defflow);
     }
-    else if (ptr<Statement<Base> >::type s =
-             boost::dynamic_pointer_cast<Statement<Base> >(node)) {
-      ptr<StatementVisitor>::type flow(new PrintFlow(out));
+    else if (ptr<Statement<Base> >::const_type s =
+             boost::dynamic_pointer_cast<const Statement<Base> >(node)) {
+      ptr<ConstStatementVisitor>::type flow(new PrintFlow(out));
       s->accept(*flow);
     }
-    else if (ptr<Expression<Base> >::type e =
-             boost::dynamic_pointer_cast<Expression<Base> >(node)) {
-      ptr<ExpressionVisitor>::type flow(new PrintExpressionFlow(out));
+    else if (ptr<Expression<Base> >::const_type e =
+             boost::dynamic_pointer_cast<const Expression<Base> >(node)) {
+      ptr<ConstExpressionVisitor>::type flow(new PrintExpressionFlow(out));
       e->accept(*flow);
     }
   }

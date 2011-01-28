@@ -3,6 +3,10 @@
 
 #include <Visitor.hpp>
  
+#include <mirv/Core/IR/Base.hpp>
+#include <mirv/Core/Memory/Heap.hpp>
+#include <mirv/Core/IR/Visitable.hpp>
+
 #include <mirv/Core/IR/ExpressionFwd.hpp>
 #include <mirv/Core/IR/ArithmeticFwd.hpp>
 #include <mirv/Core/IR/LogicalFwd.hpp>
@@ -10,6 +14,8 @@
 #include <mirv/Core/IR/RelationalFwd.hpp>
 #include <mirv/Core/IR/ReferenceFwd.hpp>
 
+#include <mirv/Core/IR/ConstantFwd.hpp>
+#include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/IR/VariableFwd.hpp>
 
 #include <boost/mpl/vector.hpp>
@@ -50,7 +56,11 @@ namespace mirv {
 
 	ptr<Expression<BitwiseAnd> >::type,
 	ptr<Expression<BitwiseOr> >::type,
+	ptr<Expression<BitwiseXor> >::type,
 	ptr<Expression<BitwiseComplement> >::type,
+	ptr<Expression<ShiftLeft> >::type,
+	ptr<Expression<ArithmeticShiftRight> >::type,
+	ptr<Expression<LogicalShiftRight> >::type,
 
 	ptr<Expression<LessThan> >::type,
 	ptr<Expression<LessThanOrEqual> >::type,
@@ -90,7 +100,11 @@ namespace mirv {
     virtual result_type visit(ptr<Expression<LogicalNot> >::type);
     virtual result_type visit(ptr<Expression<BitwiseAnd> >::type);
     virtual result_type visit(ptr<Expression<BitwiseOr> >::type);
+    virtual result_type visit(ptr<Expression<BitwiseXor> >::type);
     virtual result_type visit(ptr<Expression<BitwiseComplement> >::type);
+    virtual result_type visit(ptr<Expression<ShiftLeft> >::type);
+    virtual result_type visit(ptr<Expression<ArithmeticShiftRight> >::type);
+    virtual result_type visit(ptr<Expression<LogicalShiftRight> >::type);
     virtual result_type visit(ptr<Expression<LessThan> >::type);
     virtual result_type visit(ptr<Expression<LessThanOrEqual> >::type);
     virtual result_type visit(ptr<Expression<Equal> >::type);
