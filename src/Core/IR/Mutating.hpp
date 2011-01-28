@@ -2,16 +2,11 @@
 #define mirv_Core_IR_Mutating_hpp
 
 #include <mirv/Core/IR/Statement.hpp>
-#include <mirv/Core/IR/ExpressionFwd.hpp>
 
-#include <boost/bind.hpp>
-#include <boost/fusion/iterator.hpp>
-#include <boost/fusion/include/transform.hpp>
-#include <boost/fusion/include/for_each.hpp>
-#include <boost/fusion/include/front.hpp>
-#include <boost/fusion/include/pop_front.hpp>
-#include <boost/fusion/include/size.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <boost/bind/bind.hpp>
 
 namespace mirv {
   /// This is the interface to statements that have two child
@@ -195,6 +190,10 @@ namespace mirv {
       // By convention, the first child is the expression referencing
       // the function.
       ExpressionPtr function(void) {
+        checkInvariant(!expressionEmpty(), "No function for call");
+        return expressionFront();
+      }
+      ConstExpressionPtr function(void) const {
         checkInvariant(!expressionEmpty(), "No function for call");
         return expressionFront();
       }

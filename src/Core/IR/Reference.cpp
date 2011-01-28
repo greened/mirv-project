@@ -1,17 +1,4 @@
-#include <mirv/Core/Builder/Make.hpp>
-#include <mirv/Core/Filter/ExpressionVisitor.hpp>
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Bitwise.hpp>
-#include <mirv/Core/IR/Logical.hpp>
-#include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Reference.hpp>
-#include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
 
 namespace mirv {
   Reference<Array>::Interface::TypePtr

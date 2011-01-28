@@ -1,7 +1,6 @@
 #include <mirv/Core/Filter/StatementVisitor.hpp>
 #include <mirv/Core/IR/Control.hpp>
 #include <mirv/Core/IR/Expression.hpp>
-#include <mirv/Core/IR/Mutating.hpp>
 
 namespace mirv {
   Statement<Base> *Block::Interface::cloneImpl(void)
@@ -105,6 +104,11 @@ namespace mirv {
   void Case::Interface::setParents(void)
   {
     getCondition()->setParent(getSharedHandle());
+    getChildStatement()->setParent(getSharedHandle());
+  }
+
+  void CaseBlock::Interface::setParents(void)
+  {
     getChildStatement()->setParent(getSharedHandle());
   }
 

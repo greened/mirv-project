@@ -1,5 +1,3 @@
-#include <mirv/Core/Filter/StatementVisitor.hpp>
-#include <mirv/Core/IR/Control.hpp>
 #include <mirv/Core/IR/Expression.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
 
@@ -32,7 +30,7 @@ namespace mirv {
     return result;
   }
 
-  void Call::Interface::setParents(void)
+  void Call::Interface::setParents(void) 
   {
     for (ExpressionIterator i = expressionBegin();
          i != expressionEnd();

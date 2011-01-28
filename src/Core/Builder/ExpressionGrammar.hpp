@@ -8,6 +8,15 @@
 #include <mirv/Core/Builder/ConstantGrammar.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
 
+#include <mirv/Core/IR/Arithmetic.hpp>
+#include <mirv/Core/IR/Bitwise.hpp>
+#include <mirv/Core/IR/Reference.hpp>
+#include <mirv/Core/IR/Relational.hpp>
+#include <mirv/Core/IR/Logical.hpp>
+#include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+
 #include <boost/proto/proto.hpp>
 
 namespace mirv {

@@ -7,6 +7,7 @@
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Control.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/fusion/iterator.hpp>

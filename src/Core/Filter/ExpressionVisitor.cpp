@@ -6,6 +6,7 @@
 #include <mirv/Core/IR/Logical.hpp>
 #include <mirv/Core/IR/Bitwise.hpp>
 #include <mirv/Core/IR/Reference.hpp>
+#include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/Variable.hpp>
@@ -309,8 +310,24 @@ ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Binary> >
     ptr<Expression<BitwiseOr>::VisitorBaseType>::type p = fast_cast<Expression<BitwiseOr>::VisitorBaseType>(e);
     visit(p);
   }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<BitwiseXor> >::type e) {
+    ptr<Expression<BitwiseXor>::VisitorBaseType>::type p = fast_cast<Expression<BitwiseXor>::VisitorBaseType>(e);
+    visit(p);
+  }
   ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::type e) {
     ptr<Expression<BitwiseComplement>::VisitorBaseType>::type p = fast_cast<Expression<BitwiseComplement>::VisitorBaseType>(e);
+    visit(p);
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<ShiftLeft> >::type e) {
+    ptr<Expression<ShiftLeft>::VisitorBaseType>::type p = fast_cast<Expression<ShiftLeft>::VisitorBaseType>(e);
+    visit(p);
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<ArithmeticShiftRight> >::type e) {
+    ptr<Expression<ArithmeticShiftRight>::VisitorBaseType>::type p = fast_cast<Expression<ArithmeticShiftRight>::VisitorBaseType>(e);
+    visit(p);
+  }
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<LogicalShiftRight> >::type e) {
+    ptr<Expression<LogicalShiftRight>::VisitorBaseType>::type p = fast_cast<Expression<LogicalShiftRight>::VisitorBaseType>(e);
     visit(p);
   }
 
