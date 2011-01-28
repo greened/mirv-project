@@ -29,7 +29,7 @@ namespace mirv {
       Interface(ptr<Symbol<Type<TypeBase> > >::type type)
           : Symbol<Typed>(type) {}
 
-      virtual std::string valueString(void) = 0;
+      virtual std::string valueString(void) const = 0;
     };
 
   public:
@@ -53,7 +53,7 @@ namespace mirv {
         return val;
       }
 
-      std::string valueString(void) {
+      std::string valueString(void) const {
         return boost::lexical_cast<std::string>(value());
       }
 

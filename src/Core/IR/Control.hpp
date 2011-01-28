@@ -77,6 +77,12 @@ namespace mirv {
 	  
         return(this->front());
       }
+      ConstChildPtr getChildStatement(void) const {
+        checkInvariant(!this->empty(), 
+                       "Attempt to get statement from empty block");
+	  
+        return(this->front());
+      }
     };
 
   public:
@@ -219,6 +225,9 @@ namespace mirv {
        virtual void accept(StatementVisitor &) {
          error("IfThen::Interface::accept called!");
        }
+       virtual void accept(ConstStatementVisitor &) const {
+         error("IfThen::Interface::accept called!");
+       }
     };
 
   public:
@@ -251,6 +260,9 @@ namespace mirv {
        virtual void accept(StatementVisitor &) {
          error("IfElse::Interface::accept called!");
        }
+       virtual void accept(ConstStatementVisitor &) const {
+         error("IfElse::Interface::accept called!");
+       }
     };
 
   public:
@@ -281,6 +293,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("While::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("While::Interface::accept called!");
        }
     };
@@ -316,6 +331,9 @@ namespace mirv {
        virtual void accept(StatementVisitor &) {
          error("DoWhile::Interface::accept called!");
        }
+       virtual void accept(ConstStatementVisitor &) const {
+         error("DoWhile::Interface::accept called!");
+       }
     };
 
   public:
@@ -348,6 +366,9 @@ namespace mirv {
        virtual void accept(StatementVisitor &) {
          error("Case::Interface::accept called!");
        }
+       virtual void accept(ConstStatementVisitor &) const {
+         error("Case::Interface::accept called!");
+       }
     };
 
   public:
@@ -365,9 +386,7 @@ namespace mirv {
       typedef InterfaceBaseType::ChildPtr ChildPtr;
 
     protected:
-      void setParents(void) {
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1>
@@ -409,6 +428,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("Switch::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("Switch::Interface::accept called!");
        }
     };
@@ -482,6 +504,9 @@ namespace mirv {
        virtual void accept(StatementVisitor &) {
          error("Before::Interface::accept called!");
        }
+       virtual void accept(ConstStatementVisitor &) const {
+         error("Before::Interface::accept called!");
+       }
     };
 
   public:
@@ -515,6 +540,9 @@ namespace mirv {
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("After::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("After::Interface::accept called!");
        }
     };

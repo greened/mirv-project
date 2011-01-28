@@ -246,7 +246,8 @@ namespace mirv {
     typename AfterAction,
     typename BetweenAction,
     typename StatementAction>
-  typename ptr<ConstSymbolFlow<EnterAction,
+  typename ptr<ConstSymbolFlow<
+                 EnterAction,
                  LeaveAction,
                  BeforeAction,
                  AfterAction,
@@ -258,17 +259,19 @@ namespace mirv {
                       const AfterAction &a,
                       const BetweenAction &t,
                       const StatementAction &smt) {
-    typename ptr<ConstSymbolFlow<EnterAction,
+    typename ptr<ConstSymbolFlow<
+      EnterAction,
       LeaveAction,
       BeforeAction,
       AfterAction,
       BetweenAction,
-      StatementAction> >::type flow(new ConstSymbolFlow<EnterAction,
-                                    LeaveAction,
-                                    BeforeAction,
-                                    AfterAction,
-                                    BetweenAction,
-                                    StatementAction>(e, l, b, a, t, smt));
+      StatementAction> >::type flow(new ConstSymbolFlow<
+                                      EnterAction,
+                                      LeaveAction,
+                                      BeforeAction,
+                                      AfterAction,
+                                      BetweenAction,
+                                      StatementAction>(e, l, b, a, t, smt));
     return flow;
   }
 }

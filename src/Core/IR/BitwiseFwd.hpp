@@ -4,6 +4,7 @@
 namespace mirv {
   class BitwiseAnd;
   class BitwiseOr;
+  class BitwiseXor;
   class BitwiseComplement;
   class ShiftLeft;
   class ArithmeticShiftRight;

@@ -4,6 +4,7 @@
 #include <mirv/Core/IR/StatementFwd.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/VariableFwd.hpp>
 
 #include <tr1/functional>
 
@@ -32,12 +33,16 @@ namespace mirv {
                        public boost::enable_shared_from_this<Symbol<Function> > {
      public:
        typedef StatementBaseType::ChildPtr StatementPtr;
+       typedef StatementBaseType::ConstChildPtr ConstStatementPtr;
        typedef VariableBaseType::ChildPtr VariablePtr;
+       typedef VariableBaseType::ConstChildPtr ConstVariablePtr;
 
        Interface(const std::string &n, TypePtr t)
 	 : NamedBaseType(n), TypedBaseType(t) {}
 
-       Interface(const std::string &n, TypePtr t, StatementPtr s);
+       Interface(const std::string &n,
+		 TypePtr t,
+		 StatementPtr s);
 
        /// Add a local variable to this function.
        void variablePushBack(VariablePtr v);
@@ -71,6 +76,9 @@ namespace mirv {
 
        /// Get the single block statement child.
        StatementPtr getStatement(void) {
+	 return *StatementBaseType::begin();
+       }
+       ConstStatementPtr getStatement(void) const {
 	 return *StatementBaseType::begin();
        }
 
