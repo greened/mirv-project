@@ -112,17 +112,6 @@ namespace mirv {
     } 
   };
 
-  namespace detail {
-    template<typename Tag>
-    struct VisitorBase<Expression<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    template<typename Tag>
-    struct BaseTypeOf<Expression<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-  }
-
   /// This anchors the Expression virtual table.
   template<>
   class Visitable<Expression<Base>, ExpressionVisitor> : public Node<Base> {

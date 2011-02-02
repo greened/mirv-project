@@ -102,17 +102,6 @@ namespace mirv {
      }
   };
 
-  namespace detail {
-    template<typename Tag>
-    struct VisitorBase<Symbol<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    template<typename Tag>
-    struct BaseTypeOf<Symbol<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-  }
-
   template<>
   class Visitable<Symbol<Base>, SymbolVisitor> : public Node<Base> {
   public:

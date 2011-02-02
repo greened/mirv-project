@@ -3,6 +3,8 @@
 
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Builder/Make.hpp>
+#include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Module.hpp>
@@ -116,14 +118,14 @@ namespace mirv {
 
       /// Get the type symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
-      ptr<Symbol<Type<TypeBase> > >::type
+      ptr<Symbol<Type<TypeBase> > >::const_type
       lookupAtCurrentScope(const std::string &name,
-			   Symbol<Type<TypeBase> > *) const {
-	Symbol<Module>::TypeIterator i = module->typeFind(name);
+			   const Symbol<Type<TypeBase> > *) const {
+	Symbol<Module>::ConstTypeIterator i = module->typeFind(name);
 	if (i != module->typeEnd()) {
 	  return *i;
 	}
-	return ptr<Symbol<Type<TypeBase> > >::type();
+	return ptr<Symbol<Type<TypeBase> > >::const_type();
       }
 
       ptr<Symbol<Variable> >::type
@@ -155,12 +157,12 @@ namespace mirv {
 	return function;
       }
 
-      ptr<Symbol<Type<TypeBase> > >::type
+      ptr<Symbol<Type<TypeBase> > >::const_type
       lookupAtAllScopes(const std::string &name,
-			Symbol<Type<TypeBase> > *) const {
-	ptr<Symbol<Type<TypeBase> > >::type type =
+			const Symbol<Type<TypeBase> > *) const {
+	ptr<Symbol<Type<TypeBase> > >::const_type type =
 	  lookupAtCurrentScope(name,
-                               reinterpret_cast<Symbol<Type<TypeBase> > *>(0));
+                               reinterpret_cast<const Symbol<Type<TypeBase> > *>(0));
         if (!type) {
 	  error("Could not find type");
 	}
@@ -191,10 +193,10 @@ namespace mirv {
         module->functionPushBack(func);
       }
 
-      void addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::type type) {
-	ptr<Symbol<Type<TypeBase> > >::type result =
+      void addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::const_type type) {
+	ptr<Symbol<Type<TypeBase> > >::const_type result =
 	  lookupAtCurrentScope(type->name(),
-                               reinterpret_cast<Symbol<Type<TypeBase> > *>(0));
+                               reinterpret_cast<const Symbol<Type<TypeBase> > *>(0));
         if (result) {
 	  error("Type already exists");
 	}
@@ -243,6 +245,24 @@ namespace mirv {
       }
     };
 
+    // Specialize for types which must be const.
+    template<typename Tag>
+    struct LookupSymbol<Symbol<Type<Tag> >, boost::proto::callable>
+        : boost::proto::callable {
+      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+
+      result_type operator()(ptr<SymbolTable>::const_type symtab,
+			     const std::string &name) {
+	result_type result =
+          symtab->lookupAtAllScopes(name,
+                                    reinterpret_cast<const Symbol<Type<Tag> > *>(0));
+	if (!result) {
+	  error("Symbol does not exist");
+	}
+        return result;
+      }
+    };
+
     /// This is a callable transform to lookup a symbol and add it to
     /// the current scope if it does not exist.
     template<typename SymbolType,
@@ -255,6 +275,27 @@ namespace mirv {
 	result_type result =
           symtab->lookupAtAllScopes(symbol->name(), 
                                     reinterpret_cast<SymbolType *>(0));
+	if (!result) {
+	  symtab->addAtCurrentScope(result);
+	}
+	else {
+	  symbol.reset();
+	}
+        return result;
+      }
+    };
+
+    // Specialize for types as they must be const.
+    template<typename Tag>
+    struct LookupAndAddSymbol<Symbol<Type<Tag> >, boost::proto::callable> 
+        : boost::proto::callable {
+      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+
+      result_type operator()(ptr<SymbolTable>::type symtab,
+			     result_type symbol) {
+	result_type result =
+          symtab->lookupAtAllScopes(symbol->name(), 
+                                    reinterpret_cast<Symbol<Type<Tag> > *>(0));
 	if (!result) {
 	  symtab->addAtCurrentScope(result);
 	}
@@ -464,7 +505,8 @@ namespace mirv {
       result_type operator()(const Expr &e) const {
         //std::cout << "Translating:\n";
         //boost::proto::display_expr(e);
-        return safe_cast<ExpressionType>(translate(e, symtab));
+        return safe_cast<ExpressionType>(
+          translateWithGrammar<ConstructExpressionGrammar>(e, symtab));
       }
     };
 

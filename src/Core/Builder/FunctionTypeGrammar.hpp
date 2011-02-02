@@ -23,7 +23,7 @@ namespace mirv {
       /// operations when we don't have a vararg specifier.
       template<bool Vararg>
       struct Helper {
-        typedef ptr<Symbol<Type<FunctionType> > >::type result_type;
+        typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
         template<typename Arg1, typename Arg2>
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                                Arg1 a1,
@@ -32,13 +32,13 @@ namespace mirv {
         return TernaryConstructSymbol<Symbol<Type<FunctionType> > >()(
           symtab, a1, boost::fusion::transform(
             boost::fusion::pop_front(a2), translator),
-          Symbol<Type<FunctionType>>::VarargMark::NotVararg);
+          Symbol<Type<FunctionType> >::VarargMark::NotVararg);
         }
       };
 
       template<>
       struct Helper<true> {
-        typedef ptr<Symbol<Type<FunctionType> > >::type result_type;
+        typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
         template<typename Arg1, typename Arg2>
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                                Arg1 a1,
@@ -58,7 +58,7 @@ namespace mirv {
     
     /// This is a callable transform to construct a function type.
     struct ConstructFunctionTypeSymbol : boost::proto::callable {
-      typedef ptr<Symbol<Type<FunctionType> > >::type result_type;
+      typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
 
       template<typename Arg1, typename Arg2>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
