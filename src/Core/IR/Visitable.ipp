@@ -4,6 +4,7 @@
 
 #include <mirv/Core/IR/Visitable.hpp>
 #include <mirv/Core/Filter/NodeVisitor.hpp>
+#include <mirv/Core/Filter/TypeNodeVisitor.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 
 namespace mirv {

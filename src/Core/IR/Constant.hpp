@@ -26,7 +26,7 @@ namespace mirv {
         : public Symbol<Typed>,
           public LeafSymbol {
     public:
-      Interface(ptr<Symbol<Type<TypeBase> > >::type type)
+      Interface(ptr<Symbol<Type<TypeBase> > >::const_type type)
           : Symbol<Typed>(type) {}
 
       virtual std::string valueString(void) const = 0;
@@ -46,7 +46,7 @@ namespace mirv {
       ValueType val;
 
     public:
-      Interface(typename ptr<Symbol<Type<TypeBase> > >::type type,
+      Interface(typename ptr<Symbol<Type<TypeBase> > >::const_type type,
                 ValueType v) : Symbol<Constant<Base>>(type), val(v) {}
 
       ValueType value(void) const {

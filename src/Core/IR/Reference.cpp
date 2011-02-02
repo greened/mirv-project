@@ -1,4 +1,6 @@
+#include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Reference.hpp>
+#include <mirv/Core/IR/ArrayType.hpp>
 
 namespace mirv {
   Reference<Array>::Interface::TypePtr

@@ -304,4 +304,11 @@ namespace mirv {
   template
   void
   ConstVisitable<Expression<Reference<Constant<Base> > >, ConstExpressionVisitor, ExpressionVisitor>::accept(ConstExpressionVisitor &) const;
+
+  template
+  void
+  Visitable<Expression<Reference<Array> >, ExpressionVisitor>::accept(ExpressionVisitor &);
+  template
+  void
+  ConstVisitable<Expression<Reference<Array> >, ConstExpressionVisitor, ExpressionVisitor>::accept(ConstExpressionVisitor &) const;
 }

@@ -104,7 +104,7 @@ namespace mirv {
      typedef TypedBaseType VisitorBaseType;
 
      static std::string getName(const std::string &name,
-                                ptr<Symbol<Type<TypeBase> > >::type type) {
+                                ptr<Symbol<Type<TypeBase> > >::const_type type) {
        return name;
      }
    };

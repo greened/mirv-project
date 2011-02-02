@@ -75,22 +75,13 @@ namespace mirv {
         >(boost::proto::_data, ConstantBuilder(boost::proto::_))
       > {};
 
-    struct ArrayRefBuilder : boost::proto::when<
-      SubscriptRule,
-      ConstructNary<Expression<Reference<Array> > >(
-        boost::proto::_data,
-        ConstructExpressionGrammar(boost::proto::_left)
-        boost::proto::_expr)
-      > {};
-    
     /// This is the grammar for all terminal expressions.
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::terminal>
         : boost::proto::or_<
       VariableRefBuilder,
       FunctionRefBuilder,
-      ConstantRefBuilder,
-      ArrayRefBuilder
+      ConstantRefBuilder
       > {};
 
     /// This is the grammar for negate expressions.
@@ -275,17 +266,22 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
     struct BitwiseXorBuilder 
         : detail::BinaryBuilder<BitwiseXorRule, BitwiseXor> {};
 
-template<>
-struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
-    : BitwiseXorBuilder {};
+    template<>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
+        : BitwiseXorBuilder {};
 
     /// This is the grammar for array reference expressions.
-    struct SubscriptBuilder 
-        : detail::BinaryBuilder<SubscriptRule, ArrayRef> {};
-
+    struct ArrayRefBuilder : boost::proto::when<
+      SubscriptRule,
+      ConstructNary<Expression<Reference<Array> > >(
+        boost::proto::_data,
+        ConstructExpressionGrammar(boost::proto::_left),
+        boost::proto::_expr)
+      > {};
+    
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::subscript>
-        : SubscriptBuilder {};
+        : ArrayRefBuilder {};
 
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::function>
