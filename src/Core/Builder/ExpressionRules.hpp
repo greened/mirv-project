@@ -2,7 +2,6 @@
 #define mirv_Core_Builder_ExpressionRules_hpp
 
 #include <mirv/Core/Builder/Transform.hpp>
-#include <mirv/Core/Builder/DomainFwd.hpp>
 #include <mirv/Core/Builder/GrammarFwd.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/IR/Variable.hpp>
