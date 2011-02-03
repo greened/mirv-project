@@ -3,7 +3,9 @@
 
 #include <mirv/Core/IR/Statement.hpp>
 #include <mirv/Core/IR/Expression.hpp>
-#include <mirv/Core/Builder/Grammar.hpp>
+#include <mirv/Core/Builder/Domain.hpp>
+#include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
+#include <mirv/Core/Builder/StatementGrammarFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/mpl/assert.hpp>
@@ -45,21 +47,6 @@ namespace mirv {
      }
 
      /// This is the utility to transform a proto build expression to
-     /// MIRV IR.
-     template<typename Expr>
-     ptr<Node<Base> >::type
-     translate(ptr<Symbol<Module> >::type module,
-	       ptr<Symbol<Function> >::type function,
-	       const Expr &expr) {
-       //std::cout << "Translating:\n";
-       //boost::proto::display_expr(expr);
-       checkMatch<ConstructGrammar>(expr);
-       ptr<SymbolTable>::type symtab(new SymbolTable(module, function));
-       ConstructGrammar trans;
-       return trans(expr, 0, symtab);
-     }
-
-     /// This is the utility to transform a proto build expression to
      /// MIRV IR.  It allows the client to specify the grammar to use
      /// for translation.
      template<typename Grammar, typename Expr>
@@ -75,19 +62,6 @@ namespace mirv {
        return trans(expr, 0, symtab);
      }
 
-     template<typename Expr>
-     ptr<Node<Base> >::type
-     translate(ptr<Symbol<Module> >::type module,
-	       const Expr &expr) {
-       //std::cout << "Translating:\n";
-       //boost::proto::display_expr(expr);
-       checkMatch<ConstructGrammar>(expr);
-       ptr<SymbolTable>::type symtab(
-         new SymbolTable(module, ptr<Symbol<Function> >::type()));
-       ConstructGrammar trans;
-       return trans(expr, 0, symtab);
-     }
-
      template<typename Grammar, typename Expr>
      ptr<Node<Base> >::type
      translateWithGrammar(ptr<Symbol<Module> >::type module,
@@ -101,16 +75,6 @@ namespace mirv {
        return trans(expr, 0, symtab);
      }
 
-     template<typename Expr>
-     ptr<Node<Base> >::type
-     translate(const Expr &expr, ptr<SymbolTable>::type symtab) {
-       //std::cout << "Translating:\n";
-       //boost::proto::display_expr(expr);
-       checkMatch<ConstructGrammar>(expr);
-       ConstructGrammar trans;
-       return trans(expr, 0, symtab);
-     }
-
      template<typename Grammar, typename Expr>
      ptr<Node<Base> >::type
      translateWithGrammar(const Expr &expr, ptr<SymbolTable>::type symtab) {
@@ -118,19 +82,6 @@ namespace mirv {
        //boost::proto::display_expr(expr);
        checkMatch<Grammar>(expr);
        Grammar trans;
-       return trans(expr, 0, symtab);
-     }
-
-     template<typename Expr>
-     ptr<Node<Base> >::type
-     translate(const Expr &expr) {
-       //std::cout << "Translating:\n";
-       //boost::proto::display_expr(expr);
-       checkMatch<ConstructGrammar>(expr);
-       ptr<SymbolTable>::type symtab(
-         new SymbolTable(ptr<Symbol<Module> >::type(),
-                         ptr<Symbol<Function> >::type()));
-       ConstructGrammar trans;
        return trans(expr, 0, symtab);
      }
 

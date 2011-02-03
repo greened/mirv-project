@@ -1,6 +1,9 @@
 #ifndef mirv_Core_Builder_SymbolTransforms_hpp
 #define mirv_Core_Builder_SymbolTransforms_hpp
 
+#include <mirv/Core/Builder/SymbolGrammarFwd.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
+
 #include <boost/proto/proto.hpp>
 #include <boost/mpl/print.hpp>
 #include <boost/lexical_cast.hpp>
@@ -146,7 +149,8 @@ namespace mirv {
       result_type operator()(const Expr &e) const {
         //std::cout << "Translating:\n";
         //boost::proto::display_expr(e);
-        return safe_cast<SymbolType>(translate(e, symtab));
+        return safe_cast<SymbolType>(
+          translateWithGrammar<ConstructSymbolGrammar>(e, symtab));
       }
     };
   }

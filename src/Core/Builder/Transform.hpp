@@ -3,6 +3,8 @@
 
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Builder/Make.hpp>
+#include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
+#include <mirv/Core/Builder/TranslateFwd.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Module.hpp>
@@ -464,7 +466,8 @@ namespace mirv {
       result_type operator()(const Expr &e) const {
         //std::cout << "Translating:\n";
         //boost::proto::display_expr(e);
-        return safe_cast<ExpressionType>(translate(e, symtab));
+        return safe_cast<ExpressionType>(
+          translateWithGrammar<ConstructExpressionGrammar>(e, symtab));
       }
     };
 
