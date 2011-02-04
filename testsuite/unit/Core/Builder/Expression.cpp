@@ -33,7 +33,7 @@ using mirv::Type;
 using mirv::TypeBase;
 using mirv::Integral;
 using mirv::FunctionType;
-using mirv::Expression;
+using mirv::Node;
 using mirv::Base;
 using mirv::Add;
 using mirv::Subtract;
@@ -85,8 +85,9 @@ int main(void)
   Builder::VariableTerminal d = {{"d"}};
   Builder::VariableTerminal e = {{"e"}};
 
-  ptr<Expression<Base> >::type expr =
-    Builder::translate_expression(module, function, a + (b - c) * d / -e);
+  ptr<Node<Base> >::type expr =
+    Builder::translateWithGrammar<Builder::ConstructExpressionGrammar>(
+      module, function, a + (b - c) * d / -e);
 
   PrintFilter print(std::cout);
 
