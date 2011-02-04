@@ -4,7 +4,7 @@
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
-#include <mirv/Core/Builder/Translate.hpp>
+#include <mirv/Core/Builder/TranslateFwd.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Module.hpp>
