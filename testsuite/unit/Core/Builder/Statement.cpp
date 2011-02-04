@@ -56,7 +56,7 @@ using mirv::Type;
 using mirv::TypeBase;
 using mirv::Integral;
 using mirv::FunctionType;
-using mirv::Statement;
+using mirv::Node;
 using mirv::Base;
 using mirv::ptr;
 using mirv::PrintFilter;
@@ -97,8 +97,9 @@ int main(void)
   Builder::VariableTerminal b = {{"b"}};
   Builder::VariableTerminal c = {{"c"}};
 
-  ptr<Statement<Base> >::type stmt =
-    Builder::translate_statement(module, function,
+  ptr<Node<Base> >::type stmt =
+    Builder::translateWithGrammar<Builder::ConstructStatementGrammar>(
+      module, function,
       do_[
 	a = a + b,
         if_(b > c) [

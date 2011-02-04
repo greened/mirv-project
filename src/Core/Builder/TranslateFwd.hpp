@@ -17,17 +17,6 @@ namespace mirv {
      void
      checkMatch(const Expr &expr);
 
-     template<typename Expr>
-     ptr<Expression<Base> >::type
-     translate_expression(ptr<Symbol<Module> >::type module,
-			  ptr<Symbol<Function> >::type function,
-			  const Expr &expr);
-     template<typename Expr>
-     ptr<Statement<Base> >::type 
-     translate_statement(ptr<Symbol<Module> >::type module,
-			 ptr<Symbol<Function> >::type function,
-			 const Expr &expr);
-
      template<typename Grammar, typename Expr>
      ptr<Node<Base> >::type
      translateWithGrammar(ptr<Symbol<Module> >::type module,
