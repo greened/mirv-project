@@ -6,7 +6,12 @@
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
+#include <boost/bind/bind.hpp>
+#include <boost/fusion/iterator.hpp>
+#include <boost/fusion/include/for_each.hpp>
 #include <boost/mpl/vector.hpp>
+
+#include <algorithm>
 #include <list>
 
 namespace mirv {
@@ -151,7 +156,17 @@ namespace mirv {
        children.push_back(C1);
        children.push_back(C2);
      }
- 
+       template<typename Sequence>
+       InnerImpl(ChildPtr C1, Sequence Children) {  
+         boost::fusion::for_each(Children,
+                                 boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
+       }
+       template<typename InputIterator>
+       InnerImpl(ChildPtr C1, InputIterator start, InputIterator end) {  
+         std::for_each(start, end,
+                       boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
+       }
+       
      typedef typename ChildList::iterator iterator;
      typedef typename ChildList::reverse_iterator reverse_iterator;
      typedef typename ChildList::const_iterator const_iterator;

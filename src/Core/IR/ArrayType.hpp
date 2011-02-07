@@ -9,6 +9,8 @@
 
 #include <numeric>
 #include <vector>
+#include <iterator>
+#include <algorithm>
 
 namespace mirv {
   namespace detail {
@@ -65,7 +67,9 @@ namespace mirv {
                              + detail::stringizeDimensions(dimensionStart,
                                                            dimensionEnd)
                              + "]"),
-             dimensions(dimensionStart, dimensionEnd) {}
+             dimensions(dimensionStart, dimensionEnd) {
+         push_back(ElementType);
+       }
          typedef DimensionVector::iterator DimensionIterator;
          typedef DimensionVector::const_iterator ConstDimensionIterator;
 

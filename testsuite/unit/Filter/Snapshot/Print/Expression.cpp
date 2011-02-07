@@ -20,6 +20,7 @@
 #include <mirv/Core/IR/StructType.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
+#include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 

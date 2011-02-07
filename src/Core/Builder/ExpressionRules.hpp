@@ -77,9 +77,29 @@ namespace mirv {
 
      typedef boost::proto::mem_ptr<ConstructExpressionGrammar, ConstructExpressionGrammar> MemPtrRule;
 
-     // Nary Rules
-     typedef boost::proto::subscript<ConstructExpressionGrammar,
-       boost::proto::vararg<ConstructExpressionGrammar> > SubscriptRule;
+     // Array reference rules.
+     struct ArrayIndexRule;
+
+     struct MultiIndexRule 
+         : public boost::proto::comma<
+       ArrayIndexRule,
+       ArrayIndexRule
+       > {};
+
+     struct ArrayIndexRule : public boost::proto::or_<
+       ConstructExpressionGrammar,
+       MultiIndexRule
+       > {};
+
+     struct MultiSubscriptRule :  boost::proto::subscript<
+       ConstructExpressionGrammar,
+       MultiIndexRule
+       > {};
+
+     struct SubscriptRule : boost::proto::subscript<
+       ConstructExpressionGrammar,
+       ConstructExpressionGrammar
+       > {};
 
      // No comma
      // No assign (statement)

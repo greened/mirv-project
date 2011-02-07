@@ -271,12 +271,21 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
         : BitwiseXorBuilder {};
 
     /// This is the grammar for array reference expressions.
-    struct ArrayRefBuilder : boost::proto::when<
-      SubscriptRule,
-      ConstructNary<Expression<Reference<Array> > >(
-        boost::proto::_data,
-        ConstructExpressionGrammar(boost::proto::_left),
-        boost::proto::_expr)
+    struct ArrayRefBuilder : boost::proto::or_<
+      boost::proto::when<
+        MultiSubscriptRule,
+        ConstructNaryFlat<Expression<Reference<Array> > >(
+          boost::proto::_data,
+          ConstructExpressionGrammar(boost::proto::_left),
+          boost::proto::_right)
+        >,
+      boost::proto::when<
+        SubscriptRule,
+        ConstructBinary<Expression<Reference<Array> > >(
+          boost::proto::_data,
+          ConstructExpressionGrammar(boost::proto::_left),
+          ConstructExpressionGrammar(boost::proto::_right))
+        > 
       > {};
     
     template<>

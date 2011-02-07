@@ -58,6 +58,16 @@ namespace mirv {
      }
 
      template<typename Grammar, typename Expr>
+     ptr<Node<Base> >::const_type
+     constTranslateWithGrammar(const Expr &expr, ptr<SymbolTable>::type symtab) {
+       //std::cout << "Translating:\n";
+       //boost::proto::display_expr(expr);
+       checkMatch<Grammar>(expr);
+       Grammar trans;
+       return trans(expr, 0, symtab);
+     }
+
+     template<typename Grammar, typename Expr>
      ptr<Node<Base> >::type
      translateWithGrammar(const Expr &expr) {
        //std::cout << "Translating:\n";

@@ -44,7 +44,7 @@ namespace mirv {
         typename boost::fusion::result_of::transform<
           const typename boost::proto::result_of::flatten<const List>::type,
           TranslateToSymbol<Symbol<Type<TypeBase> > > >::type,
-        ptr<Symbol<Type<TypeBase> > >::type
+        ptr<Symbol<Type<TypeBase> > >::const_type
         >::type result_type;
 
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -65,7 +65,7 @@ namespace mirv {
 
     /// This is a callable transform to construct a struct type.
     struct ConstructStructTypeSymbol : boost::proto::callable {
-      typedef ptr<Symbol<Type<StructType> > >::type result_type;
+      typedef ptr<Symbol<Type<StructType> > >::const_type result_type;
 
       template<typename List>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,

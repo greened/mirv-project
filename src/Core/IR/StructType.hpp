@@ -40,7 +40,8 @@ namespace mirv {
       }
 
       /// Construct a struct type with a single member.
-      Interface(const std::string &name, ptr<Symbol<Type<TypeBase> > >::type member)
+      Interface(const std::string &name,
+                ptr<Symbol<Type<TypeBase> > >::const_type member)
           : InterfaceBaseType(name) {
         push_back(member);
       }
