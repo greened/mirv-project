@@ -111,7 +111,7 @@ namespace mirv {
 	std::string name = Symbol<Type<Tag> >::getName(a1, a2);
 
 	// Make sure we're not already in the symbol table at the current scope.
-	ptr<Symbol<Base> >::type exists =
+	ptr<Symbol<Base> >::const_type exists =
           symtab->lookupAtCurrentScope(name,
                                        reinterpret_cast<const Symbol<Type<Tag> >  *>(0));
 	if (exists) {
@@ -249,7 +249,8 @@ namespace mirv {
       result_type operator()(const Expr &e) const {
         //std::cout << "Translating:\n";
         //boost::proto::display_expr(e);
-        return safe_cast<const Symbol<Type<Tag> > >(translate(e, symtab));
+        return safe_cast<const Symbol<Type<Tag> > >(
+          constTranslateWithGrammar<ConstructSymbolGrammar>(e, symtab));
       }
     };
   }

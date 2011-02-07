@@ -370,4 +370,9 @@ ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression
     ptr<Expression<Reference<Constant<Base> > >::VisitorBaseType>::const_type p = fast_cast<const Expression<Reference<Constant<Base> > >::VisitorBaseType>(e);
     visit(p);
   }
+
+  ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Reference<Array> > >::const_type e) {
+    ptr<Expression<Reference<Array> >::VisitorBaseType>::const_type p = fast_cast<const Expression<Reference<Array> >::VisitorBaseType>(e);
+    visit(p);
+  }
 }

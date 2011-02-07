@@ -70,7 +70,7 @@ int main(void)
         var["b"].type[int_(32)],
 
         b = 1,
-        b = b + a[2,0,1]
+        b = b + a[boost::proto::lit(2),0,1]
       ]
     );
 

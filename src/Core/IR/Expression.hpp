@@ -228,6 +228,13 @@ namespace mirv {
     InnerExpression(ChildPtr Child) : BaseType(Child) {}
     InnerExpression(ChildPtr Child1,
 		    ChildPtr Child2) : BaseType(Child1, Child2) {}
+    template<typename Sequence>
+    InnerExpression(ChildPtr Child1,
+		    Sequence Children) : BaseType(Child1, Children) {}
+    template<typename InputIterator>
+    InnerExpression(ChildPtr Child1,
+		    InputIterator start,
+                    InputIterator end) : BaseType(Child1, start, end) {}
   };
 
   /// This is an expression with no children.

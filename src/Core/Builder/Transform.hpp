@@ -12,6 +12,7 @@
 #include <mirv/Core/IR/Control.hpp>
 
 #include <boost/proto/proto.hpp>
+#include <boost/proto/fusion.hpp>
 #include <boost/fusion/iterator.hpp>
 #include <boost/fusion/include/transform.hpp>
 
@@ -536,6 +537,36 @@ namespace mirv {
                                     a2,
                                     boost::fusion::transform(
                                       boost::fusion::pop_front(expr),
+                                      translator));
+      }
+    };
+
+    // A transform to flatten an expression tree and process it as a
+    // fusion sequence.
+    template<typename NodeType, typename Dummy = boost::proto::callable>
+    struct ConstructNaryFlat : boost::proto::callable {
+      typedef typename ptr<NodeType>::type result_type;
+        
+      template<typename Arg1, typename Arg2>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Arg1 a1,
+                             const Arg2 &a2) {
+        TranslateToExpression<Expression<Base>> translator(symtab);
+        return mirv::make<NodeType>(a1,
+                                    boost::fusion::transform(
+                                      boost::proto::flatten(a2), translator));
+      }
+
+      template<typename Arg1, typename Arg2, typename Expr>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Arg1 a1,
+                             Arg2 a2,
+                             const Expr &expr) {
+        TranslateToExpression<Expression<Base>> translator(symtab);
+        return mirv::make<NodeType>(a1,
+                                    a2,
+                                    boost::fusion::transform(
+                                      expr,
                                       translator));
       }
     };

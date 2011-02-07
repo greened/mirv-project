@@ -17,6 +17,7 @@
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/StructType.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/ExpressionGrammar.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
 #include <mirv/Core/Builder/Translate.hpp>

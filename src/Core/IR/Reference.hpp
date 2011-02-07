@@ -21,7 +21,8 @@ namespace mirv {
    private:
      typedef InnerImpl<Symbol<SymbolType>, LeafExpression> InterfaceBaseType;
 
-     class Interface : public InterfaceBaseType {
+     class Interface : public InterfaceBaseType,
+                       public boost::enable_shared_from_this<Expression<Reference<SymbolType> > > {
      private:
        Expression<Base> *cloneImpl(void) {
          typename ptr<Expression<Reference<SymbolType> > >::type expr(
@@ -98,7 +99,7 @@ namespace mirv {
     // InnerExpression's type() implementation.
     class Interface
         : public InnerExpression,
-          public Expression<Ref>,
+    //public Expression<Ref>,
           public boost::enable_shared_from_this<Expression<Reference<Array> > > {
     private:
       Expression<Base> *cloneImpl(void) {
@@ -117,25 +118,17 @@ namespace mirv {
         return result;
       }
  
-    protected:
-      void setParents(void) {}
-
     public:
+      Interface(ChildPtr Base, ChildPtr Index)
+          : InnerExpression(Base, Index) {}
+
       template<typename Sequence>
       Interface(ChildPtr Base, const Sequence &indices)
-          : InnerExpression(Base) {
-        // Add the indices.
-        boost::fusion::for_each(indices,
-                                boost::bind(&Interface::push_back, this, _1));
-      }
+          : InnerExpression(Base, indices) {}
+
       template<typename InputIterator>
       Interface(ChildPtr Base, InputIterator start, InputIterator end)
-          : InnerExpression(Base) {
-        // Add the indices.
-        std::for_each(start,
-                      end,
-                      boost::bind(&Interface::push_back, this, _1));
-      }
+          : InnerExpression(Base, start, end) {}
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
