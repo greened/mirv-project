@@ -35,6 +35,7 @@ namespace mirv {
      virtual ~Node<Base>(void);
 
      virtual ptr<Node<Base>>::type getSharedHandle(void) = 0;
+     virtual ptr<Node<Base>>::const_type getSharedHandle(void) const = 0;
 
      template<typename NodeType>
      typename ptr<NodeType>::type parent(void) const {
@@ -158,11 +159,13 @@ namespace mirv {
      }
        template<typename Sequence>
        InnerImpl(ChildPtr C1, Sequence Children) {  
+         children.push_back(C1);
          boost::fusion::for_each(Children,
                                  boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
        }
        template<typename InputIterator>
        InnerImpl(ChildPtr C1, InputIterator start, InputIterator end) {  
+         children.push_back(C1);
          std::for_each(start, end,
                        boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
        }

@@ -32,6 +32,9 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(shared_from_this());
+      }
     };
 
   public:
@@ -219,6 +222,9 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
@@ -254,6 +260,9 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
@@ -288,6 +297,9 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
       }
 
        // We need this to be the final overriders for
@@ -325,6 +337,9 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
@@ -359,6 +374,9 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
       }
 
        // We need this to be the final overriders for
@@ -423,6 +441,9 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
       }
 
        // We need this to be the final overriders for
@@ -498,6 +519,9 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
@@ -535,6 +559,9 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
       }
 
        // We need this to be the final overriders for
@@ -574,6 +601,9 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
     };
 
   public:
@@ -593,6 +623,9 @@ namespace mirv {
     public:
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
       }
     };
 

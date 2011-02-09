@@ -46,6 +46,9 @@ namespace mirv {
        ptr<Node<Base> >::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(this->shared_from_this());
        }
+       ptr<Node<Base> >::const_type getSharedHandle(void) const {
+         return fast_cast<const Node<Base>>(this->shared_from_this());
+       }
 
        void setSymbol(ChildPtr c) {
 	 if (this->empty()) {
@@ -132,6 +135,9 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(this->shared_from_this());
       }
 
       typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
