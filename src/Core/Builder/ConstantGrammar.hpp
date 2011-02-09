@@ -49,7 +49,7 @@ namespace mirv {
         template<typename Arg, typename Expr>
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                                ptr<Expression<Base> >::type str) {
-          return make<Expression<ArrayRef>
+          return make<Expression<Reference<Array> > >();
         }
       };
     }
