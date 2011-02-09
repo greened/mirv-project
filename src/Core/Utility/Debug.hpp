@@ -1,6 +1,10 @@
 #ifndef mirv_Core_Utility_Debug_hpp
 #define mirv_Core_Utility_Debug_hpp
 
+#include <mirv/Core/Memory/Heap.hpp>
+#include <mirv/Core/IR/Base.hpp>
+#include <mirv/Core/IR/NodeFwd.hpp>
+
 #include <iostream>
 #include <cstdlib>
 
@@ -47,6 +51,8 @@ namespace mirv {
       return *(inst ? inst : inst = new DebugManager);
     }
   };
+
+  void dump(ptr<Node<Base> >::const_type node);  
 }
 
 #endif

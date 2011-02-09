@@ -70,8 +70,8 @@ namespace mirv {
     /// such as child type, iterator types and other things.
     class InnerTypeTraits {
     public:
-      typedef Symbol<Type<TypeBase> > Child;
-      typedef Symbol<Type<TypeBase> > BaseType;
+      typedef const Symbol<Type<TypeBase> > Child;
+      typedef const Symbol<Type<TypeBase> > BaseType;
 
     private:
       typedef boost::shared_ptr<Child> ChildPtr;
@@ -121,13 +121,13 @@ namespace mirv {
   /// once in the hierarchy for any inner types.  This holds the child
   /// pointers and other data necessary for inner types.
   class InnerType : public InnerImpl<
-    Symbol<Type<TypeBase> >,
+    const Symbol<Type<TypeBase> >,
     InnerTypeBase,
     // TODO: Avoid TrackParent use.
     false> {
   private:
     typedef InnerImpl<
-    Symbol<Type<TypeBase> >,
+    const Symbol<Type<TypeBase> >,
     InnerTypeBase,
     false> BaseType;
 

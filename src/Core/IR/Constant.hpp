@@ -26,10 +26,10 @@ namespace mirv {
         : public Symbol<Typed>,
           public LeafSymbol {
     public:
-      Interface(ptr<Symbol<Type<TypeBase> > >::type type)
+      Interface(ptr<Symbol<Type<TypeBase> > >::const_type type)
           : Symbol<Typed>(type) {}
 
-      virtual std::string valueString(void) = 0;
+      virtual std::string valueString(void) const = 0;
     };
 
   public:
@@ -46,19 +46,22 @@ namespace mirv {
       ValueType val;
 
     public:
-      Interface(typename ptr<Symbol<Type<TypeBase> > >::type type,
+      Interface(typename ptr<Symbol<Type<TypeBase> > >::const_type type,
                 ValueType v) : Symbol<Constant<Base>>(type), val(v) {}
 
       ValueType value(void) const {
         return val;
       }
 
-      std::string valueString(void) {
+      std::string valueString(void) const {
         return boost::lexical_cast<std::string>(value());
       }
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(this->shared_from_this());
+       };
+       ptr<Node<Base>>::const_type getSharedHandle(void) const {
+         return fast_cast<const Node<Base>>(this->shared_from_this());
        };
     };
 

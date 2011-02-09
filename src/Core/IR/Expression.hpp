@@ -3,7 +3,8 @@
 
 #include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
-#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 #include <mirv/Core/IR/Visitable.hpp>
 
 #include <mirv/Core/Memory/Heap.hpp>
@@ -29,7 +30,29 @@ namespace mirv {
         public boost::mpl::less<typename T1::Order, typename T2::Order> {};
   }
 
+  template<typename Op> class Expression;
+
+  namespace detail {
+    template<typename Tag>
+    struct VisitorBase<Expression<Tag> > {
+      typedef typename Tag::VisitorBaseType VisitorBaseType;
+    };
+    template<typename Tag>
+    struct BaseTypeOf<Expression<Tag> > {
+      typedef typename Tag::BaseType BaseType;
+    };
+    template<>
+    struct VisitorBase<Expression<Base> > {
+      typedef Node<Base> VisitorBaseType;
+    };
+    template<>
+    struct BaseTypeOf<Expression<Base> > {
+      typedef Node<Base> BaseType;
+    };
+  }
+
   struct ExpressionVisitor;
+  struct ConstExpressionVisitor;
 
   /// This is the expression implementation for all expression types.
   /// Each expression type is an instance of this template
@@ -38,11 +61,19 @@ namespace mirv {
   /// from the expression type tags and specific expression type
   /// interfaces.
   template<typename Op>
-  class Expression : public Visitable<Expression<Op>, ExpressionVisitor> {
+  class Expression : public ConstVisitable<
+    Expression<Op>,
+    ConstExpressionVisitor,
+    ExpressionVisitor
+    > {
   public:
     /// The immediate base type of this expression, distinct from
     /// the base type that will be visited by an ExpressionVisitor.
-    typedef Visitable<Expression<Op>, ExpressionVisitor> BaseType;
+    typedef ConstVisitable<
+    Expression<Op>,
+    ConstExpressionVisitor,
+    ExpressionVisitor
+    > BaseType;
     typedef typename Op::VisitorBaseType VisitorBaseType;
 
   protected:
@@ -51,6 +82,8 @@ namespace mirv {
     Expression(A1 a1) : BaseType(a1) {}
     template<typename A1, typename A2>
     Expression(A1 a1, A2 a2) : BaseType(a1, a2) {}
+    template<typename A1, typename A2, typename A3>
+    Expression(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
 
   public:
     template<typename A1>
@@ -68,32 +101,50 @@ namespace mirv {
       result->setParents();
       return result;
     } 
+
+    template<typename A1, typename A2, typename A3>
+    static typename ptr<Expression<Op> >::type
+    make(A1 a1, A2 a2, A3 a3) {
+      typename ptr<Expression<Op> >::type
+        result(new Expression<Op>(a1, a2, a3));
+      result->setParents();
+      return result;
+    } 
   };
 
   /// This anchors the Expression virtual table.
   template<>
-  class Visitable<Expression<Base>, ExpressionVisitor, boost::mpl::empty_base> {
+  class Visitable<Expression<Base>, ExpressionVisitor> : public Node<Base> {
   public:
     virtual void accept(ExpressionVisitor &V);
+  };
+
+  /// This anchors the Expression virtual table.
+  template<>
+  class ConstVisitable<
+    Expression<Base>,
+    ConstExpressionVisitor,
+    ExpressionVisitor
+    > : public Visitable<Expression<Base>, ExpressionVisitor> {
+  public:
+    using Visitable<Expression<Base>, ExpressionVisitor>::accept;
+    virtual void accept(ConstExpressionVisitor &V) const;
   };
 
   /// A specialization for base expressions.  No property information
   /// is available.
   template<>
   class Expression<Base>
-  // MI is the right thing here because Visitable doesn't inherit from
-  // anything.
-      : public Node<Base>,
-        public Visitable<
+      : public ConstVisitable<
     Expression<Base>,
-    ExpressionVisitor,
-    boost::mpl::empty_base
+    ConstExpressionVisitor,
+    ExpressionVisitor
     > {
   private:
     virtual Expression<Base> *cloneImpl(void) = 0;
 
   public:
-    typedef ptr<Symbol<Type<TypeBase>>>::const_type TypePtr;
+    typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
     Expression<Base>(void) {}
 
     ptr<Expression<Base> >::type clone(void) {
@@ -146,7 +197,11 @@ namespace mirv {
     }
   };
 
-  class InnerExpressionBase : public Expression<Inner<detail::InnerExpressionTraits> > {};
+  class InnerExpressionBase : public Expression<Inner<detail::InnerExpressionTraits> > {
+  public:
+    typedef Expression<Inner<detail::InnerExpressionTraits> > BaseType;
+    typedef BaseType::VisitorBaseType VisitorBaseType;
+  };
   
   /// This is the implementation of inner expressions.  It is
   /// inherited from once in the hierarchy for any inner expressions.
@@ -156,8 +211,9 @@ namespace mirv {
     Expression<Base>,
     Virtual<InnerExpressionBase>
     > {
-  private:
+  public:
     typedef InnerImpl<Expression<Base>, Virtual<InnerExpressionBase> > BaseType;
+    typedef Expression<Base> VisitorBaseType;
 
   protected:
     void setParents(void) {
@@ -169,16 +225,22 @@ namespace mirv {
     }
 
   public:
-    typedef Expression<Base> VisitorBaseType;
-
     InnerExpression(ChildPtr Child) : BaseType(Child) {}
     InnerExpression(ChildPtr Child1,
 		    ChildPtr Child2) : BaseType(Child1, Child2) {}
+    template<typename Sequence>
+    InnerExpression(ChildPtr Child1,
+		    Sequence Children) : BaseType(Child1, Children) {}
+    template<typename InputIterator>
+    InnerExpression(ChildPtr Child1,
+		    InputIterator start,
+                    InputIterator end) : BaseType(Child1, start, end) {}
   };
 
   /// This is an expression with no children.
   class LeafExpression : public LeafImpl<Expression<Base> > {
   public:
+    typedef LeafImpl<Expression<Base> > BaseType;
     typedef Expression<Base> VisitorBaseType;
   };
 
@@ -409,7 +471,7 @@ namespace mirv {
       static typename ptr<ExprType>::type
       construct(boost::shared_ptr<ExprType> prototype) {
         typename ptr<ExprType>::type
-          expr(ExprType::make( prototype->getLeftOperand()->clone(),
+          expr(ExprType::make(prototype->getLeftOperand()->clone(),
                               prototype->getRightOperand()->clone()));
         return expr;
       }
@@ -426,9 +488,10 @@ namespace mirv {
     typedef Root BaseType;
 
   public:
-    class ExpressionInterface : public Root,
-                                public Expression<Property>...,
-                                public boost::enable_shared_from_this<Expression<Tag> > {
+    class ExpressionInterface
+        : public Root,
+          public Expression<Property>...,
+          public boost::enable_shared_from_this<Expression<Tag> > {
     private:
       Expression<Base> *cloneImpl(void) {
         typename ptr<Expression<Tag> >::type
@@ -454,9 +517,15 @@ namespace mirv {
       virtual void accept(ExpressionVisitor &) {
         error("ExpressionInterface::accept called");
       }
+      virtual void accept(ConstExpressionVisitor &) const {
+        error("ExpressionInterface::accept called");
+      }
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(this->shared_from_this());
       }
     };
     typedef ExpressionInterface type;

@@ -1,13 +1,12 @@
 #ifndef mirv_Core_IR_Function_hpp
 #define mirv_Core_IR_Function_hpp
 
+#include <mirv/Core/IR/StatementFwd.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Type.hpp>
-#include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Control.hpp>
+#include <mirv/Core/IR/VariableFwd.hpp>
 
 #include <tr1/functional>
-//#include <boost/bind.hpp>
 
 namespace mirv {
   /// This is a symbol tag for function symbols.
@@ -16,8 +15,15 @@ namespace mirv {
      typedef Symbol<Named> NamedBaseType;
      typedef Symbol<Typed> TypedBaseType;
      
-     typedef InnerImpl<Statement<Base>, Virtual<Symbol<Base> > > StatementBaseType;
-     typedef InnerImpl<Symbol<Variable>, Virtual<Symbol<Base> > > VariableBaseType;
+     typedef InnerImpl<
+       Statement<Base>,
+       Virtual<Symbol<Base> >
+       > StatementBaseType;
+
+     typedef InnerImpl<
+       Symbol<Variable>,
+       Virtual<Symbol<Base> >
+       > VariableBaseType;
 
    public:
      class Interface : public NamedBaseType,
@@ -27,25 +33,19 @@ namespace mirv {
                        public boost::enable_shared_from_this<Symbol<Function> > {
      public:
        typedef StatementBaseType::ChildPtr StatementPtr;
+       typedef StatementBaseType::ConstChildPtr ConstStatementPtr;
        typedef VariableBaseType::ChildPtr VariablePtr;
+       typedef VariableBaseType::ConstChildPtr ConstVariablePtr;
 
        Interface(const std::string &n, TypePtr t)
 	 : NamedBaseType(n), TypedBaseType(t) {}
 
        Interface(const std::string &n,
 		 TypePtr t,
-		 StatementPtr s)
-           : NamedBaseType(n),
-             TypedBaseType(t),
-	   // If the statement is not a block, make it one.
-	   StatementBaseType(dyn_cast<Statement<Block> >(s) ?
-			     s : boost::static_pointer_cast<Statement<Base> >(mirv::make<Statement<Block> >(s))) {};
+		 StatementPtr s);
 
        /// Add a local variable to this function.
-       void variablePushBack(VariablePtr v) {
-	 VariableBaseType::push_back(v); 
-         v->setParent(this->getSharedHandle());
-       }
+       void variablePushBack(VariablePtr v);
 
        typedef VariableBaseType::iterator VariableIterator;
        typedef VariableBaseType::const_iterator ConstVariableIterator;
@@ -78,6 +78,9 @@ namespace mirv {
        StatementPtr getStatement(void) {
 	 return *StatementBaseType::begin();
        }
+       ConstStatementPtr getStatement(void) const {
+	 return *StatementBaseType::begin();
+       }
 
        /// Return whether the function does not have a statement.
        bool statementEmpty(void) const {
@@ -86,6 +89,9 @@ namespace mirv {
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
+       }
+       ptr<Node<Base>>::const_type getSharedHandle(void) const {
+         return fast_cast<const Node<Base>>(shared_from_this());
        }
 
        // We need these to be the final overriders for
@@ -101,7 +107,7 @@ namespace mirv {
      typedef TypedBaseType VisitorBaseType;
 
      static std::string getName(const std::string &name,
-                                ptr<Symbol<Type<TypeBase> > >::type type) {
+                                ptr<Symbol<Type<TypeBase> > >::const_type type) {
        return name;
      }
    };

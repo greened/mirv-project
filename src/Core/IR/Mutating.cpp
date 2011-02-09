@@ -1,3 +1,4 @@
+#include <mirv/Core/IR/Expression.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
 
 namespace mirv {
@@ -11,6 +12,12 @@ namespace mirv {
     return result;
   }
 
+  void Assignment::Interface::setParents(void)
+  {
+    getLeftExpression()->setParent(getSharedHandle());
+    getRightExpression()->setParent(getSharedHandle());
+  }
+
   Statement<Base> *Call::Interface::cloneImpl(void) 
   {
     ptr<Statement<Call> >::type stmt(Statement<Call>::make(this->function()->clone()));
@@ -21,5 +28,14 @@ namespace mirv {
     Statement<Call> *result = stmt.get();
     stmt.reset();
     return result;
+  }
+
+  void Call::Interface::setParents(void) 
+  {
+    for (ExpressionIterator i = expressionBegin();
+         i != expressionEnd();
+         ++i) {
+      (*i)->setParent(getSharedHandle());
+    }
   }
 }

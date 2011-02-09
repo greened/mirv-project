@@ -9,6 +9,8 @@
 
 #include <numeric>
 #include <vector>
+#include <iterator>
+#include <algorithm>
 
 namespace mirv {
   namespace detail {
@@ -55,18 +57,19 @@ namespace mirv {
 
       public:
        typedef Symbol<Type<TypeBase> > ChildType;
-       typedef ptr<ChildType>::type ChildPtr;
          typedef ptr<ChildType>::const_type ConstChildPtr;
 
        template<typename InputIterator>
-       Interface(ChildPtr ElementType,
+       Interface(ConstChildPtr ElementType,
                  InputIterator dimensionStart,
                  InputIterator dimensionEnd) :
            InterfaceBaseType(ElementType->name() + "["
                              + detail::stringizeDimensions(dimensionStart,
                                                            dimensionEnd)
                              + "]"),
-             dimensions(dimensionStart, dimensionEnd) {}
+             dimensions(dimensionStart, dimensionEnd) {
+         push_back(ElementType);
+       }
          typedef DimensionVector::iterator DimensionIterator;
          typedef DimensionVector::const_iterator ConstDimensionIterator;
 
@@ -74,9 +77,6 @@ namespace mirv {
          typedef DimensionVector::const_reverse_iterator
          ConstReverseDimensionIterator;
 
-         ChildPtr getElementType(void) {
-            return(front());
-         }
          ConstChildPtr getElementType(void) const {
             return(front());
          }
@@ -122,6 +122,11 @@ namespace mirv {
             dimensions.push_back(d);
          }
 
+       typedef DimensionVector::size_type size_type;
+       size_type dimensionSize(void) const {
+         return dimensions.size();
+       }
+
          BitSizeType bitsize(void) const {
             return(std::accumulate(dimensionBegin(), dimensionEnd(),
                                    getElementType()->bitsize(),
@@ -131,16 +136,20 @@ namespace mirv {
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
        }
-      };
+       ptr<Node<Base>>::const_type getSharedHandle(void) const {
+         return fast_cast<const Node<Base>>(shared_from_this());
+       }
+     };
 
    public:
      typedef Interface BaseType;
      typedef Symbol<Type<Derived> > VisitorBaseType;
 
      template<typename InputIterator>
-     static std::string getName(ptr<Symbol<Type<TypeBase> > >::type elementType,
-                                InputIterator start,
-                                InputIterator end) {
+     static std::string
+     getName(ptr<Symbol<Type<TypeBase> > >::const_type elementType,
+             InputIterator start,
+             InputIterator end) {
        return elementType->name()
          + "["
          + detail::stringizeDimensions(start, end)

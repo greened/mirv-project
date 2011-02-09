@@ -8,6 +8,15 @@
 #include <mirv/Core/Builder/ConstantGrammar.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
 
+#include <mirv/Core/IR/Arithmetic.hpp>
+#include <mirv/Core/IR/Bitwise.hpp>
+#include <mirv/Core/IR/Reference.hpp>
+#include <mirv/Core/IR/Relational.hpp>
+#include <mirv/Core/IR/Logical.hpp>
+#include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
@@ -65,7 +74,7 @@ namespace mirv {
         Expression<Reference<Constant<Base> > >
         >(boost::proto::_data, ConstantBuilder(boost::proto::_))
       > {};
-    
+
     /// This is the grammar for all terminal expressions.
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::terminal>
@@ -257,17 +266,31 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
     struct BitwiseXorBuilder 
         : detail::BinaryBuilder<BitwiseXorRule, BitwiseXor> {};
 
-template<>
-struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
-    : BitwiseXorBuilder {};
+    template<>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::bitwise_xor>
+        : BitwiseXorBuilder {};
 
     /// This is the grammar for array reference expressions.
-    struct SubscriptBuilder 
-        : detail::BinaryBuilder<SubscriptRule, ArrayRef> {};
-
+    struct ArrayRefBuilder : boost::proto::or_<
+      boost::proto::when<
+        MultiSubscriptRule,
+        ConstructNaryFlat<Expression<Reference<Array> > >(
+          boost::proto::_data,
+          ConstructExpressionGrammar(boost::proto::_left),
+          boost::proto::_right)
+        >,
+      boost::proto::when<
+        SubscriptRule,
+        ConstructBinary<Expression<Reference<Array> > >(
+          boost::proto::_data,
+          ConstructExpressionGrammar(boost::proto::_left),
+          ConstructExpressionGrammar(boost::proto::_right))
+        > 
+      > {};
+    
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::subscript>
-        : SubscriptBuilder {};
+        : ArrayRefBuilder {};
 
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::function>

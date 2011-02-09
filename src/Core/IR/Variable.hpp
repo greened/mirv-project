@@ -25,6 +25,9 @@ namespace mirv {
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
        }
+       ptr<Node<Base>>::const_type getSharedHandle(void) const {
+         return fast_cast<const Node<Base>>(shared_from_this());
+       }
 
        // We need these to be the final overriders for Symbol<Named>
        // and Symbol<Typed> Visitable::accept functions.
