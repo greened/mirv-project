@@ -12,7 +12,7 @@ namespace mirv {
    class Module {
    private:
      typedef InnerImpl<Symbol<Function>, Virtual<Symbol<Base> > > FunctionBaseType;
-     typedef InnerImpl<Symbol<Type<TypeBase> >, Virtual<Symbol<Base> > > TypeBaseType;
+     typedef InnerImpl<const Symbol<Type<TypeBase> >, Virtual<Symbol<Base> > > TypeBaseType;
      typedef InnerImpl<Symbol<Variable>, Virtual<Symbol<Base> > > VariableBaseType;
 
      class Interface : public Symbol<Named>,
@@ -90,7 +90,7 @@ namespace mirv {
        }
 
        // Access type information
-       typedef TypeBaseType::ChildPtr TypePointer;
+       typedef TypeBaseType::ConstChildPtr TypePointer;
 
        /// Add a type.
        void typePushBack(TypePointer t) {
@@ -124,6 +124,9 @@ namespace mirv {
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
+       }
+       ptr<Node<Base>>::const_type getSharedHandle(void) const {
+         return fast_cast<const Node<Base>>(shared_from_this());
        }
      };
    public:

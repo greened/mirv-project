@@ -3,7 +3,6 @@
 
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/IR/Statement.hpp>
-#include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
@@ -21,13 +20,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        for (iterator i = begin();
-             i != end();
-             ++i) {
-          (*i)->setParent(getSharedHandle());
-        }
-      }
+      void setParents(void);
 
     public:
       Interface(void) : InterfaceBaseType() {}
@@ -38,6 +31,9 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(shared_from_this());
       }
     };
 
@@ -79,6 +75,12 @@ namespace mirv {
       }
 
       ChildPtr getChildStatement(void) {
+        checkInvariant(!this->empty(), 
+                       "Attempt to get statement from empty block");
+	  
+        return(this->front());
+      }
+      ConstChildPtr getChildStatement(void) const {
         checkInvariant(!this->empty(), 
                        "Attempt to get statement from empty block");
 	  
@@ -210,10 +212,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S, typename E>
@@ -223,10 +222,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("IfThen::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("IfThen::Interface::accept called!");
        }
     };
@@ -245,11 +250,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getLeftChildStatement()->setParent(getSharedHandle());
-        getRightChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename S2, typename E>
@@ -259,10 +260,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("IfElse::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("IfElse::Interface::accept called!");
        }
     };
@@ -281,10 +288,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -294,10 +298,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("While::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("While::Interface::accept called!");
        }
     };
@@ -317,10 +327,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -330,10 +337,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("DoWhile::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("DoWhile::Interface::accept called!");
        }
     };
@@ -352,10 +365,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -365,10 +375,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("Case::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("Case::Interface::accept called!");
        }
     };
@@ -388,9 +404,7 @@ namespace mirv {
       typedef InterfaceBaseType::ChildPtr ChildPtr;
 
     protected:
-      void setParents(void) {
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1>
@@ -418,10 +432,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getCondition()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -431,10 +442,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("Switch::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("Switch::Interface::accept called!");
        }
     };
@@ -492,10 +509,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -505,10 +519,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("Before::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("Before::Interface::accept called!");
        }
     };
@@ -530,10 +550,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-        getChildStatement()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename S1, typename E>
@@ -543,10 +560,16 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
        // We need this to be the final overriders for
        // Visitable::accept functions.
        virtual void accept(StatementVisitor &) {
+         error("After::Interface::accept called!");
+       }
+       virtual void accept(ConstStatementVisitor &) const {
          error("After::Interface::accept called!");
        }
     };
@@ -568,9 +591,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLabel()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       template<typename E>
@@ -579,6 +600,9 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
       }
     };
 
@@ -599,6 +623,9 @@ namespace mirv {
     public:
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
       }
     };
 

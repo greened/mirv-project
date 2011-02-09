@@ -6,7 +6,12 @@
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
+#include <boost/bind/bind.hpp>
+#include <boost/fusion/iterator.hpp>
+#include <boost/fusion/include/for_each.hpp>
 #include <boost/mpl/vector.hpp>
+
+#include <algorithm>
 #include <list>
 
 namespace mirv {
@@ -19,12 +24,18 @@ namespace mirv {
    template<>
    class Node<Base> {
    private:
-     ptr<Node<Base>>::weak_type theParent;
+     // FIXME: This really shouldn't need to be mutable.  It is so
+     // that when we add a type to a module the module can set itself
+     // as the type's parent.  We really ought to pass the module to
+     // the type during construction because that's the only place it
+     // will ever live.
+     mutable ptr<Node<Base>>::weak_type theParent;
 
    public:
      virtual ~Node<Base>(void);
 
      virtual ptr<Node<Base>>::type getSharedHandle(void) = 0;
+     virtual ptr<Node<Base>>::const_type getSharedHandle(void) const = 0;
 
      template<typename NodeType>
      typename ptr<NodeType>::type parent(void) const {
@@ -39,7 +50,7 @@ namespace mirv {
        return result->template parent<NodeType>();
      }
 
-     void setParent(ptr<Node<Base>>::weak_type parent) {
+     void setParent(ptr<Node<Base>>::weak_type parent) const {
        theParent = parent;
      }
    };
@@ -146,7 +157,19 @@ namespace mirv {
        children.push_back(C1);
        children.push_back(C2);
      }
- 
+       template<typename Sequence>
+       InnerImpl(ChildPtr C1, Sequence Children) {  
+         children.push_back(C1);
+         boost::fusion::for_each(Children,
+                                 boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
+       }
+       template<typename InputIterator>
+       InnerImpl(ChildPtr C1, InputIterator start, InputIterator end) {  
+         children.push_back(C1);
+         std::for_each(start, end,
+                       boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
+       }
+       
      typedef typename ChildList::iterator iterator;
      typedef typename ChildList::reverse_iterator reverse_iterator;
      typedef typename ChildList::const_iterator const_iterator;

@@ -4,15 +4,17 @@
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
-#include <mirv/Core/IR/Expression.hpp>
+#include <mirv/Core/IR/ExpressionFwd.hpp>
 #include <mirv/Core/IR/Visitable.hpp>
 
 #include <boost/mpl/empty_base.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/sort.hpp>
+
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/int.hpp>
+#include <boost/mpl/transform.hpp>
 
 namespace mirv {
   namespace detail {
@@ -25,8 +27,28 @@ namespace mirv {
   }
 
   struct StatementVisitor;
+  struct ConstStatementVisitor;
 
   template<typename Tag> class Statement;
+
+  namespace detail {
+    template<typename Tag>
+    struct VisitorBase<Statement<Tag> > {
+      typedef typename Tag::VisitorBaseType VisitorBaseType;
+    };
+    template<typename Tag>
+    struct BaseTypeOf<Statement<Tag> > {
+      typedef typename Tag::BaseType BaseType;
+    };
+    template<>
+    struct VisitorBase<Statement<Base> > {
+      typedef Node<Base> VisitorBaseType;
+    };
+    template<>
+    struct BaseTypeOf<Statement<Base> > {
+      typedef Node<Base> BaseType;
+    };
+  }
 
   /// This is the statement implementation for all statement types.
   /// Each statement type is an instance of this template
@@ -35,11 +57,19 @@ namespace mirv {
   /// details from the statement type tags and specific statement type
   /// Interfaces.
   template<typename Tag>
-  class Statement : public Visitable<Statement<Tag>, StatementVisitor> {
+  class Statement : public ConstVisitable<
+    Statement<Tag>,
+    ConstStatementVisitor,
+    StatementVisitor
+    > {
   public:
     /// The immediate base type of this statement, distinct from
     /// the base type that will be visited by a StatementVisitor.
-    typedef Visitable<Statement<Tag>, StatementVisitor> BaseType;
+    typedef ConstVisitable<
+    Statement<Tag>,
+    ConstStatementVisitor,
+    StatementVisitor
+    > BaseType;
     typedef typename Tag::VisitorBaseType VisitorBaseType;
 
   protected:
@@ -85,22 +115,32 @@ namespace mirv {
 
   /// This anchors the Statement virtual table.
   template<>
-  class Visitable<Statement<Base>, StatementVisitor, boost::mpl::empty_base> {
+  class Visitable<Statement<Base>, StatementVisitor> : public Node<Base> {
   public:
     virtual void accept(StatementVisitor &V);
+  };
+
+  /// This anchors the Statement virtual table.
+  template<>
+  class ConstVisitable<
+    Statement<Base>,
+    ConstStatementVisitor,
+    StatementVisitor
+    > : public Visitable<Statement<Base>, StatementVisitor> {
+  public:
+    using Visitable<Statement<Base>, StatementVisitor>::accept;
+
+    virtual void accept(ConstStatementVisitor &V) const;
   };
   
   /// A specialization for base statements.  No property information
   /// is available.
   template<>
   class Statement<Base>
-  // MI is the right thing here because Visitable doesn't inherit from
-  // anything.
-      : public Node<Base>,
-        public virtual Visitable<
+      : public virtual ConstVisitable<
     Statement<Base>,
-    StatementVisitor,
-    boost::mpl::empty_base
+    ConstStatementVisitor,
+    StatementVisitor
     > {
   private:
     virtual Statement<Base> *cloneImpl(void) = 0;
@@ -146,7 +186,8 @@ namespace mirv {
   /// operands) but we do not want to force subclasses to explicitly
   /// initialize the inner statement object.  Separating the
   /// Interface from the implementation solves that problem.
-  class InnerStatementBase : public Statement<Inner<detail::InnerStatementTraits> > {};
+  class InnerStatementBase : public Statement<Inner<detail::InnerStatementTraits> > {
+  };
 
   /// This is the implementation of inner statements.  It is
   /// inherited from once in the hierarchy for any inner statements.
@@ -156,8 +197,10 @@ namespace mirv {
     Statement<Base>,
     Virtual<InnerStatementBase>
     > {
-    typedef InnerImpl<Statement<Base>, Virtual<InnerStatementBase> > BaseType;
   public:
+    typedef InnerImpl<Statement<Base>, Virtual<InnerStatementBase> > BaseType;
+    typedef Statement<Base> VisitorBaseType;
+
     InnerStatement(void) : BaseType() {}
     InnerStatement(ChildPtr Child) : BaseType(Child) {}
     InnerStatement(ChildPtr Child1,
@@ -167,6 +210,8 @@ namespace mirv {
   /// This is a statement with no children.
   class LeafStatement : public LeafImpl<Virtual<Statement<Base> > > {
   public:
+    typedef LeafImpl<Virtual<Statement<Base> > > BaseType;
+    typedef Statement<Base> VisitorBaseType;
   };
 
   // Statement property semantics
@@ -210,6 +255,9 @@ namespace mirv {
       template<typename ...Args>
         StatementBase(const Args &...args) : Root(args...) {}
       virtual void accept(StatementVisitor &) {
+        error("StatementBase::accept called!");
+      }
+      virtual void accept(ConstStatementVisitor &) const {
         error("StatementBase::accept called!");
       }
     };

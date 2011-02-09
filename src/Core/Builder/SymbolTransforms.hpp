@@ -1,6 +1,10 @@
 #ifndef mirv_Core_Builder_SymbolTransforms_hpp
 #define mirv_Core_Builder_SymbolTransforms_hpp
 
+#include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/Builder/SymbolGrammarFwd.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
+
 #include <boost/proto/proto.hpp>
 #include <boost/mpl/print.hpp>
 #include <boost/lexical_cast.hpp>
@@ -54,6 +58,31 @@ namespace mirv {
       }
     };
 
+    // Specialize for types, which need to be const.
+    template<typename Tag>
+    struct UnaryConstructSymbol<Symbol<Type<Tag> >, boost::proto::callable>
+        : boost::proto::callable {
+      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+
+      template<typename Arg>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+			     Arg a) {
+	std::string name = Symbol<Type<Tag> >::getName(a);
+
+	// Make sure we're not already in the symbol table at the current scope.
+	ptr<const Symbol<Base> >::type exists =
+          symtab->lookupAtCurrentScope(name,
+                                       reinterpret_cast<const Symbol<Type<Tag> > *>(0));
+        if (exists) {
+          // It's ok to have a type already declared.
+          return safe_cast<const Symbol<Type<Tag> > >(exists);
+	}
+        result_type result = mirv::make<Symbol<Type<Tag> > >(a);
+        symtab->addAtCurrentScope(result);
+        return result;
+      }
+    };
+
     /// This is a callable transform to construct a symbol.  If the
     /// symbol exists at the current scope, it is an error.
     template<typename SymbolType,
@@ -89,6 +118,32 @@ namespace mirv {
           symtab->addAtCurrentScope(result);
         }
 
+	return result;
+      }
+    };
+
+    // Specialize for types, which need to be const.
+    template<typename Tag>
+    struct BinaryConstructSymbol<Symbol<Type<Tag> >, boost::proto::callable>
+        : boost::proto::callable {
+      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+
+      template<typename Arg1, typename Arg2>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+			     Arg1 a1,
+			     Arg2 a2) {
+	std::string name = Symbol<Type<Tag> >::getName(a1, a2);
+
+	// Make sure we're not already in the symbol table at the current scope.
+	ptr<Symbol<Base> >::const_type exists =
+          symtab->lookupAtCurrentScope(name,
+                                       reinterpret_cast<const Symbol<Type<Tag> >  *>(0));
+	if (exists) {
+          // It's ok to have a type already declared.
+          return safe_cast<const Symbol<Type<Tag> > >(exists);
+	}
+	result_type result = mirv::make<Symbol<Type<Tag> > >(a1, a2);
+	symtab->addAtCurrentScope(result);
 	return result;
       }
     };
@@ -133,6 +188,33 @@ namespace mirv {
       }
     };
 
+    // Specialize for types which need to be const.
+    template<typename Tag>
+    struct TernaryConstructSymbol<Symbol<Type<Tag> >, boost::proto::callable>
+        : boost::proto::callable {
+      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+
+      template<typename Arg1, typename Arg2, typename Arg3>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+			     Arg1 a1,
+			     Arg2 a2,
+                             Arg3 a3) {
+	std::string name = Symbol<Type<Tag> >::getName(a1, a2, a3);
+
+	// Make sure we're not already in the symbol table at the current scope.
+	ptr<Symbol<Base> >::const_type exists =
+          symtab->lookupAtCurrentScope(name,
+                                       reinterpret_cast<const Symbol<Type<Tag> >  *>(0));
+	if (exists) {
+          // It's ok to have a type already declared.
+          return safe_cast<const Symbol<Type<Tag> > >(exists);
+	}
+        result_type result = mirv::make<Symbol<Type<Tag> > >(a1, a2, a3);
+	symtab->addAtCurrentScope(result);
+	return result;
+      }
+    };
+
     /// This is a callable transform to construct a constant symbol.
     /// If the symbol exists at the current module, it is an error.
     template<
@@ -147,7 +229,7 @@ namespace mirv {
         ConstantTypeGenerator typeGen;
 
         // Constant type
-        ptr<Symbol<Type<TypeBase> > >::type constantType = 
+        ptr<Symbol<Type<TypeBase> > >::const_type constantType = 
           LookupSymbol<Symbol<Type<TypeBase> > >()(
             symtab,
             typeGen(sizeof(typename boost::proto::result_of::value<Expr>::type) * 8));
@@ -179,7 +261,29 @@ namespace mirv {
       result_type operator()(const Expr &e) const {
         //std::cout << "Translating:\n";
         //boost::proto::display_expr(e);
-        return safe_cast<SymbolType>(translate(e, symtab));
+        return safe_cast<SymbolType>(
+          translateWithGrammar<ConstructSymbolGrammar>(e, symtab));
+      }
+    };
+
+    // Specialize for types which must be const.
+    template<typename Tag>
+    class TranslateToSymbol<Symbol<Type<Tag> > > : boost::proto::callable {
+    private:
+      boost::shared_ptr<SymbolTable> symtab;
+
+    public:
+      TranslateToSymbol<Symbol<Type<Tag> > >(boost::shared_ptr<SymbolTable> s)
+      : symtab(s) {}
+
+      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+
+      template<typename Expr>
+      result_type operator()(const Expr &e) const {
+        //std::cout << "Translating:\n";
+        //boost::proto::display_expr(e);
+        return safe_cast<const Symbol<Type<Tag> > >(
+          constTranslateWithGrammar<ConstructSymbolGrammar>(e, symtab));
       }
     };
   }

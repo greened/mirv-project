@@ -6,6 +6,8 @@
 #include <Visitor.hpp>
  
 #include <mirv/Core/IR/Base.hpp>
+#include <mirv/Core/Memory/Heap.hpp>
+
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/VariableFwd.hpp>
 #include <mirv/Core/IR/ConstantFwd.hpp>

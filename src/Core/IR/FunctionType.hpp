@@ -78,7 +78,7 @@ namespace mirv {
                       public boost::enable_shared_from_this<Symbol<Type<FunctionType> > > {
     public:
       typedef Symbol<Type<TypeBase> > ChildType;
-      typedef ptr<ChildType>::type ChildPtr;
+      typedef ptr<ChildType>::const_type ChildPtr;
       typedef ptr<ChildType>::const_type ConstChildPtr;
 
       /// Name some booleans to clarify code when setting a function
@@ -239,6 +239,9 @@ namespace mirv {
       ptr<Node<Base>>::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
+      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(shared_from_this());
+      }
     };
 
   public:
@@ -246,7 +249,7 @@ namespace mirv {
     typedef Symbol<Type<Derived> > VisitorBaseType;
 
     static std::string
-    getName(ptr<Symbol<Type<TypeBase> > >::type returnType,
+    getName(ptr<Symbol<Type<TypeBase> > >::const_type returnType,
             Interface::VarargMark vararg) {
       const char *args =
         vararg == Symbol<Type<FunctionType> >::VarargMark::Vararg ?
@@ -262,7 +265,7 @@ namespace mirv {
 
     template<typename FusionSequence>
     static std::string
-    getName(ptr<Symbol<Type<TypeBase> > >::type returnType,
+    getName(ptr<Symbol<Type<TypeBase> > >::const_type returnType,
             const FusionSequence &argTypes,
             Interface::VarargMark vararg) {
       std::stringstream name;

@@ -2,7 +2,11 @@
 #define mirv_Core_IR_Mutating_hpp
 
 #include <mirv/Core/IR/Statement.hpp>
+
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <boost/bind/bind.hpp>
 
 namespace mirv {
   /// This is the interface to statements that have two child
@@ -82,10 +86,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        getLeftExpression()->setParent(getSharedHandle());
-        getRightExpression()->setParent(getSharedHandle());
-      }
+      void setParents(void);
 
     public:
       typedef ExpressionIterator iterator;
@@ -101,6 +102,9 @@ namespace mirv {
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
       }
 
       iterator begin(void) {
@@ -144,13 +148,7 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     protected:
-      void setParents(void) {
-        for (ExpressionIterator i = expressionBegin();
-             i != expressionEnd();
-             ++i) {
-          (*i)->setParent(getSharedHandle());
-        }
-      }
+      void setParents(void);
 
     public:
       typedef ExpressionPtr ChildPtr;
@@ -191,10 +189,17 @@ namespace mirv {
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
 
       // By convention, the first child is the expression referencing
       // the function.
       ExpressionPtr function(void) {
+        checkInvariant(!expressionEmpty(), "No function for call");
+        return expressionFront();
+      }
+      ConstExpressionPtr function(void) const {
         checkInvariant(!expressionEmpty(), "No function for call");
         return expressionFront();
       }

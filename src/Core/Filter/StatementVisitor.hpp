@@ -2,10 +2,14 @@
 #define mirv_Core_Filter_StatementVisitor_hpp
 
 #include <Visitor.hpp>
- 
+
+#include <mirv/Core/IR/Base.hpp>
+#include <mirv/Core/Memory/Heap.hpp>
+
 #include <mirv/Core/IR/StatementFwd.hpp>
 #include <mirv/Core/IR/ControlFwd.hpp>
 #include <mirv/Core/IR/MutatingFwd.hpp>
+#include <mirv/Core/Memory/Heap.hpp>
 
 #include <mirv/Core/IR/ExpressionFwd.hpp>
 #include <mirv/Core/IR/ArithmeticFwd.hpp>
@@ -15,6 +19,7 @@
 #include <mirv/Core/IR/ReferenceFwd.hpp>
 
 #include <mirv/Core/IR/VariableFwd.hpp>
+#include <mirv/Core/Memory/Heap.hpp>
 
 #include <boost/mpl/vector.hpp>
 

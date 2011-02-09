@@ -2,7 +2,6 @@
 #define mirv_Core_Builder_ExpressionRules_hpp
 
 #include <mirv/Core/Builder/Transform.hpp>
-#include <mirv/Core/Builder/DomainFwd.hpp>
 #include <mirv/Core/Builder/GrammarFwd.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/IR/Variable.hpp>
@@ -76,16 +75,36 @@ namespace mirv {
      typedef boost::proto::bitwise_and<ConstructExpressionGrammar, ConstructExpressionGrammar> BitwiseAndRule;
      typedef boost::proto::bitwise_xor<ConstructExpressionGrammar, ConstructExpressionGrammar> BitwiseXorRule;
 
-      // No comma
-
      typedef boost::proto::mem_ptr<ConstructExpressionGrammar, ConstructExpressionGrammar> MemPtrRule;
 
-      // No assign (statement)
-      // No op-assign
+     // Array reference rules.
+     struct ArrayIndexRule;
 
-     typedef boost::proto::subscript<ConstructExpressionGrammar, ConstructExpressionGrammar> SubscriptRule;
+     struct MultiIndexRule 
+         : public boost::proto::comma<
+       ArrayIndexRule,
+       ArrayIndexRule
+       > {};
 
-      // No ?:
+     struct ArrayIndexRule : public boost::proto::or_<
+       ConstructExpressionGrammar,
+       MultiIndexRule
+       > {};
+
+     struct MultiSubscriptRule :  boost::proto::subscript<
+       ConstructExpressionGrammar,
+       MultiIndexRule
+       > {};
+
+     struct SubscriptRule : boost::proto::subscript<
+       ConstructExpressionGrammar,
+       ConstructExpressionGrammar
+       > {};
+
+     // No comma
+     // No assign (statement)
+     // No op-assign
+     // No ?:
    }
 }
 

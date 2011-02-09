@@ -1,10 +1,7 @@
 #ifndef mirv_Core_IR_Visitable_hpp
 #define mirv_Core_IR_Visitable_hpp
 
-#include <mirv/Core/Filter/NodeVisitor.hpp>
-#include <mirv/Core/IR/ExpressionFwd.hpp>
-#include <mirv/Core/IR/StatementFwd.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/Utility/Debug.hpp>
 
 namespace mirv {
   namespace detail {
@@ -16,33 +13,6 @@ namespace mirv {
     struct BaseTypeOf {
       typedef typename Op::BaseType BaseType;
     };
-
-    template<typename Tag>
-    struct VisitorBase<Expression<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    template<typename Tag>
-    struct BaseTypeOf<Expression<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-
-    template<typename Tag>
-    struct VisitorBase<Statement<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    template<typename Tag>
-    struct BaseTypeOf<Statement<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-
-    template<typename Tag>
-    struct VisitorBase<Symbol<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    template<typename Tag>
-    struct BaseTypeOf<Symbol<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
   }
 
   /// Enable a class hierarchy to be visited.  This exists as a
@@ -50,27 +20,57 @@ namespace mirv {
   /// different kinds of nodes.
   template<
     typename NodeType,
-    typename Visitor,
-    typename Base = typename detail::BaseTypeOf<NodeType>::BaseType
+    typename Visitor
     >
-  class Visitable : public Base {
+  class Visitable : public detail::BaseTypeOf<NodeType>::BaseType {
   private:
-    typedef Base BaseType;
+    typedef typename detail::BaseTypeOf<NodeType>::BaseType BaseType;
 
   public:
     Visitable(void) : BaseType() {}
     template<typename ...Arg>
     Visitable(const Arg &...arg) : BaseType(arg...) {};
 
-    virtual void accept(Visitor &V) {
-      detail::AcceptImpl<NodeType,
-        boost::is_base_of<
-          boost::enable_shared_from_this<NodeType>,
-          NodeType
-          >::value
-      > impl;
-      impl(safe_cast<NodeType>(this), V);
-    }
+    // The visitor classes overloads based on ptr<...>::type.  This
+    // requires the smart pointer to determine whether one is
+    // convertable to another, which in turn requires full definition
+    // of the classes pointed to.  This creates a lot of coupling
+    // between visited types.  Thus we leave this undefined here and
+    // explicitly instantiate it in the various IR source files.  This
+    // breaks the coupling and avoids lots of spurious include file
+    // dependencies.
+    virtual void accept(Visitor &V);
+  };
+
+  /// This enables visitation of a class by a const visitor.  It
+  /// inherits from Visitable to avoid some MI issues.
+  // TODO: Fix MI issues.
+  template<
+    typename NodeType,
+    typename ConstVisitor,
+    typename Visitor
+    >
+  class ConstVisitable : public Visitable<NodeType, Visitor> {
+  private:
+    typedef Visitable<NodeType, Visitor> BaseType;
+
+  public:
+    ConstVisitable(void) : BaseType() {}
+    template<typename ...Arg>
+    ConstVisitable(const Arg &...arg)
+    : BaseType(arg...) {};
+
+    using Visitable<NodeType, Visitor>::accept;
+
+    // The visitor classes overloads based on ptr<...>::type.  This
+    // requires the smart pointer to determine whether one is
+    // convertable to another, which in turn requires full definition
+    // of the classes pointed to.  This creates a lot of coupling
+    // between visited types.  Thus we leave this undefined here and
+    // explicitly instantiate it in the various IR source files.  This
+    // breaks the coupling and avoids lots of spurious include file
+    // dependencies.
+    virtual void accept(ConstVisitor &V) const;
   };
 }
 
