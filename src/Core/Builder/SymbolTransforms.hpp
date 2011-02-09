@@ -35,7 +35,7 @@ namespace mirv {
 	// Make sure we're not already in the symbol table at the current scope.
 	ptr<Symbol<Base> >::type exists =
           scope == ModuleScope ?
-          symtab->lookupAtGlobalScope(name, reinterpret_cast<SymbolType *>(0))
+          symtab->lookupAtModuleScope(name, reinterpret_cast<SymbolType *>(0))
           : symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
 	if (exists) {
           if (boost::is_base_and_derived<Symbol<Type<TypeBase> >,
