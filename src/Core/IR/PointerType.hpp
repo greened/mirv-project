@@ -42,6 +42,9 @@ namespace mirv {
       ptr<Node<Base>>::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
+      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(shared_from_this());
+      }
 
       // FIXME: This is target-dependent.
       BitSizeType bitsize(void) const {

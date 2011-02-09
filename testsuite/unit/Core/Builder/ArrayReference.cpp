@@ -6,7 +6,7 @@
 // STDOUT:    {
 // STDOUT:       assign
 // STDOUT:          vref b
-// STDOUT:          cref int32 0
+// STDOUT:          cref int32 1
 // STDOUT:       assign
 // STDOUT:          vref b
 // STDOUT:          +

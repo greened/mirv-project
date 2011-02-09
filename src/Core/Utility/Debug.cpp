@@ -7,7 +7,7 @@ namespace mirv {
 
   void dump(ptr<Node<Base> >::const_type node) 
   {
-    PrintFilter print(std::cerr);
-    print(node);
+    //PrintFilter print(std::cerr);
+    //print(node);
   }
 }
