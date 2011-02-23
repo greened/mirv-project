@@ -2,7 +2,8 @@
 #define mirv_Core_Builder_VoidTypeGrammar_hpp
 
 #include <mirv/Core/Builder/VoidTypeRules.hpp>
-#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/fusion/include/transform.hpp>

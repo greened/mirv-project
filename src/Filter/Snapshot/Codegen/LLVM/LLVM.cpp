@@ -70,16 +70,26 @@ namespace mirv {
   void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<Integral> > >::const_type type) 
   {
-    TheType = llvm::IntegerType::get(Context, type->bitsize());
+    ptr<Expression<Reference<Constant<Base> > > >::type expr =
+      safe_cast<Expression<Reference<Constant<Base> > > >(type->bitsize());
+    ptr<Symbol<Constant<std::uint64_t> > >::type constant =
+      safe_cast<Symbol<Constant<std::uint64_t> > >(expr->getSymbol());
+
+    TheType = llvm::IntegerType::get(Context, constant->value());
   }
 
   void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<Floating> > >::const_type type) 
   {
-    checkInvariant(type->bitsize() == 32
-      || type->bitsize() == 64,
-      "Unexpected floating type");
-    TheType = type->bitsize() == 32 ?
+    ptr<Expression<Reference<Constant<Base> > > >::type expr =
+      safe_cast<Expression<Reference<Constant<Base> > > >(type->bitsize());
+    ptr<Symbol<Constant<std::uint64_t> > >::type constant =
+      safe_cast<Symbol<Constant<std::uint64_t> > >(expr->getSymbol());
+
+    checkInvariant(constant->value() == 32
+                   || constant->value() == 64,
+                   "Unexpected floating type");
+    TheType = constant->value() == 32 ?
       llvm::Type::getFloatTy(Context) :   
       llvm::Type::getDoubleTy(Context);
   }

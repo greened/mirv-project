@@ -7,6 +7,9 @@
 #include <mirv/Core/Builder/TypeGrammar.hpp>
 #include <mirv/Core/Builder/FunctionTypeRules.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
+#include <mirv/Core/IR/FunctionTypeFwd.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/proto/proto.hpp>
@@ -32,7 +35,7 @@ namespace mirv {
         return TernaryConstructSymbol<Symbol<Type<FunctionType> > >()(
           symtab, a1, boost::fusion::transform(
             boost::fusion::pop_front(a2), translator),
-          Symbol<Type<FunctionType> >::VarargMark::NotVararg);
+          VarargMark::NotVararg);
         }
       };
 
@@ -51,7 +54,7 @@ namespace mirv {
               boost::fusion::pop_front(
                 boost::fusion::pop_back(a2)),
               translator),
-            Symbol<Type<FunctionType>>::VarargMark::Vararg);
+            VarargMark::Vararg);
         }
       };
     }

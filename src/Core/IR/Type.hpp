@@ -1,6 +1,8 @@
 #ifndef mirv_Core_IR_Type_hpp
 #define mirv_Core_IR_Type_hpp
 
+#include <mirv/Core/IR/Base.hpp>
+#include <mirv/Core/IR/ExpressionFwd.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 
 namespace mirv {
@@ -44,7 +46,7 @@ namespace mirv {
     class Interface : public InterfaceBaseType {
     public:
       Interface(const std::string &name) : InterfaceBaseType(name) {}
-      typedef int BitSizeType;
+      typedef ptr<Expression<Base> >::type BitSizeType;
       virtual BitSizeType bitsize(void) const = 0;
     };
 
@@ -143,15 +145,13 @@ namespace mirv {
 
     class Interface : public InterfaceBaseType {
     private:
-      BitSizeType bsize;
+      std::uint64_t bsize;
 
     public:
-      Interface(const std::string &name, BitSizeType s)
+      Interface(const std::string &name, std::uint64_t s)
           : InterfaceBaseType(name), bsize(s) {};
 
-      BitSizeType bitsize(void) const {
-        return bsize;
-      }
+      BitSizeType bitsize(void) const;
     };
 
   public:
