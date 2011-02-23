@@ -47,9 +47,7 @@ namespace mirv {
       }
 
       // FIXME: This is target-dependent.
-      BitSizeType bitsize(void) const {
-        return 64;
-      }
+      BitSizeType bitsize(void) const;
     };
 
   public:

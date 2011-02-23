@@ -138,6 +138,7 @@ namespace mirv {
      template<typename Child, typename BaseType, bool TrackParent = true>
     class InnerImpl : public BaseType {
     public:
+       typedef Child ChildType;
       typedef typename boost::shared_ptr<Child> ChildPtr;
       typedef typename boost::shared_ptr<const Child> ConstChildPtr;
 

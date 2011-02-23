@@ -49,10 +49,7 @@ namespace mirv {
       /// Construct a struct type with no members.
       Interface(const std::string &name) : InterfaceBaseType(name) {}
 
-      BitSizeType bitsize(void) const {
-        // TODO: This depends on ABI rules.
-        return 0;
-      }
+      BitSizeType bitsize(void) const;
 
       /// Get the start of the member type sequence.
       iterator memberBegin(void) {

@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_FunctionType_hpp
 #define mirv_Core_IR_FunctionType_hpp
 
+#include <mirv/Core/IR/FunctionTypeFwd.hpp>
 #include <mirv/Core/IR/Type.hpp>
 
 #include <boost/bind.hpp>
@@ -80,13 +81,6 @@ namespace mirv {
       typedef Symbol<Type<TypeBase> > ChildType;
       typedef ptr<ChildType>::const_type ChildPtr;
       typedef ptr<ChildType>::const_type ConstChildPtr;
-
-      /// Name some booleans to clarify code when setting a function
-      /// vararg.
-      enum VarargMark {
-        Vararg = true,
-        NotVararg = false
-      };
 
     private:
       /// Mark whether this function is vararg.
@@ -197,9 +191,7 @@ namespace mirv {
                                             _1));
       }
 
-      BitSizeType bitsize(void) const {
-        return 0;
-      }
+      BitSizeType bitsize(void) const;
 
       ChildPtr getReturnType(void) {
         return(front());
@@ -250,10 +242,9 @@ namespace mirv {
 
     static std::string
     getName(ptr<Symbol<Type<TypeBase> > >::const_type returnType,
-            Interface::VarargMark vararg) {
+            VarargMark vararg) {
       const char *args =
-        vararg == Symbol<Type<FunctionType> >::VarargMark::Vararg ?
-        " (...)" : " ()";
+        vararg == VarargMark::Vararg ? " (...)" : " ()";
 
       if (returnType) {
         return returnType->name() + args;
@@ -267,7 +258,7 @@ namespace mirv {
     static std::string
     getName(ptr<Symbol<Type<TypeBase> > >::const_type returnType,
             const FusionSequence &argTypes,
-            Interface::VarargMark vararg) {
+            VarargMark vararg) {
       std::stringstream name;
       if (returnType) {
           name << returnType->name() << " (";
@@ -281,7 +272,7 @@ namespace mirv {
         > outputArgs(name);
 
       outputArgs(argTypes,
-                 vararg == Symbol<Type<FunctionType> >::VarargMark::Vararg);
+                 vararg == VarargMark::Vararg);
 
       name << ")";
       return name.str();
