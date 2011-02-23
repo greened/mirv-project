@@ -226,15 +226,30 @@ namespace mirv {
 
   public:
     InnerExpression(ChildPtr Child) : BaseType(Child) {}
+    InnerExpression(ConstChildPtr Child)
+        : BaseType(boost::const_pointer_cast<ChildType>(Child)) {}
     InnerExpression(ChildPtr Child1,
 		    ChildPtr Child2) : BaseType(Child1, Child2) {}
+    InnerExpression(ConstChildPtr Child1,
+		    ConstChildPtr Child2)
+        : BaseType(boost::const_pointer_cast<ChildType>(Child1),
+                   boost::const_pointer_cast<ChildType>(Child2)) {}
     template<typename Sequence>
     InnerExpression(ChildPtr Child1,
 		    Sequence Children) : BaseType(Child1, Children) {}
+    template<typename Sequence>
+    InnerExpression(ConstChildPtr Child1,
+		    Sequence Children) :
+        BaseType(boost::const_pointer_cast<ChildType>(Child1), Children) {}
     template<typename InputIterator>
     InnerExpression(ChildPtr Child1,
 		    InputIterator start,
                     InputIterator end) : BaseType(Child1, start, end) {}
+    template<typename InputIterator>
+    InnerExpression(ConstChildPtr Child1,
+		    InputIterator start,
+                    InputIterator end)
+        : BaseType(boost::const_pointer_cast<ChildType>(Child1), start, end) {}
   };
 
   /// This is an expression with no children.
@@ -263,6 +278,7 @@ namespace mirv {
       typedef ptr<ChildType>::const_type ConstChildPtr;
 
       Interface(ChildPtr Child) : InterfaceBaseType(Child) {}
+      // Interface(ConstChildPtr Child) : InterfaceBaseType(Child) {}
 
       /// Set the child expression.
       void setOperand(ChildPtr c) {
@@ -309,6 +325,12 @@ namespace mirv {
         checkInvariant(Child1->type() == Child2->type(),
                        "Expression type mismatch");
       }
+
+      // Interface(ConstChildPtr Child1,
+      //           ConstChildPtr Child2) : InterfaceBaseType(Child1, Child2) {
+      //   checkInvariant(Child1->type() == Child2->type(),
+      //                  "Expression type mismatch");
+      // }
 
       /// Set the left child expression.
       void setLeftOperand(ChildPtr c) {

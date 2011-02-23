@@ -5,9 +5,13 @@
 
 #include <mirv/Core/Builder/ArrayTypeRules.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
+#include <mirv/Core/IR/ArrayTypeFwd.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 
+#include <boost/bind/bind.hpp>
 #include <boost/proto/proto.hpp>
+#include <boost/fusion/algorithm.hpp>
 #include <boost/fusion/iterator.hpp>
 #include <boost/fusion/include/transform.hpp>
 

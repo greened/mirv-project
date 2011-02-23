@@ -2,30 +2,25 @@
 #define mirv_Core_Builder_ConstantGrammar_hpp
 
 #include <mirv/Core/Builder/ConstantRules.hpp>
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/Builder/TypeLookupGrammar.hpp>
-#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/Builder/ConstantSymbolTransforms.hpp>
 
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
   namespace Builder {
     namespace detail {
-      struct IntegralTypeName {
-        typedef std::string result_type;
+      struct IntegralTypeGen {
+        typedef ptr<Symbol<Type<Integral> > >::const_type result_type;
 
-        result_type operator()(size_t bitsize) {
-          return "int" + boost::lexical_cast<std::string>(bitsize);
-        }
+        result_type operator()(ptr<SymbolTable>::type symtab,
+                               size_t bitsize);
       };
  
-      struct FloatingTypeName {
-        typedef std::string result_type;
+      struct FloatingTypeGen {
+        typedef ptr<Symbol<Type<Floating> > >::const_type result_type;
 
-        result_type operator()(size_t bitsize) {
-          return "float"
-            + boost::lexical_cast<std::string>(bitsize);
-        }
+        result_type operator()(ptr<SymbolTable>::type symtab,
+                               size_t bitsize);
       };
     }
 
@@ -33,14 +28,14 @@ namespace mirv {
     struct ConstantBuilder : boost::proto::or_<
       boost::proto::when<
         IntegralConstantRule,
-        ConstructConstantSymbol<detail::IntegralTypeName>(
+        ConstructConstantSymbol<detail::IntegralTypeGen>(
             boost::proto::_data,
             // Constant expression
             boost::proto::_expr)
             >,
       boost::proto::when<
         FloatingConstantRule,
-        ConstructConstantSymbol<detail::FloatingTypeName>(
+        ConstructConstantSymbol<detail::FloatingTypeGen>(
             boost::proto::_data,
             // Constant expression
             boost::proto::_expr)

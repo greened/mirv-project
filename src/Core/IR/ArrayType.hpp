@@ -127,11 +127,7 @@ namespace mirv {
          return dimensions.size();
        }
 
-         BitSizeType bitsize(void) const {
-            return(std::accumulate(dimensionBegin(), dimensionEnd(),
-                                   getElementType()->bitsize(),
-                                   std::multiplies<size_type>()));
-	 }
+       BitSizeType bitsize(void) const;
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
