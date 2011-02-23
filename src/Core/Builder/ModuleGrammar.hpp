@@ -13,7 +13,7 @@
 namespace mirv {
   namespace Builder {
     /// This is a callable transform to get the current module.
-    struct GetModule : boost::proto::callable {
+    struct GetBuiltModule : boost::proto::callable {
       typedef ptr<Symbol<Module> >::type result_type;
 
       template<typename T>
@@ -46,7 +46,7 @@ namespace mirv {
     /// This is the grammar for module symbols.
     struct ModuleBuilder : boost::proto::when<
       ModuleRule,
-      GetModule(
+      GetBuiltModule(
         boost::proto::_data,
         ModuleBodyBuilder(
           boost::proto::_right,

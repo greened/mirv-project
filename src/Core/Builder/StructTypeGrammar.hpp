@@ -5,7 +5,9 @@
 
 #include <mirv/Core/Builder/StructTypeRules.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/StructTypeFwd.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/fusion/iterator.hpp>

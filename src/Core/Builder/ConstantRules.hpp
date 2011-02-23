@@ -3,11 +3,6 @@
 
 #include <cstdint>
 
-#include <mirv/Core/Builder/ConstantRulesFwd.hpp>
-
-#include <mirv/Core/Builder/TypeLookupRules.hpp>
-#include <mirv/Core/Builder/Wrapper.hpp>
-
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
