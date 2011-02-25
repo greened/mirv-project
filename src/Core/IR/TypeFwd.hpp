@@ -15,6 +15,7 @@ namespace mirv {
   struct Pointer;
   struct FunctionType;
   struct StructType;
+  struct Tuple;
 }
 
 #endif

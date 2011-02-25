@@ -11,6 +11,7 @@
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
 
 namespace mirv {
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Base> >::type s) {};
@@ -161,6 +162,11 @@ namespace mirv {
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::type s) {
     ptr<Symbol<Type<StructType> >::VisitorBaseType>::type p = fast_cast<Symbol<Type<StructType> >::VisitorBaseType>(s);
+    visit(p);
+  }
+
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<Tuple> > >::type s) {
+    ptr<Symbol<Type<Tuple> >::VisitorBaseType>::type p = fast_cast<Symbol<Type<Tuple> >::VisitorBaseType>(s);
     visit(p);
   }
 }
