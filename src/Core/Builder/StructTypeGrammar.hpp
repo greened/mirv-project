@@ -5,7 +5,7 @@
 
 #include <mirv/Core/Builder/StructTypeRules.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/IR/StructTypeFwd.hpp>
+#include <mirv/Core/IR/TupleTypeFwd.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 
@@ -67,7 +67,7 @@ namespace mirv {
 
     /// This is a callable transform to construct a struct type.
     struct ConstructStructTypeSymbol : boost::proto::callable {
-      typedef ptr<Symbol<Type<StructType> > >::const_type result_type;
+      typedef ptr<Symbol<Type<Tuple> > >::const_type result_type;
 
       template<typename List>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -76,7 +76,7 @@ namespace mirv {
         //std::cout << "Building struct:\n";
         //boost::proto::display_expr(memberList);
 
-        return BinaryConstructSymbol<Symbol<Type<StructType> > >()(
+        return BinaryConstructSymbol<Symbol<Type<Tuple> > >()(
           symtab, name, detail::translateList(symtab, memberList));
       }
     };

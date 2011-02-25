@@ -127,10 +127,9 @@ namespace mirv {
         ChildList temp;
         boost::fusion::for_each(members,
                                 boost::bind(
-                                  static_cast<void (ChildList::*)(
-                                    const ChildPtr &)>(
-                                      &std::vector<ConstChildPtr>::push_back),
-                                  temp,
+                                  static_cast<void (ChildList::*)(const ConstChildPtr &)>(
+                                      &ChildList::push_back),
+                                  &temp,
                                   _1));
         construct(temp.begin(), temp.end());
       }

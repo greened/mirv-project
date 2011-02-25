@@ -62,6 +62,26 @@ namespace mirv {
     out << indent(ind) << "}";
   }
 
+  void PrintFilter::EnterDeclSymbolVisitor::visit(ptr<Symbol<Type<Tuple> > >::const_type sym)
+  {
+    Stream &out = attributeManager.getInheritedAttribute().out();
+    Indent ind = attributeManager.getInheritedAttribute().indent();
+
+    out << indent(ind) << "tdecl " << sym->name();
+    out << " (\n";
+    for (Symbol<Type<StructType> >::const_iterator p =
+	   sym->begin(), pend = sym->end();
+	 p != pend;
+	 /* NULL */) {
+      out << indent(ind+IndentFactor) << (*p)->name();
+      if (++p != pend) {
+        out << ',';
+      }
+      out << '\n';
+    }
+    out << indent(ind) << ")";
+  }
+
   /// Print the final newline after each symbol declaration.
   void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Base> >::const_type)
   {
@@ -79,8 +99,18 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
   }
 
-      /// Print the final newline after struct types.
+  /// Print the final newline after struct types.
   void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::const_type)
+  {
+    if (   !attributeManager.setLastSynthesizedAttribute()
+        || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
+      attributeManager.getInheritedAttribute().out() << "\n";
+    }
+    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+  }
+
+  /// Print the final newline after tuple types.
+  void PrintFilter::LeaveDeclSymbolVisitor::visit(ptr<Symbol<Type<Tuple> > >::const_type)
   {
     if (   !attributeManager.setLastSynthesizedAttribute()
         || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
