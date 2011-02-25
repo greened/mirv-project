@@ -1,15 +1,15 @@
 // Test building of struct types.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    tdecl testnest {
+// STDOUT:    tdecl testnest (
 // STDOUT:       int32
-// STDOUT:    }
-// STDOUT:    tdecl teststruct {
+// STDOUT:    )
+// STDOUT:    tdecl teststruct (
 // STDOUT:       int32,
 // STDOUT:       float32,
 // STDOUT:       testnest,
 // STDOUT:       int16
-// STDOUT:    }
+// STDOUT:    )
 // STDOUT: }
 
 #include <mirv/Core/IR/Module.hpp>
@@ -18,7 +18,7 @@
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Core/Builder/SymbolGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
