@@ -4,6 +4,7 @@
 #include <mirv/Core/Filter/ConstExpressionVisitor.hpp>
 #include <mirv/Core/Filter/Dataflow.hpp>
 #include <mirv/Core/IR/Expression.hpp>
+#include <mirv/Core/Filter/Action.hpp>
 
 namespace mirv {
   /// This is the base class of all flows that operate on expressions.

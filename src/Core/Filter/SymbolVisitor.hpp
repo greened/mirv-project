@@ -51,7 +51,9 @@ namespace mirv {
 	ptr<Symbol<Type<Floating> > >::type,
 	ptr<Symbol<Type<Array> > >::type,
 	ptr<Symbol<Type<Pointer> > >::type,
-	ptr<Symbol<Type<FunctionType> > >::type
+	ptr<Symbol<Type<FunctionType> > >::type,
+	ptr<Symbol<Type<StructType> > >::type,
+	ptr<Symbol<Type<Tuple> > >::type
 	> > {
   public:
     virtual void visit(ptr<Symbol<Base> >::type);
@@ -88,6 +90,7 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Type<Pointer> > >::type);
     virtual void visit(ptr<Symbol<Type<FunctionType> > >::type);
     virtual void visit(ptr<Symbol<Type<StructType> > >::type);
+    virtual void visit(ptr<Symbol<Type<Tuple> > >::type);
   };
 }
 

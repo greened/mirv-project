@@ -22,5 +22,6 @@
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
 
 #endif
