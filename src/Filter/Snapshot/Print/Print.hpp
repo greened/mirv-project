@@ -241,7 +241,7 @@ namespace mirv {
       void visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr);
       void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
       void visit(ptr<Expression<Reference<Function> > >::const_type expr);
-      void visit(ptr<Expression<Reference<Array> > >::const_type expr);
+      void visit(ptr<Expression<Reference<Tuple> > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::const_type expr);

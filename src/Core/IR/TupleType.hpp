@@ -42,17 +42,16 @@ namespace mirv {
       }
 
       if (same) {
-        return "(" + type->name() + " x " + "i64 "
-          + boost::lexical_cast<std::string>(count) + ")";
+        return "(" + boost::lexical_cast<std::string>(count)
+          + " x " + type->name() + ")";
       }
 
       std::stringstream result;
 
       result << "(";
 
-      // Print the most significant dimension first.
-      std::copy(boost::make_transform_iterator(end, TypeName()),
-                boost::make_transform_iterator(start, TypeName()),
+      std::copy(boost::make_transform_iterator(start, TypeName()),
+                boost::make_transform_iterator(end, TypeName()),
                 std::ostream_iterator<std::string>(result, ","));
 
       // Knock off the last delimiter.
@@ -106,9 +105,8 @@ namespace mirv {
 
       Interface(ConstChildPtr ElementType,
                 ptr<Expression<Base> >::type count) :
-          InterfaceBaseType("(" + ElementType->name() + " x "
-                            + detail::stringize(count)
-                            + ")"),
+          InterfaceBaseType("(" + detail::stringize(count) + " x "
+                            + ElementType->name() + ")"),
             multiplier(count) {
         push_back(ElementType);
       }
@@ -144,7 +142,14 @@ namespace mirv {
       /// Construct a tuple type with no members.
       Interface(const std::string &name) : InterfaceBaseType(name) {}
 
+      ptr<Symbol<Type<TypeBase> > >::const_type
+      elementType(ptr<Expression<Base> >::const_type) const;
+
       BitSizeType bitsize(void) const;
+
+      bool isUniform(void) const {
+        return multiplier;
+      }
 
       ptr<Node<Base>>::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
@@ -161,8 +166,8 @@ namespace mirv {
     static std::string
     getName(ptr<Symbol<Type<TypeBase> > >::const_type elementType,
             ptr<Expression<Base> >::type count) {
-      return "(" + elementType->name() + " x "
-        + detail::stringize(count) + ")";
+      return "(" + detail::stringize(count) + " x " + elementType->name()
+        +  ")";
     }
 
     template<typename InputIterator>

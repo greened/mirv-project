@@ -48,7 +48,7 @@ namespace mirv {
 
         virtual void visit(ptr<Symbol<Type<Integral> > >::const_type);
         virtual void visit(ptr<Symbol<Type<Floating> > >::const_type);
-        virtual void visit(ptr<Symbol<Type<Array> > >::const_type);
+        virtual void visit(ptr<Symbol<Type<Tuple> > >::const_type);
         virtual void visit(ptr<Symbol<Type<Pointer> > >::const_type);
         virtual void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
         virtual void visit(ptr<Symbol<Type<StructType> > >::const_type);

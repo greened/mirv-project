@@ -274,14 +274,14 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
     struct ArrayRefBuilder : boost::proto::or_<
       boost::proto::when<
         MultiSubscriptRule,
-        ConstructNaryFlat<Expression<Reference<Array> > >(
+        ConstructNaryFlat<Expression<Reference<Tuple> > >(
           boost::proto::_data,
           ConstructExpressionGrammar(boost::proto::_left),
           boost::proto::_right)
         >,
       boost::proto::when<
         SubscriptRule,
-        ConstructBinary<Expression<Reference<Array> > >(
+        ConstructBinary<Expression<Reference<Tuple> > >(
           boost::proto::_data,
           ConstructExpressionGrammar(boost::proto::_left),
           ConstructExpressionGrammar(boost::proto::_right))
