@@ -96,14 +96,14 @@ namespace mirv {
 
   /// Specify the interface for array index expressions.
   template<>
-  class Reference<Array> { 
+  class Reference<Tuple> { 
   private:
     // We need to manually define the interface to override
     // InnerExpression's type() implementation.
     class Interface
         : public InnerExpression,
     //public Expression<Ref>,
-          public boost::enable_shared_from_this<Expression<Reference<Array> > > {
+          public boost::enable_shared_from_this<Expression<Reference<Tuple> > > {
     private:
       Expression<Base> *cloneImpl(void) {
         std::vector<ptr<Expression<Base> >::type> children;
@@ -112,11 +112,11 @@ namespace mirv {
           children.push_back((*i)->clone());
         }
 
-        ptr<Expression<Reference<Array> > >::type expr(
-          mirv::make<Expression<Reference<Array> > >(*children.begin(),
+        ptr<Expression<Reference<Tuple> > >::type expr(
+          mirv::make<Expression<Reference<Tuple> > >(*children.begin(),
                                                      children.begin() + 1,
                                                      children.end()));
-        Expression<Reference<Array> > *result = expr.get();
+        Expression<Reference<Tuple> > *result = expr.get();
         expr.reset();
         return result;
       }

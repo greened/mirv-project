@@ -29,7 +29,7 @@ namespace mirv {
         private:
           /// The stream to dump to.
           Stream *ot;
-          
+
         public:
           InheritedAttribute(void) : ot(0) {}
           InheritedAttribute(Stream &o) : ot(&o) {}
@@ -51,13 +51,14 @@ namespace mirv {
         class EnterExpressionVisitor : public ConstExpressionVisitor {
         private:
           FlowAttributeManagerType &attributeManager;
+          bool printed;
 
           template<typename ValueType>
           void visitConstant(boost::shared_ptr<const Expression<Reference<Constant<ValueType> > > > expr);
 
         public:
           EnterExpressionVisitor(FlowAttributeManagerType &am)
-              : attributeManager(am) {}
+              : attributeManager(am), printed(false) {}
 
           void visit(ptr<Expression<Add> >::const_type expr);
           void visit(ptr<Expression<Subtract> >::const_type expr);
@@ -79,7 +80,7 @@ namespace mirv {
           void visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr);
           void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
           void visit(ptr<Expression<Reference<Function> > >::const_type expr);
-          void visit(ptr<Expression<Reference<Array> > >::const_type expr);
+          void visit(ptr<Expression<Reference<Tuple> > >::const_type expr);
           void visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::const_type expr);
           void visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::const_type expr);
           void visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::const_type expr);
@@ -137,7 +138,7 @@ namespace mirv {
         void operator()(ptr<Node<Base> >::const_type node) {
           ptr<Expression<Base> >::const_type e =
             safe_cast<const Expression<Base> >(node);
-          ptr<ConstExpressionVisitor>::type flow(new PrintExpressionFlow(out));
+         ptr<ConstExpressionVisitor>::type flow(new PrintExpressionFlow(out));
           e->accept(*flow);
         }
       };
@@ -145,123 +146,142 @@ namespace mirv {
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Add> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "+ ";
+        out << (printed ? " +" : "+");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Subtract> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "- ";
+        out << (printed ? " -" : "-");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Multiply> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "* ";
+        out << (printed ? " *" : "*");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Divide> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "/ ";
+        out << (printed ? " /" : "/");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Modulus> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "% ";
+        out << (printed ? " %" : "%");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Negate> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "neg ";
+        out << (printed ? " neg" : "neg");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "&& ";
+        out << (printed ? " &&" : "&&");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalOr> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "|| ";
+        out << (printed ? " ||" : "||");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LogicalNot> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "! ";
+        out << (printed ? " !" : "!");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "& ";
+        out << (printed ? " &" : "&");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "| ";
+        out << (printed ? " |" : "|");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "~ ";
+        out << (printed ? " ~" : "~");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThan> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "< ";
+        out << (printed ? " <" : "<");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "<= ";
+        out << (printed ? " <=" : "<=");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Equal> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "== ";
+        out << (printed ? " ==" : "=="); 
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<NotEqual> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "!= ";
+        out << (printed ? " !=" : "!=");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThan> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "> ";
+        out << (printed ? " >" : ">");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << ">= ";
+        out << (printed ? " >=" : ">=");
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << expr->getSymbol()->name() << ' ';
+        out << (printed ? " " : "") << expr->getSymbol()->name();
+        printed = true;
       }
 
       template<typename ValueType>
       void ExpressionPrintFilter::EnterExpressionVisitor::visitConstant(boost::shared_ptr<const Expression<Reference<Constant<ValueType> > > > expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << expr->getSymbol()->type()->name()
-          << ' ' << expr->getSymbol()->valueString() << ' ';
+        out << (printed ? " " : "") << expr->getSymbol()->valueString();
+        printed = true;
       }
 
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr)
@@ -322,13 +342,15 @@ namespace mirv {
       void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << expr->getSymbol()->name() << ' ';
+        out << (printed ? " " : "") << expr->getSymbol()->name();
+        printed = true;
       }
 
-      void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Array> > >::const_type expr)
+      void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Tuple> > >::const_type expr)
       {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        out << "aref ";
+        out << (printed ? " tref" : "tref");
+        printed = true;
       }
     }
 
@@ -336,6 +358,7 @@ namespace mirv {
     {
       std::stringstream stream;
       ExpressionPrintFilter print(stream);
+      print(expr);
       return stream.str();
     }
   }
@@ -347,6 +370,23 @@ namespace mirv {
     push_back(t);
     multiplier =
       Builder::makeExpression(count, this->parent<Symbol<Module> >());
+  }
+
+  ptr<Symbol<Type<TypeBase> > >::const_type
+  Tuple::Interface::elementType(ptr<Expression<Base> >::const_type index) const
+  {
+    if (multiplier) {
+      // Types are uniform.
+      return *begin();
+    }
+    // index must be an integer constant.
+    ptr<Expression<Reference<Constant<Base> > > >::const_type cref =
+      safe_cast<const Expression<Reference<Constant<Base> > > >(index);
+    ptr<Symbol<Constant<std::uint64_t> > >::const_type constant =
+      safe_cast<const Symbol<Constant<std::uint64_t> > >(cref->getSymbol());
+    auto type = begin();
+    std::advance(type, constant->value());
+    return *type;
   }
 
   Tuple::Interface::BitSizeType Tuple::Interface::bitsize(void) const

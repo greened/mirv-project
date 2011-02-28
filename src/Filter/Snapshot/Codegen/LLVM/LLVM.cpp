@@ -95,22 +95,33 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::FlowAttribute::
-  TypeCreator::visit(ptr<Symbol<Type<Array> > >::const_type type) 
+  TypeCreator::visit(ptr<Symbol<Type<Tuple> > >::const_type type) 
   {
     // TODO: See about making some of these vector types.
-    // Get the element type.
-    type->getElementType()->accept(*this);
 
-    const llvm::Type *elementType = TheType;
+    if (type->isUniform()) {
+      (*type->begin())->accept(*this);
+      const llvm::Type *elementType = TheType;
 
-    // Construct series of LLVM ArrayTypes, one for each dimension.
-    for (auto d = type->dimensionRBegin();
-         d != type->dimensionREnd();
-         ++d) {
-      elementType = llvm::ArrayType::get(elementType, *d);
+      // Size must be an integer constant for LLVM.
+      ptr<Expression<Reference<Constant<Base> > > >::const_type cref =
+        safe_cast<const Expression<Reference<Constant<Base> > > >(type->bitsize());
+      ptr<Symbol<Constant<std::uint64_t> > >::const_type constant =
+        safe_cast<const Symbol<Constant<std::uint64_t> > >(cref->getSymbol());
+      TheType = llvm::ArrayType::get(elementType, constant->value());
+      return;
     }
 
-    TheType = elementType;
+    // Create a struct type.
+    std::vector<const llvm::Type *> memberTypes;
+    for (auto m = type->begin();
+         m != type->end();
+         ++m) {
+      (*m)->accept(*this);
+      memberTypes.push_back(TheType);
+    }
+
+    TheType = llvm::StructType::get(Context, memberTypes);
   }
 
   void LLVMCodegenFilter::FlowAttribute::

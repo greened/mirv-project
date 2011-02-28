@@ -1,7 +1,7 @@
 // Test building of array types.
 //
 // STDOUT: fdef testfunc {
-// STDOUT:    vdecl a int32[5,4,3]
+// STDOUT:    vdecl a (5 x (4 x (3 x int32)))
 // STDOUT:    {
 // STDOUT: 
 // STDOUT:    }
@@ -16,6 +16,7 @@
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
