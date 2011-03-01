@@ -156,20 +156,6 @@ namespace mirv {
     TheType = llvm::FunctionType::get(returnType, parameterTypes, false);
   }
 
-  void LLVMCodegenFilter::FlowAttribute::
-  TypeCreator::visit(ptr<Symbol<Type<StructType> > >::const_type type)
-  {
-    std::vector<const llvm::Type *> memberTypes;
-    for (auto m = type->memberBegin();
-         m != type->memberEnd();
-         ++m) {
-      (*m)->accept(*this);
-      memberTypes.push_back(TheType);
-    }
-
-    TheType = llvm::StructType::get(Context, memberTypes);
-  }
-  
   void LLVMCodegenFilter::
   EnterSymbolVisitor::visit(ptr<Symbol<Module> >::type sym)
   {
