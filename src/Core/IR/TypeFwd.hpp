@@ -11,10 +11,8 @@ namespace mirv {
   struct Integral;
   struct Floating;
   struct Derived;
-  struct Array;
   struct Pointer;
   struct FunctionType;
-  struct StructType;
   struct Tuple;
 }
 

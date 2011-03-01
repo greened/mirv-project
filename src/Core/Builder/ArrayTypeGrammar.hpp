@@ -5,7 +5,6 @@
 
 #include <mirv/Core/Builder/ArrayTypeRules.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/IR/ArrayTypeFwd.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 

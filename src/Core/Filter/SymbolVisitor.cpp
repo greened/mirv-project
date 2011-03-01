@@ -7,10 +7,8 @@
 #include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
 #include <mirv/Core/IR/TupleType.hpp>
 
 namespace mirv {
@@ -145,11 +143,6 @@ namespace mirv {
     visit(p);
   }
 
-  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<Array> > >::type s) {
-    ptr<Symbol<Type<Array> >::VisitorBaseType>::type p = fast_cast<Symbol<Type<Array> >::VisitorBaseType>(s);
-    visit(p);
-  }
-
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<Pointer> > >::type s) {
     ptr<Symbol<Type<Pointer> >::VisitorBaseType>::type p = fast_cast<Symbol<Type<Pointer> >::VisitorBaseType>(s);
     visit(p);
@@ -157,11 +150,6 @@ namespace mirv {
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<FunctionType> > >::type s) {
     ptr<Symbol<Type<FunctionType> >::VisitorBaseType>::type p = fast_cast<Symbol<Type<FunctionType> >::VisitorBaseType>(s);
-    visit(p);
-  }
-
-  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Type<StructType> > >::type s) {
-    ptr<Symbol<Type<StructType> >::VisitorBaseType>::type p = fast_cast<Symbol<Type<StructType> >::VisitorBaseType>(s);
     visit(p);
   }
 

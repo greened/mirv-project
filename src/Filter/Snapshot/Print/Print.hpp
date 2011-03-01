@@ -80,7 +80,6 @@ namespace mirv {
       void visit(ptr<Symbol<Function> >::const_type sym);
       void visit(ptr<Symbol<Variable> >::const_type sym);
       void visit(ptr<Symbol<Type<TypeBase> > >::const_type sym);
-      void visit(ptr<Symbol<Type<StructType> > >::const_type sym);
       void visit(ptr<Symbol<Type<Tuple> > >::const_type sym);
     };
 
@@ -123,9 +122,6 @@ namespace mirv {
 
       /// Do nothing for most types.
       void visit(ptr<Symbol<Type<TypeBase> >  >::const_type);
-
-      /// Print the final newline after struct types.
-      void visit(ptr<Symbol<Type<StructType> > >::const_type);
 
       /// Print the final newline after tuple types.
       void visit(ptr<Symbol<Type<Tuple> > >::const_type);
