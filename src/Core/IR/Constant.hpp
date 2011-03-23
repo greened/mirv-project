@@ -28,7 +28,6 @@ namespace mirv {
     public:
       Interface(ptr<Symbol<Type<TypeBase> > >::const_type type)
           : Symbol<Typed>(type) {}
-
       virtual std::string valueString(void) const = 0;
     };
 
@@ -66,6 +65,9 @@ namespace mirv {
     };
 
   public:
+    static void
+    initialize(typename ptr<Symbol<Constant<ValueType> > >::type constant) {}
+
     typedef Interface BaseType;
     typedef Symbol<Constant<Base>> VisitorBaseType;
   };

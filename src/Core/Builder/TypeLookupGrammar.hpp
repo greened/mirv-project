@@ -1,11 +1,10 @@
 #ifndef mirv_Core_Builder_TypeLookupGrammar_hpp
 #define mirv_Core_Builder_TypeLookupGrammar_hpp
 
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
+#include <mirv/Core/Builder/SymbolTable.hpp>
 #include <mirv/Core/Builder/SymbolTerminals.hpp>
 #include <mirv/Core/Builder/TypeGrammar.hpp>
-#include <mirv/Core/Builder/FunctionTypeGrammar.hpp>
-#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 

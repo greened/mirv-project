@@ -7,10 +7,7 @@
 #include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
-#include <mirv/Core/IR/StructType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
@@ -307,8 +304,8 @@ namespace mirv {
 
   template
   void
-  Visitable<Expression<Reference<Array> >, ExpressionVisitor>::accept(ExpressionVisitor &);
+  Visitable<Expression<Reference<Tuple> >, ExpressionVisitor>::accept(ExpressionVisitor &);
   template
   void
-  ConstVisitable<Expression<Reference<Array> >, ConstExpressionVisitor, ExpressionVisitor>::accept(ConstExpressionVisitor &) const;
+  ConstVisitable<Expression<Reference<Tuple> >, ConstExpressionVisitor, ExpressionVisitor>::accept(ConstExpressionVisitor &) const;
 }

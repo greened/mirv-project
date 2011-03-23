@@ -18,13 +18,13 @@ namespace mirv {
 
     template<typename Node>
     result_type operator()(boost::shared_ptr<Node>) {}
-    template<typename Node1, typename Node2>
-    result_type operator()(boost::shared_ptr<Node1>,
-                           boost::shared_ptr<Node2>) {}
-    template<typename Node1, typename Node2, typename Node3>
-    result_type operator()(boost::shared_ptr<Node1>,
-                           boost::shared_ptr<Node2>,
-                           boost::shared_ptr<Node3>) {}
+    template<typename Parent, typename InputIterator>
+    result_type operator()(boost::shared_ptr<Parent>,
+                           InputIterator) {}
+    template<typename Parent, typename InputIterator1, typename InputIterator2>
+    result_type operator()(boost::shared_ptr<Parent>,
+                           InputIterator1,
+                           InputIterator2) {}
   };
 
   /// This is an action that does nothing and says never to iterate.
@@ -42,16 +42,16 @@ namespace mirv {
       return false;
     }
 
-    template<typename Node1, typename Node2>
-    result_type operator()(boost::shared_ptr<Node1>,
-                           boost::shared_ptr<Node2>) {
+    template<typename Parent, typename InputIterator>
+    result_type operator()(boost::shared_ptr<Parent>,
+                           InputIterator) {
       return false;
     }
 
-    template<typename Node1, typename Node2, typename Node3>
-    result_type operator()(boost::shared_ptr<Node1>,
-                           boost::shared_ptr<Node2>,
-                           boost::shared_ptr<Node3>) {
+    template<typename Parent, typename InputIterator1, typename InputIterator2>
+    result_type operator()(boost::shared_ptr<Parent>,
+                           InputIterator1,
+                           InputIterator2) {
       return false;
     }
   };
@@ -79,10 +79,21 @@ namespace mirv {
       return node->accept(visitor());
     }
 
-    template<typename Parent, typename Node>
+    template<typename Parent, typename InputIterator>
     result_type operator()(boost::shared_ptr<Parent>,
-                           boost::shared_ptr<Node> node) {
-      return node->accept(visitor());
+                           InputIterator node) {
+      if (*node) {
+        return (*node)->accept(visitor());
+      }
+    }
+
+    template<typename Parent, typename InputIterator1, typename InputIterator2>
+    result_type operator()(boost::shared_ptr<Parent>,
+                           InputIterator1 node,
+                           InputIterator2) {
+      if (*node) {
+        return (*node)->accept(visitor());
+      }
     }
   };
 }

@@ -1,9 +1,10 @@
 #ifndef mirv_Core_Builder_Translate_hpp
 #define mirv_Core_Builder_Translate_hpp
 
-#include <mirv/Core/IR/Statement.hpp>
-#include <mirv/Core/IR/Expression.hpp>
+#include <mirv/Core/IR/ModuleFwd.hpp>
+#include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
+#include <mirv/Core/Builder/SymbolTable.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/mpl/assert.hpp>

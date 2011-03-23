@@ -5,11 +5,16 @@
 
 #include <mirv/Core/Builder/ArrayTypeRules.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 
+#include <boost/bind/bind.hpp>
 #include <boost/proto/proto.hpp>
+#include <boost/fusion/algorithm.hpp>
 #include <boost/fusion/iterator.hpp>
 #include <boost/fusion/include/transform.hpp>
+
+#include <cstdint>
 
 namespace mirv {
   namespace Builder {
@@ -17,13 +22,19 @@ namespace mirv {
       class TypeSubscriptData {
       private:
         ptr<Symbol<Type<TypeBase> > >::const_type baseType;
-        typedef std::list<int> dimensionList;
+        typedef std::list<std::uint64_t> dimensionList;
         dimensionList dimensions;
 
       public:
+        TypeSubscriptData(ptr<Symbol<Type<TypeBase> > >::const_type e,
+                          std::uint64_t d) 
+            : baseType(e) {
+          dimensions.push_front(d);
+        }
+
         TypeSubscriptData(ptr<Symbol<Type<TypeBase> > >::const_type e, int d) 
             : baseType(e) {
-                dimensions.push_front(d);
+          dimensions.push_front(d);
         }
 
         template<typename List>
@@ -32,7 +43,10 @@ namespace mirv {
             : baseType(e) {
           boost::fusion::for_each(
             dims,
-            boost::bind(static_cast<void(dimensionList::*)(const int &)>(
+            boost::bind(static_cast<void(dimensionList::*)(const std::uint64_t &)>(
+                          // Dimensions are listed most significant to
+                          // least.  TupleType wants them least
+                          // significant to most.
                           &dimensionList::push_front),
                         boost::ref(dimensions),
                         _1));
@@ -51,7 +65,7 @@ namespace mirv {
           return dimensions.end();
         }
 
-        void push_front(int d) {
+        void push_front(std::uint64_t d) {
           dimensions.push_front(d);
         }
       };
@@ -62,6 +76,12 @@ namespace mirv {
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                                ptr<Symbol<Type<TypeBase> > >::const_type elementType,
                                int dimension) {
+          return TypeSubscriptData(elementType, dimension);
+        }
+
+        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                               ptr<Symbol<Type<TypeBase> > >::const_type elementType,
+                               std::uint64_t dimension) {
           return TypeSubscriptData(elementType, dimension);
         }
 
@@ -81,7 +101,14 @@ namespace mirv {
         typedef TypeSubscriptData result_type;
 
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                               TypeSubscriptData &subscripts,
+                               TypeSubscriptData subscripts,
+                               std::uint64_t dimension) {
+          subscripts.push_front(dimension);
+          return subscripts;
+        }
+
+        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                               TypeSubscriptData subscripts,
                                int dimension) {
           subscripts.push_front(dimension);
           return subscripts;
@@ -91,16 +118,10 @@ namespace mirv {
 
     /// This is a callable transform to construct a struct type.
     struct ConstructArrayTypeSymbol : boost::proto::callable {
-      typedef ptr<Symbol<Type<Array> > >::const_type result_type;
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             detail::TypeSubscriptData subscripts) {
-        return TernaryConstructSymbol<Symbol<Type<Array> > >()(
-          symtab,
-          subscripts.elementType(),
-          subscripts.begin(),
-          subscripts.end());
-      }
+                             detail::TypeSubscriptData subscripts);
     };
 
     struct MultiTypeSubscriptBuilder : boost::proto::when<
@@ -123,23 +144,23 @@ namespace mirv {
         boost::proto::_value(boost::proto::_right))
       > {};
 
-    // struct TypeSubscriptListBuilder;
+  struct TypeSubscriptListBuilder;
   
-    // struct StrictTypeSubscriptListBuilder : boost::proto::when<
-    //   StrictTypeSubscriptList,
-    //   detail::AddTypeSubscript(
-    //     boost::proto::_data,
-    //     TypeSubscriptListBuilder(boost::proto::_left),
-    //     boost::proto::_value(boost::proto::_right))
-    //   > {};
-
-    // struct TypeSubscriptListBuilder : boost::proto::or_<
-    //   //StrictTypeSubscriptListBuilder,
-    //   TypeSubscriptBuilder
-    //   > {};
+    struct StrictTypeSubscriptListBuilder : boost::proto::when<
+      StrictTypeSubscriptList,
+      detail::AddTypeSubscript(
+        boost::proto::_data,
+        TypeSubscriptListBuilder(boost::proto::_left),
+        boost::proto::_value(boost::proto::_right))
+      > {};
+    
+    struct TypeSubscriptListBuilder : boost::proto::or_<
+      StrictTypeSubscriptListBuilder,
+      TypeSubscriptBuilder
+      > {};
 
     struct TypeDimensionListBuilder : boost::proto::or_<
-      TypeSubscriptBuilder,
+      TypeSubscriptListBuilder,
       MultiTypeSubscriptBuilder
       > {};
 

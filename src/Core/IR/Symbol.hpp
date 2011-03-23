@@ -6,12 +6,14 @@
 #include <mirv/Core/IR/Node.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 #include <mirv/Core/IR/Visitable.hpp>
+#include <mirv/Core/Utility/Printer.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/mpl/empty_base.hpp>
 
 #include <functional>
 #include <string>
+#include <sstream>
 
 namespace mirv {
   struct SymbolVisitor;
@@ -62,13 +64,16 @@ namespace mirv {
   public:
     static typename ptr<Symbol<Tag> >::type
     make(void) {
-      return typename ptr<Symbol<Tag> >::type(new Symbol<Tag>());
+      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>());
+      Tag::initialize(result);
+      return result;
     }
 
     template<typename A1>
     static typename ptr<Symbol<Tag> >::type
     make(A1 a1) {
       typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1));
+      Tag::initialize(result);
       return result;
     }
 
@@ -76,6 +81,7 @@ namespace mirv {
     static typename ptr<Symbol<Tag> >::type
     make(A1 a1, A2 a2) {
       typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2));
+      Tag::initialize(result);
       return result;
     }
 
@@ -143,6 +149,24 @@ namespace mirv {
     bool operator()(typename ptr<Symbol<SymbolTag> >::const_type symbol,
 		    const std::string &name) const {
       return symbol->name() == name;
+    }
+  };
+
+  template<typename TypeTag>
+  class SymbolByName<Type<TypeTag> > :
+      public std::binary_function<boost::shared_ptr<const Symbol<Type<TypeTag> > >,
+				const std::string &,
+				bool> {
+  private:
+    typedef std::binary_function<typename ptr<Symbol<Type<TypeTag> > >::const_type,
+				 const std::string &,
+				 bool> BaseType;
+  public:
+    bool operator()(typename ptr<Symbol<Type<TypeTag> > >::const_type symbol,
+		    const std::string &name) const {
+      std::ostringstream typeName;
+      print(typeName, symbol);
+      return typeName.str() == name;
     }
   };
 
@@ -239,7 +263,7 @@ namespace mirv {
     public:
       Interface(const std::string &n) : the_name(n) {};
 
-      const std::string &name(void) const {
+      virtual std::string name(void) const {
 	return(the_name);
       }
     };

@@ -26,9 +26,9 @@ namespace mirv {
     }
 
     // FIXME: Maybe move transfers to before/after actions.
-    template<typename Stmt, typename Expr>
+    template<typename Stmt, typename InputIterator>
     void operator()(boost::shared_ptr<Stmt> parent,
-                    boost::shared_ptr<Expr> child) {
+                    InputIterator child) {
       this->visitor().transfer(*parentFlow);
       VisitAction<Flow>::operator()(parent, child);
       parentFlow->transfer(this->visitor());

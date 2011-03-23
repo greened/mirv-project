@@ -1,6 +1,8 @@
 #ifndef mirv_Core_Builder_Keywords_hpp
 #define mirv_Core_Builder_Keywords_hpp
 
+#include <iostream>
+
 namespace mirv {
   namespace Builder {
     namespace keyword {

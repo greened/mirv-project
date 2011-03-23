@@ -8,6 +8,7 @@ namespace mirv {
   class Dereference;
   class Call;
   class Array;
+  class Tuple;
 }
 
 #endif

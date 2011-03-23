@@ -19,12 +19,11 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Control.hpp>
@@ -68,21 +67,6 @@ int main(void)
   Builder::VariableTerminal d = {{"d"}};
 
   Builder::FunctionTerminal foo = {{"foo"}};
-#if 0
-  auto expr = 
-      module["testmodule"] [
-	var[a].type[int_(32)],
-	var[b].type[int_(32)],
-        func["foo"].type[void_(int_(32))],
-        func["testfunc"].type[void_()] [
-          var[c].type[int_(32)],
-          var[d].type[int_(32)],
-          foo(c)
-        ]
-      ];
-
-  Builder::checkMatch<Builder::ModuleBuilder>(expr);
-#endif
 
   ptr<Node<Base> >::type code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(

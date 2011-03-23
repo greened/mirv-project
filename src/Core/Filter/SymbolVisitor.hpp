@@ -43,16 +43,6 @@ namespace mirv {
 	ptr<Symbol<Constant<float> > >::type,
 	ptr<Symbol<Constant<double> > >::type,
 	ptr<Symbol<Constant<std::string> > >::type,
-	ptr<Symbol<Type<TypeBase> > >::type,
-	ptr<LeafType>::type,
-	ptr<InnerType>::type,
-	ptr<Symbol<Type<Simple> > >::type,
-	ptr<Symbol<Type<Derived> > >::type,
-	ptr<Symbol<Type<Integral> > >::type,
-	ptr<Symbol<Type<Floating> > >::type,
-	ptr<Symbol<Type<Array> > >::type,
-	ptr<Symbol<Type<Pointer> > >::type,
-	ptr<Symbol<Type<FunctionType> > >::type
 	> > {
   public:
     virtual void visit(ptr<Symbol<Base> >::type);
@@ -79,17 +69,6 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Constant<float> > >::type);
     virtual void visit(ptr<Symbol<Constant<double> > >::type);
     virtual void visit(ptr<Symbol<Constant<std::string> > >::type);
-    virtual void visit(ptr<Symbol<Type<TypeBase> > >::type);
-    virtual void visit(ptr<LeafType>::type);
-    virtual void visit(ptr<InnerType>::type);
-    virtual void visit(ptr<Symbol<Type<Simple> > >::type);
-    virtual void visit(ptr<Symbol<Type<Derived> > >::type);
-    virtual void visit(ptr<Symbol<Type<Integral> > >::type);
-    virtual void visit(ptr<Symbol<Type<Floating> > >::type);
-    virtual void visit(ptr<Symbol<Type<Array> > >::type);
-    virtual void visit(ptr<Symbol<Type<Pointer> > >::type);
-    virtual void visit(ptr<Symbol<Type<FunctionType> > >::type);
-    virtual void visit(ptr<Symbol<Type<StructType> > >::type);
   };
 }
 

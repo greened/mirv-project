@@ -8,7 +8,7 @@ namespace mirv {
     /// This is the grammar for assignment statements.
     struct AssignBuilder : boost::proto::when<
       AssignRule,
-      ClearPendingStatements<Statement<Assignment> >(
+      ClearPendingStatements(
         boost::proto::_data,
         ConstructBinary<Statement<Assignment> >(boost::proto::_data,
                                                 ConstructExpressionGrammar(boost::proto::_left),

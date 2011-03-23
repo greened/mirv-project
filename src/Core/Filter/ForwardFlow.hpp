@@ -72,12 +72,12 @@ namespace mirv {
             send = stmt->end();
           s != send;
           /* NULL */) {
-        this->doBeforeStatement(stmt, *s);
+        this->doBeforeStatement(stmt, s);
         (*s)->accept(*this);
-        this->doAfterStatement(stmt, *s);
+        this->doAfterStatement(stmt, s);
         Statement<Block>::iterator prev = s;
         if (++s != send) {
-          this->doBetweenStatement(stmt, *prev, *s);
+          this->doBetweenStatement(stmt, prev, s);
         }
       }
       this->doLeave(stmt);
@@ -88,15 +88,15 @@ namespace mirv {
     void visit(ptr<Statement<IfThen> >::type stmt) {
       this->doEnter(stmt);
 
-      this->doBeforeExpression(stmt, stmt->getExpression());
-      this->doExpression(stmt, stmt->getExpression());
-      this->doAfterExpression(stmt, stmt->getExpression());
+      this->doBeforeExpression(stmt, stmt->expressionBegin());
+      this->doExpression(stmt, stmt->expressionBegin());
+      this->doAfterExpression(stmt, stmt->expressionBegin());
 
-      this->doBeforeStatement(stmt, stmt->getChildStatement());
+      this->doBeforeStatement(stmt, stmt->begin());
       stmt->getChildStatement()->accept(*this);
-      this->doAfterStatement(stmt, stmt->getChildStatement());
+      this->doAfterStatement(stmt, stmt->begin());
 
-      this->doJoin(stmt, stmt->getChildStatement());
+      this->doJoin(stmt, stmt->begin());
 
       this->doLeave(stmt);
     }
@@ -106,25 +106,25 @@ namespace mirv {
     void visit(ptr<Statement<IfElse> >::type stmt) {
       this->doEnter(stmt);
 
-      this->doBeforeExpression(stmt, stmt->getExpression());
-      this->doExpression(stmt, stmt->getExpression());
-      this->doAfterExpression(stmt, stmt->getExpression());
+      this->doBeforeExpression(stmt, stmt->expressionBegin());
+      this->doExpression(stmt, stmt->expressionBegin());
+      this->doAfterExpression(stmt, stmt->expressionBegin());
 
       Statement<IfElse>::iterator s = stmt->begin();
 
-      this->doBeforeStatement(stmt, *s);
+      this->doBeforeStatement(stmt, s);
       (*s)->accept(*this);
-      this->doAfterStatement(stmt, *s);
+      this->doAfterStatement(stmt, s);
 
       Statement<IfElse>::iterator prev = s++;
 
-      this->doBetweenStatement(stmt, *prev, *s);
+      this->doBetweenStatement(stmt, prev, s);
 
-      this->doBeforeStatement(stmt, *s);
+      this->doBeforeStatement(stmt, s);
       (*s)->accept(*this);
-      this->doAfterStatement(stmt, *s);
+      this->doAfterStatement(stmt, s);
 
-      this->doJoin(stmt, *prev, *s);
+      this->doJoin(stmt, prev, s);
 
       this->doLeave(stmt);
     }
@@ -134,25 +134,25 @@ namespace mirv {
     void visit(ptr<Statement<While> >::type stmt) {
       this->doEnter(stmt);
 
-      this->doBeforeExpression(stmt, stmt->getExpression());
-      this->doExpression(stmt, stmt->getExpression());
-      this->doAfterExpression(stmt, stmt->getExpression());
+      this->doBeforeExpression(stmt, stmt->expressionBegin());
+      this->doExpression(stmt, stmt->expressionBegin());
+      this->doAfterExpression(stmt, stmt->expressionBegin());
 
       bool iterate = false;
 
       do {
-        this->doBeforeStatement(stmt, stmt->getChildStatement());
+        this->doBeforeStatement(stmt, stmt->begin());
         stmt->getChildStatement()->accept(*this);
-        this->doAfterStatement(stmt, stmt->getChildStatement());
+        this->doAfterStatement(stmt, stmt->begin());
 
         // Join point: Loop body and expression.
         iterate = this->doJoin(stmt,
-                               stmt->getExpression(),
-                               stmt->getChildStatement());
+                               stmt->expressionBegin(),
+                               stmt->begin());
 
-        this->doBeforeExpression(stmt, stmt->getExpression());
-        this->doExpression(stmt, stmt->getExpression());
-        this->doAfterExpression(stmt, stmt->getExpression());
+        this->doBeforeExpression(stmt, stmt->expressionBegin());
+        this->doExpression(stmt, stmt->expressionBegin());
+        this->doAfterExpression(stmt, stmt->expressionBegin());
       } while (iterate);
 
       this->doLeave(stmt);
@@ -164,15 +164,15 @@ namespace mirv {
       this->doEnter(stmt);
 
       do {
-        this->doBeforeStatement(stmt, stmt->getChildStatement());
+        this->doBeforeStatement(stmt, stmt->begin());
         stmt->getChildStatement()->accept(*this);
-        this->doAfterStatement(stmt, stmt->getChildStatement());
+        this->doAfterStatement(stmt, stmt->begin());
 
-        this->doBeforeExpression(stmt, stmt->getExpression());
-        this->doExpression(stmt, stmt->getExpression());
-        this->doAfterExpression(stmt, stmt->getExpression());
+        this->doBeforeExpression(stmt, stmt->expressionBegin());
+        this->doExpression(stmt, stmt->expressionBegin());
+        this->doAfterExpression(stmt, stmt->expressionBegin());
       } while (this->doJoin(stmt->getExpression(),
-                               stmt->getChildStatement()));
+                               stmt->begin()));
 
       this->doLeave(stmt);
     }
@@ -182,22 +182,22 @@ namespace mirv {
     void visit(ptr<Statement<Switch> >::type stmt) {
       this->doEnter(stmt);
 
-      this->doBeforeExpression(stmt, stmt->getExpression());
-      this->doExpression(stmt, stmt->getExpression());
-      this->doAfterExpression(stmt, stmt->getExpression());
+      this->doBeforeExpression(stmt, stmt->expressionBegin());
+      this->doExpression(stmt, stmt->expressionBegin());
+      this->doAfterExpression(stmt, stmt->expressionBegin());
 
       for(Statement<Switch>::iterator s = stmt->begin(),
             send = stmt->end();
           s != send;
           /* NULL */) {
-        this->doBeforeStatement(stmt, *s);
+        this->doBeforeStatement(stmt, s);
         (*s)->accept(*this);
-        this->doAfterStatement(stmt, *s);
+        this->doAfterStatement(stmt, s);
         Statement<Block>::iterator prev = s;
         if (++s != send) {
-          this->doBetweenStatement(stmt, *prev, *s);
+          this->doBetweenStatement(stmt, prev, s);
           // Joint point: jump to label or fall-through.
-          this->doJoin(stmt->getExpression(), *s);
+          this->doJoin(stmt->getExpression(), s);
         }
       }
       // Join point: exits of case statements.  Handled at jumps.         
@@ -209,13 +209,13 @@ namespace mirv {
     void visit(ptr<Statement<Case> >::type stmt) {
       this->doEnter(stmt);
 
-      this->doBeforeExpression(stmt, stmt->getExpression());
-      this->doExpression(stmt, stmt->getExpression());
-      this->doAfterExpression(stmt, stmt->getExpression());
+      this->doBeforeExpression(stmt, stmt->expressionBegin());
+      this->doExpression(stmt, stmt->expressionBegin());
+      this->doAfterExpression(stmt, stmt->expressionBegin());
 
-      this->doBeforeStatement(stmt, stmt->getChildStatement());
+      this->doBeforeStatement(stmt, stmt->begin());
       stmt->getChildStatement()->accept(*this);
-      this->doAfterStatement(stmt, stmt->getChildStatement());
+      this->doAfterStatement(stmt, stmt->begin());
 
       this->doLeave(stmt);
     }
@@ -235,9 +235,9 @@ namespace mirv {
       checkInvariant(inserted, "Duplicate label in iterate map");
 
       do {
-        this->doBeforeStatement(stmt, stmt->getChildStatement());
+        this->doBeforeStatement(stmt, stmt->begin());
         stmt->getChildStatement()->accept(*this);
-        this->doAfterStatement(stmt, stmt->getChildStatement());
+        this->doAfterStatement(stmt, stmt->begin());
         // Joint point: Begin of before statement and jump to
         // label.  Handled at jump.
       } while(i->second);
@@ -251,9 +251,9 @@ namespace mirv {
     void visit(ptr<Statement<After> >::type stmt) {
       this->doEnter(stmt);
 
-      this->doBeforeStatement(stmt, stmt->getChildStatement());
+      this->doBeforeStatement(stmt, stmt->begin());
       stmt->getChildStatement()->accept(*this);
-      this->doAfterStatement(stmt, stmt->getChildStatement());
+      this->doAfterStatement(stmt, stmt->begin());
       // Join point: Body and jump.  Handled at jump.
 
       this->doLeave(stmt);
@@ -264,10 +264,10 @@ namespace mirv {
       this->doEnter(stmt);
 
       LabelIterateMapType::iterator i =
-        iterateMap.find(stmt->getExpression());
+        iterateMap.find(*stmt->expressionBegin());
          
       // Join point: Statement and jump target.
-      bool iterate = this->doJoin(stmt, stmt->getExpression());
+      bool iterate = this->doJoin(stmt, stmt->expressionBegin());
       if (i != iterateMap.end()) {
         i->second = iterate;
       }
@@ -286,13 +286,13 @@ namespace mirv {
     void visit(ptr<Statement<Assignment> >::type stmt) {
       this->doEnter(stmt);
 
-      this->doBeforeExpression(stmt, stmt->getRightExpression());
-      this->doExpression(stmt, stmt->getRightExpression());
-      this->doAfterExpression(stmt, stmt->getRightExpression());
-
-      this->doBeforeExpression(stmt, stmt->getLeftExpression());
-      this->doExpression(stmt, stmt->getLeftExpression());
-      this->doAfterExpression(stmt, stmt->getLeftExpression());
+      for (auto i = stmt->expressionRBegin();
+           i != stmt->expressionREnd();
+           ++i) {
+        this->doBeforeExpression(stmt, i);
+        this->doExpression(stmt, i);
+        this->doAfterExpression(stmt, i);
+      }
 
       this->doLeave(stmt);
     }
@@ -301,14 +301,10 @@ namespace mirv {
     void visit(ptr<Statement<Call> >::type stmt) {
       this->doEnter(stmt);
 
-      this->doBeforeExpression(stmt, stmt->function());
-      this->doExpression(stmt, stmt->function());
-      this->doAfterExpression(stmt, stmt->function());
-
-      for (auto e = stmt->argumentBegin(); e != stmt->argumentEnd(); ++e) {
-        this->doBeforeExpression(stmt, *e);
-        this->doExpression(stmt, *e);
-        this->doAfterExpression(stmt, *e);
+      for (auto e = stmt->expressionBegin(); e != stmt->expressionEnd(); ++e) {
+        this->doBeforeExpression(stmt, e);
+        this->doExpression(stmt, e);
+        this->doAfterExpression(stmt, e);
       }
 
       this->doLeave(stmt);

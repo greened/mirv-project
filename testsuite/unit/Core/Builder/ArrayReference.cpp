@@ -1,7 +1,7 @@
 // Test building of array types.
 //
 // STDOUT: fdef testfunc {
-// STDOUT:    vdecl a int32[5,4,3]
+// STDOUT:    vdecl a (5 x (4 x (3 x int32)))
 // STDOUT:    vdecl b int32
 // STDOUT:    {
 // STDOUT:       assign
@@ -11,7 +11,7 @@
 // STDOUT:          vref b
 // STDOUT:          +
 // STDOUT:             vref b
-// STDOUT:             aref
+// STDOUT:             tref
 // STDOUT:                vref a
 // STDOUT:                cref int32 2
 // STDOUT:                cref int32 0
@@ -22,12 +22,12 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
