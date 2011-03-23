@@ -9,6 +9,7 @@
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 
 namespace mirv {
   ConstSymbolVisitor::result_type
@@ -179,5 +180,10 @@ namespace mirv {
     ptr<Symbol<Type<Tuple> >::VisitorBaseType>::const_type p =
       fast_cast<const Symbol<Type<Tuple> >::VisitorBaseType>(s);
     visit(p);
+  }
+
+  ConstSymbolVisitor::result_type
+  ConstSymbolVisitor::visit(ptr<Symbol<Type<Placeholder> > >::const_type s) {
+    //error("Visiting placeholder type!");
   }
 }

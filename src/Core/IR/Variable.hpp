@@ -42,6 +42,8 @@ namespace mirv {
    public:
      typedef LeafSymbol VisitorBaseType;
 
+     static void initialize(ptr<Symbol<Variable> >::type variable) {}
+
      static std::string getName(const std::string &name,
                                 ptr<Symbol<Type<TypeBase> > >::const_type type) {
        return name;

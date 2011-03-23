@@ -5,8 +5,7 @@
 
 namespace mirv {
   Integral::Interface::Interface(std::uint64_t size)
-      : InterfaceBaseType("int" + boost::lexical_cast<std::string>(size),
-                          size)
+      : InterfaceBaseType(size)
   {
   }
 }

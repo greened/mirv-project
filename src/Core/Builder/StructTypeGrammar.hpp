@@ -67,7 +67,13 @@ namespace mirv {
 
     /// This is a callable transform to construct a struct type.
     struct ConstructStructTypeSymbol : boost::proto::callable {
-      typedef ptr<Symbol<Type<Tuple> > >::const_type result_type;
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+
+      // Keeping this outlined means we don't need a definition of Tuple.
+      void resolve(boost::shared_ptr<SymbolTable> symtab,
+                   const std::string &name,
+                   ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
+                   ptr<Symbol<Type<TypeBase> > >::const_type replacement);
 
       template<typename List>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -75,23 +81,66 @@ namespace mirv {
                              const List &memberList) {
         //std::cout << "Building struct:\n";
         //boost::proto::display_expr(memberList);
+        
+        ptr<Symbol<Type<Placeholder> > >::const_type placeholder =
+          symtab->lookupPlaceholder(name);
 
-        return BinaryConstructSymbol<Symbol<Type<Tuple> > >()(
-          symtab, name, detail::translateList(symtab, memberList));
+        checkInvariant(placeholder, "Missing placeholder!");
+
+        result_type tuple = UnaryConstructSymbol<Symbol<Type<Tuple> > >()(
+          symtab, detail::translateList(symtab, memberList));
+
+        resolve(symtab, name, placeholder, tuple);
+
+        return tuple;
       }
     };
 
+    struct AddPlaceholder : boost::proto::callable {
+      typedef std::string result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             const std::string &name) {
+        symtab->addPlaceholder(name);
+        return name;
+      }
+    };
+
+    struct LookupPlaceholder : boost::proto::callable {
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             const std::string &name);
+    };
+
     // This is the grammar for struct types.
-    struct StructTypeBuilder : boost::proto::when<
-      StructTypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+    struct StructTypeDefBuilder : boost::proto::when<
+      StructTypeDefRule,
+       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
         boost::proto::_data,
         ConstructStructTypeSymbol(
           boost::proto::_data,
           // Struct name
-          boost::proto::_value(boost::proto::_right(boost::proto::_left)),
+          AddPlaceholder(
+            boost::proto::_data,
+            boost::proto::_value(boost::proto::_right(boost::proto::_left))),
           // Member type list
           boost::proto::_right))
+      > {};
+
+    struct StructTypeDeclBuilder : boost::proto::when<
+      StructTypeDeclRule,
+      LookupPlaceholder(
+        boost::proto::_data,
+        AddPlaceholder(
+          boost::proto::_data,
+          // Struct name
+          boost::proto::_value(boost::proto::_right)))
+      > {};
+
+    struct StructTypeBuilder : boost::proto::or_<
+      StructTypeDeclBuilder,
+      StructTypeDefBuilder
       > {};
 
     namespace {

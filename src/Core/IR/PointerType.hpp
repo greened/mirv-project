@@ -15,7 +15,7 @@ namespace mirv {
                       public boost::enable_shared_from_this<Symbol<Type<Pointer> > > {
     public:
       Interface(ptr<Symbol<Type<TypeBase>>>::const_type base)
-          : InterfaceBaseType(base->name() + "*") {
+          : InterfaceBaseType() {
         setBaseType(base);
       }
       typedef const Symbol<Type<TypeBase> > ChildType;
@@ -53,10 +53,6 @@ namespace mirv {
   public:
     typedef Interface BaseType;
     typedef Symbol<Type<Derived> > VisitorBaseType;
-
-    static std::string getName(ptr<Symbol<Type<TypeBase>>>::const_type base) {
-      return base->name() + "*";
-    }
   };
 }
 

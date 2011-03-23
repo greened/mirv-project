@@ -9,7 +9,7 @@ namespace mirv {
   namespace Builder {
     struct IfElseBuilder : boost::proto::when<
       IfElseRule,
-      ClearPendingStatements<Statement<IfElse> >(
+      ClearPendingStatements(
         boost::proto::_data,
         ConstructTernary<
           Statement<IfElse>,

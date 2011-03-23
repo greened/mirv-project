@@ -10,6 +10,7 @@
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/IR/Visitable.ipp>
 
@@ -228,4 +229,11 @@ namespace mirv {
   template
   void
   ConstVisitable<Symbol<Type<FunctionType> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
+
+  template
+  void
+  Visitable<Symbol<Type<Placeholder> >, SymbolVisitor>::accept(SymbolVisitor &);
+  template
+  void
+  ConstVisitable<Symbol<Type<Placeholder> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
 }

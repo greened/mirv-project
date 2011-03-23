@@ -2,6 +2,7 @@
 #include <mirv/Core/Builder/Transform.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
+#include <mirv/Core/IR/Module.hpp>
 
 namespace mirv {
   ptr<Expression<Base> >::type

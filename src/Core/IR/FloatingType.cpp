@@ -3,8 +3,7 @@
 
 namespace mirv {
   Floating::Interface::Interface(std::uint64_t size)
-      : InterfaceBaseType("float" + boost::lexical_cast<std::string>(size),
-                          size)
+      : InterfaceBaseType(size)
   {
   }
 }

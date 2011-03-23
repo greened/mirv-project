@@ -90,60 +90,60 @@ namespace mirv {
     }
 
     /// Apply the before action.
-    template<typename Stmt, typename Child>
+    template<typename Stmt, typename InputIterator>
     typename BeforeStmtAction::result_type doBeforeStatement(boost::shared_ptr<Stmt> stmt,
-                                                             boost::shared_ptr<Child> child) {
+                                                             InputIterator child) {
       return bfrstmt(stmt, child);
     }
 
     /// Apply the after action.
-    template<typename Stmt, typename Child>
+    template<typename Stmt, typename InputIterator>
     typename AfterStmtAction::result_type doAfterStatement(boost::shared_ptr<Stmt> stmt,
-                                                           boost::shared_ptr<Child> child) {
+                                                           InputIterator child) {
       return aftstmt(stmt, child);
     }
 
     /// Apply the between action.
-    template<typename Stmt, typename Child>
+    template<typename Stmt, typename InputIterator>
     typename BetweenStmtAction::result_type doBetweenStatement(boost::shared_ptr<Stmt> stmt,
-                                                               boost::shared_ptr<Child> child1,
-                                                               boost::shared_ptr<Child> child2) {
+                                                               InputIterator child1,
+                                                               InputIterator child2) {
       return betstmt(stmt, child1, child2);
     }
 
     /// Apply the join action.
-    template<typename Stmt, typename Child>
+    template<typename Stmt, typename InputIterator>
     typename JoinAction::result_type doJoin(boost::shared_ptr<Stmt> stmt,
-                                            boost::shared_ptr<Child> child) {
+                                            InputIterator child) {
       return jn(stmt, child);
     }
 
     /// Apply the join action.
-    template<typename Stmt, typename Child1, typename Child2>
+    template<typename Stmt, typename InputIterator1, typename InputIterator2>
     typename JoinAction::result_type doJoin(boost::shared_ptr<Stmt> stmt,
-                                            boost::shared_ptr<Child1> child1,
-                                            boost::shared_ptr<Child2> child2) {
+                                            InputIterator1 child1,
+                                            InputIterator2 child2) {
       return jn(stmt, child1, child2);
     }
 
     /// Apply the before expression action.
-    template<typename Stmt, typename Expr>
+    template<typename Stmt, typename InputIterator>
     typename BeforeExprAction::result_type doBeforeExpression(boost::shared_ptr<Stmt> stmt,
-                                                              boost::shared_ptr<Expr> expr) {
+                                                              InputIterator expr) {
       return bfrexpr(stmt, expr);
     }
 
     /// Apply the expression action.
-    template<typename Stmt, typename Expr>
+    template<typename Stmt, typename InputIterator>
     typename ExprAction::result_type doExpression(boost::shared_ptr<Stmt> stmt,
-                                                  boost::shared_ptr<Expr> exp) {
+                                                  InputIterator exp) {
       return expr(stmt, exp);
     }
 
     /// Apply the after expression action.
-    template<typename Stmt, typename Expr>
+    template<typename Stmt, typename InputIterator>
     typename AfterExprAction::result_type doAfterExpression(boost::shared_ptr<Stmt> stmt,
-                                                            boost::shared_ptr<Expr> expr) {
+                                                            InputIterator expr) {
       return aftexpr(stmt, expr);
     }
 

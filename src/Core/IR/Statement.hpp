@@ -289,6 +289,7 @@ namespace mirv {
         expressions.push_back(a2);
       }
 
+    public:
       typedef ExpressionList::iterator ExpressionIterator;
       typedef ExpressionList::const_iterator ConstExpressionIterator;
 

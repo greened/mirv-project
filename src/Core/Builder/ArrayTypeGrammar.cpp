@@ -1,17 +1,19 @@
+#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Module.hpp>
+#include <mirv/Core/IR/Symbol.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
+
 #include <mirv/Core/Builder/SymbolTerminals.hpp>
 #include <mirv/Core/Builder/TypeGrammar.hpp>
 #include <mirv/Core/Builder/ArrayTypeGrammar.hpp>
 #include <mirv/Core/Builder/MakeExpression.hpp>
-#include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/Type.hpp>
-#include <mirv/Core/IR/Symbol.hpp>
-#include <mirv/Core/IR/TupleType.hpp>
 
 namespace mirv {
   namespace Builder {
-    ptr<Symbol<Type<Tuple> > >::const_type
+    ptr<Symbol<Type<TypeBase> > >::const_type
     ConstructArrayTypeSymbol::operator()(boost::shared_ptr<SymbolTable> symtab,
                                          detail::TypeSubscriptData subscripts) {
       // Construct a nested tuple type.

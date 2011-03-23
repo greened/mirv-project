@@ -7,6 +7,7 @@
 
 namespace mirv {
   struct SymbolVisitor;
+  struct Placeholder;
 
   /// This is the type implementation for all type symbols.  It is a
   /// templated Symbol tag.  Each type is an instance of this template
@@ -32,6 +33,9 @@ namespace mirv {
       return Tag::getName(a1, a2);
     }
 
+    static void
+    initialize(typename ptr<Symbol<Type<Tag> > >::const_type type) {}
+
     template<typename Arg1, typename Arg2, typename Arg3>
     static std::string getName(Arg1 &a1, Arg2 &a2, Arg3 &a3) {
       return Tag::getName(a1, a2, a3);
@@ -41,13 +45,15 @@ namespace mirv {
   /// A type tag for the base type of all types.
   class TypeBase {
   private:
-    typedef Symbol<Named> InterfaceBaseType;
+    typedef Symbol<Base> InterfaceBaseType;
 
     class Interface : public InterfaceBaseType {
     public:
-      Interface(const std::string &name) : InterfaceBaseType(name) {}
       typedef ptr<Expression<Base> >::type BitSizeType;
       virtual BitSizeType bitsize(void) const = 0;
+      virtual void
+      resolve(ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
+              ptr<Symbol<Type<TypeBase> > >::const_type replacement) {}
     };
 
   public:
@@ -63,8 +69,6 @@ namespace mirv {
   public:
     typedef LeafImpl<Symbol<Type<TypeBase> > > BaseType;
     typedef Symbol<Type<TypeBase> > VisitorBaseType;
-
-    LeafType(const std::string &name) : BaseType(name) {}
   };
 
   namespace detail {
@@ -106,17 +110,12 @@ namespace mirv {
     typedef Inner<detail::InnerTypeTraits>::BaseType BaseType;
 
   public:
-    Symbol<Type<Inner<detail::InnerTypeTraits> > >(const std::string &name)
-    : BaseType(name) {}
-
     typedef Symbol<Type<TypeBase> > VisitorBaseType;
   };
 
   class InnerTypeBase : public Symbol<Type<Inner<detail::InnerTypeTraits> > > {
   private:
     typedef Symbol<Type<Inner<detail::InnerTypeTraits> > > BaseType;
-  public:
-    InnerTypeBase(const std::string &name) : BaseType(name) {}
   };
 
   /// This is the implementation of inner types.  It is inherited from
@@ -132,9 +131,6 @@ namespace mirv {
     const Symbol<Type<TypeBase> >,
     InnerTypeBase,
     false> BaseType;
-
-  public:
-    InnerType(const std::string &name) : BaseType(name) {}
   };
 
   /// A type with no children that has a specific bit size, for
@@ -148,8 +144,11 @@ namespace mirv {
       std::uint64_t bsize;
 
     public:
-      Interface(const std::string &name, std::uint64_t s)
-          : InterfaceBaseType(name), bsize(s) {};
+      Interface(std::uint64_t s) : bsize(s) {};
+
+      std::uint64_t integerBitSize(void) const {
+        return bsize;
+      }
 
       BitSizeType bitsize(void) const;
     };
@@ -162,8 +161,17 @@ namespace mirv {
   /// A type that is built upon other types.  For example structures
   /// and pointers.
   struct Derived {
+  private:
+    typedef InnerType InterfaceBaseType;
+
+    class Interface : public InterfaceBaseType {
+    public:
+      void resolve(ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
+                   ptr<Symbol<Type<TypeBase> > >::const_type replacement);
+    };
+
   public:
-    typedef InnerType BaseType;
+    typedef Interface BaseType;
     typedef InnerType VisitorBaseType;
   };
 }
