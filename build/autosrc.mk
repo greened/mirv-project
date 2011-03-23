@@ -16,11 +16,14 @@ $$(call debug,$(1)_CXXSRCS = $$($(1)_CXXSRCS))
 $(1)_SRCS := $$($(1)_CSRCS) $$($(1)_CXXSRCS)
 
 $(1)_DEPS :=  $$(patsubst %.c,%.d,$$(patsubst %.cc,%.dd,$$(patsubst %.C,%.dd,$$(patsubst %.cpp,%.dd,$$($(1)_SRCS)))))
+$(1)_SODEPS :=  $$(patsubst %.d,%.do,$$(patsubst %.dd,%.ddo,$$($(1)_DEPS)))
 
 $$(call debug,$(1)_SRCS = $$($(1)_SRCS))
 $$(call debug,$(1)_DEPS = $$($(1)_DEPS))
+$$(call debug,$(1)_SODEPS = $$($(1)_SODEPS))
 
 -include $$($(1)_DEPS)
+-include $$($(1)_SODEPS)
 
 endef
 

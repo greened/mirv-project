@@ -449,13 +449,13 @@ namespace mirv {
       void visit(ptr<Statement<Assignment> >::type stmt) {
         this->doEnter(stmt);
 
-        this->doBeforeExpression(stmt, stmt->getLeftExpression());
-        this->doExpression(stmt, stmt->getLeftExpression());
-        this->doAfterExpression(stmt, stmt->getLeftExpression());
-
-        this->doBeforeExpression(stmt, stmt->getRightExpression());
-        this->doExpression(stmt, stmt->getRightExpression());
-        this->doAfterExpression(stmt, stmt->getRightExpression());
+        for (auto i = stmt->expressionBegin();
+             i != stmt->expressionEnd();
+             ++i) {
+          this->doBeforeExpression(stmt, i);
+          this->doExpression(stmt, i);
+          this->doAfterExpression(stmt, i);
+        }
 
         this->doLeave(stmt);
       }

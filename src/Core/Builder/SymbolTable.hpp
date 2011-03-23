@@ -14,6 +14,8 @@
 #include <boost/proto/proto.hpp>
 
 #include <list>
+#include <map>
+#include <sstream>
 
 namespace mirv {
   namespace Builder {
@@ -29,7 +31,22 @@ namespace mirv {
       typedef ptr<Statement<Base> >::type StatementPointer;
       typedef std::list<StatementPointer> StatementList;
       StatementList pendingStatements;
+
+      typedef std::map<
+        std::string,
+        ptr<Symbol<Type<Placeholder> > >::const_type
+        > PlaceholderMap;
+      PlaceholderMap placeholders;
+
+      typedef std::map<
+        std::string,
+        std::string
+        > NameMap;
+      NameMap names;
+
       unsigned int tempNum;
+
+      std::string translateName(const std::string &name) const;
 
     public:
       SymbolTable(ModulePointer m, FunctionPointer f)
@@ -79,6 +96,19 @@ namespace mirv {
       bool pendingStatementsEmpty(void) const {
         return pendingStatements.empty();
       }
+
+      ptr<Symbol<Type<TypeBase> > >::const_type
+      addPlaceholder(const std::string &name);
+
+      ptr<Symbol<Type<Placeholder> > >::const_type
+      lookupPlaceholder(const std::string &name) const;
+
+      ptr<Symbol<Type<Placeholder> > >::const_type
+      removePlaceholder(const std::string &name);
+
+      void resolve(const std::string &oldName,
+                   ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
+                   ptr<Symbol<Type<TypeBase> > >::const_type replacement);
 
       /// Get the variable symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
@@ -212,8 +242,10 @@ namespace mirv {
 
       result_type operator()(ptr<SymbolTable>::type symtab,
 			     result_type symbol) {
+        std::ostringstream name;
+        print(name, symbol);
 	result_type result =
-          symtab->lookupAtAllScopes(symbol->name(), 
+          symtab->lookupAtAllScopes(name.str(), 
                                     reinterpret_cast<Symbol<Type<Tag> > *>(0));
 	if (!result) {
 	  symtab->addAtCurrentScope(symbol);

@@ -118,7 +118,7 @@ namespace mirv {
 
     /// This is a callable transform to construct a struct type.
     struct ConstructArrayTypeSymbol : boost::proto::callable {
-      typedef ptr<Symbol<Type<Tuple> > >::const_type result_type;
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              detail::TypeSubscriptData subscripts);

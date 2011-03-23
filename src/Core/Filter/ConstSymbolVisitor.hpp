@@ -87,6 +87,7 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Type<Pointer> > >::const_type);
     virtual void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
     virtual void visit(ptr<Symbol<Type<Tuple> > >::const_type);
+    virtual void visit(ptr<Symbol<Type<Placeholder> > >::const_type);
   };
 }
 

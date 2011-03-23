@@ -28,6 +28,7 @@
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Control.hpp>

@@ -10,14 +10,14 @@ namespace mirv {
   namespace Builder {
     namespace detail {
       struct IntegralTypeGen {
-        typedef ptr<Symbol<Type<Integral> > >::const_type result_type;
+        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 
         result_type operator()(ptr<SymbolTable>::type symtab,
                                size_t bitsize);
       };
  
       struct FloatingTypeGen {
-        typedef ptr<Symbol<Type<Floating> > >::const_type result_type;
+        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 
         result_type operator()(ptr<SymbolTable>::type symtab,
                                size_t bitsize);

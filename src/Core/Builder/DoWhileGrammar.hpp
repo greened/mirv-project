@@ -9,7 +9,7 @@ namespace mirv {
   namespace Builder {
     struct DoWhileBuilder : boost::proto::when<
       DoWhileRule,
-      ClearPendingStatements<Statement<DoWhile> >(
+      ClearPendingStatementsDoWhile(
         boost::proto::_data,
         ConstructBinary<
           Statement<DoWhile>,

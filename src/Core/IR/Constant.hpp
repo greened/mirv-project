@@ -65,6 +65,9 @@ namespace mirv {
     };
 
   public:
+    static void
+    initialize(typename ptr<Symbol<Constant<ValueType> > >::type constant) {}
+
     typedef Interface BaseType;
     typedef Symbol<Constant<Base>> VisitorBaseType;
   };

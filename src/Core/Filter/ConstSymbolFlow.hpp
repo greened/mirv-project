@@ -32,8 +32,37 @@ namespace mirv {
     /// The flow to invoke on child statements.
     StatementAction stmt;
 
+    typedef std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> TypeList;
+    TypeList TypeStack;
+ 
   protected:
-    EnterAction &enter(void) {
+    typedef TypeList::reverse_iterator TypeStackIterator;
+    typedef TypeList::const_reverse_iterator ConstTypeStackIterator;
+
+    TypeStackIterator typeStackBegin(void) {
+      return TypeStack.rbegin();
+    }
+    ConstTypeStackIterator typeStackBegin(void) const{
+      return TypeStack.rbegin();
+    }
+
+    TypeStackIterator typeStackEnd(void) {
+      return TypeStack.rend();
+    }
+    ConstTypeStackIterator typeStackEnd(void) const{
+      return TypeStack.rend();
+    }
+
+    TypeStackIterator
+    typeStackFind(ptr<Symbol<Type<TypeBase> > >::const_type type) {
+      return std::find(typeStackBegin(), typeStackEnd(), type);
+    }
+    ConstTypeStackIterator
+    typeStackFind(ptr<Symbol<Type<TypeBase> > >::const_type type) const {
+      return std::find(typeStackBegin(), typeStackEnd(), type);
+    }
+
+   EnterAction &enter(void) {
       return ent;
     }
 
@@ -70,26 +99,31 @@ namespace mirv {
     };
 
     /// Apply the before action.
-    template<typename Expr, typename Child>
-    typename BeforeAction::result_type doBefore(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child) {
+    template<typename Expr, typename InputIterator>
+    typename BeforeAction::result_type doBefore(boost::shared_ptr<Expr> expr,
+                                                InputIterator child) {
       return(bfr(expr, child));
     };
 
     /// Apply the between action.
-    template<typename Expr, typename Child>
-    typename BeforeAction::result_type doBetween(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child1, boost::shared_ptr<Child> child2) {
-      return(bfr(expr, child1, child2));
+    template<typename Expr, typename InputIterator>
+    typename BetweenAction::result_type doBetween(boost::shared_ptr<Expr> expr,
+                                                  InputIterator child1,
+                                                  InputIterator child2) {
+      return(bet(expr, child1, child2));
     };
 
     /// Apply the after action.
-    template<typename Expr, typename Child>
-    typename AfterAction::result_type doAfter(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child) {
+    template<typename Expr, typename InputIterator>
+    typename AfterAction::result_type doAfter(boost::shared_ptr<Expr> expr,
+                                              InputIterator child) {
       return(aft(expr, child));
     };
 
     /// Apply the statement action.
-    template<typename Expr, typename Child>
-    typename StatementAction::result_type doStatement(boost::shared_ptr<Expr> expr, boost::shared_ptr<Child> child) {
+    template<typename Expr, typename InputIterator>
+    typename StatementAction::result_type doStatement(boost::shared_ptr<Expr> expr,
+                                                      InputIterator child) {
       return stmt(expr, child);
     };
 
@@ -118,15 +152,38 @@ namespace mirv {
             send = sym->end();
           s != send;
           /* NULL */) {
-        this->doBefore(sym, *s);
+        this->doBefore(sym, s);
         (*s)->accept(*this);
-        this->doAfter(sym, *s);
+        this->doAfter(sym, s);
         InnerSymbol::const_iterator prev = s;
         if (++s != send) {
-          this->doBetween(sym, *prev, *s);
+          this->doBetween(sym, prev, s);
         }
       }
       this->doLeave(sym);
+    }
+
+    /// Visit an inner type, visiting all children.  Track visited
+    /// types to avoid infinite recursion.
+    void visit(ptr<InnerType>::const_type sym) {
+      TypeStack.push_back(sym);
+      this->doEnter(sym);
+      for(InnerType::const_iterator s = sym->begin(),
+            send = sym->end();
+          s != send;
+          /* NULL */) {
+        this->doBefore(sym, s);
+        if (*s && typeStackFind(*s) == typeStackEnd()) {
+          (*s)->accept(*this);
+        }
+        this->doAfter(sym, s);
+        InnerType::const_iterator prev = s;
+        if (++s != send) {
+          this->doBetween(sym, prev, s);
+        }
+      }
+      this->doLeave(sym);
+      TypeStack.pop_back();
     }
 
     void visit(ptr<LeafSymbol>::const_type sym) {
@@ -149,12 +206,12 @@ namespace mirv {
             tend = sym->typeEnd();
           t != tend;
           /* NULL */) {
-        this->doBefore(sym, *t);
+        this->doBefore(sym, t);
         (*t)->accept(*this);
-        this->doAfter(sym, *t);
+        this->doAfter(sym, t);
         Symbol<Module>::ConstTypeIterator prev = t;
         if (++t != tend) {
-          this->doBetween(sym, *prev, *t);
+          this->doBetween(sym, prev, t);
         }
       }
 
@@ -163,12 +220,12 @@ namespace mirv {
             vend = sym->variableEnd();
           v != vend;
           /* NULL */) {
-        this->doBefore(sym, *v);
+        this->doBefore(sym, v);
         (*v)->accept(*this);
-        this->doAfter(sym, *v);
+        this->doAfter(sym, v);
         Symbol<Module>::ConstVariableIterator prev = v;
         if (++v != vend) {
-          this->doBetween(sym, *prev, *v);
+          this->doBetween(sym, prev, v);
         }
       }
 
@@ -177,12 +234,12 @@ namespace mirv {
             fend = sym->functionEnd();
           f != fend;
           /* NULL */) {
-        this->doBefore(sym, *f);
+        this->doBefore(sym, f);
         (*f)->accept(*this);
-        this->doAfter(sym, *f);
+        this->doAfter(sym, f);
         Symbol<Module>::ConstFunctionIterator prev = f;
         if (++f != fend) {
-          this->doBetween(sym, *prev, *f);
+          this->doBetween(sym, prev, f);
         }
       }
       this->doLeave(sym);
@@ -197,17 +254,17 @@ namespace mirv {
             vend = sym->variableEnd();
           v != vend;
           /* NULL */) {
-        this->doBefore(sym, *v);
+        this->doBefore(sym, v);
         (*v)->accept(*this);
-        this->doAfter(sym, *v);
+        this->doAfter(sym, v);
         Symbol<Function>::ConstVariableIterator prev = v;
         if (++v != vend) {
-          this->doBetween(sym, *prev, *v);
+          this->doBetween(sym, prev, v);
         }
       }
 
       // Visit statements
-      this->doStatement(sym, sym->getStatement());
+      this->doStatement(sym, sym->statementBegin());
 
       this->doLeave(sym);
     }

@@ -10,8 +10,9 @@ namespace mirv {
     struct LookupSymbol;
     template<typename SymbolType, typename Dummy>
     struct LookupAndAddSymbol;
-    template<typename StatementType, typename Dummy>
     struct ClearPendingStatements;
+    struct ClearPendingStatementsDoWhile;
+    struct ClearPendingStatementsWhileRule;
     template<typename NodeType, typename Child, typename Dummy>
     struct ConstructUnary;
     template<typename NodeType, typename Child1, typename Child2, typename Dummy>

@@ -32,13 +32,6 @@ namespace mirv {
    public:
      typedef Interface BaseType;
      typedef Symbol<Type<Simple> > VisitorBaseType;
-
-     static std::string getName(std::uint64_t size) {
-       return "int" + boost::lexical_cast<std::string>(size);
-     }
-     static std::string getName(std::uint64_t size, ptr<Symbol<Module> >::type) {
-       return getName(size);
-     }
   };
 }
 

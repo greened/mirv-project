@@ -14,53 +14,6 @@
 #include <algorithm>
 
 namespace mirv {
-  namespace detail {
-    // TODO: Make this a proper std function object.
-    class TypeName {
-    public:
-      typedef std::string result_type;
-
-      std::string operator()(ptr<Symbol<Type<TypeBase> > >::const_type type) const {
-        return type->name();
-      }
-    };
-
-    std::string stringize(ptr<Expression<Base> >::type expr);
-
-    template<typename InputIterator>
-    std::string stringize(InputIterator start, InputIterator end) {
-      // If all the types are the same, optimize it.
-      bool same = true;
-      int count = 0;
-      ptr<Symbol<Type<TypeBase> > >::const_type type = *start;
-      for (InputIterator i = start; i != end; ++i) {
-        ++count;
-        if (type != *i) {
-          same = false;
-          break;
-        }
-      }
-
-      if (same) {
-        return "(" + boost::lexical_cast<std::string>(count)
-          + " x " + type->name() + ")";
-      }
-
-      std::stringstream result;
-
-      result << "(";
-
-      std::copy(boost::make_transform_iterator(start, TypeName()),
-                boost::make_transform_iterator(end, TypeName()),
-                std::ostream_iterator<std::string>(result, ","));
-
-      // Knock off the last delimiter.
-      // TODO: There must be a better way.
-      std::string resultString = result.str();
-      return resultString.substr(0, resultString.length() - 1) + ")";
-    }
-  }
-  
   /// A tuple type.  Multidimensional tuples are represented by tuples
   /// of tuples.
   struct Tuple {
@@ -105,21 +58,18 @@ namespace mirv {
 
       Interface(ConstChildPtr ElementType,
                 ptr<Expression<Base> >::type count) :
-          InterfaceBaseType("(" + detail::stringize(count) + " x "
-                            + ElementType->name() + ")"),
-            multiplier(count) {
+          InterfaceBaseType(), multiplier(count) {
         push_back(ElementType);
       }
 
       template<typename InputIterator>
       Interface(InputIterator start, InputIterator end) 
-          : InterfaceBaseType(detail::stringize(start, end)) {
+          : InterfaceBaseType() {
         construct(start, end);
       }
 
       template<typename Sequence>
-      Interface(const std::string &name, const Sequence &members)
-          : InterfaceBaseType(name) {
+      Interface(const Sequence &members) : InterfaceBaseType() {
         // Add the member types.
         typedef std::vector<ConstChildPtr> ChildList;
         ChildList temp;
@@ -133,14 +83,13 @@ namespace mirv {
       }
 
       /// Construct a tuple type with a single member.
-      Interface(const std::string &name,
-                ptr<Symbol<Type<TypeBase> > >::const_type member)
-          : InterfaceBaseType(name) {
+      Interface(ptr<Symbol<Type<TypeBase> > >::const_type member)
+          : InterfaceBaseType() {
         push_back(member);
       }
 
       /// Construct a tuple type with no members.
-      Interface(const std::string &name) : InterfaceBaseType(name) {}
+      Interface() : InterfaceBaseType() {}
 
       ptr<Symbol<Type<TypeBase> > >::const_type
       elementType(ptr<Expression<Base> >::const_type) const;
@@ -148,6 +97,11 @@ namespace mirv {
       BitSizeType bitsize(void) const;
 
       bool isUniform(void) const {
+        return multiplier;
+      }
+
+      ptr<Expression<Base> >::const_type
+      count(void) const {
         return multiplier;
       }
 
@@ -162,28 +116,6 @@ namespace mirv {
   public:
     typedef Interface BaseType;
     typedef Symbol<Type<Derived> > VisitorBaseType;
-
-    static std::string
-    getName(ptr<Symbol<Type<TypeBase> > >::const_type elementType,
-            ptr<Expression<Base> >::type count) {
-      return "(" + detail::stringize(count) + " x " + elementType->name()
-        +  ")";
-    }
-
-    template<typename InputIterator>
-    static std::string
-    getName(InputIterator start, InputIterator end) {
-      return detail::stringize(start, end);
-    }
-
-    static std::string getName(std::string &name) {
-      return name;
-    }
-
-    template<typename List>
-    static std::string getName(std::string &name, List) {
-      return getName(name);
-    }
   };
 }
 

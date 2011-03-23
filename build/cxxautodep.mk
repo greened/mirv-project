@@ -13,6 +13,8 @@ include $(BUILDTOOLS)/configure/cxxpp.mk
 
 CXXMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.dd $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.dd)
 
+CXXSOMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.ddo $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.ddo)
+
 #ifdef CONFIG_HAVE_GXX
 #  CXXMAKEDEPEND = $(CXX) -MM $(CPPFLAGS) -o $*.dd $<
 #else
@@ -21,10 +23,16 @@ CXXMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.dd $<,$(CPP
                         | $(SORT) | $(UNIQ) > $*.dd
 #endif
 
-PROCESS_CXXDEPS = $(CP) -f $*.dd $*.PP && \
+PROCESS_CXXSODEPS = $(CP) -f $*.dd $*.PP && \
                       $(SED) -i -e 's%$(subst .,\.,$(@F))%$@%' $*.PP && \
                       $(SED) -e 's%\#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
                              -e '\%^$$% d' -e 's%$$% :%' < $*.dd >> $*.PP && \
                   $(MV) -f $*.PP $*.dd
+
+PROCESS_CXXSODEPS = $(CP) -f $*.ddo $*.PPo && \
+                      $(SED) -i -e 's%$(subst .,\.,$(@F))%$@%' $*.PPo && \
+                      $(SED) -e 's%\#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
+                             -e '\%^$$% d' -e 's%$$% :%' < $*.ddo >> $*.PPo && \
+                  $(MV) -f $*.PPo $*.ddo
 
 endif

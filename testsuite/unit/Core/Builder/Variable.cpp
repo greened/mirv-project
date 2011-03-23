@@ -14,6 +14,7 @@
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>

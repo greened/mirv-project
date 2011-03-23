@@ -6,10 +6,6 @@
 #include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
 #include <mirv/Core/Builder/SymbolTable.hpp>
 #include <mirv/Core/Builder/TranslateFwd.hpp>
-#include <mirv/Core/IR/Symbol.hpp>
-#include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Control.hpp>
 
 #include <boost/proto/proto.hpp>
@@ -22,114 +18,35 @@
 
 namespace mirv {
   namespace Builder {
-#if 0
-    /// This is a callable transform to add a symbol at the current
-    /// scope.  If the symbol already exists, it is an error.
-    template<typename SymbolType,
-      typename Dummy = boost::proto::callable>
-    struct AddAtCurrentScope : boost::proto::callable {
-      typedef typename ptr<SymbolType>::type result_type;
-
-      result_type operator()(ptr<SymbolTable>::type symtab,
-			     result_type symbol) {
-	symtab->addAtCurrentScope(symbol);
-        return symbol;
-      }
-    };
-#endif
-
     // Bundle any pending statements created from child expressions
     // with this statement.
-    template<typename StatementType, typename Dummy = boost::proto::callable>
     struct ClearPendingStatements : boost::proto::callable {
       typedef ptr<Statement<Base> >::type StatementPointer;
       typedef StatementPointer result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             StatementPointer stmt) {
-        // Add the pending statements to the function.
-
-        // TODO: Should use splice but it exposes the symtab statement
-        // list.
-        for (SymbolTable::StatementIterator s =
-               symtab->pendingStatementsBegin();
-             s != symtab->pendingStatementsEnd();
-             ++s) {
-          symtab->getFunction()->statementPushBack(*s);
-        }
-        
-        symtab->clearPendingStatements();
-
-        // This will get added by the caller.
-        return stmt;
-      }
+                             StatementPointer stmt);
     };
 
     // Loops need to be handled specially.
-    template<>
-    struct ClearPendingStatements<Statement<DoWhile>, boost::proto::callable>
-        : boost::proto::callable {
+    struct ClearPendingStatementsDoWhile : boost::proto::callable {
       typedef ptr<Statement<DoWhile> >::type StatementPointer;
       typedef StatementPointer result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             StatementPointer stmt) {
-        // Add the pending statements to the loop body.
-
-        // TODO: Should use splice but it exposes the symtab statement
-        // lst.
-        for (SymbolTable::StatementIterator s =
-               symtab->pendingStatementsBegin();
-             s != symtab->pendingStatementsEnd();
-             ++s) {
-          safe_cast<Statement<Block> >(stmt->getChildStatement())->
-            push_back(*s);
-        }
-        
-        symtab->clearPendingStatements();
-
-        // This will get added by the caller.
-        return stmt;
-      }
+                             StatementPointer stmt);
     };
 
     // Since there is no while statement, indicate a while by
     // specializing on the grammar rule.
     struct WhileRule;
 
-    template<>
-    struct ClearPendingStatements<WhileRule, boost::proto::callable>
-        : boost::proto::callable {
+    struct ClearPendingStatementsWhileRule : boost::proto::callable {
       typedef ptr<Statement<IfThen> >::type StatementPointer;
       typedef StatementPointer result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             StatementPointer stmt) {
-        for (SymbolTable::StatementIterator s =
-               symtab->pendingStatementsBegin();
-             s != symtab->pendingStatementsEnd();
-             ++s) {
-          // Add the pending statements before the top test.
-          safe_cast<Statement<Block> >(stmt->parent<Statement<Base> >())->
-            push_back(*s);
-
-          // Add the pending statements to the loop body.
-          safe_cast<Statement<Block> > (
-            safe_cast<Statement<DoWhile> >(
-              *(safe_cast<Statement<Block> >
-                (
-                  stmt->getChildStatement()
-                )->begin()
-               )
-            )->
-            getChildStatement())->push_back((*s)->clone());
-      }
-
-      symtab->clearPendingStatements();
-
-      // This will get added by the caller.
-      return stmt;
-    }
+                             StatementPointer stmt);
     };
 
     /// Transform a one-operand node into a single-child IR node.
