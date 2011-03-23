@@ -94,6 +94,18 @@ namespace mirv {
       }
       return ptr<Symbol<Variable> >::type();
     } 
+
+    /// Get the variable symbol at module scope only.  Return a null
+    /// pointer if the symbol does not exist.
+    ptr<Symbol<Variable> >::type
+    SymbolTable::lookupAtModuleScope(const std::string &name,
+                                     Symbol<Variable> *) const {
+      Symbol<Module>::VariableIterator i = module->variableFind(name);
+      if (i != module->variableEnd()) {
+        return *i;
+      }
+      return ptr<Symbol<Variable> >::type();
+    } 
      
     /// Get the function symbol at the current scope only.  Return a
     /// null pointer if the symbol does not exist.
