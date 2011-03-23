@@ -21,7 +21,7 @@ namespace mirv {
 		       public VariableBaseType,
                        public boost::enable_shared_from_this<Symbol<Module> > {
      public:
-       Interface(const std::string &n) : Symbol<Named>(n) {}
+       Interface(const std::string &n);
 
        // Access function information
        typedef FunctionBaseType::ChildPtr FunctionPointer;
@@ -132,6 +132,8 @@ namespace mirv {
    public:
      typedef Interface BaseType;
      typedef FunctionBaseType VisitorBaseType;
+
+     static void initialize(ptr<Symbol<Module> >::type module);
 
      static std::string getName(const std::string &name) {
        return name;

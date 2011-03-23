@@ -3,7 +3,9 @@
 
 #include <mirv/Core/Builder/FloatingTypeRules.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
+#include <mirv/Core/IR/FloatingTypeFwd.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 

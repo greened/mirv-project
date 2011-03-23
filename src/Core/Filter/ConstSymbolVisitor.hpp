@@ -50,9 +50,9 @@ namespace mirv {
 	ptr<Symbol<Type<Derived> > >::const_type,
 	ptr<Symbol<Type<Integral> > >::const_type,
 	ptr<Symbol<Type<Floating> > >::const_type,
-	ptr<Symbol<Type<Array> > >::const_type,
 	ptr<Symbol<Type<Pointer> > >::const_type,
-	ptr<Symbol<Type<FunctionType> > >::const_type
+	ptr<Symbol<Type<FunctionType> > >::const_type,
+	ptr<Symbol<Type<Tuple> > >::const_type
 	> > {
   public:
     virtual void visit(ptr<Symbol<Base> >::const_type);
@@ -86,10 +86,10 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Type<Derived> > >::const_type);
     virtual void visit(ptr<Symbol<Type<Integral> > >::const_type);
     virtual void visit(ptr<Symbol<Type<Floating> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<Array> > >::const_type);
     virtual void visit(ptr<Symbol<Type<Pointer> > >::const_type);
     virtual void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<StructType> > >::const_type);
+    virtual void visit(ptr<Symbol<Type<Tuple> > >::const_type);
+    virtual void visit(ptr<Symbol<Type<Placeholder> > >::const_type);
   };
 }
 

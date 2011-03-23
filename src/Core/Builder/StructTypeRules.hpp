@@ -14,12 +14,22 @@ namespace mirv {
 
      /// This is the rule to match struct type symbols.  It matches
      /// struct_["name"][body]
-     struct StructTypeRule : boost::proto::subscript<
+     struct StructTypeDefRule : boost::proto::subscript<
        boost::proto::subscript<
 	 StructTerminal,
 	 StringTerminal
 	 >,
        TypeList
+       > {};
+
+     struct StructTypeDeclRule : boost::proto::subscript<
+       StructTerminal,
+       StringTerminal
+       > {};
+
+     struct StructTypeRule : boost::proto::or_<
+       StructTypeDefRule,
+       StructTypeDeclRule
        > {};
    }
 }

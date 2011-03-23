@@ -11,7 +11,7 @@ namespace mirv {
       WhileRule,
       // Since there is not while statement, indicate a while by
       // specializing on the grammar rule.
-      ClearPendingStatements<WhileRule> (
+      ClearPendingStatementsWhileRule (
         boost::proto::_data,
         ConstructBinary<
           Statement<IfThen>,

@@ -48,10 +48,9 @@ namespace mirv {
 
         virtual void visit(ptr<Symbol<Type<Integral> > >::const_type);
         virtual void visit(ptr<Symbol<Type<Floating> > >::const_type);
-        virtual void visit(ptr<Symbol<Type<Array> > >::const_type);
+        virtual void visit(ptr<Symbol<Type<Tuple> > >::const_type);
         virtual void visit(ptr<Symbol<Type<Pointer> > >::const_type);
         virtual void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
-        virtual void visit(ptr<Symbol<Type<StructType> > >::const_type);
 
         const llvm::Type *type(void) const {
           return TheType;
@@ -450,13 +449,13 @@ namespace mirv {
       void visit(ptr<Statement<Assignment> >::type stmt) {
         this->doEnter(stmt);
 
-        this->doBeforeExpression(stmt, stmt->getLeftExpression());
-        this->doExpression(stmt, stmt->getLeftExpression());
-        this->doAfterExpression(stmt, stmt->getLeftExpression());
-
-        this->doBeforeExpression(stmt, stmt->getRightExpression());
-        this->doExpression(stmt, stmt->getRightExpression());
-        this->doAfterExpression(stmt, stmt->getRightExpression());
+        for (auto i = stmt->expressionBegin();
+             i != stmt->expressionEnd();
+             ++i) {
+          this->doBeforeExpression(stmt, i);
+          this->doExpression(stmt, i);
+          this->doAfterExpression(stmt, i);
+        }
 
         this->doLeave(stmt);
       }

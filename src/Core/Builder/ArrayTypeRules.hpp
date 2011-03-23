@@ -3,6 +3,7 @@
 
 #include <mirv/Core/Builder/ArrayTypeRulesFwd.hpp>
 #include <mirv/Core/Builder/TypeRulesFwd.hpp>
+#include <mirv/Core/Builder/SymbolTerminals.hpp>
 
 #include <mirv/Core/Builder/Wrapper.hpp>
 
@@ -43,25 +44,25 @@ namespace mirv {
       IntegerList
       > {};
 
-    // struct TypeSubscriptList;
+    struct TypeSubscriptList;
 
-    // struct StrictTypeSubscriptList : boost::proto::subscript<
-    //   TypeSubscriptList,
-    //   IntegerTerminal
-    //   > {};
+    struct StrictTypeSubscriptList : boost::proto::subscript<
+      TypeSubscriptList,
+      IntegerTerminal
+      > {};
 
     struct TypeSubscriptRule : boost::proto::subscript<
       TypeRule,
       IntegerTerminal
       > {};
 
-    // struct TypeSubscriptList : boost::proto::or_<
-    //   StrictTypeSubscriptList,
-    //   TypeSubscriptRule
-    //   > {};
+    struct TypeSubscriptList : boost::proto::or_<
+      StrictTypeSubscriptList,
+      TypeSubscriptRule
+      > {};
 
     struct TypeDimensionList : boost::proto::or_<
-      TypeSubscriptRule,
+      TypeSubscriptList,
       MultiTypeSubscriptRule
       > {};
 

@@ -1,10 +1,10 @@
 // Test building of pointer types.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    fdecl printf int32 (int8*, ...)
+// STDOUT:    fdecl printf int32 (int8 *, ...)
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl a int32**
+// STDOUT:       vdecl a int32 * *
 // STDOUT:       {
 // STDOUT:
 // STDOUT:       }
@@ -12,12 +12,11 @@
 // STDOUT: }
 
 #include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/Builder/Builder.hpp>

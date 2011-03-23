@@ -71,7 +71,7 @@ namespace mirv {
 	ptr<Expression<Reference<Variable> > >::const_type,
 	ptr<Expression<Reference<Function> > >::const_type,
 	ptr<Expression<Reference<Constant<Base> > > >::const_type,
-	ptr<Expression<Reference<Array> > >::const_type
+	ptr<Expression<Reference<Tuple> > >::const_type
 	> > {
   public:
     virtual result_type visit(ptr<Expression<Base> >::const_type);
@@ -114,7 +114,7 @@ namespace mirv {
     virtual result_type visit(ptr<Expression<Reference<Variable> > >::const_type);
     virtual result_type visit(ptr<Expression<Reference<Function> > >::const_type);
     virtual result_type visit(ptr<Expression<Reference<Constant<Base> > > >::const_type);
-    virtual result_type visit(ptr<Expression<Reference<Array> > >::const_type);
+    virtual result_type visit(ptr<Expression<Reference<Tuple> > >::const_type);
   };
 }
 

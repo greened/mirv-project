@@ -4,6 +4,7 @@
 #include <mirv/Core/Filter/ConstExpressionVisitor.hpp>
 #include <mirv/Core/Filter/Dataflow.hpp>
 #include <mirv/Core/IR/Expression.hpp>
+#include <mirv/Core/Filter/Action.hpp>
 
 namespace mirv {
   /// This is the base class of all flows that operate on expressions.
@@ -61,23 +62,24 @@ namespace mirv {
       };
 
     /// Apply the before action to an expression.
-     template<typename Expr, typename Child>
+     template<typename Expr, typename InputIterator>
      typename BeforeAction::result_type doBefore(boost::shared_ptr<Expr> expr,
-                                                 boost::shared_ptr<Child> child) {
+                                                 InputIterator child) {
        return(bfr(expr, child));
       };
 
     /// Apply the between action to a pair of expressions.
-     template<typename Expr, typename Child>
+     template<typename Expr, typename InputIterator>
      typename BetweenAction::result_type doBetween(boost::shared_ptr<Expr> expr,
-                                                   boost::shared_ptr<Child> child1, boost::shared_ptr<Child> child2) {
+                                                   InputIterator child1,
+                                                   InputIterator child2) {
        return(bfr(expr, child1, child2));
       };
 
     /// Apply the after action to an expression.
-     template<typename Expr, typename Child>
+     template<typename Expr, typename InputIterator>
      typename AfterAction::result_type doAfter(boost::shared_ptr<Expr> expr,
-                                               boost::shared_ptr<Child> child) {
+                                               InputIterator child) {
        return(aft(expr, child));
       };
 
@@ -154,12 +156,12 @@ namespace mirv {
                 iend = expr->end();
              i != iend;
              /* NULL */) {
-            this->doBefore(expr, *i);
+            this->doBefore(expr, i);
             (*i)->accept(*this);
-            this->doAfter(expr, *i);
+            this->doAfter(expr, i);
             InnerExpression::const_iterator prev = i;
             if (++i != iend) {
-               this->doBetween(expr, *prev, *i);
+               this->doBetween(expr, prev, i);
             }
          }
 
@@ -239,12 +241,12 @@ namespace mirv {
              iend = expr->rend();
            i != iend;
            /* NULL */) {
-         this->doBefore(expr, *i);
+         this->doBefore(expr, i);
          (*i)->accept(*this);
-         this->doAfter(expr, *i);
+         this->doAfter(expr, i);
          InnerExpression::reverse_iterator prev = i;
          if (++i != iend) {
-           this->doBetween(expr, *prev, *i);
+           this->doBetween(expr, prev, i);
          }
        } 
 

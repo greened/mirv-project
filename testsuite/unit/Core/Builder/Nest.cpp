@@ -1,24 +1,16 @@
 // Test building of struct types.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    tdecl testnest {
-// STDOUT:       int32
-// STDOUT:    }
-// STDOUT:    tdecl teststruct {
-// STDOUT:       int32,
-// STDOUT:       float32,
-// STDOUT:       testnest,
-// STDOUT:       int16
-// STDOUT:    }
+// STDOUT:    vdecl a (int32, float32, (int32), int16)
 // STDOUT: }
 
 #include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Core/Builder/SymbolGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
@@ -36,6 +28,7 @@ using Builder::int_;
 using Builder::float_;
 using Builder::struct_;
 using Builder::module;
+using Builder::var;
 
 int main(void)
 {
@@ -49,7 +42,8 @@ int main(void)
             int_(32)
           ],
           int_(16)
-        ]
+        ],
+        var["a"].type["teststruct"]
       ]
     );
 

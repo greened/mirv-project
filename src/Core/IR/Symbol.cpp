@@ -7,10 +7,10 @@
 #include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/IR/Visitable.ipp>
 
@@ -211,10 +211,10 @@ namespace mirv {
 
   template
   void
-  Visitable<Symbol<Type<StructType> >, SymbolVisitor>::accept(SymbolVisitor &);
+  Visitable<Symbol<Type<Tuple> >, SymbolVisitor>::accept(SymbolVisitor &);
   template
   void
-  ConstVisitable<Symbol<Type<StructType> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
+  ConstVisitable<Symbol<Type<Tuple> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
 
   template
   void
@@ -225,15 +225,15 @@ namespace mirv {
 
   template
   void
-  Visitable<Symbol<Type<Array> >, SymbolVisitor>::accept(SymbolVisitor &);
-  template
-  void
-  ConstVisitable<Symbol<Type<Array> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
-
-  template
-  void
   Visitable<Symbol<Type<FunctionType> >, SymbolVisitor>::accept(SymbolVisitor &);
   template
   void
   ConstVisitable<Symbol<Type<FunctionType> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
+
+  template
+  void
+  Visitable<Symbol<Type<Placeholder> >, SymbolVisitor>::accept(SymbolVisitor &);
+  template
+  void
+  ConstVisitable<Symbol<Type<Placeholder> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
 }

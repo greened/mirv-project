@@ -87,6 +87,25 @@ namespace mirv {
 	 return StatementBaseType::empty();
        }
 
+       typedef StatementBaseType::iterator StatementIterator;
+       typedef StatementBaseType::const_iterator ConstStatementIterator;
+       /// Get the start of the local statement sequence.
+       StatementIterator statementBegin(void) {
+	 return StatementBaseType::begin();
+       }
+       /// Get the end of the local statement sequence.
+       StatementIterator statementEnd(void) {
+	 return StatementBaseType::end();
+       }
+       /// Get the start of the local statement sequence.
+       ConstStatementIterator statementBegin(void) const {
+	 return StatementBaseType::begin();
+       }
+       /// Get the end of the local statement sequence.
+       ConstStatementIterator statementEnd(void) const {
+	 return StatementBaseType::end();
+       }
+
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
        }
@@ -105,6 +124,8 @@ namespace mirv {
      };
      typedef Interface BaseType;
      typedef TypedBaseType VisitorBaseType;
+
+     static void initialize(ptr<Symbol<Function> >::type function) {}
 
      static std::string getName(const std::string &name,
                                 ptr<Symbol<Type<TypeBase> > >::const_type type) {
