@@ -116,6 +116,12 @@ namespace mirv {
       lookupAtCurrentScope(const std::string &name,
 			   Symbol<Variable> *) const;
 
+      /// Get the variable symbol at module scope only.  Return a null
+      /// pointer if the symbol does not exist.
+      ptr<Symbol<Variable> >::type
+      lookupAtModuleScope(const std::string &name,
+                          Symbol<Variable> *) const;
+
       /// Get the function symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
       ptr<Symbol<Function> >::type
