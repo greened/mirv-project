@@ -443,6 +443,7 @@ namespace mirv {
       void visit(ptr<Expression<NotEqual> >::const_type expr);
       void visit(ptr<Expression<GreaterThan> >::const_type expr);
       void visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr);
+      void visit(ptr<Expression<TuplePointer> >::const_type expr);
       void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
       void visit(ptr<Expression<Reference<Function> > >::const_type expr);
       void visit(ptr<Expression<Reference<Tuple> > >::const_type expr);
@@ -740,6 +741,7 @@ namespace mirv {
             void visit(ptr<Expression<NotEqual> >::const_type expr);
             void visit(ptr<Expression<GreaterThan> >::const_type expr);
             void visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr);
+            void visit(ptr<Expression<TuplePointer> >::const_type expr);
             void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
             void visit(ptr<Expression<Reference<Function> > >::const_type expr);
             void visit(ptr<Expression<Reference<Tuple> > >::const_type expr);
@@ -928,6 +930,13 @@ namespace mirv {
         {
           Stream &out = attributeManager.getInheritedAttribute().out();
           out << (printed ? " >=" : ">=");
+          printed = true;
+        }
+
+        void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<TuplePointer> >::const_type expr)
+        {
+          Stream &out = attributeManager.getInheritedAttribute().out();
+          out << (printed ? " &" : "&");
           printed = true;
         }
 
@@ -1589,6 +1598,16 @@ namespace mirv {
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
       out << indent(ind) << ">=\n";
+      attributeManager.setInheritedAttribute(
+        InheritedAttribute(ind + IndentFactor, out));
+    }
+
+    void EnterExpressionVisitor::visit(ptr<Expression<TuplePointer> >::const_type expr)
+    {
+      Stream &out = attributeManager.getInheritedAttribute().out();
+      Indent ind = attributeManager.getInheritedAttribute().indent();
+
+      out << indent(ind) << "&\n";
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }

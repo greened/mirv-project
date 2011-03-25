@@ -376,4 +376,10 @@ ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<Binary> >
       fast_cast<Expression<Reference<Tuple> >::VisitorBaseType>(e);
     visit(p);
   }
+
+  ExpressionVisitor::result_type ExpressionVisitor::visit(ptr<Expression<TuplePointer> >::type e) {
+    ptr<Expression<TuplePointer>::VisitorBaseType>::type p =
+      fast_cast<Expression<TuplePointer>::VisitorBaseType>(e);
+    visit(p);
+  }
 }
