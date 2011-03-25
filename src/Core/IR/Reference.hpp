@@ -77,15 +77,6 @@ namespace mirv {
      typedef Interface BaseType;
    };
 
-  /// Take the address of an lvalue expression.
-  class AddressOf { 
-  public:
-    // TODO: Interface that checks for lvalues.
-    typedef Expression<Unary> BaseType;
-    typedef Expression<Unary> VisitorBaseType;
-    // TODO: Override type().
-  };
-
   /// Dereference the address provided by some expression.
   class Dereference { 
   public:
@@ -147,6 +138,62 @@ namespace mirv {
    public:
      typedef InnerExpression VisitorBaseType;
      typedef Interface BaseType;
+  };
+
+  /// Take the address of a tuple item.
+  class TuplePointer { 
+  public:
+    // TODO: Interface that checks for lvalues.
+    // We need to manually define the interface to override
+    // InnerExpression's type() implementation.
+    class Interface
+        : public InnerExpression,
+    //public Expression<Ref>,
+          public boost::enable_shared_from_this<Expression<TuplePointer> > {
+    private:
+      Expression<Base> *cloneImpl(void) {
+        std::vector<ptr<Expression<Base> >::type> children;
+
+        for (auto i = begin(); i != end(); ++i) {
+          children.push_back((*i)->clone());
+        }
+
+        ptr<Expression<TuplePointer> >::type expr(
+          mirv::make<Expression<TuplePointer> >(*children.begin(),
+                                                children.begin() + 1,
+                                                children.end()));
+        Expression<TuplePointer> *result = expr.get();
+        expr.reset();
+        return result;
+      }
+ 
+    public:
+      Interface(ChildPtr Base, ChildPtr Index)
+          : InnerExpression(Base, Index) {}
+
+      template<typename Sequence>
+      Interface(ChildPtr Base, const Sequence &indices)
+          : InnerExpression(Base, indices) {}
+
+      template<typename InputIterator>
+      Interface(ChildPtr Base, InputIterator start, InputIterator end)
+          : InnerExpression(Base, start, end) {}
+
+      ptr<Node<Base> >::type getSharedHandle(void) {
+        return fast_cast<Node<Base>>(this->shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(this->shared_from_this());
+      }
+
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
+      TypePtr type(void) const;
+    };
+
+   public:
+     typedef InnerExpression VisitorBaseType;
+     typedef Interface BaseType;
+    // TODO: Override type().
   };
 }
 
