@@ -101,6 +101,20 @@ namespace mirv {
        ConstructExpressionGrammar
        > {};
 
+     struct MultiSubscriptAddressRule : boost::proto::address_of<
+       boost::proto::subscript<
+         ConstructExpressionGrammar,
+         MultiIndexRule
+         >
+       > {};
+
+     struct SubscriptAddressRule : boost::proto::address_of<
+       boost::proto::subscript<
+         ConstructExpressionGrammar,
+         ConstructExpressionGrammar
+         >
+       > {};
+
      // No comma
      // No assign (statement)
      // No op-assign
