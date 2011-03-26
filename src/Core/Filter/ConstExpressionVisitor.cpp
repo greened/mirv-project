@@ -375,4 +375,9 @@ ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression
     ptr<Expression<Reference<Tuple> >::VisitorBaseType>::const_type p = fast_cast<const Expression<Reference<Tuple> >::VisitorBaseType>(e);
     visit(p);
   }
+
+  ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<TuplePointer> >::const_type e) {
+    ptr<Expression<TuplePointer>::VisitorBaseType>::const_type p = fast_cast<const Expression<TuplePointer>::VisitorBaseType>(e);
+    visit(p);
+  }
 }

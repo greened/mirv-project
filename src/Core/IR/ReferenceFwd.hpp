@@ -9,6 +9,7 @@ namespace mirv {
   class Call;
   class Array;
   class Tuple;
+  class TuplePointer;
 }
 
 #endif

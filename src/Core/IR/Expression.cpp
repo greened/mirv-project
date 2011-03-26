@@ -283,6 +283,13 @@ namespace mirv {
 
   template
   void
+  Visitable<Expression<TuplePointer>, ExpressionVisitor>::accept(ExpressionVisitor &);
+  template
+  void
+  ConstVisitable<Expression<TuplePointer>, ConstExpressionVisitor, ExpressionVisitor>::accept(ConstExpressionVisitor &) const;
+
+  template
+  void
   Visitable<Expression<Reference<Function> >, ExpressionVisitor>::accept(ExpressionVisitor &);
   template
   void
