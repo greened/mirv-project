@@ -292,6 +292,28 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::subscript>
         : ArrayRefBuilder {};
 
+    /// This is the grammar for array address expressions.
+    struct ArrayAddressBuilder : boost::proto::or_<
+      boost::proto::when<
+        MultiSubscriptAddressRule,
+        ConstructNaryFlat<Expression<TuplePointer> >(
+          boost::proto::_data,
+          ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),
+          boost::proto::_right(boost::proto::_left))
+        >,
+      boost::proto::when<
+        SubscriptAddressRule,
+        ConstructBinary<Expression<TuplePointer> >(
+          boost::proto::_data,
+          ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),
+          ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)))
+        > 
+      > {};
+
+    template<>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::address_of>
+        : ArrayAddressBuilder {};
+
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::function>
         : CallExpressionBuilder {};
