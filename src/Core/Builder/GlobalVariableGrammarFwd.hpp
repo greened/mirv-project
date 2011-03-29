@@ -1,5 +1,5 @@
-#ifndef mirv_Core_Builder_VariableGrammarFwd_hpp
-#define mirv_Core_Builder_VariableGrammarFwd_hpp
+#ifndef mirv_Core_Builder_GlobalVariableGrammarFwd_hpp
+#define mirv_Core_Builder_GlobalVariableGrammarFwd_hpp
 
 namespace mirv {
   namespace Builder {

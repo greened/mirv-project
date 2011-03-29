@@ -10,6 +10,7 @@
 
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/VariableFwd.hpp>
+#include <mirv/Core/IR/GlobalVariableFwd.hpp>
 #include <mirv/Core/IR/ConstantFwd.hpp>
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/FunctionFwd.hpp>
@@ -31,6 +32,7 @@ namespace mirv {
 	ptr<Symbol<Module> >::type,
 	ptr<Symbol<Function> >::type,
 	ptr<Symbol<Variable> >::type,
+	ptr<Symbol<GlobalVariable> >::type,
 	ptr<Symbol<Constant<Base> > >::type,
 	ptr<Symbol<Constant<std::int8_t> > >::type,
 	ptr<Symbol<Constant<std::uint8_t> > >::type,
@@ -52,6 +54,7 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Module> >::type);
     virtual void visit(ptr<Symbol<Function> >::type);
     virtual void visit(ptr<Symbol<Variable> >::type);
+    virtual void visit(ptr<Symbol<GlobalVariable> >::type);
     virtual void visit(ptr<Symbol<Constant<Base> > >::type);
     virtual void visit(ptr<Symbol<Constant<std::int8_t> > >::type);
     

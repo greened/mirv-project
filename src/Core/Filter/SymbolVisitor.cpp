@@ -4,6 +4,7 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
@@ -51,6 +52,12 @@ namespace mirv {
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Variable> >::type s) {
     ptr<Symbol<Variable>::VisitorBaseType>::type p =
       fast_cast<Symbol<Variable>::VisitorBaseType>(s);
+    visit(p);
+  }
+
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::type s) {
+    ptr<Symbol<GlobalVariable>::VisitorBaseType>::type p =
+      fast_cast<Symbol<GlobalVariable>::VisitorBaseType>(s);
     visit(p);
   }
 
