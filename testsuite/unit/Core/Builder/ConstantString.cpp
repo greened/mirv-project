@@ -13,11 +13,10 @@
 // STDOUT:          call
 // STDOUT:             fref printf
 // STDOUT:             vref __ct0__
-// STDOUT:             addrOf
-// STDOUT:                aref
-// STDOUT:                   vref __str0__
-// STDOUT:                   cref 0
-// STDOUT:                vref i
+// STDOUT:             &
+// STDOUT:               vref __str0__
+// STDOUT:               cref 0
+// STDOUT:             vref i
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
@@ -26,17 +25,19 @@
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Constant.hpp>
-#include <mirv/Core/IR/ArrayType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/StructType.hpp>
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Control.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
+#include <mirv/Core/Builder/ConstantGrammar.hpp>
+#include <mirv/Core/Builder/SymbolGrammar.hpp>
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/Builder/Domain.hpp>

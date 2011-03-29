@@ -56,15 +56,17 @@ namespace mirv {
 
     /// This is a callable transform to construct a symbol.  If the
     /// symbol exists at the current scope, it is an error.
-    template<typename SymbolType,
-	     typename Dummy = boost::proto::callable>
+    template<
+      typename SymbolType,
+      Scope scope,
+      typename Dummy = boost::proto::callable
+      >
     struct UnaryConstructSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
       template<typename Arg>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             Arg a,
-                             Scope scope) {
+                             Arg a) {
         std::string name = SymbolType::getName(a);
 
 	// Make sure we're not already in the symbol table at the current scope.
@@ -90,7 +92,11 @@ namespace mirv {
 
     // Specialize for types, which need to be const.
     template<typename Tag>
-    struct UnaryConstructSymbol<Symbol<Type<Tag> >, boost::proto::callable>
+    struct UnaryConstructSymbol<
+      Symbol<Type<Tag> >,
+      ModuleScope,
+      boost::proto::callable
+      >
         : boost::proto::callable {
       typedef typename ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 
@@ -101,8 +107,8 @@ namespace mirv {
 
 	// Make sure we're not already in the symbol table at the current scope.
 	ptr<Symbol<Type<TypeBase> > >::const_type exists =
-          symtab->lookupAtCurrentScope(name,
-                                       reinterpret_cast<const Symbol<Type<Tag> > *>(0));
+          symtab->lookupAtModuleScope(name,
+                                      reinterpret_cast<const Symbol<Type<Tag> > *>(0));
         if (exists) {
           // If this is a placeholder, we're about to replace it.
           typename ptr<Symbol<Type<Tag> > >::const_type type =
@@ -117,23 +123,25 @@ namespace mirv {
 	}
         result_type result = mirv::make<Symbol<Type<Tag> > >(a);
         result->setParent(symtab->getModule());
-        symtab->addAtCurrentScope(result);
+        symtab->addAtModuleScope(result);
         return result;
       }
     };
 
     /// This is a callable transform to construct a symbol.  If the
     /// symbol exists at the current scope, it is an error.
-    template<typename SymbolType,
-	     typename Dummy = boost::proto::callable>
+    template<
+      typename SymbolType,
+      Scope scope,
+      typename Dummy = boost::proto::callable
+      >
     struct BinaryConstructSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
       template<typename Arg1, typename Arg2>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
 			     Arg1 a1,
-			     Arg2 a2,
-                             Scope scope) {
+			     Arg2 a2) {
 	std::string name = SymbolType::getName(a1, a2);
 
 	// Make sure we're not already in the symbol table at the current scope.
@@ -158,8 +166,11 @@ namespace mirv {
 
     // Specialize for types, which need to be const.
     template<typename Tag>
-    struct BinaryConstructSymbol<Symbol<Type<Tag> >, boost::proto::callable>
-        : boost::proto::callable {
+    struct BinaryConstructSymbol<
+      Symbol<Type<Tag> >,
+      ModuleScope,
+      boost::proto::callable
+      > : boost::proto::callable {
       typedef typename ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 
       template<typename Arg1, typename Arg2>
@@ -170,8 +181,8 @@ namespace mirv {
 
 	// Make sure we're not already in the symbol table at the current scope.
 	ptr<Symbol<Type<TypeBase> > >::const_type exists =
-          symtab->lookupAtCurrentScope(name,
-                                       reinterpret_cast<const Symbol<Type<Tag> >  *>(0));
+          symtab->lookupAtModuleScope(name,
+                                      reinterpret_cast<const Symbol<Type<Tag> >  *>(0));
 	if (exists) {
           // If this is a placeholder, we're about to replace it.
           typename ptr<Symbol<Type<Tag> > >::const_type type =
@@ -186,15 +197,18 @@ namespace mirv {
 	}
         result_type result = mirv::make<Symbol<Type<Tag> > >(a1, a2);
         result->setParent(symtab->getModule());
-	symtab->addAtCurrentScope(result);
+	symtab->addAtModuleScope(result);
 	return result;
       }
     };
 
     /// This is a callable transform to construct a symbol.  If the
     /// symbol exists at the current scope, it is an error.
-    template<typename SymbolType,
-	     typename Dummy = boost::proto::callable>
+    template<
+      typename SymbolType,
+      Scope scope,
+      typename Dummy = boost::proto::callable
+      >
     struct TernaryConstructSymbol : boost::proto::callable {
       typedef typename ptr<SymbolType>::type result_type;
 
@@ -202,8 +216,7 @@ namespace mirv {
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
 			     Arg1 a1,
 			     Arg2 a2,
-                             Arg3 a3,
-                             Scope scope) {
+                             Arg3 a3) {
 	std::string name = SymbolType::getName(a1, a2, a3);
 
 	// Make sure we're not already in the symbol table at the current scope.
@@ -227,8 +240,11 @@ namespace mirv {
 
     // Specialize for types which need to be const.
     template<typename Tag>
-    struct TernaryConstructSymbol<Symbol<Type<Tag> >, boost::proto::callable>
-        : boost::proto::callable {
+    struct TernaryConstructSymbol<
+      Symbol<Type<Tag> >,
+      ModuleScope,
+      boost::proto::callable
+      > : boost::proto::callable {
       typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
 
       template<typename Arg1, typename Arg2, typename Arg3>
@@ -243,8 +259,8 @@ namespace mirv {
 
 	// Make sure we're not already in the symbol table at the current scope.
 	ptr<Symbol<Base> >::const_type exists =
-          symtab->lookupAtCurrentScope(name,
-                                       reinterpret_cast<const Symbol<Type<Tag> >  *>(0));
+          symtab->lookupAtModuleScope(name,
+                                      reinterpret_cast<const Symbol<Type<Tag> >  *>(0));
 	if (exists) {
           // If this is a placeholder, we're about to replace it.
           typename ptr<Symbol<Type<Tag> > >::const_type type =
@@ -259,7 +275,7 @@ namespace mirv {
 	}
         result_type result = mirv::make<Symbol<Type<Tag> > >(a1, a2, a3);
         result->setParent(symtab->getModule());
-	symtab->addAtCurrentScope(result);
+	symtab->addAtModuleScope(result);
 	return result;
       }
     };

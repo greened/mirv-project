@@ -26,13 +26,12 @@ namespace mirv {
                              Arg functionExpr,
                              const Expr &expr) {
         ptr<Symbol<Variable> >::type temp =
-          BinaryConstructSymbol<Symbol<Variable> >()(
+          BinaryConstructSymbol<Symbol<Variable>, CurrentScope>()(
             symtab, "__ct"
             + boost::lexical_cast<std::string>(symtab->getNextTempNum())
             + "__",
             safe_cast<const Symbol<Type<FunctionType> > >(functionExpr->type())->
-            getReturnType(),
-            CurrentScope);
+            getReturnType());
 
       ptr<Expression<Reference<Variable> > >::type returnValue =
         make<Expression<Reference<Variable> > >(temp);

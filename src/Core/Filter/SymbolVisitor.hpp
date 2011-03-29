@@ -42,7 +42,7 @@ namespace mirv {
 	ptr<Symbol<Constant<std::uint64_t> > >::type,
 	ptr<Symbol<Constant<float> > >::type,
 	ptr<Symbol<Constant<double> > >::type,
-	ptr<Symbol<Constant<std::string> > >::type,
+	ptr<Symbol<Constant<std::string> > >::type
 	> > {
   public:
     virtual void visit(ptr<Symbol<Base> >::type);

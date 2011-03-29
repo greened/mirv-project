@@ -122,17 +122,20 @@ namespace mirv {
       lookupAtModuleScope(const std::string &name,
                           Symbol<Variable> *) const;
 
-      /// Get the function symbol at the current scope only.  Return a
+      /// Get the function symbol at the module scope only.  Return a
       /// null pointer if the symbol does not exist.
       ptr<Symbol<Function> >::type
+      lookupAtModuleScope(const std::string &name,
+                          Symbol<Function> *) const;
+      ptr<Symbol<Function> >::type
       lookupAtCurrentScope(const std::string &name,
-			   Symbol<Function> *) const;
+                           Symbol<Function> *) const;
 
       /// Get the type symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
       ptr<Symbol<Type<TypeBase> > >::const_type
-      lookupAtCurrentScope(const std::string &name,
-			   const Symbol<Type<TypeBase> > *) const;
+      lookupAtModuleScope(const std::string &name,
+                          const Symbol<Type<TypeBase> > *) const;
 
       ptr<Symbol<Variable> >::type
       lookupAtAllScopes(const std::string &name,
@@ -146,6 +149,8 @@ namespace mirv {
       void addAtCurrentScope(ptr<Symbol<Variable> >::type var);
       void addAtCurrentScope(ptr<Symbol<Function> >::type func);
       void addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::const_type type);
+      void addAtModuleScope(ptr<Symbol<Function> >::type func);
+      void addAtModuleScope(ptr<Symbol<Type<TypeBase> > >::const_type type);
       void addAtModuleScope(ptr<Symbol<Variable> >::type var);
     };
 

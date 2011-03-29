@@ -107,11 +107,11 @@ namespace mirv {
       return ptr<Symbol<Variable> >::type();
     } 
      
-    /// Get the function symbol at the current scope only.  Return a
+    /// Get the function symbol at the module scope only.  Return a
     /// null pointer if the symbol does not exist.
     ptr<Symbol<Function> >::type
-    SymbolTable::lookupAtCurrentScope(const std::string &name,
-                                      Symbol<Function> *) const {
+    SymbolTable::lookupAtModuleScope(const std::string &name,
+                                     Symbol<Function> *) const {
       Symbol<Module>::FunctionIterator i = module->functionFind(name);
       if (i != module->functionEnd()) {
         return *i;
@@ -119,11 +119,17 @@ namespace mirv {
       return ptr<Symbol<Function> >::type();
     }
 
+    ptr<Symbol<Function> >::type
+    SymbolTable::lookupAtCurrentScope(const std::string &name,
+                                      Symbol<Function> *dummy) const {
+      return lookupAtModuleScope(name, dummy);
+    }
+
     /// Get the type symbol at the current scope only.  Return a
     /// null pointer if the symbol does not exist.
     ptr<Symbol<Type<TypeBase> > >::const_type
-    SymbolTable::lookupAtCurrentScope(const std::string &name,
-                                      const Symbol<Type<TypeBase> > *) const {
+    SymbolTable::lookupAtModuleScope(const std::string &name,
+                                     const Symbol<Type<TypeBase> > *) const {
       Symbol<Module>::ConstTypeIterator i = module->typeFind(name);
       if (i != module->typeEnd()) {
         return *i;
@@ -160,7 +166,7 @@ namespace mirv {
     SymbolTable::lookupAtAllScopes(const std::string &name,
                                    Symbol<Function> *) const {
       ptr<Symbol<Function> >::type function =
-        lookupAtCurrentScope(name, reinterpret_cast<Symbol<Function> *>(0));
+        lookupAtModuleScope(name, reinterpret_cast<Symbol<Function> *>(0));
       if (!function) {
         error("Could not find function");
       }
@@ -173,8 +179,8 @@ namespace mirv {
       std::string realName = translateName(name);
 
       ptr<Symbol<Type<TypeBase> > >::const_type type =
-        lookupAtCurrentScope(realName,
-                             reinterpret_cast<const Symbol<Type<TypeBase> > *>(0));
+        lookupAtModuleScope(realName,
+                            reinterpret_cast<const Symbol<Type<TypeBase> > *>(0));
       if (!type) {
         error("Could not find type");
       }
@@ -198,8 +204,13 @@ namespace mirv {
 
     void
     SymbolTable::addAtCurrentScope(ptr<Symbol<Function> >::type func) {
+      addAtModuleScope(func);
+    }
+
+    void
+    SymbolTable::addAtModuleScope(ptr<Symbol<Function> >::type func) {
       ptr<Symbol<Function> >::type result =
-        lookupAtCurrentScope(func->name(),
+        lookupAtModuleScope(func->name(),
                              reinterpret_cast<Symbol<Function> *>(0));
       if (result) {
         error("Function already exists");
@@ -209,11 +220,16 @@ namespace mirv {
 
     void
     SymbolTable::addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::const_type type) {
+      addAtModuleScope(type);
+    }
+
+    void
+    SymbolTable::addAtModuleScope(ptr<Symbol<Type<TypeBase> > >::const_type type) {
       std::ostringstream name;
       print(name, type);
       ptr<Symbol<Type<TypeBase> > >::const_type result =
-        lookupAtCurrentScope(name.str(),
-                             reinterpret_cast<const Symbol<Type<TypeBase> > *>(0));
+        lookupAtModuleScope(name.str(),
+                            reinterpret_cast<const Symbol<Type<TypeBase> > *>(0));
       if (result) {
         ptr<Symbol<Type<Placeholder> > >::const_type placeholder =
           dyn_cast<const Symbol<Type<Placeholder> > >(result);

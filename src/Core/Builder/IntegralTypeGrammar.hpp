@@ -16,7 +16,7 @@ namespace mirv {
       IntRule,
       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
         boost::proto::_data,
-        UnaryConstructSymbol<Symbol<Type<Integral> > >(
+        UnaryConstructSymbol<Symbol<Type<Integral> >, ModuleScope>(
           boost::proto::_data,
           boost::proto::_value(boost::proto::_right)))
       > {};

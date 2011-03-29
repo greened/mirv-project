@@ -87,7 +87,7 @@ namespace mirv {
         boost::proto::_data,
         SetFunction(
           boost::proto::_data,
-          BinaryConstructSymbol<Symbol<Function> >(
+          BinaryConstructSymbol<Symbol<Function>, ModuleScope>(
             boost::proto::_data,
             // Function name
             boost::proto::_value(
@@ -109,7 +109,7 @@ namespace mirv {
           boost::proto::_state,
           SetFunction(
             boost::proto::_data,
-            BinaryConstructSymbol<Symbol<Function> >(
+            BinaryConstructSymbol<Symbol<Function>, ModuleScope>(
               boost::proto::_data,
               // Function name
               boost::proto::_value(

@@ -16,7 +16,7 @@ namespace mirv {
       PointerTypeRule,
       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
         boost::proto::_data,
-        UnaryConstructSymbol<Symbol<Type<Pointer> > >(
+        UnaryConstructSymbol<Symbol<Type<Pointer> >, ModuleScope>(
           boost::proto::_data,
           TypeBuilder(boost::proto::_child)))
       > {};

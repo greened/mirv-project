@@ -458,6 +458,7 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Constant<float> > > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<double> > > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
+      void visit(ptr<Expression<Reference<Constant<std::string> > > >::const_type expr);
     };
 
     class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {
@@ -756,6 +757,7 @@ namespace mirv {
             void visit(ptr<Expression<Reference<Constant<float> > > >::const_type expr);
             void visit(ptr<Expression<Reference<Constant<double> > > >::const_type expr);
             void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
+            void visit(ptr<Expression<Reference<Constant<std::string> > > >::const_type expr);
           };
 
           class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {
