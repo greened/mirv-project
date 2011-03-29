@@ -287,6 +287,7 @@ namespace mirv {
       void visit(ptr<Symbol<Module> >::const_type sym);
       void visit(ptr<Symbol<Function> >::const_type sym);
       void visit(ptr<Symbol<Variable> >::const_type sym);
+      void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
       void visit(ptr<Symbol<Type<TypeBase> > >::const_type sym);
       void visit(ptr<Symbol<Type<Tuple> > >::const_type sym);
     };
@@ -308,6 +309,7 @@ namespace mirv {
       void visit(ptr<Symbol<Module> >::const_type sym);
       void visit(ptr<Symbol<Function> >::const_type sym);
       void visit(ptr<Symbol<Variable> >::const_type sym);
+      void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
     };
 
     class EnterDefSymbolAction : public VisitAction<EnterDefSymbolVisitor> {
@@ -352,6 +354,7 @@ namespace mirv {
 
       /// Print the final newline after each symbol definition.
       void visit(ptr<Symbol<Variable> >::const_type sym);
+      void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
       void visit(ptr<Symbol<Module> >::const_type sym);
       void visit(ptr<Symbol<Function> >::const_type sym);
     };
@@ -1147,6 +1150,21 @@ namespace mirv {
       sym->type()->accept(typePrinter);
     }
 
+    void EnterDeclSymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
+    {
+      Stream &out = attributeManager.getInheritedAttribute().out();
+      Indent ind = attributeManager.getInheritedAttribute().indent();
+
+      out << indent(ind) << "gvdecl " << sym->name() << " "; 
+      TypeNameFlow typePrinter(out);
+      sym->type()->accept(typePrinter);
+      if (sym->initializer()) {
+        out << ' ';
+        ExpressionPrintFilter exprPrinter(out);
+        exprPrinter(sym->initializer());
+      }
+    }
+
     void EnterDeclSymbolVisitor::visit(ptr<Symbol<Type<TypeBase> > >::const_type sym)
     {
       // This is a type that doesn't need a declaration.  So tell the
@@ -1232,7 +1250,31 @@ namespace mirv {
       sym->type()->accept(typePrinter);
     }
 
+    void EnterDefSymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
+    {
+      Stream &out = attributeManager.getInheritedAttribute().out();
+      Indent ind = attributeManager.getInheritedAttribute().indent();
+
+      out << indent(ind) << "gvdecl " << sym->name() << " ";
+      TypeNameFlow typePrinter(out);
+      sym->type()->accept(typePrinter);
+      if (sym->intializer()) {
+        out << ' ';
+        ExpressionPrintFilter exprPrinter(out);
+        exprPrinter(sym->initializer());
+      }
+    }
+
     void LeaveDefSymbolVisitor::visit(ptr<Symbol<Variable> >::const_type sym)
+    {
+      if (   !attributeManager.setLastSynthesizedAttribute()
+             || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
+        attributeManager.getInheritedAttribute().out() << "\n";
+      }
+      attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
+    }
+
+    void LeaveDefSymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
