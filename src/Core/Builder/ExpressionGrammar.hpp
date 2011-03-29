@@ -81,7 +81,8 @@ namespace mirv {
         : boost::proto::or_<
       VariableRefBuilder,
       FunctionRefBuilder,
-      ConstantRefBuilder
+      ConstantRefBuilder,
+      StringRefBuilder
       > {};
 
     /// This is the grammar for negate expressions.

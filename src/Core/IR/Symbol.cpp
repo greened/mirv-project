@@ -155,6 +155,13 @@ namespace mirv {
 
   template
   void
+  Visitable<Symbol<Constant<std::string> >, SymbolVisitor>::accept(SymbolVisitor &);
+  template
+  void
+  ConstVisitable<Symbol<Constant<std::string> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
+
+  template
+  void
   Visitable<Symbol<Module>, SymbolVisitor>::accept(SymbolVisitor &);
   template
   void

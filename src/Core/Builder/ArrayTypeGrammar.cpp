@@ -23,14 +23,14 @@ namespace mirv {
       auto s = subscripts.begin();
 
       result_type TupleType =
-        BinaryConstructSymbol<Symbol<Type<Tuple> > >()(
+        BinaryConstructSymbol<Symbol<Type<Tuple> >, ModuleScope>()(
           symtab,
           elementType,
           makeExpression(*s, symtab->getModule()));
         
       while (++s != subscripts.end()) {
         TupleType =
-          BinaryConstructSymbol<Symbol<Type<Tuple> > >()(
+          BinaryConstructSymbol<Symbol<Type<Tuple> >, ModuleScope>()(
             symtab,
             TupleType,
             makeExpression(*s, symtab->getModule()));

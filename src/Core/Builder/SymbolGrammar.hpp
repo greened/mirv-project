@@ -1,6 +1,7 @@
 #ifndef mirv_Core_Builder_SymbolGrammar_hpp
 #define mirv_Core_Builder_SymbolGrammar_hpp
 
+#include <mirv/Core/Builder/ConstantGrammarFwd.hpp>
 #include <mirv/Core/Builder/ModuleGrammarFwd.hpp>
 #include <mirv/Core/Builder/FunctionGrammarFwd.hpp>
 #include <mirv/Core/Builder/VariableGrammarFwd.hpp>
@@ -13,6 +14,7 @@ namespace mirv {
     /// This aggregates all of the symbol rules.  It serves as the
     /// grammar for all symbols.
     struct ConstructSymbolGrammar : boost::proto::or_<
+      ConstantBuilder,
       ModuleBuilder,
       FunctionBuilder,
       FunctionDeclBuilder,

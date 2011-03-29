@@ -13,15 +13,13 @@ namespace mirv {
     /// This is the grammar for variable symbols.
     struct VariableBuilder : boost::proto::when<
       VariableRule,
-      BinaryConstructSymbol<
-        Symbol<Variable> >(
-          boost::proto::_data,
-          // Variable name
-          boost::proto::_value(boost::proto::_right(
-                                 boost::proto::_left(boost::proto::_left))),
-          // Variable type
-          TypeAccessBuilder(boost::proto::_right),
-          CurrentScope)
+      BinaryConstructSymbol<Symbol<Variable>, CurrentScope>(
+        boost::proto::_data,
+        // Variable name
+        boost::proto::_value(boost::proto::_right(
+                               boost::proto::_left(boost::proto::_left))),
+        // Variable type
+        TypeAccessBuilder(boost::proto::_right))
       > {};
 
     namespace {

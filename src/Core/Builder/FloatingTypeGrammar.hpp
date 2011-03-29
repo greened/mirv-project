@@ -16,7 +16,7 @@ namespace mirv {
       FloatRule,
       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
         boost::proto::_data,
-        UnaryConstructSymbol<Symbol<Type<Floating> > >(
+        UnaryConstructSymbol<Symbol<Type<Floating> >, ModuleScope>(
           boost::proto::_data,
           boost::proto::_value(boost::proto::_right)))
       > {};

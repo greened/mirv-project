@@ -23,16 +23,11 @@ namespace mirv {
                                size_t bitsize);
       };
 
-      struct StringTypeName {
-        typedef std::string result_type;
+      struct StringTypeGen {
+        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 
-        result_type operator()(const std::string &value) {
-          std::size_t length = value.size();
-
-          return "int8["
-            + boost::lexical_cast<std::string>(length)
-            + ']';
-        }
+        result_type operator()(ptr<SymbolTable>::type symtab,
+                               const std::string &value);
       };
 
       /// This is a callable transform to take a string-type variable
@@ -41,11 +36,8 @@ namespace mirv {
       struct GetCStringReference : boost::proto::callable {
         typedef ptr<Expression<Base> >::type result_type;
 
-        template<typename Arg, typename Expr>
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                               ptr<Expression<Base> >::type str) {
-          return make<Expression<Reference<Array> > >();
-        }
+                               ptr<Expression<Base> >::type str);
       };
     }
 
@@ -54,22 +46,8 @@ namespace mirv {
     struct AddStringConstant : boost::proto::callable {
       typedef ptr<Expression<Base> >::type result_type;
 
-      template<typename Arg, typename Expr>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             ptr<Constant<std::string>>::type str) {
-        ptr<Symbol<Variable> >::type temp =
-          BinaryConstructSymbol<Symbol<Variable> >()(
-            symtab,
-            "__str"
-            + boost::lexical_cast<std::string>(symtab->getNextTempNum())
-            + "__",
-            str->type(),
-            ModuleScope);
-        ptr<Expression<Reference<Variable> > >::type constant =
-          make<Expression<Reference<Constant<std::string>>>>(temp);
-
-        return constant;
-      }
+                             ptr<Symbol<Constant<Base> > >::type str);
     };
 
     /// This is a callable transform to construct a constant symbol.
@@ -78,7 +56,7 @@ namespace mirv {
     /// calculate the size of a string differently.  "sizeof" won't
     /// work to get the length of a std::string.
     template<>
-    struct ConstructConstantSymbol<detail::StringTypeName,
+    struct ConstructConstantSymbol<detail::StringTypeGen,
       boost::proto::callable>
         : boost::proto::callable {
       typedef ptr<Symbol<Constant<Base>>>::type result_type;
@@ -86,13 +64,12 @@ namespace mirv {
       template<typename Expr>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
 			     const Expr &expr) {
-        detail::StringTypeName typeGen;
+        detail::StringTypeGen typeGen;
 
         // Constant type
-        ptr<Symbol<Type<TypeBase> > >::type constantType = 
-          LookupSymbol<Symbol<Type<TypeBase> > >()(
-            symtab,
-            typeGen(boost::proto::value(expr)));
+        ptr<Symbol<Type<TypeBase> > >::const_type constantType = 
+          LookupAndAddSymbol<Symbol<Type<TypeBase> > >()(
+            symtab, typeGen(symtab, boost::proto::value(expr)));
 
         typedef Constant<std::string> ConstantType;
 
@@ -119,18 +96,18 @@ namespace mirv {
             boost::proto::_data,
             // Constant expression
             boost::proto::_expr)
-        >,
-      boost::proto::when<
-        StringConstantRule,
-        detail::GetCStringReference(
+        >
+      > {};
+    struct StringRefBuilder : boost::proto::when<
+      StringConstantRule,
+      detail::GetCStringReference(
+        boost::proto::_data,
+        AddStringConstant(
           boost::proto::_data,
-          AddStringConstant(
+          ConstructConstantSymbol<detail::StringTypeGen>(
             boost::proto::_data,
-            ConstructConstantSymbol<detail::StringTypeName>(
-              boost::proto::_data,
-              // Constant expression
-              boost::proto::_expr)))
-          >
+            // Constant expression
+            boost::proto::_expr)))
       > {};
   }
 }

@@ -32,7 +32,7 @@ namespace mirv {
                                Arg1 a1,
                                const Arg2 &a2) {
         TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
-        return TernaryConstructSymbol<Symbol<Type<FunctionType> > >()(
+        return TernaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
           symtab, a1, boost::fusion::transform(
             boost::fusion::pop_front(a2), translator),
           VarargMark::NotVararg);
@@ -47,7 +47,7 @@ namespace mirv {
                                Arg1 a1,
                                const Arg2 &a2) {
           TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
-          return TernaryConstructSymbol<Symbol<Type<FunctionType> > >()(
+          return TernaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
             symtab,
             a1,
             boost::fusion::transform(

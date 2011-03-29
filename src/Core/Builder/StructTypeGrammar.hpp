@@ -87,7 +87,8 @@ namespace mirv {
 
         checkInvariant(placeholder, "Missing placeholder!");
 
-        result_type tuple = UnaryConstructSymbol<Symbol<Type<Tuple> > >()(
+        result_type tuple = UnaryConstructSymbol<Symbol<Type<Tuple> >,
+          ModuleScope>()(
           symtab, detail::translateList(symtab, memberList));
 
         resolve(symtab, name, placeholder, tuple);
