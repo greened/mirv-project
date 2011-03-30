@@ -272,6 +272,32 @@ namespace mirv {
     typedef Interface BaseType;
     typedef Symbol<Base> VisitorBaseType;
   };
+
+  /// A global symbol, a function or global variable.
+  class Global {
+  private:
+    typedef Symbol<Named> NamedBaseType;
+    typedef Symbol<Typed> TypedBaseType;
+    class Interface : public NamedBaseType,
+                      public TypedBaseType { 
+    public:
+      Interface(const std::string &n, TypePtr t)
+          : NamedBaseType(n), TypedBaseType(t) {};
+
+       // We need these to be the final overriders for
+       // Visitable::accept functions.
+       virtual void accept(SymbolVisitor &) {
+         error("Global::Interface::accept called!");
+       }
+       virtual void accept(ConstSymbolVisitor &) const {
+         error("Global::Interface::accept called!");
+       }
+    };
+
+  public:
+    typedef Interface BaseType;
+    typedef Symbol<Typed> VisitorBaseType;
+  };
 }
 
 #include <mirv/Core/IR/Symbol.ipp>
