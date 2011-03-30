@@ -8,6 +8,7 @@ namespace mirv {
   class LeafSymbol;
   class Typed;
   class Named;
+  class Global;
 }
 
 #endif

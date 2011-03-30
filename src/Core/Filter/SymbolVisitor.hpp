@@ -29,6 +29,7 @@ namespace mirv {
 	ptr<LeafSymbol>::type,
 	ptr<Symbol<Named> >::type,
 	ptr<Symbol<Typed> >::type,
+	ptr<Symbol<Global> >::type,
 	ptr<Symbol<Module> >::type,
 	ptr<Symbol<Function> >::type,
 	ptr<Symbol<Variable> >::type,
@@ -51,6 +52,7 @@ namespace mirv {
     virtual void visit(ptr<InnerSymbol>::type);
     virtual void visit(ptr<Symbol<Typed> >::type);
     virtual void visit(ptr<Symbol<Named> >::type);
+    virtual void visit(ptr<Symbol<Global> >::type);
     virtual void visit(ptr<Symbol<Module> >::type);
     virtual void visit(ptr<Symbol<Function> >::type);
     virtual void visit(ptr<Symbol<Variable> >::type);

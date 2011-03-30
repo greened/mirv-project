@@ -45,6 +45,13 @@ namespace mirv {
   }
 
   ConstSymbolVisitor::result_type
+  ConstSymbolVisitor::visit(ptr<Symbol<Global> >::const_type s) {
+    ptr<Symbol<Global>::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Global>::VisitorBaseType>(s);
+    visit(p);
+  }
+
+  ConstSymbolVisitor::result_type
   ConstSymbolVisitor::visit(ptr<Symbol<Module> >::const_type s) {
     ptr<Symbol<Module>::VisitorBaseType>::const_type p =
       fast_cast<const Symbol<Module>::VisitorBaseType>(s);
