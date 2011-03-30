@@ -7,8 +7,7 @@ namespace mirv {
   Function::Interface::Interface(const std::string &n,
                                  TypePtr t,
                                  StatementPtr s)
-      : NamedBaseType(n),
-          TypedBaseType(t),
+      : GlobalBaseType(n, t),
           // If the statement is not a block, make it one.
           StatementBaseType(dyn_cast<Statement<Block> >(s) ?
                             s : boost::static_pointer_cast<Statement<Base> >(mirv::make<Statement<Block> >(s))) {}
