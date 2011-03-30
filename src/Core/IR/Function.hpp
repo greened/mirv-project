@@ -12,8 +12,7 @@ namespace mirv {
   /// This is a symbol tag for function symbols.
    class Function {
    private:
-     typedef Symbol<Named> NamedBaseType;
-     typedef Symbol<Typed> TypedBaseType;
+     typedef Symbol<Global> GlobalBaseType;
      
      typedef InnerImpl<
        Statement<Base>,
@@ -26,8 +25,7 @@ namespace mirv {
        > VariableBaseType;
 
    public:
-     class Interface : public NamedBaseType,
-		       public TypedBaseType,
+     class Interface : public GlobalBaseType,
 		       public VariableBaseType,
 		       public StatementBaseType,
                        public boost::enable_shared_from_this<Symbol<Function> > {
@@ -38,7 +36,7 @@ namespace mirv {
        typedef VariableBaseType::ConstChildPtr ConstVariablePtr;
 
        Interface(const std::string &n, TypePtr t)
-	 : NamedBaseType(n), TypedBaseType(t) {}
+           : GlobalBaseType(n, t) {}
 
        Interface(const std::string &n,
 		 TypePtr t,
@@ -112,18 +110,9 @@ namespace mirv {
        ptr<Node<Base>>::const_type getSharedHandle(void) const {
          return fast_cast<const Node<Base>>(shared_from_this());
        }
-
-       // We need these to be the final overriders for
-       // Visitable::accept functions.
-       virtual void accept(SymbolVisitor &) {
-         error("Function::Interface::accept called!");
-       }
-       virtual void accept(ConstSymbolVisitor &) const {
-         error("Function::Interface::accept called!");
-       }
      };
      typedef Interface BaseType;
-     typedef TypedBaseType VisitorBaseType;
+     typedef GlobalBaseType VisitorBaseType;
 
      static void initialize(ptr<Symbol<Function> >::type function) {}
 
