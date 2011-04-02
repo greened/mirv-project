@@ -1,15 +1,15 @@
+// FIXME: Why is this necessary?
+#include <mirv/Core/IR/Module.hpp>
+#include <mirv/Core/IR/IR.hpp>
 #include <mirv/Core/Builder/MultiplyOperators.hpp>
 #include <mirv/Core/Builder/AddOperators.hpp>
+#include <mirv/Core/Builder/ExpressionGrammar.hpp>
 #include <mirv/Core/Filter/AttributeFlow.hpp>
 #include <mirv/Core/Filter/ConstExpressionFlow.hpp>
 #include <mirv/Core/Filter/FlowAction.hpp>
 #include <mirv/Core/Filter/ConstSymbolFlow.hpp>
 #include <mirv/Core/Filter/Filter.hpp>
 #include <mirv/Core/Filter/Action.hpp>
-#include <mirv/Core/IR/IR.hpp>
-#include <mirv/Core/IR/TupleType.hpp>
-// FIXME: Why is this necessary?
-#include <mirv/Core/IR/Module.hpp>
 
 #include <sstream>
 

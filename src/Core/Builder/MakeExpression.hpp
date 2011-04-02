@@ -9,6 +9,8 @@
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 
+#include <cstdint>
+
 namespace mirv {
   namespace Builder {
     ptr<Expression<Base> >::type
