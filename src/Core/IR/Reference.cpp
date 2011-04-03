@@ -4,6 +4,7 @@
 #include <mirv/Core/IR/TupleType.hpp>
 
 #include <mirv/Core/Builder/Make.hpp>
+#include <mirv/Core/Utility/Printer.hpp>
 
 #include <iostream>
 
@@ -18,9 +19,17 @@ namespace mirv {
     // Skip base expression to get to the first dimension.
     ++index;
     do {
-      ptr<Symbol<Type<Tuple> > >::const_type tupleType =
-        safe_cast<const Symbol<Type<Tuple> > >(elementType);
-      elementType = tupleType->elementType(*index);
+      if (ptr<Symbol<Type<Tuple> > >::const_type tupleType =
+          dyn_cast<const Symbol<Type<Tuple> > >(elementType)) {
+        elementType = tupleType->elementType(*index);
+      }
+      else {
+        ptr<Symbol<Type<Pointer> > >::const_type pointerType =
+          safe_cast<const Symbol<Type<Pointer> > >(elementType);
+        // The index is simply a pointer offset, so the type returned
+        // is always the same.
+        elementType = pointerType->getBaseType();
+      }
     } while (++index != end());
 
     return elementType;
