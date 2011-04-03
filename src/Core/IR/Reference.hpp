@@ -77,14 +77,6 @@ namespace mirv {
      typedef Interface BaseType;
    };
 
-  /// Dereference the address provided by some expression.
-  class Dereference { 
-  public:
-    typedef Expression<Unary> BaseType;
-    typedef Expression<Unary> VisitorBaseType;
-    // TODO: Override type().
-  };
-
   /// Specify the interface for array index expressions.
   template<>
   class Reference<Tuple> { 

@@ -20,6 +20,19 @@ namespace mirv {
           boost::proto::_data,
           TypeBuilder(boost::proto::_child)))
       > {};
+
+    /// This is the grammar for looking up pointer types.  It differs
+    /// from the construct grammar in that it assumes the base type
+    /// already exists.  This avoids the problem of creating and
+    /// returning placeholders for struct types.
+    struct PointerTypeLookupBuilder : boost::proto::when<
+      PointerTypeRule,
+      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+        boost::proto::_data,
+        UnaryConstructSymbol<Symbol<Type<Pointer> > >(
+          boost::proto::_data,
+          TypeLookupBuilder(boost::proto::_child)))
+      > {};
   }
 }
 

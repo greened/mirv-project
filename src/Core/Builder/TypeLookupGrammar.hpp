@@ -20,7 +20,7 @@ namespace mirv {
           boost::proto::_data,
           boost::proto::_value)
         >,
-      TypeBuilder
+      TypeLookupBuilder
       > {};
 
     struct FunctionTypeAccessBuilder : boost::proto::or_<

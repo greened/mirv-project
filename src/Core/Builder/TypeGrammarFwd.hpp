@@ -4,6 +4,7 @@
 namespace mirv {
   namespace Builder {
     struct TypeBuilder;
+    struct TypeLookupBuilder;
   }
 }
 

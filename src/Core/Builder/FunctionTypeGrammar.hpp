@@ -87,6 +87,12 @@ namespace mirv {
       TypeBuilder
       > {};
 
+    /// This is the grammar for looking up function return types.
+    struct FunctionReturnTypeLookupBuilder : boost::proto::or_<
+      VoidBuilder,
+      TypeLookupBuilder
+      > {};
+
     // struct FunctionTypeBuilder : boost::proto::or_<
     //   boost::proto::when<
     //     FunctionTypeWithArgsRule,
@@ -114,6 +120,25 @@ namespace mirv {
         ConstructFunctionTypeSymbol(
           boost::proto::_data,
           FunctionReturnTypeBuilder(boost::proto::_left),
+          boost::proto::_expr))
+      > {};
+
+    /// This is the grammar to lookup function types.  It is almost
+    /// the same as the construct grammar except for struct types it
+    /// assumes the struct already exists.  This lets the rule avoid
+    /// creating and returning placeholders instead of the real type.
+    struct FunctionTypeLookupBuilder : boost::proto::when<
+      FunctionTypeRule,
+      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+        boost::proto::_data,
+        ConstructFunctionTypeSymbol(
+          boost::proto::_data,
+          FunctionReturnTypeLookupBuilder(boost::proto::_left),
+          // FIXME: We probably should do lookups here.  If we pass
+          // structs this will break.  We can do something like what's
+          // done for array types except translateToSymbol uses
+          // ConstructSymbolGrammar.  Possibly specialize this for
+          // types?
           boost::proto::_expr))
       > {};
 

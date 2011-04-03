@@ -4,6 +4,7 @@
 namespace mirv {
    namespace Builder {
      struct StructTypeRule;
+     struct StructTypeDeclRule;
    }
 }
 
