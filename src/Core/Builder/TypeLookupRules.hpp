@@ -15,7 +15,7 @@ namespace mirv {
      /// Define a rule to access a type from a module.
      struct TypeAccessRule : boost::proto::or_<
        StringTerminal,
-       TypeRule
+       TypeLookupRule
        > {};
 
      /// Define a rule to access a function type from a module.

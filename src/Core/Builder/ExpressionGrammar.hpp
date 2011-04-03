@@ -100,23 +100,13 @@ namespace mirv {
         : ComplementRule {};
 
     /// This is the grammar for deref expressions.
-    struct DerefBuilder 
-        : detail::UnaryBuilder<DereferenceRule, Dereference> {};
+    //    struct DerefBuilder 
+    //        : detail::UnaryBuilder<DereferenceRule, Dereference> {};
 
-    template<>
-    struct ConstructExpressionGrammarCases::case_<
-      boost::proto::tag::dereference
-      > : DerefBuilder {};
-
-#if 0
-    /// This is the grammar for addrof expressions.
-    struct AddressOfBuilder 
-        : detail::UnaryBuilder<AddressOfRule, AddressOf> {};
-
-    template<>
-    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::address_of>
-        : AddressOfBuilder {};
-#endif
+    //    template<>
+    //    struct ConstructExpressionGrammarCases::case_<
+    //      boost::proto::tag::dereference
+    //      > : DerefBuilder {};
 
     /// This is the grammar for logical not expressions.
     struct NotBuilder 
