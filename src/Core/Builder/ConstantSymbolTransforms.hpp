@@ -31,7 +31,7 @@ namespace mirv {
             typeGen(symtab,
                     sizeof(typename boost::proto::result_of::value<Expr>::type) * 8));
 
-        typedef typename boost::proto::result_of::value<Expr>::type BaseType;
+        typedef typename ConstantTypeGenerator::value_type BaseType;
         typedef Constant<BaseType> ConstantType;
 
         result_type result =

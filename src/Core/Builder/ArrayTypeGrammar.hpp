@@ -124,47 +124,59 @@ namespace mirv {
                              detail::TypeSubscriptData subscripts);
     };
 
+    template<typename ElementTypeBuilder,
+      typename Dummy = boost::proto::callable>
     struct MultiTypeSubscriptBuilder : boost::proto::when<
       MultiTypeSubscriptRule,
       detail::CreateTypeSubscript(
         boost::proto::_data,
         // Element type
-        TypeBuilder(boost::proto::_left),
+        ElementTypeBuilder(boost::proto::_left),
         // Dimensions
         boost::proto::_right)
       > {};
 
+    template<typename ElementTypeBuilder,
+      typename Dummy = boost::proto::callable>
     struct TypeSubscriptBuilder : boost::proto::when<
       TypeSubscriptRule,
       detail::CreateTypeSubscript(
         boost::proto::_data,
         // Element type
-        TypeBuilder(boost::proto::_left),
+        ElementTypeBuilder(boost::proto::_left),
         // Index
         boost::proto::_value(boost::proto::_right))
       > {};
 
-  struct TypeSubscriptListBuilder;
+    template<typename ElementTypeBuilder,
+      typename Dummy>
+    struct TypeSubscriptListBuilder;
   
+    template<typename ElementTypeBuilder,
+      typename Dummy = boost::proto::callable>
     struct StrictTypeSubscriptListBuilder : boost::proto::when<
       StrictTypeSubscriptList,
       detail::AddTypeSubscript(
         boost::proto::_data,
-        TypeSubscriptListBuilder(boost::proto::_left),
+        TypeSubscriptListBuilder<ElementTypeBuilder, Dummy>(boost::proto::_left),
         boost::proto::_value(boost::proto::_right))
       > {};
     
+    template<typename ElementTypeBuilder,
+      typename Dummy = boost::proto::callable>
     struct TypeSubscriptListBuilder : boost::proto::or_<
-      StrictTypeSubscriptListBuilder,
-      TypeSubscriptBuilder
+      StrictTypeSubscriptListBuilder<ElementTypeBuilder>,
+      TypeSubscriptBuilder<ElementTypeBuilder>
       > {};
 
+    template<typename ElementTypeBuilder,
+      typename Dummy = boost::proto::callable>
     struct TypeDimensionListBuilder : boost::proto::or_<
-      TypeSubscriptListBuilder,
-      MultiTypeSubscriptBuilder
+      TypeSubscriptListBuilder<ElementTypeBuilder>,
+      MultiTypeSubscriptBuilder<ElementTypeBuilder>
       > {};
 
-    // This is the grammar for struct types.
+    // This is the grammar for array types.
     struct ArrayTypeBuilder : boost::proto::when<
       ArrayTypeRule,
       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
@@ -172,7 +184,18 @@ namespace mirv {
         ConstructArrayTypeSymbol(
           boost::proto::_data,
           // TypeSubscript data
-          TypeDimensionListBuilder(boost::proto::_)))
+          TypeDimensionListBuilder<TypeBuilder>(boost::proto::_)))
+      > {};
+
+    // This is the grammar for looking up array types.
+    struct ArrayTypeLookupBuilder : boost::proto::when<
+      ArrayTypeRule,
+      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+        boost::proto::_data,
+        ConstructArrayTypeSymbol(
+          boost::proto::_data,
+          // TypeSubscript data
+          TypeDimensionListBuilder<TypeLookupBuilder>(boost::proto::_)))
       > {};
   }
 }
