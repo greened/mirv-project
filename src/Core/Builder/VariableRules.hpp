@@ -15,8 +15,6 @@ namespace mirv {
      // var["name"].type[int_(32)];
      //
 
-     typedef Wrapper<boost::proto::terminal<keyword::var>::type> VarTerminal;
-
      /// This is the rule to match variable symbols.  It matches
      /// var["name"].type["name"|type].
      struct VariableNameSpecifier : boost::proto::subscript<

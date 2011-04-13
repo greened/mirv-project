@@ -1,7 +1,7 @@
-#include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/Module.hpp>
+#include <mirv/Core/IR/Reference.hpp>
 
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/Utility/Printer.hpp>

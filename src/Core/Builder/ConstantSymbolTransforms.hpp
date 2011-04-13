@@ -12,7 +12,6 @@
 namespace mirv {
   namespace Builder {
     /// This is a callable transform to construct a constant symbol.
-    /// If the symbol exists at the current module, it is an error.
     template<
       typename ConstantTypeGenerator,
       typename Dummy = boost::proto::callable>
@@ -39,6 +38,15 @@ namespace mirv {
 
 	return result;
       }
+    };
+
+    /// This is a callable transform to construct an address constant
+    /// symbol.
+    struct ConstructAddressConstantSymbol : boost::proto::callable {
+      typedef typename ptr<Symbol<Constant<Base>>>::type result_type;
+
+      result_type operator()(ptr<SymbolTable>::type symtab,
+			     ptr<Symbol<Global> >::type symbol);
     };
   }
 }

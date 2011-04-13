@@ -5,7 +5,9 @@
 // STDOUT:    /
 // STDOUT:       *
 // STDOUT:          -
-// STDOUT:             vref b
+// STDOUT:             tref
+// STDOUT:                cref int32 * & b
+// STDOUT:                cref int64 0
 // STDOUT:             vref c
 // STDOUT:          vref d
 // STDOUT:       neg
@@ -13,6 +15,8 @@
 //
 
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
@@ -29,6 +33,7 @@ using mirv::Module;
 using mirv::Function;
 using mirv::Symbol;
 using mirv::Variable;
+using mirv::GlobalVariable;
 using mirv::Type;
 using mirv::TypeBase;
 using mirv::Integral;
@@ -67,8 +72,9 @@ int main(void)
   ptr<Symbol<Variable> >::type asym = make<Symbol<Variable> >("a", inttype);
   function->variablePushBack(asym);
 
-  ptr<Symbol<Variable> >::type bsym = make<Symbol<Variable> >("b", inttype);
-  module->variablePushBack(bsym);
+  ptr<Symbol<GlobalVariable> >::type bsym =
+    make<Symbol<GlobalVariable> >("b", inttype);
+  module->globalVariablePushBack(bsym);
 
   ptr<Symbol<Variable> >::type csym = make<Symbol<Variable> >("c", inttype);
   function->variablePushBack(csym);
@@ -80,7 +86,7 @@ int main(void)
   function->variablePushBack(esym);
 
   Builder::VariableTerminal a = {{"a"}};
-  Builder::VariableTerminal b = {{"b"}};
+  Builder::GlobalVariableTerminal b = {{"b"}};
   Builder::VariableTerminal c = {{"c"}};
   Builder::VariableTerminal d = {{"d"}};
   Builder::VariableTerminal e = {{"e"}};

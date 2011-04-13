@@ -148,14 +148,14 @@ namespace mirv {
       this->doEnter(sym);
 
       // Visit variables
-      for(Symbol<Module>::VariableIterator v = sym->variableBegin(),
-            vend = sym->variableEnd();
+      for(Symbol<Module>::GlobalVariableIterator v = sym->globalVariableBegin(),
+            vend = sym->globalVariableEnd();
           v != vend;
           /* NULL */) {
         this->doBefore(sym, v);
         (*v)->accept(*this);
         this->doAfter(sym, v);
-        Symbol<Module>::VariableIterator prev = v;
+        Symbol<Module>::GlobalVariableIterator prev = v;
         if (++v != vend) {
           this->doBetween(sym, prev, v);
         }

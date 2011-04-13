@@ -1,6 +1,8 @@
 #ifndef mirv_Core_IR_GlobalVariable_hpp
 #define mirv_Core_IR_GlobalVariable_hpp
 
+#include <mirv/Core/IR/ConstantFwd.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/Type.hpp>
 
 namespace mirv {
@@ -18,17 +20,17 @@ namespace mirv {
      // Variables.  Variables are single-assignment only while
      // GlobalVariable represents a global region of memory which may
      // be defined multiple times.
-     class Interface : public Symbol<Typed>,
-		       public Symbol<Named>,
-		       public LeafSymbol,
-                       public boost::enable_shared_from_this<Symbol<Variable> > {
+     class Interface
+         : public Symbol<Global>,
+           public LeafSymbol,
+           public boost::enable_shared_from_this<Symbol<GlobalVariable> > {
      private:
-       typedef ptr<Symbol<Constant<Base> > >::ConstantPtr;
+       typedef ptr<Symbol<Constant<Base> > >::type ConstantPtr;
        ConstantPtr init;
 
       public:
        Interface(const std::string &n, TypePtr t, ConstantPtr i = ConstantPtr())
-	   : Symbol<Typed>(t), Symbol<Named>(n), init(i) {}
+	   : Symbol<Global>(n, t), init(i) {}
 
        ConstantPtr initializer(void) const {
          return init;
@@ -54,10 +56,18 @@ namespace mirv {
    public:
      typedef LeafSymbol VisitorBaseType;
 
-     static void initialize(ptr<Symbol<Variable> >::type variable) {}
+     static void initialize(ptr<Symbol<GlobalVariable> >::type variable) {}
 
-     static std::string getName(const std::string &name,
-                                ptr<Symbol<Type<TypeBase> > >::const_type type) {
+     static std::string
+     getName(const std::string &name,
+             ptr<Symbol<Type<TypeBase> > >::const_type type) {
+       return name;
+     }
+     template<typename Init>
+     static std::string
+     getName(const std::string &name,
+             ptr<Symbol<Type<TypeBase> > >::const_type type,
+             const Init &) {
        return name;
      }
    };

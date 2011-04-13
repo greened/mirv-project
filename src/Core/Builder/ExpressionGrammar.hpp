@@ -14,6 +14,7 @@
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Logical.hpp>
 #include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/AddressConstant.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 
@@ -59,6 +60,14 @@ namespace mirv {
                                           boost::proto::_value))
       > {};
 
+    struct GlobalVariableRefBuilder : boost::proto::when<
+      GlobalVariableTerminal,
+      ConstructGlobalReference(
+        boost::proto::_data,
+        LookupSymbol<Symbol<GlobalVariable> >(boost::proto::_data,
+                                              boost::proto::_value))
+      > {};
+
     struct FunctionRefBuilder : boost::proto::when<
       FunctionTerminal,
       ConstructUnary<
@@ -79,6 +88,7 @@ namespace mirv {
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::terminal>
         : boost::proto::or_<
+      GlobalVariableRefBuilder,
       VariableRefBuilder,
       FunctionRefBuilder,
       ConstantRefBuilder

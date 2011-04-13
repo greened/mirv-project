@@ -1,6 +1,7 @@
 #include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/TupleType.hpp>

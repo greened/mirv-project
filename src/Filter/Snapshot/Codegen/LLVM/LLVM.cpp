@@ -1,7 +1,7 @@
-#include "LLVM.hpp"
-
 #include <mirv/Core/IR/IR.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
+
+#include "LLVM.hpp"
 
 namespace mirv {
   void LLVMCodegenFilter::

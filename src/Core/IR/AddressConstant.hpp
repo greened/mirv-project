@@ -15,6 +15,7 @@ namespace mirv {
         : public Symbol<Constant<Base> >,
           public boost::enable_shared_from_this<Symbol<Constant<Address> > > {
     private:
+      typedef Symbol<Constant<Base> > BaseType;
       typedef ptr<Symbol<Global> >::type SymbolPtr;
       SymbolPtr sym;
 

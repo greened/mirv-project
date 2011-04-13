@@ -1,48 +1,30 @@
-// Test building of constants.
+// Test building of global variables.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    fdecl foo void (int32)
+// STDOUT:    gvdecl a int32
+// STDOUT:    gvdecl b int32 int32 0
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl i int32
+// STDOUT:       vdecl a int32
 // STDOUT:       {
-// STDOUT:          doWhile
-// STDOUT:             {
-// STDOUT:                call
-// STDOUT:                   fref foo
-// STDOUT:                   vref i
-// STDOUT:                assign
-// STDOUT:                   vref i
-// STDOUT:                   +
-// STDOUT:                      vref i
-// STDOUT:                      cref int32 1
-// STDOUT:             }
-// STDOUT:             <
-// STDOUT:                vref i
-// STDOUT:                cref int32 10
+// STDOUT:
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
 
 #include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/GlobalVariable.hpp>
-#include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/PlaceholderType.hpp>
-#include <mirv/Core/IR/Relational.hpp>
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Control.hpp>
-#include <mirv/Core/IR/Mutating.hpp>
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
-#include <mirv/Core/Builder/SymbolGrammar.hpp>
-#include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
 using mirv::Symbol;
@@ -66,25 +48,16 @@ using Builder::func;
 using Builder::module;
 using Builder::void_;
 using Builder::int_;
-using Builder::do_;
 
 int main(void)
 {
-  Builder::VariableTerminal i = {{"i"}};
-
-  Builder::FunctionTerminal foo = {{"foo"}};
-
   ptr<Node<Base> >::type code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
-        func["foo"].type[void_(int_(32))],
+        var["a"].type[int_(32)],
+        var["b"].type[int_(32)] = boost::proto::lit(0),
         func["testfunc"].type[void_()] [
-          var["i"].type[int_(32)],
-
-          do_[
-            foo(i),
-            i = i + 1
-          ].while_(i < 10)
+  	  var["a"].type[int_(32)]
         ]
       ]
     );

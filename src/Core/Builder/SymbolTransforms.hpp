@@ -234,6 +234,13 @@ namespace mirv {
       }
     };
 
+    struct ConstructGlobalReference : boost::proto::callable {
+      typedef ptr<Expression<Base> >::type result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             ptr<Symbol<GlobalVariable> >::type global);
+    };
+
     /// This is a callable transform to translate a proto expression
     /// to a symbol.
     template<typename SymbolType>

@@ -1,8 +1,10 @@
 #ifndef mirv_Core_IR_Module_hpp
 #define mirv_Core_IR_Module_hpp
 
-#include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/Symbol.hpp>
+#include <mirv/Core/IR/FunctionFwd.hpp>
+#include <mirv/Core/IR/GlobalVariableFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 
 namespace mirv {
   /// This is the symbol tag for module symbols.  A module is a
@@ -26,10 +28,7 @@ namespace mirv {
        typedef FunctionBaseType::ChildPtr FunctionPointer;
 
        /// Add a function.
-       void functionPushBack(FunctionPointer f) {
-	 FunctionBaseType::push_back(f);
-         f->setParent(this->getSharedHandle());
-       }
+       void functionPushBack(FunctionPointer f);
  
        typedef FunctionBaseType::iterator FunctionIterator;
        typedef FunctionBaseType::const_iterator ConstFunctionIterator;
@@ -50,25 +49,13 @@ namespace mirv {
 	 return FunctionBaseType::end();
        }
 
-       FunctionIterator functionFind(const std::string &name) {
-	 return std::find_if(functionBegin(), functionEnd(),
-			     std::tr1::bind(SymbolByName<Function>(), std::tr1::placeholders::_1, name));
-       }
-  ConstSymbolVisitor::result_type
-  ConstSymbolVisitor::visit(ptr<Symbol<Variable> >::const_type s) {
-    ptr<Symbol<Variable>::VisitorBaseType>::const_type p =
-      fast_cast<const Symbol<Variable>::VisitorBaseType>(s);
-    visit(p);
-  }
+       FunctionIterator functionFind(const std::string &name);
 
        // Access variable information
        typedef GlobalVariableBaseType::ChildPtr GlobalVariablePointer;
 
        /// Add a global variable.
-       void globalVariablePushBack(GlobalVariablePointer v) {
-	 GlobalVariableBaseType::push_back(v);
-         v->setParent(this->getSharedHandle());
-       }
+       void globalVariablePushBack(GlobalVariablePointer v);
 
        typedef GlobalVariableBaseType::iterator GlobalVariableIterator;
        typedef GlobalVariableBaseType::const_iterator ConstGlobalVariableIterator;
@@ -89,19 +76,13 @@ namespace mirv {
 	 return GlobalVariableBaseType::end();
        }
 
-       GlobalVariableIterator globalVariableFind(const std::string &name) {
-	 return std::find_if(globalVariableBegin(), globalVariableEnd(),
-			     std::tr1::bind(SymbolByName<GlobalVariable>(), std::tr1::placeholders::_1, name));
-       }
+       GlobalVariableIterator globalVariableFind(const std::string &name);
 
        // Access type information
        typedef TypeBaseType::ConstChildPtr TypePointer;
 
        /// Add a type.
-       void typePushBack(TypePointer t) {
-	 TypeBaseType::push_back(t);
-         t->setParent(this->getSharedHandle());
-       }
+       void typePushBack(TypePointer t);
 
        typedef TypeBaseType::iterator TypeIterator;
        typedef TypeBaseType::const_iterator ConstTypeIterator;
@@ -122,10 +103,7 @@ namespace mirv {
 	 return TypeBaseType::end();
        }
 
-       TypeIterator typeFind(const std::string &name) {
-	 return std::find_if(typeBegin(), typeEnd(),
-			     std::tr1::bind(SymbolByName<Type<TypeBase> >(), std::tr1::placeholders::_1, name));
-       }
+       TypeIterator typeFind(const std::string &name);
 
        ptr<Node<Base>>::type getSharedHandle(void) {
          return fast_cast<Node<Base>>(shared_from_this());
