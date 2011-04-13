@@ -5,6 +5,8 @@
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/AddressConstant.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
@@ -128,6 +130,11 @@ namespace mirv {
   ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<double> > >::const_type s) {
     ptr<Symbol<Constant<double> >::VisitorBaseType>::const_type p =
       fast_cast<const Symbol<Constant<double> >::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<Address> > >::const_type s) {
+    ptr<Symbol<Constant<Address> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<Address> >::VisitorBaseType>(s);
     visit(p);
   }
   ConstSymbolVisitor::result_type

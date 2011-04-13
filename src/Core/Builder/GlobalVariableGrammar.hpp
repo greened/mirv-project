@@ -11,7 +11,20 @@
 namespace mirv {
   namespace Builder {
     /// This is the grammar for variable symbols.
-    struct GlobalVariableBuilder : boost::proto::_or<
+    struct GlobalVariableBuilder : boost::proto::or_<
+      boost::proto::when<
+        GlobalVariableDeclWithInit,
+        TernaryConstructSymbol<
+          Symbol<GlobalVariable> >(
+            boost::proto::_data,
+            // Variable name
+            boost::proto::_value(boost::proto::_right(
+                                   boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
+            // Variable type
+            TypeAccessBuilder(boost::proto::_right(boost::proto::_left)),
+            // Initializer
+            ConstantBuilder(boost::proto::_right))
+        >,
       boost::proto::when<
         GlobalVariableDecl,
         BinaryConstructSymbol<
@@ -22,28 +35,8 @@ namespace mirv {
                                    boost::proto::_left(boost::proto::_left))),
             // Variable type
             TypeAccessBuilder(boost::proto::_right))
-        >,
-          boost::proto::when<
-            GlobalVariableDeclWithInit,
-            TernaryConstructSymbol<
-              Symbol<GlobalVariable> >(
-                boost::proto::_data,
-                // Variable name
-                boost::proto::_value(boost::proto::_right(
-                                       boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
-                // Variable type
-                TypeAccessBuilder(boost::proto::_right(boost::proto::_left)),
-                // Initializer
-                ConstantBuilder(boost::proto::_right))
-            >
+        >
       > {};
-
-    namespace {
-      /// A var "operator."  This is a protoized object that
-      /// implements the subscript operator to kick off variable
-      /// symbol generation.
-      const VarTerminal var = {{}};
-    }
   }
 }
 

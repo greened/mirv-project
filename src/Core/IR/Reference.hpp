@@ -108,6 +108,11 @@ namespace mirv {
       Interface(ChildPtr Base, ChildPtr Index)
           : InnerExpression(Base, Index) {}
 
+      template<typename ExprType>
+      Interface(ChildPtr Base,
+                const boost::shared_ptr<Expression<ExprType> > &Index)
+          : InnerExpression(Base, fast_cast<Expression<mirv::Base> >(Index)) {}
+
       template<typename Sequence>
       Interface(ChildPtr Base, const Sequence &indices)
           : InnerExpression(Base, indices) {}

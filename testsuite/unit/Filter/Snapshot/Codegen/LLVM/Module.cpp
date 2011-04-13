@@ -4,6 +4,7 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
@@ -27,6 +28,7 @@ using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
 using mirv::Variable;
+using mirv::GlobalVariable;
 using mirv::Type;
 using mirv::TypeBase;
 using mirv::Integral;
@@ -49,8 +51,8 @@ using Builder::if_;
 
 int main(void)
 {
-  Builder::VariableTerminal a = {{"a"}};
-  Builder::VariableTerminal b = {{"b"}};
+  Builder::GlobalVariableTerminal a = {{"a"}};
+  Builder::GlobalVariableTerminal b = {{"b"}};
   Builder::VariableTerminal c = {{"c"}};
   Builder::VariableTerminal d = {{"d"}};
 

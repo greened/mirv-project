@@ -12,6 +12,7 @@
 #include <mirv/Core/IR/VariableFwd.hpp>
 #include <mirv/Core/IR/GlobalVariableFwd.hpp>
 #include <mirv/Core/IR/ConstantFwd.hpp>
+#include <mirv/Core/IR/AddressConstantFwd.hpp>
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
@@ -44,7 +45,8 @@ namespace mirv {
 	ptr<Symbol<Constant<std::int64_t> > >::type,
 	ptr<Symbol<Constant<std::uint64_t> > >::type,
 	ptr<Symbol<Constant<float> > >::type,
-	ptr<Symbol<Constant<double> > >::type
+	ptr<Symbol<Constant<double> > >::type,
+	ptr<Symbol<Constant<Address> > >::type
 	> > {
   public:
     virtual void visit(ptr<Symbol<Base> >::type);
@@ -72,6 +74,7 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Constant<std::uint64_t> > >::type);
     virtual void visit(ptr<Symbol<Constant<float> > >::type);
     virtual void visit(ptr<Symbol<Constant<double> > >::type);
+    virtual void visit(ptr<Symbol<Constant<Address> > >::type);
   };
 }
 

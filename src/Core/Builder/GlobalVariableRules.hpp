@@ -16,8 +16,6 @@ namespace mirv {
      // var["name"].type[int_(32)] [= <init>]
      //
 
-     typedef Wrapper<boost::proto::terminal<keyword::var>::type> VarTerminal;
-
      /// This is the rule to match variable symbols.  It matches
      /// var["name"].type["name"|type] [= <init>].
      struct GlobalVariableNameSpecifier : boost::proto::subscript<
@@ -26,12 +24,12 @@ namespace mirv {
        > {};
 
      struct GlobalVariableTypeMember : boost::proto::member<
-       VariableNameSpecifier,
+       GlobalVariableNameSpecifier,
        TypeTerminal
        > {};
 
      struct GlobalVariableDecl : boost::proto::subscript<
-       VariableTypeMember,
+       GlobalVariableTypeMember,
        TypeAccessRule
        > {};
 
@@ -40,9 +38,9 @@ namespace mirv {
        ConstantBuilder
        > {};
 
-     struct GlobalVariableRule : boost::proto::_or<
-       GlobalVariableDecl,
-       GlobalVariableDeclWithInit
+     struct GlobalVariableRule : boost::proto::or_<
+       GlobalVariableDeclWithInit,
+       GlobalVariableDecl
        > {};
    }
 }

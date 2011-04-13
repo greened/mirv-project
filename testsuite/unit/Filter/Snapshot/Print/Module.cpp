@@ -40,13 +40,19 @@
 // STDOUT:    }
 // STDOUT: }
 
+#include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/AddressConstant.hpp>
+#include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>
@@ -59,11 +65,16 @@ using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
 using mirv::Variable;
+using mirv::GlobalVariable;
 using mirv::Type;
 using mirv::TypeBase;
 using mirv::Integral;
+using mirv::Pointer;
 using mirv::FunctionType;
+using mirv::Tuple;
 using mirv::Expression;
+using mirv::Constant;
+using mirv::Address;
 using mirv::Base;
 using mirv::Add;
 using mirv::LessThan;
@@ -80,20 +91,26 @@ using mirv::make;
 
 int main(void)
 {
-  auto type = make<Symbol<Type<Integral> > >(32);
+  ptr<Symbol<Type<Integral> > >::const_type type =
+    make<Symbol<Type<Integral> > >(32);
+  ptr<Symbol<Type<Pointer> > >::const_type ptrtype =
+    make<Symbol<Type<Pointer> > >(type);
 
-  ptr<Symbol<Variable> >::type a =
-    Symbol<Variable>::make("a", type);
-  ptr<Symbol<Variable> >::type b =
-    Symbol<Variable>::make("b", type);
-  ptr<Symbol<Variable> >::type c =
-    Symbol<Variable>::make("c", type);
+  ptr<Symbol<Variable> >::type a = Symbol<Variable>::make("a", type);
+  ptr<Symbol<Variable> >::type b = Symbol<Variable>::make("b", type);
+  ptr<Symbol<GlobalVariable> >::type c =
+    Symbol<GlobalVariable>::make("c", type);
 
   ptr<Statement<Base> >::type dowhile =
     Statement<DoWhile>::make(
       Expression<LessThan>::make(
         Expression<Reference<Variable> >::make(a),
-	Expression<Reference<Variable> >::make(c)),
+        Expression<Reference<Tuple> >::make(
+          Expression<Reference<Constant<Base> > >::make(
+            Symbol<Constant<Address> >::make(ptrtype, c)),
+          Expression<Reference<Constant<Base> > >::make(
+            Symbol<Constant<std::uint64_t> >::make(
+              type, 0)))),
       Statement<Block>::make(
         Statement<Assignment>::make(
           Expression<Reference<Variable> >::make(a),
@@ -103,19 +120,29 @@ int main(void)
 	Statement<IfElse>::make(
           Expression<GreaterThan>::make(
             Expression<Reference<Variable> >::make(b),
-	    Expression<Reference<Variable> >::make(c)),
-        Statement<Block>::make(
-          Statement<Assignment>::make(
-            Expression<Reference<Variable> >::make(a),
-  	    Expression<Add>::make(
-	      Expression<Reference<Variable> >::make(a),
-	      Expression<Reference<Variable> >::make(b)))),
-        Statement<Block>::make(
-          Statement<Assignment>::make(
-            Expression<Reference<Variable> >::make(a),
-  	    Expression<Add>::make(
-	      Expression<Reference<Variable> >::make(a),
-	      Expression<Reference<Variable> >::make(c)))))));
+            Expression<Reference<Tuple> >::make(
+              Expression<Reference<Constant<Base> > >::make(
+                Symbol<Constant<Address> >::make(ptrtype, c)),
+              Expression<Reference<Constant<Base> > >::make(
+                Symbol<Constant<std::uint64_t> >::make(
+                  type, 0)))),
+          Statement<Block>::make(
+            Statement<Assignment>::make(
+              Expression<Reference<Variable> >::make(a),
+              Expression<Add>::make(
+                Expression<Reference<Variable> >::make(a),
+                Expression<Reference<Variable> >::make(b)))),
+          Statement<Block>::make(
+            Statement<Assignment>::make(
+              Expression<Reference<Variable> >::make(a),
+              Expression<Add>::make(
+                Expression<Reference<Variable> >::make(a),
+                Expression<Reference<Tuple> >::make(
+                  Expression<Reference<Constant<Base> > >::make(
+                    Symbol<Constant<Address> >::make(ptrtype, c)),
+                  Expression<Reference<Constant<Base> > >::make(
+                    Symbol<Constant<std::uint64_t> >::make(
+                      type, 0)))))))));
 
   ptr<Symbol<Type<TypeBase> > >::type ftype =
     make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >::type());
@@ -132,7 +159,7 @@ int main(void)
   m->typePushBack(type);
   m->typePushBack(ftype);
   m->functionPushBack(f);
-  m->variablePushBack(c);
+  m->globalVariablePushBack(c);
 
   PrintFilter print(std::cout);
 

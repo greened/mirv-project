@@ -39,6 +39,11 @@ namespace mirv {
      typedef Wrapper<boost::proto::terminal<SymbolTerminal<Variable>>::type>
      VariableTerminal;
 
+     /// Define a convenient way to talk about global variable
+     /// reference expressions.
+     typedef Wrapper<boost::proto::terminal<SymbolTerminal<GlobalVariable>>::type>
+     GlobalVariableTerminal;
+
      /// Define a convenient way to talk about function reference
      /// expressions.
      typedef Wrapper<boost::proto::terminal<SymbolTerminal<Function>>::type>

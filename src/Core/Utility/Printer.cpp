@@ -1160,8 +1160,9 @@ namespace mirv {
       sym->type()->accept(typePrinter);
       if (sym->initializer()) {
         out << ' ';
-        ExpressionPrintFilter exprPrinter(out);
-        exprPrinter(sym->initializer());
+        TypeNameFlow typePrinter(out);
+        sym->initializer()->type()->accept(typePrinter);
+        out << ' ' << sym->initializer()->valueString();
       }
     }
 
@@ -1258,9 +1259,9 @@ namespace mirv {
       out << indent(ind) << "gvdecl " << sym->name() << " ";
       TypeNameFlow typePrinter(out);
       sym->type()->accept(typePrinter);
-      if (sym->intializer()) {
+      if (sym->initializer()) {
         out << ' ';
-        ExpressionPrintFilter exprPrinter(out);
+        detail::ExpressionPrintFilter exprPrinter(out);
         exprPrinter(sym->initializer());
       }
     }

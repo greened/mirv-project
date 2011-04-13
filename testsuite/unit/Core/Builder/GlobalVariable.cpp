@@ -2,7 +2,7 @@
 //
 // STDOUT: mdef testmodule {
 // STDOUT:    gvdecl a int32
-// STDOUT:    gvdecl b int32 0
+// STDOUT:    gvdecl b int32
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
 // STDOUT:       vdecl a int32
@@ -55,7 +55,7 @@ int main(void)
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
         var["a"].type[int_(32)],
-        var["b"].type[int_(32)] = boost::proto::lit(0),
+        var["b"].type[int_(32)],
         func["testfunc"].type[void_()] [
   	  var["a"].type[int_(32)]
         ]
