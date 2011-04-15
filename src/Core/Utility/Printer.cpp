@@ -9,8 +9,33 @@
 #include <mirv/Core/Utility/Printer.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
+#include <iostream>
+
 namespace mirv {
   namespace Printer {
+    namespace detail {
+      class DefaultFormatter {
+      public:
+        class Newline {
+        public:
+          Stream &operator()(Stream &out) const {
+            return out << '\n';
+          }
+        };
+      };
+    }
+
+    template<typename Formatter>
+    class Newline : public Formatter::Newline {};
+
+    template<typename Formatter>
+    inline Stream &
+    operator<<(Stream &out,
+               const Newline<Formatter> &formatter) 
+    {
+      return formatter(out);
+    }
+
     typedef std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> TypeList;
     typedef int Indent;
 
@@ -1164,7 +1189,8 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "mdef " << sym->name() << " {\n";
+      out << indent(ind) << "mdef " << sym->name() << " {"
+        << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1244,7 +1270,8 @@ namespace mirv {
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        attributeManager.getInheritedAttribute().out() << "\n";
+        attributeManager.getInheritedAttribute().out()
+          << Newline<Formatter>();
       }
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
@@ -1263,7 +1290,8 @@ namespace mirv {
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        attributeManager.getInheritedAttribute().out() << "\n";
+        attributeManager.getInheritedAttribute().out()
+          << Newline<Formatter>();
       }
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
@@ -1285,7 +1313,8 @@ namespace mirv {
         Stream &out = attributeManager.getInheritedAttribute().out();
         Indent ind = attributeManager.getInheritedAttribute().indent();
 
-        out << indent(ind) << "fdef " << sym->name() << " {\n";
+        out << indent(ind) << "fdef " << sym->name() << " {"
+          << Newline<Formatter>();
         attributeManager.setInheritedAttribute(
           InheritedAttribute(ind + IndentFactor, out));
       }
@@ -1323,7 +1352,8 @@ namespace mirv {
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        attributeManager.getInheritedAttribute().out() << "\n";
+        attributeManager.getInheritedAttribute().out()
+          << Newline<Formatter>();
       }
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
@@ -1333,7 +1363,8 @@ namespace mirv {
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        attributeManager.getInheritedAttribute().out() << "\n";
+        attributeManager.getInheritedAttribute().out()
+          << Newline<Formatter>();
       }
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
@@ -1343,7 +1374,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "}\n";
+      out << indent(ind) << "}" << Newline<Formatter>();
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
 
@@ -1355,9 +1386,9 @@ namespace mirv {
 
         if (   !attributeManager.setLastSynthesizedAttribute()
                || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-          out << "\n";
+          out << Newline<Formatter>();
         }
-        out << indent(ind) << "}\n";
+        out << indent(ind) << '}' << Newline<Formatter>();
         attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
       }
     }
@@ -1368,7 +1399,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "{\n";
+      out << indent(ind) << "{" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1379,7 +1410,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "ifThen\n";
+      out << indent(ind) << "ifThen" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1390,7 +1421,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "ifElse\n";
+      out << indent(ind) << "ifElse" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1401,7 +1432,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "while\n";
+      out << indent(ind) << "while" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1412,7 +1443,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "doWhile\n";
+      out << indent(ind) << "doWhile" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1423,7 +1454,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "switch\n";
+      out << indent(ind) << "switch" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1479,7 +1510,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "return\n";
+      out << indent(ind) << "return" << Newline<Formatter>();
     }
 
     template<typename Formatter>
@@ -1488,7 +1519,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "assign\n";
+      out << indent(ind) << "assign" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1499,7 +1530,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "call\n";
+      out << indent(ind) << "call" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1509,7 +1540,8 @@ namespace mirv {
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        attributeManager.getInheritedAttribute().out() << "\n";
+        attributeManager.getInheritedAttribute().out()
+          << Newline<Formatter>();
       }
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
@@ -1521,9 +1553,9 @@ namespace mirv {
 
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        out << "\n";
+        out << Newline<Formatter>();
       }
-      out << indent(ind) << "}\n";
+      out << indent(ind) << '}' << Newline<Formatter>();
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
 
@@ -1533,7 +1565,7 @@ namespace mirv {
 
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        out << "\n";
+        out << Newline<Formatter>();
       }
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
@@ -1544,7 +1576,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "+\n";
+      out << indent(ind) << '+' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1555,7 +1587,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "-\n";
+      out << indent(ind) << '-' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1566,7 +1598,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "*\n";
+      out << indent(ind) << '*' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1577,7 +1609,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "/\n";
+      out << indent(ind) << '/' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1588,7 +1620,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "%\n";
+      out << indent(ind) << '%' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1599,7 +1631,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "neg\n";
+      out << indent(ind) << "neg" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1610,7 +1642,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "&&\n";
+      out << indent(ind) << "&&" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1621,7 +1653,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "||\n";
+      out << indent(ind) << "||" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1632,7 +1664,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "!\n";
+      out << indent(ind) << '!' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1643,7 +1675,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "&\n";
+      out << indent(ind) << '&' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1654,7 +1686,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "|\n";
+      out << indent(ind) << '|' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1665,7 +1697,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "~\n";
+      out << indent(ind) << '~' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1676,7 +1708,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "<\n";
+      out << indent(ind) << '<' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1687,7 +1719,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "<=\n";
+      out << indent(ind) << "<=" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1698,7 +1730,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "==\n";
+      out << indent(ind) << "==" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1709,7 +1741,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "!=\n";
+      out << indent(ind) << "!=" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1720,7 +1752,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << ">\n";
+      out << indent(ind) << '>' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1731,7 +1763,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << ">=\n";
+      out << indent(ind) << ">=" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1742,7 +1774,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "&\n";
+      out << indent(ind) << '&' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1850,7 +1882,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       Indent ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "tref\n";
+      out << indent(ind) << "tref" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + IndentFactor, out));
     }
@@ -1858,9 +1890,10 @@ namespace mirv {
     template<typename Formatter>
     void LeaveExpressionVisitor<Formatter>::visit(ptr<Expression<Base> >::const_type expr)
     {
+      Stream &out = attributeManager.getInheritedAttribute().out();
       if (   !attributeManager.setLastSynthesizedAttribute()
-             || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        attributeManager.getInheritedAttribute().out() << "\n";
+          || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
+        out << Newline<Formatter>();
       }
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
@@ -1868,9 +1901,10 @@ namespace mirv {
     template<typename Formatter>
     void LeaveExpressionVisitor<Formatter>::visit(ptr<InnerExpression>::const_type expr)
     {
+      Stream &out = attributeManager.getInheritedAttribute().out();
       if (   !attributeManager.setLastSynthesizedAttribute()
-             || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
-        attributeManager.getInheritedAttribute().out() << "\n";
+          || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
+        out << Newline<Formatter>();
       }
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
@@ -1901,12 +1935,8 @@ namespace mirv {
     }
   }
 
-  namespace detail {
-    class NewlineFormatter {};
-  }
-
   namespace {
-    template<typename Formatter = detail::NewlineFormatter>
+    template<typename Formatter = Printer::detail::DefaultFormatter>
     void printImpl(Printer::Stream &out, ptr<Node<Base> >::const_type node)
     {
       if (ptr<Symbol<Module> >::const_type s =

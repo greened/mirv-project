@@ -1,7 +1,7 @@
 // Test printing of modules.
 //
 // STDOUT: mdef Test {
-// STDOUT:    vdecl c int32
+// STDOUT:    gvdecl c int32
 // STDOUT:    fdecl foo void ()
 // STDOUT:    fdef foo {
 // STDOUT:       vdecl a int32
@@ -17,7 +17,9 @@
 // STDOUT:                ifElse
 // STDOUT:                   >
 // STDOUT:                      vref b
-// STDOUT:                      vref c
+// STDOUT:                      tref
+// STDOUT:                         cref int32 * & c
+// STDOUT:                         cref int32 0
 // STDOUT:                   {
 // STDOUT:                      assign
 // STDOUT:                         vref a
@@ -30,12 +32,16 @@
 // STDOUT:                         vref a
 // STDOUT:                         +
 // STDOUT:                            vref a
-// STDOUT:                            vref c
+// STDOUT:                            tref
+// STDOUT:                               cref int32 * & c
+// STDOUT:                               cref int32 0
 // STDOUT:                   }
 // STDOUT:             }
 // STDOUT:             <
 // STDOUT:                vref a
-// STDOUT:                vref c
+// STDOUT:                tref
+// STDOUT:                   cref int32 * & c
+// STDOUT:                   cref int32 0
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
