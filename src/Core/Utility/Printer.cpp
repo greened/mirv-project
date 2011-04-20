@@ -22,11 +22,89 @@ namespace mirv {
             return out << '\n';
           }
         };
+
+        class Delimit {
+        public:
+          Stream &operator()(Stream &out) const {
+            return out;
+          }
+        };
+
+        class Indent {
+        public:
+          Indent(int ind) : val(ind) {};
+          Stream &operator()(Stream &out) const {
+            checkInvariant(val >= 0, "Indent underflow");
+            int i = val;
+            while(i--) {
+              out << ' ';
+            }
+            return out;
+          }
+
+        private:
+          /// The number of spaces to print.
+          int val;
+        };
+
+        /// The factor by which to increase the indent at deeper nesting
+        /// levels.
+        static int indentFactor(void) {
+          return 3;
+        }
+      };
+
+      class CompactFormatter {
+      public:
+        class Newline {
+        public:
+          Stream &operator()(Stream &out) const {
+            return out;
+          }
+        };
+
+        class Delimit {
+        public:
+          Stream &operator()(Stream &out) const {
+            return out;
+          }
+        };
+
+        class Indent {
+        public:
+          Indent(int ind) : val(ind) {};
+          Stream &operator()(Stream &out) const {
+            checkInvariant(val >= 0, "Indent underflow");
+            if (val > 0) {
+              out << ' ';
+            }
+            return out;
+          }
+
+        private:
+          /// The number of spaces to print.
+          int val;
+        };
+
+        /// The factor by which to increase the indent at deeper nesting
+        /// levels.
+        static int indentFactor(void) {
+          return 1;
+        }
       };
     }
 
     template<typename Formatter>
     class Newline : public Formatter::Newline {};
+
+    template<typename Formatter>
+    class Delimit : public Formatter::Delimit {};
+
+    template<typename Formatter>
+    class Indent : public Formatter::Indent {
+    public:
+      Indent(int ind) : Formatter::Indent(ind) {}
+    };
 
     template<typename Formatter>
     inline Stream &
@@ -36,8 +114,28 @@ namespace mirv {
       return formatter(out);
     }
 
+    template<typename Formatter>
+    inline Stream &
+    operator<<(Stream &out,
+               const Delimit<Formatter> &formatter) 
+    {
+      return formatter(out);
+    }
+
+    template<typename Formatter>
+    inline Stream &
+    operator<<(Stream &out,
+               const Indent<Formatter> &formatter) 
+    {
+      return formatter(out);
+    }
+
+    namespace {
+      template<typename Formatter = Printer::detail::DefaultFormatter>
+      void printImpl(Stream &out, ptr<Node<Base> >::const_type node);
+    }
+
     typedef std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> TypeList;
-    typedef int Indent;
 
     /// Define the inherited attibute.
     class TypeNameInheritedAttribute {
@@ -272,15 +370,15 @@ namespace mirv {
     class InheritedAttribute {
     private:
       /// The current indent level.
-      Indent ind;
+      int ind;
       /// The stream to dump to.
       Stream *ot;
 
     public:
       InheritedAttribute(void) : ind(0), ot(0) {}
-      InheritedAttribute(Indent i, Stream &o) : ind(i), ot(&o) {}
+      InheritedAttribute(int i, Stream &o) : ind(i), ot(&o) {}
 
-      Indent indent(void) const {
+      int indent(void) const {
         return ind;
       }
       Stream &out(void) const {
@@ -694,7 +792,7 @@ namespace mirv {
       > BaseType;
 
     public:
-      PrintDefSymbolFlow(Stream &out, Indent i = 0)
+      PrintDefSymbolFlow(Stream &out, int i = 0)
           : BaseType(InheritedAttribute(i, out)) {
         this->statement().setParentFlow(this);
       }
@@ -704,36 +802,39 @@ namespace mirv {
       void visit(ptr<Symbol<Module> >::const_type sym);
     };
 
-    /// This is an iostream manipulator to print a specified number
-    /// of spaces for indentation.
-    class indent {
-    private:
-      /// The number of spaces to print.
-      int val;
-
-    public:
-      indent(int ind) : val(ind) {};
-
-      /// Print the spafces specified by val.
-      Stream &operator()(Stream &out) const {
-        checkInvariant(val >= 0, "Indent underflow");
-        int i = val;
-        while(i--) {
-          out << " ";
+    namespace {
+      template<typename Formatter = Printer::detail::DefaultFormatter>
+      void printImpl(Printer::Stream &out, ptr<Node<Base> >::const_type node)
+      {
+        if (ptr<Symbol<Module> >::const_type s =
+            boost::dynamic_pointer_cast<const Symbol<Module> >(node)) {
+          ptr<ConstSymbolVisitor>::type declflow(new Printer::PrintDeclSymbolFlow<Formatter>(out));
+          s->accept(*declflow);
+          ptr<ConstSymbolVisitor>::type defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
+          s->accept(*defflow);
         }
-        return(out);
+        else if (ptr<Symbol<Type<TypeBase> > >::const_type t =
+                 boost::dynamic_pointer_cast<const Symbol<Type<TypeBase> > >(node)) {
+          ptr<ConstSymbolVisitor>::type flow(new Printer::TypeNameFlow<Formatter>(out));
+          t->accept(*flow);
+        }
+        else if (ptr<Symbol<Base> >::const_type s =
+                 boost::dynamic_pointer_cast<const Symbol<Base> >(node)) {
+          ptr<ConstSymbolVisitor>::type defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
+          s->accept(*defflow);
+        }
+        else if (ptr<Statement<Base> >::const_type s =
+                 boost::dynamic_pointer_cast<const Statement<Base> >(node)) {
+          ptr<ConstStatementVisitor>::type flow(new Printer::PrintFlow<Formatter>(out));
+          s->accept(*flow);
+        }
+        else if (ptr<Expression<Base> >::const_type e =
+                 boost::dynamic_pointer_cast<const Expression<Base> >(node)) {
+          ptr<ConstExpressionVisitor>::type flow(new Printer::PrintExpressionFlow<Formatter>(out));
+          e->accept(*flow);
+        }
       }
-    };
-
-    /// This is the stream operator for the indent iostream manipulator.
-    inline std::ostream &operator<<(std::ostream &out, const indent &ind) {
-      return ind(out);
     }
-
-    /// The factor by which to increase the indent at deeper nesting
-    /// levels.
-    const int IndentFactor = 3;
-
     namespace detail {
       namespace {
         /// This is essentially a specialized print filter for
@@ -1085,8 +1186,7 @@ namespace mirv {
       std::string stringize(ptr<Expression<Base> >::type expr)
       {
         std::stringstream stream;
-        ExpressionPrintFilter print(stream);
-        print(expr);
+        printImpl<detail::CompactFormatter>(stream, expr);
         return stream.str();
       }
     }
@@ -1111,8 +1211,7 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       out << "(";
       if (sym->isUniform()) {
-        detail::ExpressionPrintFilter expressionPrinter(out);
-        expressionPrinter(sym->count());
+        printImpl<detail::CompactFormatter>(out, sym->count());
         out << " x ";
       }
       attributeManager.getInheritedAttribute().typeStackPushBack(sym);
@@ -1187,22 +1286,22 @@ namespace mirv {
     void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Module> >::const_type sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "mdef " << sym->name() << " {"
+      out << Indent<Formatter>(ind) << "mdef " << sym->name() << " {"
         << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Function> >::const_type sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
       // Just declarations.
-      out << indent(ind) << "fdecl " << sym->name() << ' ';
+      out << Indent<Formatter>(ind) << "fdecl " << sym->name() << ' ';
       TypeNameFlow<Formatter> typePrinter(out);
       sym->type()->accept(typePrinter);
     }
@@ -1211,9 +1310,9 @@ namespace mirv {
     void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Variable> >::const_type sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "vdecl " << sym->name() << " "; 
+      out << Indent<Formatter>(ind) << "vdecl " << sym->name() << " "; 
       TypeNameFlow<Formatter> typePrinter(out);
       sym->type()->accept(typePrinter);
     }
@@ -1222,16 +1321,14 @@ namespace mirv {
     void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "gvdecl " << sym->name() << " "; 
+      out << Indent<Formatter>(ind) << "gvdecl " << sym->name() << " "; 
       TypeNameFlow<Formatter> typePrinter(out);
       sym->type()->accept(typePrinter);
       if (sym->initializer()) {
         out << ' ';
-        TypeNameFlow<Formatter> typePrinter(out);
-        sym->initializer()->type()->accept(typePrinter);
-        out << ' ' << sym->initializer()->valueString();
+        printImpl<detail::CompactFormatter>(out, sym->initializer());
       }
     }
 
@@ -1247,21 +1344,21 @@ namespace mirv {
     void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Type<Tuple> > >::const_type sym)
     {
       // Stream &out = attributeManager.getInheritedAttribute().out();
-      // Indent ind = attributeManager.getInheritedAttribute().indent();
+      // int ind = attributeManager.getInheritedAttribute().indent();
 
-      // out << indent(ind) << "tdecl " << sym->name();
+      // out << Indent<Formatter>(ind) << "tdecl " << sym->name();
       // out << " (\n";
       // for (Symbol<Type<Tuple> >::const_iterator p =
       //        sym->begin(), pend = sym->end();
       //      p != pend;
       //      /* NULL */) {
-      //   out << indent(ind+IndentFactor) << (*p)->name();
+      //   out << indent(ind+Formatter::indentFactor()) << (*p)->name();
       //   if (++p != pend) {
       //     out << ',';
       //   }
       //   out << '\n';
       // }
-      // out << indent(ind) << ")";
+      // out << Indent<Formatter>(ind) << ")";
     }
 
     /// Print the final newline after each symbol declaration.
@@ -1300,10 +1397,10 @@ namespace mirv {
     void EnterDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Module> >::const_type sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
@@ -1311,12 +1408,12 @@ namespace mirv {
     {
       if (!sym->statementEmpty()) {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        Indent ind = attributeManager.getInheritedAttribute().indent();
+        int ind = attributeManager.getInheritedAttribute().indent();
 
-        out << indent(ind) << "fdef " << sym->name() << " {"
+        out << Indent<Formatter>(ind) << "fdef " << sym->name() << " {"
           << Newline<Formatter>();
         attributeManager.setInheritedAttribute(
-          InheritedAttribute(ind + IndentFactor, out));
+          InheritedAttribute(ind + Formatter::indentFactor(), out));
       }
     }
 
@@ -1324,9 +1421,9 @@ namespace mirv {
     void EnterDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Variable> >::const_type sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "vdecl " << sym->name() << " ";
+      out << Indent<Formatter>(ind) << "vdecl " << sym->name() << " ";
       TypeNameFlow<Formatter> typePrinter(out);
       sym->type()->accept(typePrinter);
     }
@@ -1335,15 +1432,14 @@ namespace mirv {
     void EnterDefSymbolVisitor<Formatter>::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "gvdecl " << sym->name() << " ";
+      out << Indent<Formatter>(ind) << "gvdecl " << sym->name() << " ";
       TypeNameFlow<Formatter> typePrinter(out);
       sym->type()->accept(typePrinter);
       if (sym->initializer()) {
         out << ' ';
-        detail::ExpressionPrintFilter exprPrinter(out);
-        exprPrinter(sym->initializer());
+        printImpl<detail::CompactFormatter>(out, sym->initializer());
       }
     }
 
@@ -1372,9 +1468,9 @@ namespace mirv {
     template<typename Formatter>
     void LeaveDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Module> >::const_type sym) {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "}" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "}" << Newline<Formatter>();
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
 
@@ -1382,13 +1478,13 @@ namespace mirv {
     void LeaveDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Function> >::const_type sym) {
       if (!sym->statementEmpty()) {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        Indent ind = attributeManager.getInheritedAttribute().indent();
+        int ind = attributeManager.getInheritedAttribute().indent();
 
         if (   !attributeManager.setLastSynthesizedAttribute()
                || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
           out << Newline<Formatter>();
         }
-        out << indent(ind) << '}' << Newline<Formatter>();
+        out << Indent<Formatter>(ind) << '}' << Newline<Formatter>();
         attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
       }
     }
@@ -1397,142 +1493,142 @@ namespace mirv {
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Block> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "{" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "{" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<IfThen> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "ifThen" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "ifThen" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<IfElse> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "ifElse" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "ifElse" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<While> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "while" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "while" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<DoWhile> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "doWhile" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "doWhile" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Switch> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "switch" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "switch" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Case> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "case";
+      out << Indent<Formatter>(ind) << "case";
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<CaseBlock> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "caseblock";
+      out << Indent<Formatter>(ind) << "caseblock";
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Before> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "before ";
+      out << Indent<Formatter>(ind) << "before ";
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<After> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "after ";
+      out << Indent<Formatter>(ind) << "after ";
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Goto> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "goto ";
+      out << Indent<Formatter>(ind) << "goto ";
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Return> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "return" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "return" << Newline<Formatter>();
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Assignment> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "assign" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "assign" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Call> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "call" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "call" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
@@ -1549,13 +1645,13 @@ namespace mirv {
     template<typename Formatter>
     void LeaveStatementVisitor<Formatter>::visit(ptr<Statement<Block> >::const_type stmt) {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
         out << Newline<Formatter>();
       }
-      out << indent(ind) << '}' << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << '}' << Newline<Formatter>();
       attributeManager.setSynthesizedAttribute(SynthesizedAttribute(true));
     }
 
@@ -1574,218 +1670,238 @@ namespace mirv {
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Add> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '+' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '+' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Subtract> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '-' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '-' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Multiply> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '*' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '*' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Divide> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '/' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '/' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Modulus> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '%' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '%' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Negate> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "neg" << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << "neg" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LogicalAnd> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "&&" << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << "&&" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LogicalOr> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "||" << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << "||" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LogicalNot> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '!' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '!' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<BitwiseAnd> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '&' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '&' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<BitwiseOr> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '|' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '|' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<BitwiseComplement> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '~' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '~' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LessThan> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '<' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '<' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LessThanOrEqual> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "<=" << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << "<=" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Equal> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "==" << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << "==" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<NotEqual> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "!=" << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << "!=" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<GreaterThan> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '>' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '>' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << ">=" << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << ">=" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<TuplePointer> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << '&' << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << '&' << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Variable> > >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "vref " << expr->getSymbol()->name();
+      out << Indent<Formatter>(ind);
+      out << "vref " << expr->getSymbol()->name();
     }
 
     template<typename Formatter>
@@ -1793,9 +1909,10 @@ namespace mirv {
     void EnterExpressionVisitor<Formatter>::visitConstant(boost::shared_ptr<const Expression<Reference<Constant<ValueType> > > > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "cref ";
+      out << Indent<Formatter>(ind);
+      out << "cref ";
       TypeNameFlow<Formatter> typePrinter(out);
       expr->getSymbol()->type()->accept(typePrinter);
       out << ' ' << expr->getSymbol()->valueString();
@@ -1871,20 +1988,22 @@ namespace mirv {
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Function> > >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "fref " << expr->getSymbol()->name();
+      out << Indent<Formatter>(ind);
+      out << "fref " << expr->getSymbol()->name();
     }
 
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Tuple> > >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
-      Indent ind = attributeManager.getInheritedAttribute().indent();
+      int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << indent(ind) << "tref" << Newline<Formatter>();
+      out << Indent<Formatter>(ind);
+      out << "tref" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
-        InheritedAttribute(ind + IndentFactor, out));
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
@@ -1935,42 +2054,8 @@ namespace mirv {
     }
   }
 
-  namespace {
-    template<typename Formatter = Printer::detail::DefaultFormatter>
-    void printImpl(Printer::Stream &out, ptr<Node<Base> >::const_type node)
-    {
-      if (ptr<Symbol<Module> >::const_type s =
-          boost::dynamic_pointer_cast<const Symbol<Module> >(node)) {
-        ptr<ConstSymbolVisitor>::type declflow(new Printer::PrintDeclSymbolFlow<Formatter>(out));
-        s->accept(*declflow);
-        ptr<ConstSymbolVisitor>::type defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
-        s->accept(*defflow);
-      }
-      else if (ptr<Symbol<Type<TypeBase> > >::const_type t =
-               boost::dynamic_pointer_cast<const Symbol<Type<TypeBase> > >(node)) {
-        ptr<ConstSymbolVisitor>::type flow(new Printer::TypeNameFlow<Formatter>(out));
-        t->accept(*flow);
-      }
-      else if (ptr<Symbol<Base> >::const_type s =
-               boost::dynamic_pointer_cast<const Symbol<Base> >(node)) {
-        ptr<ConstSymbolVisitor>::type defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
-        s->accept(*defflow);
-      }
-      else if (ptr<Statement<Base> >::const_type s =
-               boost::dynamic_pointer_cast<const Statement<Base> >(node)) {
-        ptr<ConstStatementVisitor>::type flow(new Printer::PrintFlow<Formatter>(out));
-        s->accept(*flow);
-      }
-      else if (ptr<Expression<Base> >::const_type e =
-               boost::dynamic_pointer_cast<const Expression<Base> >(node)) {
-        ptr<ConstExpressionVisitor>::type flow(new Printer::PrintExpressionFlow<Formatter>(out));
-        e->accept(*flow);
-      }
-    }
-  }
-
   void print(Printer::Stream &out, ptr<Node<Base>>::const_type node)
   {
-    printImpl(out, node);
+    Printer::printImpl(out, node);
   }
 }

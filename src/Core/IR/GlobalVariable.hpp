@@ -2,7 +2,9 @@
 #define mirv_Core_IR_GlobalVariable_hpp
 
 #include <mirv/Core/IR/ConstantFwd.hpp>
+#include <mirv/Core/IR/ReferenceFwd.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/ConstantFwd.hpp>
 #include <mirv/Core/IR/Type.hpp>
 
 namespace mirv {
@@ -25,7 +27,7 @@ namespace mirv {
            public LeafSymbol,
            public boost::enable_shared_from_this<Symbol<GlobalVariable> > {
      private:
-       typedef ptr<Symbol<Constant<Base> > >::type ConstantPtr;
+       typedef ptr<Expression<Reference<Constant<Base> > > >::type ConstantPtr;
        ConstantPtr init;
 
       public:
