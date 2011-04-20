@@ -738,6 +738,16 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Tuple> > >::type expr)
+  {
+    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+
+    if (!attributeManager.getInheritedAttribute().generateAddress()) {
+    }
+
+    attributeManager.setSynthesizedAttribute(syn);
+  }
+
   void LLVMCodegenFilter::operator()(ptr<Node<Base> >::type node)
   {
     if (ptr<Symbol<Module> >::type s =

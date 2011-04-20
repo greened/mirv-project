@@ -2,6 +2,7 @@
 #define mirv_Core_Builder_GlobalVariableGrammar_hpp
 
 #include <mirv/Core/Builder/GlobalVariableRules.hpp>
+#include <mirv/Core/Builder/ExpressionGrammar.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
 #include <mirv/Core/Builder/TypeLookupGrammar.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
@@ -23,7 +24,7 @@ namespace mirv {
             // Variable type
             TypeAccessBuilder(boost::proto::_right(boost::proto::_left)),
             // Initializer
-            ConstantBuilder(boost::proto::_right))
+            ConstantRefBuilder(boost::proto::_right))
         >,
       boost::proto::when<
         GlobalVariableDecl,
