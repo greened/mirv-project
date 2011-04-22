@@ -309,6 +309,19 @@ namespace mirv {
 
       this->doLeave(stmt);
     }
+
+    /// Visit Allocate statements.
+    void visit(ptr<Statement<Allocate> >::type stmt) {
+      this->doEnter(stmt);
+
+      for (auto e = stmt->expressionBegin(); e != stmt->expressionEnd(); ++e) {
+        this->doBeforeExpression(stmt, e);
+        this->doExpression(stmt, e);
+        this->doAfterExpression(stmt, e);
+      }
+
+      this->doLeave(stmt);
+    }
   };
 
   /// This is a type generator to create forward flow types.
