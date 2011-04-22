@@ -1,6 +1,7 @@
 // FIXME: Why is this necessary?
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/Builder/MakeExpression.hpp>
 #include <mirv/Core/IR/PlaceholderType.hpp>
