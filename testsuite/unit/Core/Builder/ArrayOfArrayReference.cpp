@@ -1,20 +1,26 @@
 // Test building of array types.
 //
 // STDOUT: fdef testfunc {
-// STDOUT:    vdecl a (cref int64 5 x (cref int64 4 x (cref int64 3 x int32)))
-// STDOUT:    vdecl b int32
+// STDOUT:    vdecl a (cref int64 5 x (cref int64 4 x (cref int64 3 x int32))) *
+// STDOUT:    vdecl b int32 *
 // STDOUT:    {
 // STDOUT:       assign
-// STDOUT:          vref b
+// STDOUT:          tref
+// STDOUT:             vref b
+// STDOUT:             cref int64 0
 // STDOUT:          cref int32 1
 // STDOUT:       assign
-// STDOUT:          vref b
+// STDOUT:          tref
+// STDOUT:             vref b
+// STDOUT:             cref int64 0
 // STDOUT:          +
 // STDOUT:             vref b
 // STDOUT:             tref
 // STDOUT:                tref
 // STDOUT:                   tref
-// STDOUT:                      vref a
+// STDOUT:                      tref
+// STDOUT:                         vref a
+// STDOUT:                         cref int64 0
 // STDOUT:                      cref int32 2
 // STDOUT:                   cref int32 0
 // STDOUT:                cref int32 1

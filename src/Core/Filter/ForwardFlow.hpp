@@ -310,11 +310,14 @@ namespace mirv {
       this->doLeave(stmt);
     }
 
-    /// Visit Allocate statements.
+    /// Visit Allocate statements, starting with the right-hand
+    /// side, followed by the left-hand side.
     void visit(ptr<Statement<Allocate> >::type stmt) {
       this->doEnter(stmt);
 
-      for (auto e = stmt->expressionBegin(); e != stmt->expressionEnd(); ++e) {
+      for (auto e = stmt->expressionRBegin();
+           e != stmt->expressionREnd();
+           ++e) {
         this->doBeforeExpression(stmt, e);
         this->doExpression(stmt, e);
         this->doAfterExpression(stmt, e);

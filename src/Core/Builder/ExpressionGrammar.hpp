@@ -54,11 +54,19 @@ namespace mirv {
 
     struct VariableRefBuilder : boost::proto::when<
       VariableTerminal,
-      ConstructUnary<
-        Expression<Reference<Variable> >
-        >(boost::proto::_data,
-          LookupSymbol<Symbol<Variable> >(boost::proto::_data,
-                                          boost::proto::_value))
+      ConstructBinary<Expression<Reference<Tuple> > >(
+        boost::proto::_data,
+        // Tuple pointer
+        ConstructUnary<
+          Expression<Reference<Variable> >
+          >(boost::proto::_data,
+            LookupSymbol<Symbol<Variable> >(boost::proto::_data,
+                                            boost::proto::_value)),
+        // Index
+        ConstructUnary<
+          Expression<Reference<Constant<Base> > >
+          >(boost::proto::_data,
+            ConstructIntegerConstantSymbol<0>(boost::proto::_data)))
       > {};
 
     struct GlobalVariableRefBuilder : boost::proto::when<

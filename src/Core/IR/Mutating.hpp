@@ -2,6 +2,7 @@
 #define mirv_Core_IR_Mutating_hpp
 
 #include <mirv/Core/IR/Statement.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
@@ -280,11 +281,11 @@ namespace mirv {
   // TODO: Add alignment information.
   class Allocate {
   private:
-    class Interface : public Statement<SingleExpression>,
+    class Interface : public Statement<DualExpression>,
                       public LeafStatement,
                       public boost::enable_shared_from_this<Statement<Allocate> > {
     public:
-      typedef ptr<Type<TypeBase> >::const_type TypePtr;
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
 
     private:
       TypePtr theType;
@@ -300,9 +301,9 @@ namespace mirv {
       typedef ReverseExpressionIterator reverse_iterator;
       typedef ConstReverseExpressionIterator const_reverse_iterator;
 
-      template<typename E, typename T>
-      Interface(E e, T t)
-          : Statement<SingleExpression>(e), LeafStatement(), theType(t) {}
+      template<typename E1, typename E2, typename T>
+      Interface(E1 e1, E2 e2, T t)
+          : Statement<DualExpression>(e1, e2), LeafStatement(), theType(t) {}
 
       typedef ExpressionPtr ChildPtr;
       typedef ConstExpressionPtr ConstChildPtr;
@@ -346,7 +347,7 @@ namespace mirv {
     };
   public:
     typedef StatementBaseGenerator<Interface, Allocate, Mutating>::type BaseType;
-    typedef Statement<SingleExpression> VisitorBaseType;
+    typedef Statement<DualExpression> VisitorBaseType;
   };
 }
 

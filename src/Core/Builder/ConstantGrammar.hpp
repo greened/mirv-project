@@ -10,24 +10,6 @@
 
 namespace mirv {
   namespace Builder {
-    namespace detail {
-      struct IntegralTypeGen {
-        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
-        typedef std::uint64_t value_type;
-
-        result_type operator()(ptr<SymbolTable>::type symtab,
-                               size_t bitsize);
-      };
- 
-      struct FloatingTypeGen {
-        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
-        typedef double value_type;
-
-        result_type operator()(ptr<SymbolTable>::type symtab,
-                               size_t bitsize);
-      };
-    }
-
     /// This is the grammar for constant symbols.
     struct ConstantBuilder : boost::proto::or_<
       boost::proto::when<

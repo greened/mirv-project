@@ -18,6 +18,7 @@ namespace mirv {
     auto index = begin();
     // Skip base expression to get to the first dimension.
     ++index;
+
     do {
       if (ptr<Symbol<Type<Tuple> > >::const_type tupleType =
           dyn_cast<const Symbol<Type<Tuple> > >(elementType)) {
