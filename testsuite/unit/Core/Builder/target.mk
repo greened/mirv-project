@@ -15,6 +15,7 @@ $(call make_unittest,libmirvcore_builder_test,$(libmirvcore_builder_test_SRCDIR)
 
 $(call debug, [print test] libmirvcore_builder_test_UNITTESTS = $(libmirvcore_builder_test_UNITTESTS))
 
-TARGETS += $(libmirvcore_builder_test_UNITTESTS)
+TARGETS   += $(libmirvcore_builder_test_UNITTESTS)
+UNITTESTS += $(libmirvcore_builder_test_UNITTESTS)
 
 endif
