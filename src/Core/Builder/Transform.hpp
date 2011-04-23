@@ -18,6 +18,23 @@
 
 namespace mirv {
   namespace Builder {
+    /// This is a callable transform to add a statement to a function.
+    struct AddAllocateStatement : boost::proto::callable {
+      typedef ptr<Statement<Base> >::type result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             boost::shared_ptr<Statement<Base> > stmt);
+    };
+    
+    // Get a variable symbol given a statement.
+    struct ExtractVariable : boost::proto::callable {
+      typedef ptr<Symbol<Variable> >::type VariablePointer;
+      typedef VariablePointer result_type;
+
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             ptr<Statement<Base> >::type stmt);
+    };
+
     // Bundle any pending statements created from child expressions
     // with this statement.
     struct ClearPendingStatements : boost::proto::callable {

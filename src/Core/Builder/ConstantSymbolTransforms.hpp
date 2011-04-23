@@ -11,6 +11,24 @@
 
 namespace mirv {
   namespace Builder {
+    namespace detail {
+      struct IntegralTypeGen {
+        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+        typedef std::uint64_t value_type;
+
+        result_type operator()(ptr<SymbolTable>::type symtab,
+                               size_t bitsize);
+      };
+ 
+      struct FloatingTypeGen {
+        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+        typedef double value_type;
+
+        result_type operator()(ptr<SymbolTable>::type symtab,
+                               size_t bitsize);
+      };
+    }
+
     /// This is a callable transform to construct a constant symbol.
     template<
       typename ConstantTypeGenerator,
@@ -47,6 +65,32 @@ namespace mirv {
 
       result_type operator()(ptr<SymbolTable>::type symtab,
 			     ptr<Symbol<Global> >::type symbol);
+    };
+
+    /// This is a callable transform to construct an integer constant
+    /// symbol.
+    template<
+      std::int64_t Value,
+      typename Dummy = boost::proto::callable>
+    struct ConstructIntegerConstantSymbol : boost::proto::callable {
+      typedef typename ptr<Symbol<Constant<Base>>>::type result_type;
+
+      result_type operator()(ptr<SymbolTable>::type symtab) {
+        // Constant type
+        detail::IntegralTypeGen typeGen;
+        ptr<Symbol<Type<TypeBase> > >::const_type constantType = 
+          LookupAndAddSymbol<Symbol<Type<TypeBase> > >()(
+            symtab,
+            typeGen(symtab, 64));
+
+        typedef detail::IntegralTypeGen::value_type BaseType;
+        typedef Constant<BaseType> ConstantType;
+
+        result_type result =
+          mirv::make<Symbol<ConstantType>>(constantType, Value);
+
+	return result;
+      }
     };
   }
 }

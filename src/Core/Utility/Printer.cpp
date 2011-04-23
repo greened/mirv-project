@@ -726,6 +726,21 @@ namespace mirv {
 
         this->doLeave(stmt);
       }
+
+      // We need to reverse the order in which we visit the
+      // allocate operands.
+      void visit(ptr<Statement<Allocate> >::const_type stmt) {
+        this->doEnter(stmt);
+
+        for (auto i = stmt->expressionBegin();
+             i != stmt->expressionEnd(); ++i) {
+          this->doBeforeExpression(stmt, i);
+          this->doExpression(stmt, i);
+          this->doAfterExpression(stmt, i);
+        }
+
+        this->doLeave(stmt);
+      }
     };
 
     /// This is the flow to print symbol declarations.  It prints the
@@ -1283,7 +1298,10 @@ namespace mirv {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << Indent<Formatter>(ind) << "allocate" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "allocate ";
+      TypeNameFlow<Formatter> typePrinter(out);
+      stmt->type()->accept(typePrinter);
+      out << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }

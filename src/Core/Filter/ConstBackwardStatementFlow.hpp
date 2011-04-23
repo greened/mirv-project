@@ -270,23 +270,35 @@ namespace mirv {
       void visit(ptr<Statement<Assignment> >::const_type stmt) {
          this->doEnter(stmt);
 
-         for (auto e = stmt->argumentRBegin();
-              e != stmt->argumentREend();
-              ++e) {
-           this->doBeforeExpression(stmt, e);
-           this->doExpression(stmt, e);
-           this->doAfterExpression(stmt, e);
+         for (auto i = stmt->expressionBegin();
+              i != stmt->expressionEnd();
+              ++i) {
+           this->doBeforeExpression(stmt, i);
+           this->doExpression(stmt, i);
+           this->afterExpression(stmt, i);
          }
-
-         this->doBeforeExpression(stmt, stmt->begin());
-         this->doExpression(stmt, stmt->begin());
-         this->doAfterExpression(stmt, stmt->begin());
 
          this->doLeave(stmt);
       }
 
      /// Visit Call statements.
       void visit(ptr<Statement<Call> >::const_type stmt) {
+         this->doEnter(stmt);
+
+         for (auto i = stmt->expressionRBegin();
+              i != stmt->expressionREnd();
+              ++i) {
+           this->doBeforeExpression(stmt, i);
+           this->doExpression(stmt, i);
+           this->afterExpression(stmt, i);
+         }
+
+         this->doLeave(stmt);
+      }
+
+     /// Visit Allocate statements, visiting the left-hand side,
+     /// then the right-hand side.
+      void visit(ptr<Statement<Allocate> >::const_type stmt) {
          this->doEnter(stmt);
 
          for (auto i = stmt->expressionBegin();
