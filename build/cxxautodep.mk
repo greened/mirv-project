@@ -23,16 +23,18 @@ CXXSOMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.ddo $<,$(
                         | $(SORT) | $(UNIQ) > $*.dd
 #endif
 
-PROCESS_CXXSODEPS = $(CP) -f $*.dd $*.PP && \
+PROCESS_CXXDEPS = $(CP) -f $*.dd $*.PP && \
                       $(SED) -i -e 's%$(subst .,\.,$(@F))%$@%' $*.PP && \
                       $(SED) -e 's%\#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
-                             -e '\%^$$% d' -e 's%$$% :%' < $*.dd >> $*.PP && \
+                             -e 's%^[ ]*%%' -e '/^$$/ d' \
+                             -e 's%$$%:%' < $*.dd >> $*.PP && \
                   $(MV) -f $*.PP $*.dd
 
 PROCESS_CXXSODEPS = $(CP) -f $*.ddo $*.PPo && \
                       $(SED) -i -e 's%$(subst .,\.,$(@F))%$@%' $*.PPo && \
                       $(SED) -e 's%\#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
-                             -e '\%^$$% d' -e 's%$$% :%' < $*.ddo >> $*.PPo && \
+                             -e 's%^[ ]*%%' -e '/^$$/ d' \
+                             -e 's%$$%:%' < $*.ddo >> $*.PPo && \
                   $(MV) -f $*.PPo $*.ddo
 
 endif

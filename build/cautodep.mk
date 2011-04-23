@@ -24,14 +24,16 @@ CSOMAKEDEPEND = $(if $(CONFIG_HAVE_GCC),$(CC) -MM $(CPPFLAGS) -o $*.do $<,$(CPP)
 #endif
 
 PROCESS_CDEPS = $(CP) -f $*.d $*.P && \
-                    $(SED) -i -e 's%$(subst .,\.,$(@F))%$@%' $*.P && \
-                    $(SED) -e 's%#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
-                           -e '\%^$$% d' -e 's%$$% :%' < $*.d >> $*.P && \
+                      $(SED) -i -e 's%$(subst .,\.,$(@F))%$@%' $*.P && \
+                      $(SED) -e 's%\#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
+                             -e 's%^[ ]*%%' -e '/^$$/ d' \
+                             -e 's%$$%:%' < $*.d >> $*.P && \
                 $(MV) -f $*.P $*.d
 
 PROCESS_CSODEPS = $(CP) -f $*.do $*.Po && \
                       $(SED) -i -e 's%$(subst .,\.,$(@F))%$@%' $*.Po && \
-                      $(SED) -e 's%#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
-                             -e '\%^$$% d' -e 's%$$% :%' < $*.do >> $*.Po && \
+                      $(SED) -e 's%\#.*%%' -e 's%^[^:]*: *%%' -e 's% *\\$$%%' \
+                             -e 's%^[ ]*%%' -e '/^$$/ d' \
+                             -e 's%$$%:%' < $*.do >> $*.Po && \
                   $(MV) -f $*.Po $*.do
 endif
