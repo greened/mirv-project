@@ -41,10 +41,11 @@ $(call debug,TARGETS = $(TARGETS))
 # may add more things to be configured
 include $(SRCDIR)/rules.mk
 
-CFLAGS = $($(FLAVOR)_CFLAGS)
-CXXFLAGS = $($(FLAVOR)_CXXFLAGS)
-CPPFLAGS = $($(FLAVOR)_CPPFLAGS)
+CFLAGS += $($(FLAVOR)_CFLAGS)
+CXXFLAGS += $($(FLAVOR)_CXXFLAGS)
+CPPFLAGS += $($(FLAVOR)_CPPFLAGS)
 
+$(call debug,FLAVOR = $(FLAVOR))
 $(call debug,CFLAGS = $(CFLAGS))
 $(call debug,CXXFLAGS = $(CXXFLAGS))
 $(call debug,CPPFLAGS = $(CPPFLAGS))
