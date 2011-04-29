@@ -59,7 +59,7 @@ make_unittest = $(eval $(call make_unittest_impl,$(1),$(2),$(3),$(4),$(5),$(6),$
 %.hdr:
 	$(QUIET)$(GREP) "^//" $(SRCDIR)/$(*).cpp | $(GREP) -v "STDOUT" > $(@)
 
-%.src:
+%.src: %.cpp
 	$(QUIET)$(GREP) -v "^//" $(SRCDIR)/$(*).cpp > $(@)
 
 %.mch: %.out
