@@ -1,6 +1,5 @@
 // Test building of variables.
 //
-
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>

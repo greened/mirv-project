@@ -1,8 +1,11 @@
 // Test building of function calls combined with another statement and
 // variable declarations.
 // STDOUT: fdef testfunc {
-// STDOUT:    vdecl c int32
+// STDOUT:    vdecl c int32 *
 // STDOUT:    {
+// STDOUT:       allocate int32
+// STDOUT:          vref c
+// STDOUT:          cref int64 1
 // STDOUT:       assign
 // STDOUT:          tref
 // STDOUT:             cref int32 * & b

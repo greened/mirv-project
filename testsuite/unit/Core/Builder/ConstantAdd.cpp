@@ -3,15 +3,24 @@
 // STDOUT: mdef testmodule {
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl i int32
+// STDOUT:       vdecl i int32 *
 // STDOUT:       {
-// STDOUT:          assign
+// STDOUT:          allocate int32
 // STDOUT:             vref i
+// STDOUT:             cref int64 1
+// STDOUT:          assign
+// STDOUT:             tref
+// STDOUT:                vref i
+// STDOUT:                cref int64 0
 // STDOUT:             cref int32 0
 // STDOUT:          assign
-// STDOUT:             vref i
-// STDOUT:             +
+// STDOUT:             tref
 // STDOUT:                vref i
+// STDOUT:                cref int64 0
+// STDOUT:             +
+// STDOUT:                tref
+// STDOUT:                   vref i
+// STDOUT:                   cref int64 0
 // STDOUT:                cref int32 1
 // STDOUT:       }
 // STDOUT:    }

@@ -1,5 +1,6 @@
 // Test printing of expressions.
 //
+//
 // STDOUT: +
 // STDOUT:    vref a
 // STDOUT:    /
@@ -10,7 +11,6 @@
 // STDOUT:          vref d
 // STDOUT:       neg
 // STDOUT:          vref e
-//
 
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>

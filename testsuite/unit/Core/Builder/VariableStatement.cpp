@@ -1,42 +1,81 @@
 // Test building of variables.
 //
 // STDOUT: fdef testfunc {
-// STDOUT:    vdecl a int32
-// STDOUT:    vdecl b int32
-// STDOUT:    vdecl c int32
+// STDOUT:    vdecl a int32 *
+// STDOUT:    vdecl b int32 *
+// STDOUT:    vdecl c int32 *
 // STDOUT:    {
+// STDOUT:       allocate int32
+// STDOUT:          vref a
+// STDOUT:          cref int64 1
+// STDOUT:       allocate int32
+// STDOUT:          vref b
+// STDOUT:          cref int64 1
+// STDOUT:       allocate int32
+// STDOUT:          vref c
+// STDOUT:          cref int64 1
 // STDOUT:       doWhile
 // STDOUT:          {
 // STDOUT:             assign
-// STDOUT:                vref a
-// STDOUT:                +
+// STDOUT:                tref
 // STDOUT:                   vref a
-// STDOUT:                   vref b
+// STDOUT:                   cref int64 0
+// STDOUT:                +
+// STDOUT:                   tref
+// STDOUT:                      vref a
+// STDOUT:                      cref int64 0
+// STDOUT:                   tref
+// STDOUT:                      vref b
+// STDOUT:                      cref int64 0
 // STDOUT:             ifElse
 // STDOUT:                >
-// STDOUT:                   vref b
-// STDOUT:                   vref c
+// STDOUT:                   tref
+// STDOUT:                      vref b
+// STDOUT:                      cref int64 0
+// STDOUT:                   tref
+// STDOUT:                      vref c
+// STDOUT:                      cref int64 0
 // STDOUT:                {
 // STDOUT:                   assign
-// STDOUT:                      vref a
-// STDOUT:                      +
+// STDOUT:                      tref
 // STDOUT:                         vref a
-// STDOUT:                         vref b
+// STDOUT:                         cref int64 0
+// STDOUT:                      +
+// STDOUT:                         tref
+// STDOUT:                            vref a
+// STDOUT:                            cref int64 0
+// STDOUT:                         tref
+// STDOUT:                            vref b
+// STDOUT:                            cref int64 0
 // STDOUT:                }
 // STDOUT:                {
 // STDOUT:                   assign
-// STDOUT:                      vref a
-// STDOUT:                      +
+// STDOUT:                      tref
 // STDOUT:                         vref a
-// STDOUT:                         vref c
+// STDOUT:                         cref int64 0
+// STDOUT:                      +
+// STDOUT:                         tref
+// STDOUT:                            vref a
+// STDOUT:                            cref int64 0
+// STDOUT:                         tref
+// STDOUT:                            vref c
+// STDOUT:                            cref int64 0
 // STDOUT:                }
 // STDOUT:          }
 // STDOUT:          <
-// STDOUT:             vref a
-// STDOUT:             vref c
+// STDOUT:             tref
+// STDOUT:                vref a
+// STDOUT:                cref int64 0
+// STDOUT:             tref
+// STDOUT:                vref c
+// STDOUT:                cref int64 0
 // STDOUT:       assign
-// STDOUT:          vref c
-// STDOUT:          vref a
+// STDOUT:          tref
+// STDOUT:             vref c
+// STDOUT:             cref int64 0
+// STDOUT:          tref
+// STDOUT:             vref a
+// STDOUT:             cref int64 0
 // STDOUT:    }
 // STDOUT: }
 
