@@ -5,9 +5,15 @@
 // STDOUT:    gvdecl b int32
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl c int32
-// STDOUT:       vdecl d int32
+// STDOUT:       vdecl c int32 *
+// STDOUT:       vdecl d int32 *
 // STDOUT:       {
+// STDOUT:          allocate int32
+// STDOUT:             vref c
+// STDOUT:             cref int64 1
+// STDOUT:          allocate int32
+// STDOUT:             vref d
+// STDOUT:             cref int64 1
 // STDOUT:          doWhile
 // STDOUT:             {
 // STDOUT:                assign
@@ -26,7 +32,9 @@
 // STDOUT:                      tref
 // STDOUT:                         cref int32 * & b
 // STDOUT:                         cref int64 0
-// STDOUT:                      vref c
+// STDOUT:                      tref
+// STDOUT:                         vref c
+// STDOUT:                         cref int64 0
 // STDOUT:                   {
 // STDOUT:                      assign
 // STDOUT:                         tref
@@ -36,7 +44,9 @@
 // STDOUT:                            tref
 // STDOUT:                               cref int32 * & a
 // STDOUT:                               cref int64 0
-// STDOUT:                            vref d
+// STDOUT:                            tref
+// STDOUT:                               vref d
+// STDOUT:                               cref int64 0
 // STDOUT:                   }
 // STDOUT:                   {
 // STDOUT:                      assign
@@ -47,16 +57,22 @@
 // STDOUT:                            tref
 // STDOUT:                               cref int32 * & a
 // STDOUT:                               cref int64 0
-// STDOUT:                            vref c
+// STDOUT:                            tref
+// STDOUT:                               vref c
+// STDOUT:                               cref int64 0
 // STDOUT:                   }
 // STDOUT:             }
 // STDOUT:             <
 // STDOUT:                tref
 // STDOUT:                   cref int32 * & a
 // STDOUT:                   cref int64 0
-// STDOUT:                vref c
+// STDOUT:                tref
+// STDOUT:                   vref c
+// STDOUT:                   cref int64 0
 // STDOUT:          assign
-// STDOUT:             vref c
+// STDOUT:             tref
+// STDOUT:                vref c
+// STDOUT:                cref int64 0
 // STDOUT:             tref
 // STDOUT:                cref int32 * & a
 // STDOUT:                cref int64 0

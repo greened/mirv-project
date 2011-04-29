@@ -1,9 +1,11 @@
 // Test building of types.
 //
 // STDOUT: fdef testfunc {
-// STDOUT:    vdecl a int32
+// STDOUT:    vdecl a int32 *
 // STDOUT:    {
-// STDOUT: 
+// STDOUT:       allocate int32
+// STDOUT:          vref a
+// STDOUT:          cref int64 1
 // STDOUT:    }
 // STDOUT: }
 

@@ -2,15 +2,23 @@
 //
 // STDOUT: ifThen
 // STDOUT:    <
-// STDOUT:       vref a
-// STDOUT:       vref c
+// STDOUT:       tref
+// STDOUT:          vref a
+// STDOUT:          cref int64 0
+// STDOUT:       tref
+// STDOUT:          vref c
+// STDOUT:          cref int64 0
 // STDOUT:    {
 // STDOUT:       doWhile
 // STDOUT:          {
 // STDOUT:             assign
-// STDOUT:                vref a
-// STDOUT:                +
+// STDOUT:                tref
 // STDOUT:                   vref a
+// STDOUT:                   cref int64 0
+// STDOUT:                +
+// STDOUT:                   tref
+// STDOUT:                      vref a
+// STDOUT:                      cref int64 0
 // STDOUT:                   tref
 // STDOUT:                      cref int32 * & b
 // STDOUT:                      cref int64 0
@@ -19,27 +27,43 @@
 // STDOUT:                   tref
 // STDOUT:                      cref int32 * & b
 // STDOUT:                      cref int64 0
-// STDOUT:                   vref c
+// STDOUT:                   tref
+// STDOUT:                      vref c
+// STDOUT:                      cref int64 0
 // STDOUT:                {
 // STDOUT:                   assign
-// STDOUT:                      vref a
-// STDOUT:                      +
+// STDOUT:                      tref
 // STDOUT:                         vref a
+// STDOUT:                         cref int64 0
+// STDOUT:                      +
+// STDOUT:                         tref
+// STDOUT:                            vref a
+// STDOUT:                            cref int64 0
 // STDOUT:                         tref
 // STDOUT:                            cref int32 * & b
 // STDOUT:                            cref int64 0
 // STDOUT:                }
 // STDOUT:                {
 // STDOUT:                   assign
-// STDOUT:                      vref a
-// STDOUT:                      +
+// STDOUT:                      tref
 // STDOUT:                         vref a
-// STDOUT:                         vref c
+// STDOUT:                         cref int64 0
+// STDOUT:                      +
+// STDOUT:                         tref
+// STDOUT:                            vref a
+// STDOUT:                            cref int64 0
+// STDOUT:                         tref
+// STDOUT:                            vref c
+// STDOUT:                            cref int64 0
 // STDOUT:                }
 // STDOUT:          }
 // STDOUT:          <
-// STDOUT:             vref a
-// STDOUT:             vref c
+// STDOUT:             tref
+// STDOUT:                vref a
+// STDOUT:                cref int64 0
+// STDOUT:             tref
+// STDOUT:                vref c
+// STDOUT:                cref int64 0
 // STDOUT:    }
 
 #include <mirv/Core/IR/Module.hpp>
@@ -69,6 +93,7 @@ using mirv::GlobalVariable;
 using mirv::Type;
 using mirv::TypeBase;
 using mirv::Integral;
+using mirv::Pointer;
 using mirv::FunctionType;
 using mirv::Node;
 using mirv::Base;
@@ -94,19 +119,23 @@ int main(void)
     make<Symbol<Type<Integral> > >(32);
   module->typePushBack(inttype);
 
+  ptr<Symbol<Type<TypeBase> > >::type ptrtype =
+    make<Symbol<Type<Pointer> > >(inttype);
+  module->typePushBack(ptrtype);
+
   ptr<Symbol<Function> >::type function =
     make<Symbol<Function> >("testfunc", functype);
 
   module->functionPushBack(function);
 
-  ptr<Symbol<Variable> >::type asym = make<Symbol<Variable> >("a", inttype);
+  ptr<Symbol<Variable> >::type asym = make<Symbol<Variable> >("a", ptrtype);
   function->variablePushBack(asym);
 
   ptr<Symbol<GlobalVariable> >::type bsym =
     make<Symbol<GlobalVariable> >("b", inttype);
   module->globalVariablePushBack(bsym);
 
-  ptr<Symbol<Variable> >::type csym = make<Symbol<Variable> >("c", inttype);
+  ptr<Symbol<Variable> >::type csym = make<Symbol<Variable> >("c", ptrtype);
   function->variablePushBack(csym);
 
   Builder::VariableTerminal a = {{"a"}};

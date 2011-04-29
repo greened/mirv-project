@@ -6,18 +6,30 @@
 // STDOUT:    fdecl foo int32 (int32)
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl c int32
-// STDOUT:       vdecl d int32
+// STDOUT:       vdecl c int32 *
+// STDOUT:       vdecl d int32 *
 // STDOUT:       vdecl __ct0__ int32
 // STDOUT:       {
+// STDOUT:          allocate int32
+// STDOUT:             vref c
+// STDOUT:             cref int64 1
+// STDOUT:          allocate int32
+// STDOUT:             vref d
+// STDOUT:             cref int64 1
 // STDOUT:          call
 // STDOUT:             fref foo
 // STDOUT:             vref __ct0__
-// STDOUT:             vref c
-// STDOUT:          assign
-// STDOUT:             vref d
-// STDOUT:             +
+// STDOUT:             tref
 // STDOUT:                vref c
+// STDOUT:                cref int64 0
+// STDOUT:          assign
+// STDOUT:             tref
+// STDOUT:                vref d
+// STDOUT:                cref int64 0
+// STDOUT:             +
+// STDOUT:                tref
+// STDOUT:                   vref c
+// STDOUT:                   cref int64 0
 // STDOUT:                vref __ct0__
 // STDOUT:       }
 // STDOUT:    }

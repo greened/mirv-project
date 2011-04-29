@@ -4,21 +4,32 @@
 // STDOUT:    fdecl foo void (int32)
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl i int32
+// STDOUT:       vdecl i int32 *
 // STDOUT:       {
+// STDOUT:          allocate int32
+// STDOUT:             vref i
+// STDOUT:             cref int64 1
 // STDOUT:          doWhile
 // STDOUT:             {
 // STDOUT:                call
 // STDOUT:                   fref foo
-// STDOUT:                   vref i
-// STDOUT:                assign
-// STDOUT:                   vref i
-// STDOUT:                   +
+// STDOUT:                   tref
 // STDOUT:                      vref i
+// STDOUT:                      cref int64 0
+// STDOUT:                assign
+// STDOUT:                   tref
+// STDOUT:                      vref i
+// STDOUT:                      cref int64 0
+// STDOUT:                   +
+// STDOUT:                      tref
+// STDOUT:                         vref i
+// STDOUT:                         cref int64 0
 // STDOUT:                      cref int32 1
 // STDOUT:             }
 // STDOUT:             <
-// STDOUT:                vref i
+// STDOUT:                tref
+// STDOUT:                   vref i
+// STDOUT:                   cref int64 0
 // STDOUT:                cref int32 10
 // STDOUT:       }
 // STDOUT:    }
