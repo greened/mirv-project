@@ -1,3 +1,4 @@
+include $(BUILDTOOLS)/configure/cp.mk
 include $(BUILDTOOLS)/configure/ln.mk
 include $(BUILDTOOLS)/configure/touch.mk
 
@@ -19,3 +20,7 @@ include $(BUILDTOOLS)/cxxpatterns.mk
 
 .PHONY: update_tests
 update_tests: $(patsubst %.display,%.update,$(UNITTESTS))
+
+.PHONY: replace_tests
+replace_tests:
+	$(foreach test,$(UNITTESTS),$(CP) $(FINAL_BUILDDIR)/$(patsubst %.display,%.update,$(test)) $(SRCDIR)/$(patsubst %.display,%.cpp,$(test)) ; )
