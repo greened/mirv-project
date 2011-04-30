@@ -3,9 +3,10 @@
 
 #include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
 
-#include <mirv/Core/Builder/ExpressionRules.hpp>
 #include <mirv/Core/Builder/CallExpressionGrammar.hpp>
 #include <mirv/Core/Builder/ConstantGrammar.hpp>
+#include <mirv/Core/Builder/ExpressionRules.hpp>
+#include <mirv/Core/Builder/ExpressionTerminals.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
 
 #include <mirv/Core/IR/Arithmetic.hpp>
@@ -14,6 +15,7 @@
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/Logical.hpp>
 #include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/AddressConstant.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 
@@ -52,11 +54,27 @@ namespace mirv {
 
     struct VariableRefBuilder : boost::proto::when<
       VariableTerminal,
-      ConstructUnary<
-        Expression<Reference<Variable> >
-        >(boost::proto::_data,
-          LookupSymbol<Symbol<Variable> >(boost::proto::_data,
-                                          boost::proto::_value))
+      ConstructBinary<Expression<Reference<Tuple> > >(
+        boost::proto::_data,
+        // Tuple pointer
+        ConstructUnary<
+          Expression<Reference<Variable> >
+          >(boost::proto::_data,
+            LookupSymbol<Symbol<Variable> >(boost::proto::_data,
+                                            boost::proto::_value)),
+        // Index
+        ConstructUnary<
+          Expression<Reference<Constant<Base> > >
+          >(boost::proto::_data,
+            ConstructIntegerConstantSymbol<0>(boost::proto::_data)))
+      > {};
+
+    struct GlobalVariableRefBuilder : boost::proto::when<
+      GlobalVariableTerminal,
+      ConstructGlobalReference(
+        boost::proto::_data,
+        LookupSymbol<Symbol<GlobalVariable> >(boost::proto::_data,
+                                              boost::proto::_value))
       > {};
 
     struct FunctionRefBuilder : boost::proto::when<
@@ -79,6 +97,7 @@ namespace mirv {
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::terminal>
         : boost::proto::or_<
+      GlobalVariableRefBuilder,
       VariableRefBuilder,
       FunctionRefBuilder,
       ConstantRefBuilder,
@@ -101,23 +120,13 @@ namespace mirv {
         : ComplementRule {};
 
     /// This is the grammar for deref expressions.
-    struct DerefBuilder 
-        : detail::UnaryBuilder<DereferenceRule, Dereference> {};
+    //    struct DerefBuilder 
+    //        : detail::UnaryBuilder<DereferenceRule, Dereference> {};
 
-    template<>
-    struct ConstructExpressionGrammarCases::case_<
-      boost::proto::tag::dereference
-      > : DerefBuilder {};
-
-#if 0
-    /// This is the grammar for addrof expressions.
-    struct AddressOfBuilder 
-        : detail::UnaryBuilder<AddressOfRule, AddressOf> {};
-
-    template<>
-    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::address_of>
-        : AddressOfBuilder {};
-#endif
+    //    template<>
+    //    struct ConstructExpressionGrammarCases::case_<
+    //      boost::proto::tag::dereference
+    //      > : DerefBuilder {};
 
     /// This is the grammar for logical not expressions.
     struct NotBuilder 

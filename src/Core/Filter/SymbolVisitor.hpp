@@ -10,7 +10,9 @@
 
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/VariableFwd.hpp>
+#include <mirv/Core/IR/GlobalVariableFwd.hpp>
 #include <mirv/Core/IR/ConstantFwd.hpp>
+#include <mirv/Core/IR/AddressConstantFwd.hpp>
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
@@ -28,9 +30,11 @@ namespace mirv {
 	ptr<LeafSymbol>::type,
 	ptr<Symbol<Named> >::type,
 	ptr<Symbol<Typed> >::type,
+	ptr<Symbol<Global> >::type,
 	ptr<Symbol<Module> >::type,
 	ptr<Symbol<Function> >::type,
 	ptr<Symbol<Variable> >::type,
+	ptr<Symbol<GlobalVariable> >::type,
 	ptr<Symbol<Constant<Base> > >::type,
 	ptr<Symbol<Constant<std::int8_t> > >::type,
 	ptr<Symbol<Constant<std::uint8_t> > >::type,
@@ -42,7 +46,8 @@ namespace mirv {
 	ptr<Symbol<Constant<std::uint64_t> > >::type,
 	ptr<Symbol<Constant<float> > >::type,
 	ptr<Symbol<Constant<double> > >::type,
-	ptr<Symbol<Constant<std::string> > >::type
+	ptr<Symbol<Constant<std::string> > >::type,
+	ptr<Symbol<Constant<Address> > >::type
 	> > {
   public:
     virtual void visit(ptr<Symbol<Base> >::type);
@@ -50,9 +55,11 @@ namespace mirv {
     virtual void visit(ptr<InnerSymbol>::type);
     virtual void visit(ptr<Symbol<Typed> >::type);
     virtual void visit(ptr<Symbol<Named> >::type);
+    virtual void visit(ptr<Symbol<Global> >::type);
     virtual void visit(ptr<Symbol<Module> >::type);
     virtual void visit(ptr<Symbol<Function> >::type);
     virtual void visit(ptr<Symbol<Variable> >::type);
+    virtual void visit(ptr<Symbol<GlobalVariable> >::type);
     virtual void visit(ptr<Symbol<Constant<Base> > >::type);
     virtual void visit(ptr<Symbol<Constant<std::int8_t> > >::type);
     
@@ -69,6 +76,7 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Constant<float> > >::type);
     virtual void visit(ptr<Symbol<Constant<double> > >::type);
     virtual void visit(ptr<Symbol<Constant<std::string> > >::type);
+    virtual void visit(ptr<Symbol<Constant<Address> > >::type);
   };
 }
 

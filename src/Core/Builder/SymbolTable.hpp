@@ -5,6 +5,7 @@
 #include <mirv/Core/IR/Base.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/VariableFwd.hpp>
+#include <mirv/Core/IR/GlobalVariableFwd.hpp>
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/IR/StatementFwd.hpp>
@@ -116,13 +117,13 @@ namespace mirv {
       lookupAtCurrentScope(const std::string &name,
 			   Symbol<Variable> *) const;
 
-      /// Get the variable symbol at module scope only.  Return a null
-      /// pointer if the symbol does not exist.
-      ptr<Symbol<Variable> >::type
-      lookupAtModuleScope(const std::string &name,
-                          Symbol<Variable> *) const;
+      /// Get the global variable symbol at the current scope only.
+      /// Return a null pointer if the symbol does not exist.
+      ptr<Symbol<GlobalVariable> >::type
+      lookupAtCurrentScope(const std::string &name,
+			   Symbol<GlobalVariable> *) const;
 
-      /// Get the function symbol at the module scope only.  Return a
+      /// Get the function symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
       ptr<Symbol<Function> >::type
       lookupAtModuleScope(const std::string &name,
@@ -130,6 +131,12 @@ namespace mirv {
       ptr<Symbol<Function> >::type
       lookupAtCurrentScope(const std::string &name,
                            Symbol<Function> *) const;
+
+      /// Get the variable symbol at module scope only.  Return a null
+      /// pointer if the symbol does not exist.
+      ptr<Symbol<Variable> >::type
+      lookupAtModuleScope(const std::string &name,
+                          Symbol<Variable> *) const;
 
       /// Get the type symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
@@ -140,6 +147,9 @@ namespace mirv {
       ptr<Symbol<Variable> >::type
       lookupAtAllScopes(const std::string &name,
 			Symbol<Variable> *) const;
+      ptr<Symbol<GlobalVariable> >::type
+      lookupAtAllScopes(const std::string &name,
+			Symbol<GlobalVariable> *) const;
       ptr<Symbol<Function> >::type
       lookupAtAllScopes(const std::string &name,
 			Symbol<Function> *) const;
@@ -147,6 +157,7 @@ namespace mirv {
       lookupAtAllScopes(const std::string &name,
 			const Symbol<Type<TypeBase> > *) const;
       void addAtCurrentScope(ptr<Symbol<Variable> >::type var);
+      void addAtCurrentScope(ptr<Symbol<GlobalVariable> >::type var);
       void addAtCurrentScope(ptr<Symbol<Function> >::type func);
       void addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::const_type type);
       void addAtModuleScope(ptr<Symbol<Function> >::type func);
@@ -257,8 +268,8 @@ namespace mirv {
         std::ostringstream name;
         print(name, symbol);
 	result_type result =
-          symtab->lookupAtAllScopes(name.str(), 
-                                    reinterpret_cast<Symbol<Type<Tag> > *>(0));
+          symtab->lookupAtCurrentScope(name.str(), 
+                                       reinterpret_cast<Symbol<Type<Tag> > *>(0));
 	if (!result) {
 	  symtab->addAtCurrentScope(symbol);
           result = symbol;

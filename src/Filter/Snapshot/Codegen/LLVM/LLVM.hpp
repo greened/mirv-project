@@ -326,6 +326,7 @@ namespace mirv {
       void visit(ptr<Expression<GreaterThan> >::type expr);
       void visit(ptr<Expression<GreaterThanOrEqual> >::type expr);
       void visit(ptr<Expression<Reference<Variable> > >::type expr);
+      void visit(ptr<Expression<Reference<Tuple> > >::type expr);
     };
 
     class LeaveExpressionAction : public VisitAction<LeaveExpressionVisitor> {

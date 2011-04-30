@@ -2,6 +2,8 @@
 #define mirv_Core_IR_Mutating_hpp
 
 #include <mirv/Core/IR/Statement.hpp>
+#include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/mpl/vector.hpp>
@@ -83,6 +85,7 @@ namespace mirv {
     class Interface : public Statement<DualExpression>,
                       public LeafStatement,
                       public boost::enable_shared_from_this<Statement<Assignment> > {
+    private:
       Statement<Base> *cloneImpl(void);
 
     protected:
@@ -272,6 +275,79 @@ namespace mirv {
   public:
     typedef StatementBaseGenerator<Interface, Call, Mutating>::type BaseType;
     typedef Statement<Controlled> VisitorBaseType;
+  };
+
+  /// Specify the interface to alloc statements.
+  // TODO: Add alignment information.
+  class Allocate {
+  private:
+    class Interface : public Statement<DualExpression>,
+                      public LeafStatement,
+                      public boost::enable_shared_from_this<Statement<Allocate> > {
+    public:
+      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
+
+    private:
+      TypePtr theType;
+
+      Statement<Base> *cloneImpl(void);
+
+    protected:
+      void setParents(void);
+
+    public:
+      typedef ExpressionIterator iterator;
+      typedef ConstExpressionIterator const_iterator;
+      typedef ReverseExpressionIterator reverse_iterator;
+      typedef ConstReverseExpressionIterator const_reverse_iterator;
+
+      template<typename E1, typename E2, typename T>
+      Interface(E1 e1, E2 e2, T t)
+          : Statement<DualExpression>(e1, e2), LeafStatement(), theType(t) {}
+
+      typedef ExpressionPtr ChildPtr;
+      typedef ConstExpressionPtr ConstChildPtr;
+
+      ptr<Node<Base> >::type getSharedHandle(void) {
+        return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
+
+      TypePtr type(void) const {
+        return theType;
+      }
+
+      iterator begin(void) {
+        return expressionBegin();
+      }
+      const_iterator begin(void) const {
+        return expressionBegin();
+      }
+      reverse_iterator rbegin(void) {
+        return expressionRBegin();
+      }
+      const_reverse_iterator rbegin(void) const {
+        return expressionRBegin();
+      }
+
+      iterator end(void) {
+        return expressionEnd();
+      }
+      const_iterator end(void) const {
+        return expressionEnd();
+      }
+      reverse_iterator rend(void) {
+        return expressionREnd();
+      }
+      const_reverse_iterator rend(void) const {
+        return expressionREnd();
+      }
+    };
+  public:
+    typedef StatementBaseGenerator<Interface, Allocate, Mutating>::type BaseType;
+    typedef Statement<DualExpression> VisitorBaseType;
   };
 }
 

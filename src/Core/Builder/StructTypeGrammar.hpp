@@ -144,6 +144,14 @@ namespace mirv {
       StructTypeDefBuilder
       > {};
 
+    struct StructTypeLookupBuilder : boost::proto::when<
+      StructTypeDeclRule,
+      LookupSymbol<Symbol<Type<TypeBase> > >(
+        boost::proto::_data,
+        // Struct name
+        boost::proto::_value(boost::proto::_right))
+      > {};
+
     namespace {
       /// A struct_ "operator."  This is a protoized object that
       /// implements the function operator to construct struct types.

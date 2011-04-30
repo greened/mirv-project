@@ -1,17 +1,25 @@
 // Test building of function calls.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    vdecl a int32
-// STDOUT:    vdecl b int32
+// STDOUT:    gvdecl a int32
+// STDOUT:    gvdecl b int32
 // STDOUT:    fdecl foo void (int32)
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl c int32
-// STDOUT:       vdecl d int32
+// STDOUT:       vdecl c int32 *
+// STDOUT:       vdecl d int32 *
 // STDOUT:       {
+// STDOUT:          allocate int32
+// STDOUT:             vref c
+// STDOUT:             cref int64 1
+// STDOUT:          allocate int32
+// STDOUT:             vref d
+// STDOUT:             cref int64 1
 // STDOUT:          call
 // STDOUT:             fref foo
-// STDOUT:             vref c
+// STDOUT:             tref
+// STDOUT:                vref c
+// STDOUT:                cref int64 0
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
@@ -19,6 +27,7 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>

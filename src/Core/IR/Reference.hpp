@@ -77,14 +77,6 @@ namespace mirv {
      typedef Interface BaseType;
    };
 
-  /// Dereference the address provided by some expression.
-  class Dereference { 
-  public:
-    typedef Expression<Unary> BaseType;
-    typedef Expression<Unary> VisitorBaseType;
-    // TODO: Override type().
-  };
-
   /// Specify the interface for array index expressions.
   template<>
   class Reference<Tuple> { 
@@ -115,6 +107,11 @@ namespace mirv {
     public:
       Interface(ChildPtr Base, ChildPtr Index)
           : InnerExpression(Base, Index) {}
+
+      template<typename ExprType>
+      Interface(ChildPtr Base,
+                const boost::shared_ptr<Expression<ExprType> > &Index)
+          : InnerExpression(Base, fast_cast<Expression<mirv::Base> >(Index)) {}
 
       template<typename Sequence>
       Interface(ChildPtr Base, const Sequence &indices)

@@ -3,13 +3,16 @@
 // STDOUT:    {
 // STDOUT:       call
 // STDOUT:          fref foo
-// STDOUT:          vref b
+// STDOUT:          tref
+// STDOUT:             cref int32 * & b
+// STDOUT:             cref int64 0
 // STDOUT:    }
 // STDOUT: }
 
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
@@ -29,6 +32,7 @@ using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
 using mirv::Variable;
+using mirv::GlobalVariable;
 using mirv::Type;
 using mirv::TypeBase;
 using mirv::Integral;
@@ -67,17 +71,19 @@ int main(void)
                                        argTypes.end());
   module->typePushBack(functype);
 
-  ptr<Symbol<Variable> >::type asym = make<Symbol<Variable> >("a", inttype);
-  module->variablePushBack(asym);
+  ptr<Symbol<GlobalVariable> >::type asym =
+    make<Symbol<GlobalVariable> >("a", inttype);
+  module->globalVariablePushBack(asym);
 
-  ptr<Symbol<Variable> >::type bsym = make<Symbol<Variable> >("b", inttype);
-  module->variablePushBack(bsym);
+  ptr<Symbol<GlobalVariable> >::type bsym =
+    make<Symbol<GlobalVariable> >("b", inttype);
+  module->globalVariablePushBack(bsym);
 
   ptr<Symbol<Function> >::type fsym = make<Symbol<Function> >("foo", functype);
   module->functionPushBack(fsym);
 
-  Builder::VariableTerminal a = {{"a"}};
-  Builder::VariableTerminal b = {{"b"}};
+  Builder::GlobalVariableTerminal a = {{"a"}};
+  Builder::GlobalVariableTerminal b = {{"b"}};
 
   Builder::FunctionTerminal foo = {{"foo"}};
 

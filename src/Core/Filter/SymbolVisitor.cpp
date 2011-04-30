@@ -4,7 +4,9 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/AddressConstant.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
@@ -38,6 +40,12 @@ namespace mirv {
     visit(p);
   }
 
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Global> >::type s) {
+    ptr<Symbol<Global>::VisitorBaseType>::type p =
+      fast_cast<Symbol<Global>::VisitorBaseType>(s);
+    visit(p);
+  }
+
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Module> >::type s) {
     ptr<Symbol<Module>::VisitorBaseType>::type p =
       fast_cast<Symbol<Module>::VisitorBaseType>(s);
@@ -51,6 +59,12 @@ namespace mirv {
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Variable> >::type s) {
     ptr<Symbol<Variable>::VisitorBaseType>::type p =
       fast_cast<Symbol<Variable>::VisitorBaseType>(s);
+    visit(p);
+  }
+
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::type s) {
+    ptr<Symbol<GlobalVariable>::VisitorBaseType>::type p =
+      fast_cast<Symbol<GlobalVariable>::VisitorBaseType>(s);
     visit(p);
   }
 
@@ -113,6 +127,12 @@ namespace mirv {
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::string> > >::type s) {
     ptr<Symbol<Constant<std::string> >::VisitorBaseType>::type p =
       fast_cast<Symbol<Constant<std::string> >::VisitorBaseType>(s);
+    visit(p);
+  }
+
+  SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<Address> > >::type s) {
+    ptr<Symbol<Constant<Address> >::VisitorBaseType>::type p =
+      fast_cast<Symbol<Constant<Address> >::VisitorBaseType>(s);
     visit(p);
   }
 }

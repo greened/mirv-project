@@ -1,13 +1,15 @@
 // Test building of function declaration.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    vdecl g int32
+// STDOUT:    gvdecl g int32
 // STDOUT:    fdecl foo void (int32)
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl a int32
+// STDOUT:       vdecl a int32 *
 // STDOUT:       {
-// STDOUT:
+// STDOUT:          allocate int32
+// STDOUT:             vref a
+// STDOUT:             cref int64 1
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
@@ -20,6 +22,7 @@
 #include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Core/Builder/SymbolGrammar.hpp>

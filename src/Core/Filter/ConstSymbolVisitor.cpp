@@ -4,6 +4,9 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/AddressConstant.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
@@ -44,6 +47,13 @@ namespace mirv {
   }
 
   ConstSymbolVisitor::result_type
+  ConstSymbolVisitor::visit(ptr<Symbol<Global> >::const_type s) {
+    ptr<Symbol<Global>::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Global>::VisitorBaseType>(s);
+    visit(p);
+  }
+
+  ConstSymbolVisitor::result_type
   ConstSymbolVisitor::visit(ptr<Symbol<Module> >::const_type s) {
     ptr<Symbol<Module>::VisitorBaseType>::const_type p =
       fast_cast<const Symbol<Module>::VisitorBaseType>(s);
@@ -59,6 +69,12 @@ namespace mirv {
   ConstSymbolVisitor::visit(ptr<Symbol<Variable> >::const_type s) {
     ptr<Symbol<Variable>::VisitorBaseType>::const_type p =
       fast_cast<const Symbol<Variable>::VisitorBaseType>(s);
+    visit(p);
+  }
+  ConstSymbolVisitor::result_type
+  ConstSymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::const_type s) {
+    ptr<Symbol<GlobalVariable>::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<GlobalVariable>::VisitorBaseType>(s);
     visit(p);
   }
   ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<Base> > >::const_type s) {
@@ -119,6 +135,12 @@ namespace mirv {
   ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<std::string> > >::const_type s) {
     ptr<Symbol<Constant<std::string> >::VisitorBaseType>::const_type p =
       fast_cast<const Symbol<Constant<std::string> >::VisitorBaseType>(s);
+    visit(p);
+  }
+
+  ConstSymbolVisitor::result_type ConstSymbolVisitor::visit(ptr<Symbol<Constant<Address> > >::const_type s) {
+    ptr<Symbol<Constant<Address> >::VisitorBaseType>::const_type p =
+      fast_cast<const Symbol<Constant<Address> >::VisitorBaseType>(s);
     visit(p);
   }
   ConstSymbolVisitor::result_type

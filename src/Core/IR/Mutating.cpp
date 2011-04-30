@@ -38,4 +38,21 @@ namespace mirv {
       (*i)->setParent(getSharedHandle());
     }
   }
+
+  Statement<Base> *Allocate::Interface::cloneImpl(void) 
+  {
+    ptr<Statement<Allocate> >::type stmt(Statement<Allocate>::make(
+                                           getLeftExpression()->clone(),
+                                           getRightExpression()->clone(),
+                                           type()));
+    Statement<Allocate> *result = stmt.get();
+    stmt.reset();
+    return result;
+  }
+
+  void Allocate::Interface::setParents(void)
+  {
+    getLeftExpression()->setParent(getSharedHandle());
+    getRightExpression()->setParent(getSharedHandle());
+  }
 }

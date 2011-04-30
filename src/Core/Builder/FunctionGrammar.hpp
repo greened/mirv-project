@@ -8,6 +8,7 @@
 #include <mirv/Core/Builder/TypeLookupGrammar.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
 #include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/proto/proto.hpp>
 

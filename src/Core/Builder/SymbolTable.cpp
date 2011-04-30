@@ -3,6 +3,7 @@
 #include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/Utility/Printer.hpp>
@@ -88,11 +89,19 @@ namespace mirv {
           return *i;
         }
       }
-      Symbol<Module>::VariableIterator i = module->variableFind(name);
-      if (i != module->variableEnd()) {
+      return ptr<Symbol<Variable> >::type();
+    } 
+
+    /// Get the global variable symbol at the current scope only.
+    /// Return a null pointer if the symbol does not exist.
+    ptr<Symbol<GlobalVariable> >::type
+    SymbolTable::lookupAtCurrentScope(const std::string &name,
+                                      Symbol<GlobalVariable> *) const {
+      Symbol<Module>::GlobalVariableIterator i = module->globalVariableFind(name);
+      if (i != module->globalVariableEnd()) {
         return *i;
       }
-      return ptr<Symbol<Variable> >::type();
+      return ptr<Symbol<GlobalVariable> >::type();
     } 
 
     /// Get the variable symbol at module scope only.  Return a null
@@ -149,18 +158,25 @@ namespace mirv {
                                    Symbol<Variable> *) const {
       ptr<Symbol<Variable> >::type var =
         lookupAtCurrentScope(name, reinterpret_cast<Symbol<Variable> *>(0));
-      if (function && !var) {
-        // Look up at module scope
-        SymbolTable ModuleScope(module, ptr<Symbol<Function> >::type());
-        var = ModuleScope.lookupAtCurrentScope(
-          name,
-          reinterpret_cast<Symbol<Variable> *>(0));
-      }
       if (!var) {
         error("Could not find variable");
       }
       return var;
     } 
+
+    ptr<Symbol<GlobalVariable> >::type
+    SymbolTable::lookupAtAllScopes(const std::string &name,
+                                   Symbol<GlobalVariable> *) const {
+      // Look up at module scope
+      SymbolTable ModuleScope(module, ptr<Symbol<Function> >::type());
+      ptr<Symbol<GlobalVariable> >::type var = ModuleScope.lookupAtCurrentScope(
+        name,
+        reinterpret_cast<Symbol<GlobalVariable> *>(0));
+      if (!var) {
+        error("Could not find variable");
+      }
+      return var;
+    }
      
     ptr<Symbol<Function> >::type
     SymbolTable::lookupAtAllScopes(const std::string &name,
@@ -199,7 +215,18 @@ namespace mirv {
         function->variablePushBack(var);
         return;
       }
-      module->variablePushBack(var);
+      error("Cannot add variable to module");
+    }
+
+    void
+    SymbolTable::addAtCurrentScope(ptr<Symbol<GlobalVariable> >::type var) {
+      ptr<Symbol<GlobalVariable> >::type result =
+        lookupAtCurrentScope(var->name(),
+                             reinterpret_cast<Symbol<GlobalVariable> *>(0));
+      if (result) {
+        error("Global variable already exists");
+      }
+      module->globalVariablePushBack(var);
     }
 
     void

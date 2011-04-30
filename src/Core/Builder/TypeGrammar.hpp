@@ -30,6 +30,19 @@ namespace mirv {
       PointerTypeBuilder,
       ArrayTypeBuilder
       > {};
+
+    /// This is the grammar to lookup types.  It is almost the same as
+    /// the construct grammar except for struct types it assumes the
+    /// struct already exists.  This lets the rule avoid creating and
+    /// returning placeholders instead of the real type.
+    struct TypeLookupBuilder : boost::proto::or_<
+      IntBuilder,
+      FloatBuilder,
+      FunctionTypeLookupBuilder,
+      StructTypeLookupBuilder,
+      PointerTypeLookupBuilder,
+      ArrayTypeLookupBuilder
+      > {};
   }
 }
 

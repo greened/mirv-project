@@ -10,7 +10,9 @@
 
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/VariableFwd.hpp>
+#include <mirv/Core/IR/GlobalVariableFwd.hpp>
 #include <mirv/Core/IR/ConstantFwd.hpp>
+#include <mirv/Core/IR/AddressConstantFwd.hpp>
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
@@ -28,9 +30,11 @@ namespace mirv {
 	ptr<LeafSymbol>::const_type,
 	ptr<Symbol<Named> >::const_type,
 	ptr<Symbol<Typed> >::const_type,
+	ptr<Symbol<Global> >::const_type,
 	ptr<Symbol<Module> >::const_type,
 	ptr<Symbol<Function> >::const_type,
 	ptr<Symbol<Variable> >::const_type,
+	ptr<Symbol<GlobalVariable> >::const_type,
 	ptr<Symbol<Constant<Base> > >::const_type,
 	ptr<Symbol<Constant<std::int8_t> > >::const_type,
 	ptr<Symbol<Constant<std::uint8_t> > >::const_type,
@@ -43,6 +47,7 @@ namespace mirv {
 	ptr<Symbol<Constant<float> > >::const_type,
 	ptr<Symbol<Constant<double> > >::const_type,
 	ptr<Symbol<Constant<std::string> > >::const_type,
+	ptr<Symbol<Constant<Address> > >::const_type,
 	ptr<Symbol<Type<TypeBase> > >::const_type,
 	ptr<LeafType>::const_type,
 	ptr<InnerType>::const_type,
@@ -60,9 +65,11 @@ namespace mirv {
     virtual void visit(ptr<InnerSymbol>::const_type);
     virtual void visit(ptr<Symbol<Typed> >::const_type);
     virtual void visit(ptr<Symbol<Named> >::const_type);
+    virtual void visit(ptr<Symbol<Global> >::const_type);
     virtual void visit(ptr<Symbol<Module> >::const_type);
     virtual void visit(ptr<Symbol<Function> >::const_type);
     virtual void visit(ptr<Symbol<Variable> >::const_type);
+    virtual void visit(ptr<Symbol<GlobalVariable> >::const_type);
     virtual void visit(ptr<Symbol<Constant<Base> > >::const_type);
     virtual void visit(ptr<Symbol<Constant<std::int8_t> > >::const_type);
     
@@ -79,6 +86,7 @@ namespace mirv {
     virtual void visit(ptr<Symbol<Constant<float> > >::const_type);
     virtual void visit(ptr<Symbol<Constant<double> > >::const_type);
     virtual void visit(ptr<Symbol<Constant<std::string> > >::const_type);
+    virtual void visit(ptr<Symbol<Constant<Address> > >::const_type);
     virtual void visit(ptr<Symbol<Type<TypeBase> > >::const_type);
     virtual void visit(ptr<LeafType>::const_type);
     virtual void visit(ptr<InnerType>::const_type);

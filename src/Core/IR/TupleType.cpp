@@ -1,15 +1,22 @@
+// FIXME: Why is this necessary?  SymbolVisitor exposes
+// implementations.
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Module.hpp>
+#include <mirv/Core/IR/TupleType.hpp>
+#include <mirv/Core/IR/PlaceholderType.hpp>
+#include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/Builder/MultiplyOperators.hpp>
 #include <mirv/Core/Builder/AddOperators.hpp>
+#include <mirv/Core/Builder/ExpressionGrammar.hpp>
 #include <mirv/Core/Filter/AttributeFlow.hpp>
 #include <mirv/Core/Filter/ConstExpressionFlow.hpp>
 #include <mirv/Core/Filter/FlowAction.hpp>
 #include <mirv/Core/Filter/ConstSymbolFlow.hpp>
 #include <mirv/Core/Filter/Filter.hpp>
 #include <mirv/Core/Filter/Action.hpp>
-#include <mirv/Core/IR/IR.hpp>
-#include <mirv/Core/IR/TupleType.hpp>
-// FIXME: Why is this necessary?
-#include <mirv/Core/IR/Module.hpp>
 
 #include <sstream>
 

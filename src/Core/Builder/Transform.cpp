@@ -1,9 +1,35 @@
 #include <mirv/Core/Builder/Transform.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Mutating.hpp>
+#include <mirv/Core/IR/Reference.hpp>
+#include <mirv/Core/Utility/Cast.hpp>
 
 namespace mirv {
   namespace Builder {
+    ptr<Statement<Base> >::type
+    AddAllocateStatement::operator()(boost::shared_ptr<SymbolTable> symtab,
+                                     boost::shared_ptr<Statement<Base> > stmt)
+    {
+      auto function = symtab->getFunction();
+      function->statementPushBack(stmt);
+      return stmt;
+    }
+
+    ptr<Symbol<Variable> >::type
+    ExtractVariable::operator()(boost::shared_ptr<SymbolTable> symtab,
+                                ptr<Statement<Base> >::type stmt)
+    {
+      ptr<Statement<Allocate > >::type allocate =
+        safe_cast<Statement<Allocate> >(stmt);
+
+      ptr<Expression<Reference<Variable> > >::type vref =
+        safe_cast<Expression<Reference<Variable> > >(
+          allocate->getLeftExpression());
+
+      return vref->getSymbol();
+    }
+
     ClearPendingStatements::result_type
     ClearPendingStatements::operator()(boost::shared_ptr<SymbolTable> symtab,
                                        StatementPointer stmt)

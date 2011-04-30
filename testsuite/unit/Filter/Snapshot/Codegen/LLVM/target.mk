@@ -18,7 +18,14 @@ $(call debug, [llvm codegen test] libmirvfilter_codegen_llvm_test_UNITTESTS = $(
 
 $(libmirvfilter_codegen_llvm_test_UNITTESTS): \
   CPPFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+$(libmirvfilter_codegen_llvm_test_UNITTESTS): \
+  opt_CPPFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+$(libmirvfilter_codegen_llvm_test_UNITTESTS): \
+  debug_CPPFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+$(libmirvfilter_codegen_llvm_test_UNITTESTS): \
+  DFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 
-TARGETS += $(libmirvfilter_codegen_llvm_test_UNITTESTS)
+TARGETS   += $(libmirvfilter_codegen_llvm_test_UNITTESTS)
+UNITTESTS += $(libmirvfilter_codegen_llvm_test_UNITTESTS)
 
 endif

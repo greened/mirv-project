@@ -38,6 +38,19 @@ namespace mirv {
        PointerTypeRule,
        ArrayTypeRule
        > {};
+
+    /// This is the rule to lookup types.  It is almost the same as
+    /// the construct rule except for struct types it assumes the
+    /// struct already exists.  This lets the rule avoid creating and
+    /// returning placeholders instead of the real type.
+     struct TypeLookupRule : boost::proto::or_<
+       IntRule,
+       FloatRule,
+       StructTypeDeclRule,
+       FunctionTypeRule,
+       PointerTypeRule,
+       ArrayTypeRule
+       > {};
    }
 }
 
