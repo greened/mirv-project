@@ -1,7 +1,7 @@
-#include "LLVM.hpp"
-
 #include <mirv/Core/IR/IR.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
+
+#include "LLVM.hpp"
 
 namespace mirv {
   void LLVMCodegenFilter::
@@ -734,6 +734,16 @@ namespace mirv {
         CreateLoad(value, "vref");
     }
     syn.setValue(value);
+
+    attributeManager.setSynthesizedAttribute(syn);
+  }
+
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Tuple> > >::type expr)
+  {
+    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+
+    if (!attributeManager.getInheritedAttribute().generateAddress()) {
+    }
 
     attributeManager.setSynthesizedAttribute(syn);
   }

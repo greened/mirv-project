@@ -2,7 +2,7 @@
 #define mirv_Core_Builder_Wrapper_hpp
 
 #include <mirv/Core/Builder/Keywords.hpp>
-#include <mirv/Core/Builder/DomainFwd.hpp>
+#include <mirv/Core/Builder/Domain.hpp>
 
 #include <boost/proto/proto.hpp>
 

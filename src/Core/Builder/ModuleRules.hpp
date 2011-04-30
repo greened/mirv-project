@@ -4,7 +4,7 @@
 #include <mirv/Core/Builder/SymbolTerminals.hpp>
 #include <mirv/Core/Builder/FunctionRulesFwd.hpp>
 #include <mirv/Core/Builder/TypeRulesFwd.hpp>
-#include <mirv/Core/Builder/VariableRulesFwd.hpp>
+#include <mirv/Core/Builder/GlobalVariableRulesFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 
@@ -22,7 +22,7 @@ namespace mirv {
      struct FunctionVariableType : boost::proto::or_<
     FunctionRule,
     FunctionDeclRule,
-    VariableRule,
+    GlobalVariableRule,
     TypeRule
        > {};
 

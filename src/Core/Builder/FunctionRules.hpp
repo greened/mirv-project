@@ -1,7 +1,7 @@
 #ifndef mirv_Core_Builder_FunctionRules_hpp
 #define mirv_Core_Builder_FunctionRules_hpp
 
-#include <mirv/Core/Builder/VariableRules.hpp>
+#include <mirv/Core/Builder/VariableRulesFwd.hpp>
 #include <mirv/Core/Builder/StatementGrammar.hpp>
 #include <mirv/Core/Builder/CallExpressionGrammar.hpp>
 #include <mirv/Core/Builder/TypeRules.hpp>

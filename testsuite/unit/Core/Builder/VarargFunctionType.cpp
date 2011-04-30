@@ -3,14 +3,19 @@
 // STDOUT: mdef testmodule {
 // STDOUT:    fdecl testfunc void (int32, int16, ...)
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl a int32
+// STDOUT:       vdecl a int32 *
 // STDOUT:       {
-// STDOUT:
+// STDOUT:          allocate int32
+// STDOUT:             vref a
+// STDOUT:             cref int64 1
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
 
 #include <mirv/Core/IR/Module.hpp>
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>

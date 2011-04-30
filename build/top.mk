@@ -1,3 +1,5 @@
+.SUFFIXES:
+
 ifndef SRCDIR
   SRCDIR := $(CURDIR)
 endif

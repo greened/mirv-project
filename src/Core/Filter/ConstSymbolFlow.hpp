@@ -216,14 +216,15 @@ namespace mirv {
       }
 
       // Visit variables
-      for(Symbol<Module>::ConstVariableIterator v = sym->variableBegin(),
-            vend = sym->variableEnd();
+      for(Symbol<Module>::ConstGlobalVariableIterator v =
+            sym->globalVariableBegin(),
+            vend = sym->globalVariableEnd();
           v != vend;
           /* NULL */) {
         this->doBefore(sym, v);
         (*v)->accept(*this);
         this->doAfter(sym, v);
-        Symbol<Module>::ConstVariableIterator prev = v;
+        Symbol<Module>::ConstGlobalVariableIterator prev = v;
         if (++v != vend) {
           this->doBetween(sym, prev, v);
         }

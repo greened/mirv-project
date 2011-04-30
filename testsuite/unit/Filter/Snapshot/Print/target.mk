@@ -15,6 +15,7 @@ $(call make_unittest,libmirvfilter_print_test,$(libmirvfilter_print_test_SRCDIR)
 
 $(call debug, [print test] libmirvfilter_print_test_UNITTESTS = $(libmirvfilter_print_test_UNITTESTS))
 
-TARGETS += $(libmirvfilter_print_test_UNITTESTS)
+TARGETS   += $(libmirvfilter_print_test_UNITTESTS)
+UNITTESTS += $(libmirvfilter_print_test_UNITTESTS)
 
 endif

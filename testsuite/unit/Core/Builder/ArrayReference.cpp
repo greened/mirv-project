@@ -1,18 +1,32 @@
 // Test building of array types.
 //
 // STDOUT: fdef testfunc {
-// STDOUT:    vdecl a (5 x (4 x (3 x int32)))
-// STDOUT:    vdecl b int32
+// STDOUT:    vdecl a (cref int64 5 x (cref int64 4 x (cref int64 3 x int32))) *
+// STDOUT:    vdecl b int32 *
 // STDOUT:    {
-// STDOUT:       assign
+// STDOUT:       allocate (cref int64 5 x (cref int64 4 x (cref int64 3 x int32)))
+// STDOUT:          vref a
+// STDOUT:          cref int64 1
+// STDOUT:       allocate int32
 // STDOUT:          vref b
+// STDOUT:          cref int64 1
+// STDOUT:       assign
+// STDOUT:          tref
+// STDOUT:             vref b
+// STDOUT:             cref int64 0
 // STDOUT:          cref int32 1
 // STDOUT:       assign
-// STDOUT:          vref b
-// STDOUT:          +
+// STDOUT:          tref
 // STDOUT:             vref b
+// STDOUT:             cref int64 0
+// STDOUT:          +
 // STDOUT:             tref
-// STDOUT:                vref a
+// STDOUT:                vref b
+// STDOUT:                cref int64 0
+// STDOUT:             tref
+// STDOUT:                tref
+// STDOUT:                   vref a
+// STDOUT:                   cref int64 0
 // STDOUT:                cref int32 2
 // STDOUT:                cref int32 0
 // STDOUT:                cref int32 1
@@ -22,6 +36,7 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>

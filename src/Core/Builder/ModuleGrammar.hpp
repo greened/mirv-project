@@ -4,7 +4,7 @@
 #include <mirv/Core/Builder/ModuleRules.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Core/Builder/TypeGrammar.hpp>
-#include <mirv/Core/Builder/VariableGrammar.hpp>
+#include <mirv/Core/Builder/GlobalVariableGrammar.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
 #include <mirv/Core/IR/Module.hpp>
 
@@ -26,7 +26,7 @@ namespace mirv {
     // This is the grammar to match a variable declaration, a type
     // definition or a function definition.
     struct VariableTypeOrFunctionBuilder : boost::proto::or_<
-      VariableBuilder,
+      GlobalVariableBuilder,
       TypeBuilder,
       FunctionBuilder,
       FunctionDeclBuilder

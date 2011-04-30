@@ -4,6 +4,9 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/AddressConstant.hpp>
 #include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
@@ -61,6 +64,20 @@ namespace mirv {
   template
   void
   ConstVisitable<Symbol<Typed>, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
+
+  template
+  void
+  Visitable<Symbol<Global>, SymbolVisitor>::accept(SymbolVisitor &);
+  template
+  void
+  ConstVisitable<Symbol<Global>, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
+
+  template
+  void
+  Visitable<Symbol<GlobalVariable>, SymbolVisitor>::accept(SymbolVisitor &);
+  template
+  void
+  ConstVisitable<Symbol<GlobalVariable>, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
 
   template
   void
@@ -159,6 +176,13 @@ namespace mirv {
   template
   void
   ConstVisitable<Symbol<Constant<std::string> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
+
+  template
+  void
+  Visitable<Symbol<Constant<Address> >, SymbolVisitor>::accept(SymbolVisitor &);
+  template
+  void
+  ConstVisitable<Symbol<Constant<Address> >, ConstSymbolVisitor, SymbolVisitor>::accept(ConstSymbolVisitor &) const;
 
   template
   void

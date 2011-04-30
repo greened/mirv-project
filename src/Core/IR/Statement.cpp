@@ -211,4 +211,11 @@ namespace mirv{
   template
   void
   ConstVisitable<Statement<Call>, ConstStatementVisitor, StatementVisitor>::accept(ConstStatementVisitor &) const;
+
+  template
+  void
+  Visitable<Statement<Allocate>, StatementVisitor>::accept(StatementVisitor &);
+  template
+  void
+  ConstVisitable<Statement<Allocate>, ConstStatementVisitor, StatementVisitor>::accept(ConstStatementVisitor &) const;
 }
