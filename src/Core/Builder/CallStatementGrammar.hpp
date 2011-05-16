@@ -12,14 +12,54 @@
 
 namespace mirv {
   namespace Builder {
+    /// This is a callable transform to add a statement-level call to
+    /// a function.
+    struct AddCallAsStatement : boost::proto::callable {
+      typedef ptr<Statement<Base> >::type result_type;
+
+      template<typename Arg, typename Expr>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             Arg functionExpr,
+                             const Expr &expr) {
+        ptr<Statement<Call> >::type call;
+
+        // If this function has a return type, we're ignoring it.
+        // Create a temporary to hold the result and pass it to the
+        // call statement.
+        ptr<Symbol<Type<FunctionType> > >::const_type functionType =
+          safe_cast<const Symbol<Type<FunctionType> > >(functionExpr->type());
+        if (functionType->getReturnType()) {
+          ptr<Symbol<Variable> >::type temp =
+            BinaryConstructSymbol<Symbol<Variable> >()(
+              symtab, "__ct"
+              + boost::lexical_cast<std::string>(symtab->getNextTempNum())
+              + "__",
+              functionType->getReturnType());
+
+          ptr<Expression<Reference<Variable> > >::type returnValue =
+            make<Expression<Reference<Variable> > >(temp);
+
+          call = ConstructNary<Statement<Call> >()(symtab,
+                                                   functionExpr,
+                                                   returnValue,
+                                                   expr);
+        }
+        else {
+          call = ConstructNary<Statement<Call> >()(symtab,
+                                                   functionExpr,
+                                                   expr);
+        }        
+        return call;
+      }
+    };
+
     /// This is the grammar for function call statements.
     struct CallStatementBuilder :  boost::proto::when<
       CallRule,
-      ConstructNary<
-        Statement<Call>
-        >(boost::proto::_data,
-          ConstructExpressionGrammar(boost::proto::_left),
-          boost::proto::_expr)
+      AddCallAsStatement(
+        boost::proto::_data,
+        ConstructExpressionGrammar(boost::proto::_left),
+        boost::proto::_expr)
       > {};
   }
 }
