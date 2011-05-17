@@ -28,7 +28,6 @@ namespace mirv {
     public:
       Interface(ptr<Symbol<Type<TypeBase> > >::const_type type)
           : Symbol<Typed>(type) {}
-      virtual std::string valueString(void) const = 0;
     };
 
   public:
@@ -50,10 +49,6 @@ namespace mirv {
 
       ValueType value(void) const {
         return val;
-      }
-
-      std::string valueString(void) const {
-        return boost::lexical_cast<std::string>(value());
       }
 
        ptr<Node<Base>>::type getSharedHandle(void) {
