@@ -132,11 +132,11 @@ namespace mirv {
       lookupAtCurrentScope(const std::string &name,
                            Symbol<Function> *) const;
 
-      /// Get the variable symbol at module scope only.  Return a null
-      /// pointer if the symbol does not exist.
-      ptr<Symbol<Variable> >::type
+      /// Get the global variable symbol at module scope only.  Return
+      /// a null pointer if the symbol does not exist.
+      ptr<Symbol<GlobalVariable> >::type
       lookupAtModuleScope(const std::string &name,
-                          Symbol<Variable> *) const;
+                          Symbol<GlobalVariable> *) const;
 
       /// Get the type symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
@@ -162,7 +162,7 @@ namespace mirv {
       void addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::const_type type);
       void addAtModuleScope(ptr<Symbol<Function> >::type func);
       void addAtModuleScope(ptr<Symbol<Type<TypeBase> > >::const_type type);
-      void addAtModuleScope(ptr<Symbol<Variable> >::type var);
+      void addAtModuleScope(ptr<Symbol<GlobalVariable> >::type var);
     };
 
     /// This is a callable transform to set the module scope in a
@@ -268,8 +268,8 @@ namespace mirv {
         std::ostringstream name;
         print(name, symbol);
 	result_type result =
-          symtab->lookupAtCurrentScope(name.str(), 
-                                       reinterpret_cast<Symbol<Type<Tag> > *>(0));
+          symtab->lookupAtModuleScope(name.str(), 
+                                      reinterpret_cast<Symbol<Type<Tag> > *>(0));
 	if (!result) {
 	  symtab->addAtCurrentScope(symbol);
           result = symbol;

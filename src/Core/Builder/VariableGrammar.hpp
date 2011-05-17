@@ -34,7 +34,8 @@ namespace mirv {
                 Expression<Reference<Variable> >
                 >(boost::proto::_data,
                   BinaryConstructSymbol<
-                    Symbol<Variable> >(
+                    Symbol<Variable>,
+                    CurrentScope>(
                       boost::proto::_data,
                       // Variable name
                       boost::proto::_value(boost::proto::_right(
@@ -43,7 +44,9 @@ namespace mirv {
                       // Variable type (pointer to allocated type)
                       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
                         boost::proto::_data,
-                        UnaryConstructSymbol<Symbol<Type<Pointer> > >(
+                        UnaryConstructSymbol<
+                          Symbol<Type<Pointer> >,
+                          ModuleScope>(
                           boost::proto::_data,
                           TypeAccessBuilder(boost::proto::_right))))),
               // Number of elements

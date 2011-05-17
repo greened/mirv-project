@@ -52,6 +52,54 @@ namespace mirv {
           return "float" + boost::lexical_cast<std::string>(size);
         }
       };
+
+      template<typename SymbolType, Scope scope>
+      struct Lookup;
+
+      template<typename SymbolType> 
+      struct Lookup<SymbolType, CurrentScope> {
+        typedef typename ptr<SymbolType>::type result_type;
+
+        template<typename ...Args>
+        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                               Args... a) {
+          std::string name = SymbolType::getName(a...);
+          return symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
+        }
+      };
+
+      template<typename SymbolType> 
+      struct Lookup<SymbolType, ModuleScope> {
+        typedef typename ptr<SymbolType>::type result_type;
+
+        template<typename ...Args>
+        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                               Args... a) {
+          std::string name = SymbolType::getName(a...);
+          return symtab->lookupAtModuleScope(name, reinterpret_cast<SymbolType *>(0));
+        }
+      };
+
+      template<Scope scope>
+      struct Add;
+
+      template<> 
+      struct Add<CurrentScope> {
+        template<typename SymbolType>
+        void operator()(boost::shared_ptr<SymbolTable> symtab,
+                        SymbolType a) {
+          symtab->addAtCurrentScope(a);
+        }
+      };
+
+      template<> 
+      struct Add<ModuleScope> {
+        template<typename SymbolType>
+        void operator()(boost::shared_ptr<SymbolTable> symtab,
+                        SymbolType a) {
+          symtab->addAtModuleScope(a);
+        }
+      };
     }
 
     /// This is a callable transform to construct a symbol.  If the
@@ -71,20 +119,13 @@ namespace mirv {
 
 	// Make sure we're not already in the symbol table at the current scope.
 	ptr<Symbol<Base> >::type exists =
-          scope == ModuleScope ?
-          symtab->lookupAtModuleScope(name, reinterpret_cast<SymbolType *>(0))
-          : symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
+          detail::Lookup<SymbolType, scope>()(symtab, a);
 	if (exists) {
 	  error("Symbol exists");
 	}
 	result_type result = mirv::make<SymbolType>(a);
 
-	if (scope == ModuleScope) {
-          symtab->addAtModuleScope(result);
-        }
-        else {
-          symtab->addAtModuleScope(result);
-        }
+        detail::Add<scope>()(symtab, result);
 
 	return result;
       }
@@ -146,19 +187,12 @@ namespace mirv {
 
 	// Make sure we're not already in the symbol table at the current scope.
 	ptr<Symbol<Base> >::type exists =
-          scope == ModuleScope ?
-          symtab->lookupAtModuleScope(name, reinterpret_cast<SymbolType *>(0))
-          : symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
+          detail::Lookup<SymbolType, scope>()(symtab, a1, a2);
 	if (exists) {
 	  error("Symbol exists");
 	}
 	result_type result = mirv::make<SymbolType>(a1, a2);
-        if (scope == ModuleScope) {
-          symtab->addAtModuleScope(result);
-        }
-        else {
-          symtab->addAtCurrentScope(result);
-        }
+        detail::Add<scope>()(symtab, result);
 
 	return result;
       }
@@ -221,19 +255,13 @@ namespace mirv {
 
 	// Make sure we're not already in the symbol table at the current scope.
 	ptr<Symbol<Base> >::type exists =
-          scope == ModuleScope ?
-          symtab->lookupAtModuleScope(name, reinterpret_cast<SymbolType *>(0))
-          : symtab->lookupAtCurrentScope(name, reinterpret_cast<SymbolType *>(0));
+          detail::Lookup<SymbolType, scope>()(symtab, a1, a2, a3);
 	if (exists) {
 	  error("Symbol exists");
 	}
         result_type result = mirv::make<SymbolType>(a1, a2, a3);
-        if (scope == ModuleScope) {
-          symtab->addAtModuleScope(result);
-        }
-        else {
-          symtab->addAtCurrentScope(result);
-        }
+        detail::Add<scope>()(symtab, result);
+
         return result;
       }
     };

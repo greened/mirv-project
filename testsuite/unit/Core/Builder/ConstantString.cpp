@@ -1,22 +1,32 @@
 // Test building of string constants.
 //
 // STDOUT: mdef testmodule {
+// STDOUT:    gvdecl __str1__ (cref int32 7 x int8) cref (cref int32 7 x int8) "i = %d\n"
 // STDOUT:    fdecl printf int32 (int8 *, ...)
-// STDOUT:    vdecl __str0__ int8[15] "Hello, World!\n\0"
+// STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
-// STDOUT:       vdecl i int32
+// STDOUT:       vdecl i int32 *
 // STDOUT:       vdecl __ct0__ int32
-// STDOUT:       assign
-// STDOUT:          vref i
-// STDOUT:          cref 0
 // STDOUT:       {
+// STDOUT:          allocate int32
+// STDOUT:             vref i
+// STDOUT:             cref int64 1
+// STDOUT:          assign
+// STDOUT:             tref
+// STDOUT:                vref i
+// STDOUT:                cref int64 0
+// STDOUT:             cref int32 0
 // STDOUT:          call
 // STDOUT:             fref printf
 // STDOUT:             vref __ct0__
 // STDOUT:             &
-// STDOUT:               vref __str0__
-// STDOUT:               cref 0
-// STDOUT:             vref i
+// STDOUT:                tref
+// STDOUT:                   cref (cref int32 7 x int8) * & __str1__
+// STDOUT:                   cref int64 0
+// STDOUT:                cref int32 0
+// STDOUT:             tref
+// STDOUT:                vref i
+// STDOUT:                cref int64 0
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }
@@ -24,6 +34,7 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/TupleType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
@@ -79,7 +90,7 @@ int main(void)
         func["testfunc"].type[void_()] [
           var[i].type[int_(32)],
           i = 0,
-          printf_("i = %d", i)
+          printf_("i = %d\n", i)
         ]
       ]
     );

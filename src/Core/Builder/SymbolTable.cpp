@@ -104,16 +104,17 @@ namespace mirv {
       return ptr<Symbol<GlobalVariable> >::type();
     } 
 
-    /// Get the variable symbol at module scope only.  Return a null
-    /// pointer if the symbol does not exist.
-    ptr<Symbol<Variable> >::type
+    /// Get the globalvariable symbol at module scope only.  Return a
+    /// null pointer if the symbol does not exist.
+    ptr<Symbol<GlobalVariable> >::type
     SymbolTable::lookupAtModuleScope(const std::string &name,
-                                     Symbol<Variable> *) const {
-      Symbol<Module>::VariableIterator i = module->variableFind(name);
-      if (i != module->variableEnd()) {
+                                     Symbol<GlobalVariable> *) const {
+      Symbol<Module>::GlobalVariableIterator i =
+        module->globalVariableFind(name);
+      if (i != module->globalVariableEnd()) {
         return *i;
       }
-      return ptr<Symbol<Variable> >::type();
+      return ptr<Symbol<GlobalVariable> >::type();
     } 
      
     /// Get the function symbol at the module scope only.  Return a
@@ -268,15 +269,15 @@ namespace mirv {
     }
 
     void
-    SymbolTable::addAtModuleScope(ptr<Symbol<Variable> >::type var)
+    SymbolTable::addAtModuleScope(ptr<Symbol<GlobalVariable> >::type var)
     {
-      ptr<Symbol<Variable> >::type result =
+      ptr<Symbol<GlobalVariable> >::type result =
         lookupAtModuleScope(var->name(),
-                            reinterpret_cast<Symbol<Variable> *>(0));
+                            reinterpret_cast<Symbol<GlobalVariable> *>(0));
       if (result) {
         error("Variable already exists");
       }
-      module->variablePushBack(var);
+      module->globalVariablePushBack(var);
     }
   }
 }

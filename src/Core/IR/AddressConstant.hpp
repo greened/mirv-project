@@ -28,16 +28,16 @@ namespace mirv {
         return sym;
       }
 
-      std::string valueString(void) const {
+      std::string value(void) const {
         return "& " + sym->name();
       }
 
-       ptr<Node<Base>>::type getSharedHandle(void) {
-         return fast_cast<Node<Base>>(this->shared_from_this());
-       };
-       ptr<Node<Base>>::const_type getSharedHandle(void) const {
-         return fast_cast<const Node<Base>>(this->shared_from_this());
-       };
+      ptr<Node<Base>>::type getSharedHandle(void) {
+        return fast_cast<Node<Base>>(this->shared_from_this());
+      };
+      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(this->shared_from_this());
+      };
     };
 
   public:

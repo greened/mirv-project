@@ -9,6 +9,7 @@
 #include <mirv/Core/Utility/Printer.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
+#include <boost/algorithm/string.hpp>
 #include <iostream>
 
 namespace mirv {
@@ -365,7 +366,7 @@ namespace mirv {
       TypeNameFlow(std::ostream &out)
           : BaseType(TypeNameInheritedAttribute(out, typeStack)) {}
     };
-
+ 
     /// Define the inherited attibute.
     class InheritedAttribute {
     private:
@@ -407,6 +408,74 @@ namespace mirv {
       SynthesizedAttribute
       > FlowAttributeManagerType;
 
+    /// Type name construction.
+    template<typename Formatter>
+    class EnterConstantValueVisitor : public ConstSymbolVisitor {
+    private:
+      FlowAttributeManagerType &attributeManager;
+
+      template<typename ConstantType>
+      void
+      visitPrimitiveConstant(boost::shared_ptr<const Symbol<Constant<ConstantType> > > sym) {
+        Stream &out = attributeManager.getInheritedAttribute().out();
+        out << sym->value();
+      }
+
+    public:
+      EnterConstantValueVisitor(FlowAttributeManagerType &am)
+          : attributeManager(am) {}
+
+      void visit(ptr<Symbol<Constant<std::int8_t> > >::const_type);
+      void visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type);
+      void visit(ptr<Symbol<Constant<std::int16_t> > >::const_type);
+      void visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type);
+      void visit(ptr<Symbol<Constant<std::int32_t> > >::const_type);
+      void visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type);
+      void visit(ptr<Symbol<Constant<std::int64_t> > >::const_type);
+      void visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type);
+      void visit(ptr<Symbol<Constant<float> > >::const_type);
+      void visit(ptr<Symbol<Constant<double> > >::const_type);
+      void visit(ptr<Symbol<Constant<std::string> > >::const_type);
+      void visit(ptr<Symbol<Constant<Address> > >::const_type);
+    };
+
+    template<typename Formatter>
+    class EnterConstantValueAction : public VisitAction<EnterConstantValueVisitor<Formatter>> {
+    public:
+      EnterConstantValueAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<EnterConstantValueVisitor<Formatter>>(attributeManager) {}
+    };
+
+    template<typename Formatter>
+    class ConstantValueFlow : public AttributeFlow<
+      InheritedAttribute,
+      SynthesizedAttribute,
+      ConstSymbolFlowGenerator,
+      EnterConstantValueAction<Formatter>,
+      NullAction,
+      NullAction,
+      NullAction,
+      NullAction,
+      NullAction> {
+    private:
+      typedef AttributeFlow<
+      InheritedAttribute,
+      SynthesizedAttribute,
+      ConstSymbolFlowGenerator,
+      EnterConstantValueAction<Formatter>,
+      NullAction,
+      NullAction,
+      NullAction,
+      NullAction,
+      NullAction> BaseType;
+
+      Printer::TypeList typeStack;
+
+    public:
+      ConstantValueFlow(std::ostream &out)
+          : BaseType(InheritedAttribute(0, out)) {}
+    };
+ 
     /// Entering each symbol
     template<typename Formatter>
     class EnterDeclSymbolVisitor : public ConstSymbolVisitor {
@@ -840,24 +909,10 @@ namespace mirv {
           ptr<ConstSymbolVisitor>::type defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
           s->accept(*defflow);
         }
-<<<<<<< HEAD
-
-        void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::string> > > >::const_type expr)
-        {
-          visitConstant(expr);
-        }
-
-        void ExpressionPrintFilter::EnterExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::const_type expr)
-        {
-          Stream &out = attributeManager.getInheritedAttribute().out();
-          out << (printed ? " " : "") << expr->getSymbol()->name();
-          printed = true;
-=======
         else if (ptr<Statement<Base> >::const_type s =
                  boost::dynamic_pointer_cast<const Statement<Base> >(node)) {
           ptr<ConstStatementVisitor>::type flow(new Printer::PrintFlow<Formatter>(out));
           s->accept(*flow);
->>>>>>> master
         }
         else if (ptr<Expression<Base> >::const_type e =
                  boost::dynamic_pointer_cast<const Expression<Base> >(node)) {
@@ -956,6 +1011,80 @@ namespace mirv {
     void LeaveTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Derived> > >::const_type sym)
     {
       attributeManager.getInheritedAttribute().typeStackPopBack();
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::int8_t> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::int16_t> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::int32_t> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::int64_t> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<float> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<double> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::string> > >::const_type sym)
+    {
+      Stream &out = attributeManager.getInheritedAttribute().out();
+      out << '"' << boost::replace_all_copy(sym->value(),
+                                            "\n", "\\n") << '"';
+    }
+
+    template<typename Formatter>
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<Address> > >::const_type sym)
+    {
+      this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
@@ -1605,7 +1734,9 @@ namespace mirv {
       out << "cref ";
       TypeNameFlow<Formatter> typePrinter(out);
       expr->getSymbol()->type()->accept(typePrinter);
-      out << ' ' << expr->getSymbol()->valueString();
+      out << ' ';
+      ConstantValueFlow<Formatter> valuePrinter(out);
+      expr->getSymbol()->accept(valuePrinter);
     }
 
     template<typename Formatter>
@@ -1674,17 +1805,23 @@ namespace mirv {
       visitConstant(expr);
     }
 
-<<<<<<< HEAD
-    void EnterExpressionVisitor::visit(ptr<Expression<Reference<Constant<std::string> > > >::const_type expr)
+    template<typename Formatter>
+    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::string> > > >::const_type expr)
     {
-      visitConstant(expr);
+      Stream &out = attributeManager.getInheritedAttribute().out();
+      int ind = attributeManager.getInheritedAttribute().indent();
+
+      out << Indent<Formatter>(ind);
+      out << "cref ";
+      TypeNameFlow<Formatter> typePrinter(out);
+      expr->getSymbol()->type()->accept(typePrinter);
+      out << ' ';
+      ConstantValueFlow<Formatter> valuePrinter(out);
+      expr->getSymbol()->accept(valuePrinter);
     }
 
-    void EnterExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::const_type expr)
-=======
     template<typename Formatter>
     void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Function> > >::const_type expr)
->>>>>>> master
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();

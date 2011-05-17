@@ -30,7 +30,7 @@ namespace mirv {
           safe_cast<const Symbol<Type<FunctionType> > >(functionExpr->type());
         if (functionType->getReturnType()) {
           ptr<Symbol<Variable> >::type temp =
-            BinaryConstructSymbol<Symbol<Variable> >()(
+            BinaryConstructSymbol<Symbol<Variable>, CurrentScope>()(
               symtab, "__ct"
               + boost::lexical_cast<std::string>(symtab->getNextTempNum())
               + "__",
