@@ -17,9 +17,7 @@
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
-#include <mirv/Filter/Snapshot/Codegen/LLVM/LLVM.hpp>
-
-#include <llvm/Module.h>
+#include <mirv/Filter/Snapshot/Codegen/LLVM/JIT/JIT.hpp>
 
 #include <iostream>
 
@@ -35,8 +33,6 @@ using mirv::FunctionType;
 using mirv::Node;
 using mirv::Base;
 using mirv::ptr;
-using mirv::LLVMCodegenFilter;
-using mirv::make;
 
 namespace Builder = mirv::Builder;
 
@@ -47,6 +43,7 @@ using Builder::void_;
 using Builder::int_;
 using Builder::do_;
 using Builder::if_;
+using Builder::vararg;
 
 int main(void)
 {
@@ -55,34 +52,39 @@ int main(void)
   Builder::VariableTerminal c = {{"c"}};
   Builder::VariableTerminal d = {{"d"}};
 
-  ptr<Node<Base> >::type code =
-    Builder::translateWithGrammar<Builder::ModuleBuilder>(
-      module["testmodule"] [
-	var[a].type[int_(32)],
-	var[b].type[int_(32)],
+  Builder::FunctionTerminal printf_ = {{"printf"}};
 
-        func["testfunc"].type[void_()] [
-          var[c].type[int_(32)],
-          var[d].type[int_(32)],
+  ptr<Symbol<Module> >::type code =
+    mirv::safe_cast<Symbol<Module> >(
+      Builder::translateWithGrammar<Builder::ModuleBuilder>(
+        module["testmodule"] [
+          func["printf"].type[int_(32)(*int_(8), vararg)],
 
-          do_[
-            a = a + b,
-            if_(b > c) [
-              a = a + d
-            ].else_[
-              a = a + c
-            ]
-          ].while_(a < c),
-          c = a
+          var[a].type[int_(32)],
+          var[b].type[int_(32)],
+
+          func["testfunc"].type[void_()] [
+            var[c].type[int_(32)],
+            var[d].type[int_(32)],
+            a = 0,
+            b = 1,
+            c = 20,
+            d = 3,
+
+            do_[
+              a = a + b,
+              if_(b > c) [
+                a = a + d
+              ].else_[
+                a = a + c
+              ]
+            ].while_(a < c),
+            printf_("a = %d, b = %d, c = %d, d= %d\n", a, b, c, d)
+          ]
         ]
-      ]
-    );
+      ));
 
-  LLVMCodegenFilter codegen;
-  codegen(code);
-  llvm::Module *TheModule = codegen.getModule();
-
-  std::cout << *TheModule;
+  mirv::JITAndRun(code, "testfunc");
 
   return(0);
 }
