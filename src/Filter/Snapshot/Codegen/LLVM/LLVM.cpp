@@ -444,6 +444,13 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Call> >::const_type stmt)
+  {
+    error("Unimplemented");
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
+    attributeManager.setSynthesizedAttribute(syn);
+  }
+
   void LLVMCodegenFilter::
   LeaveStatementVisitor::visit(ptr<Statement<IfThen> >::const_type stmt)
   {
@@ -920,8 +927,9 @@ namespace mirv {
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::const_type expr)
   {
-    error("Unimplemented");
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+    syn.setReferencedFunction(syn.getModule()->
+                              getFunction(expr->getSymbol()->name()));
     attributeManager.setSynthesizedAttribute(syn);
   }
 

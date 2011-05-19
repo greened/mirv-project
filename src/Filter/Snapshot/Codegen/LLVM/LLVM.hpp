@@ -28,6 +28,7 @@ namespace mirv {
       ptr<llvm::IRBuilder<> >::type Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
+      llvm::Function *ReferencedFunction;
       llvm::BasicBlock *TheBlock;
       llvm::Value *TheValue;
       bool ReturnValue;
@@ -149,6 +150,14 @@ namespace mirv {
 
       void createFunction(const std::string &name,
                           ptr<Symbol<Type<TypeBase> > >::const_type type);
+
+      void setReferencedFunction(llvm::Function *function) {
+        ReferencedFunction = function;
+      }
+      
+      llvm::Function *referencedFunction(void) const {
+        return ReferencedFunction;
+      }
 
       void createVariable(const std::string &name,
                           ptr<Symbol<Type<TypeBase> > >::const_type type);
@@ -306,6 +315,7 @@ namespace mirv {
       void visit(ptr<Statement<Goto> >::const_type stmt);
       void visit(ptr<Statement<Return> >::const_type stmt);
       void visit(ptr<Statement<Assignment> >::const_type stmt);
+      void visit(ptr<Statement<Call> >::const_type stmt);
       void visit(ptr<Statement<IfElse> >::const_type stmt);
       void visit(ptr<Statement<IfThen> >::const_type stmt);
       void visit(ptr<Statement<While> >::const_type stmt);
