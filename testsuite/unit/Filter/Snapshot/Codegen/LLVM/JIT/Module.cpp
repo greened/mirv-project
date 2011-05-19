@@ -15,6 +15,8 @@
 #include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
+#include <mirv/Core/Builder/ConstantGrammar.hpp>
+#include <mirv/Core/Builder/SymbolGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
 #include <mirv/Filter/Snapshot/Codegen/LLVM/JIT/JIT.hpp>
