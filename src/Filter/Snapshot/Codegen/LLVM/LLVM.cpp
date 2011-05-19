@@ -149,6 +149,7 @@ namespace mirv {
   createFunction(const std::string &name,
                  ptr<Symbol<Type<TypeBase> > >::const_type type)
   {
+    checkInvariant(TheModule != 0, "No current module");
     checkInvariant(TheFunction == 0, "Function already exists");
     const llvm::FunctionType *llvmFunctionType =
       llvm::cast<const llvm::FunctionType>(getType(type));
@@ -322,16 +323,18 @@ namespace mirv {
   void LLVMCodegenFilter::
   LeaveSymbolVisitor::visit(ptr<Symbol<Function> >::const_type sym)
   {
-    SynthesizedAttribute syn(attributeManager.getLastSynthesizedAttribute());
-    // Add a return if necessary.
-    llvm::BasicBlock *body = syn.getBlock();
-    if (!body->getTerminator()) {
-      syn.builder()->SetInsertPoint(body);
-      syn.builder()->CreateRetVoid();
-    }
+    if (!sym->statementEmpty()) {
+      SynthesizedAttribute syn(attributeManager.getLastSynthesizedAttribute());
+      // Add a return if necessary.
+      llvm::BasicBlock *body = syn.getBlock();
+      if (!body->getTerminator()) {
+        syn.builder()->SetInsertPoint(body);
+        syn.builder()->CreateRetVoid();
+      }
 
-    syn.clearFunctionMap();
-    attributeManager.setSynthesizedAttribute(syn);
+      syn.clearFunctionMap();
+      attributeManager.setSynthesizedAttribute(syn);
+    }
   }
 
   void LLVMCodegenFilter::
