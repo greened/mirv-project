@@ -246,14 +246,13 @@ namespace mirv {
   TypeCreator::visit(ptr<Symbol<Type<Tuple> > >::const_type type) 
   {
     // TODO: See about making some of these vector types.
-
     if (type->isUniform()) {
       (*type->begin())->accept(*this);
       const llvm::Type *elementType = TheType;
 
       // Size must be an integer constant for LLVM.
       ptr<Expression<Reference<Constant<Base> > > >::const_type cref =
-        safe_cast<const Expression<Reference<Constant<Base> > > >(type->bitsize());
+        safe_cast<const Expression<Reference<Constant<Base> > > >(type->count());
       ptr<Symbol<Constant<std::uint64_t> > >::const_type constant =
         safe_cast<const Symbol<Constant<std::uint64_t> > >(cref->getSymbol());
       TheType = llvm::ArrayType::get(elementType, constant->value());
@@ -347,7 +346,7 @@ namespace mirv {
   LeaveSymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-    syn.createVariable(sym->name(), sym->type());
+    syn.createGlobalVariable(sym->name(), sym->type());
     attributeManager.setSynthesizedAttribute(syn);
   }
   
