@@ -42,15 +42,15 @@ namespace mirv {
                                 const std::string &value)
       {
         ptr<Symbol<Module> >::type module = symtab->getModule();
-        Symbol<Module>::TypeIterator intType = module->typeFind("int32");
+        Symbol<Module>::TypeIterator intType = module->typeFind("int64");
 
         if (intType == module->typeEnd()) {
           ptr<Symbol<Type<TypeBase> > >::const_type type =
-            make<Symbol<Type<Integral> > >(32);
+            make<Symbol<Type<Integral> > >(64);
           module->typePushBack(type);
-          intType = module->typeFind("int32");
+          intType = module->typeFind("int64");
           checkInvariant(intType != module->typeEnd(),
-                         "Could not create int32 type!");
+                         "Could not create int64 type!");
         }
         ptr<Symbol<Constant<std::uint64_t> > >::type size =
           mirv::make<Symbol<Constant<std::uint64_t> > >(*intType, value.size());

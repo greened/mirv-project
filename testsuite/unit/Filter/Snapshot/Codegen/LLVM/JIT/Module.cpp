@@ -78,8 +78,8 @@ int main(void)
               ].else_[
                 a = a + c
               ]
-            ].while_(a < c),
-            printf_("a = %d, b = %d, c = %d, d= %d\n", a, b, c, d)
+            ].while_(a < c)
+            //printf_("a = %d, b = %d, c = %d, d= %d\n", a, b, c, d)
           ]
         ]
       ));
