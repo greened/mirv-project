@@ -19,6 +19,7 @@
 #include <mirv/Core/Builder/SymbolGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
+#include <mirv/Filter/Snapshot/Codegen/LLVM/LLVM.hpp>
 #include <mirv/Filter/Snapshot/Codegen/LLVM/JIT/JIT.hpp>
 
 #include <iostream>
@@ -62,6 +63,12 @@ int main(void)
           ]
         ]
       ));
+
+  print(std::cout, code);
+
+  mirv::LLVMCodegenFilter codegen;
+  codegen(code);
+  codegen.getModule()->dump();
 
   mirv::JITAndRun(code, "testfunc");
 

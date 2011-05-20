@@ -140,7 +140,20 @@ namespace mirv {
 
     void EnterConstantVisitor::visit(ptr<Symbol<Constant<Address> > >::const_type sym)
     {
-      error("Unimplemented");
+      SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+
+      // First, see if this is a function address.
+      if (llvm::Function *function =
+          syn.getModule()->getFunction(sym->symbol()->name())) {
+        error("Unimplemented");
+      }
+      else {
+        // This must be a global variable address.  LLVM's
+        // GlobalVariable is already an implicit address.
+        syn.setValue(syn.getGlobalVariable(sym->symbol()->name()));
+      }
+
+      attributeManager.setSynthesizedAttribute(syn);
     }
   }
 
