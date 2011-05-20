@@ -4,6 +4,9 @@
 #include <mirv/Core/Containers/Vector.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
+#include <boost/iterator/filter_iterator.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+
 #include <utility>
 
 namespace mirv {
@@ -32,7 +35,10 @@ namespace mirv {
       friend class FlowAttributeManager<Inherited, Synthesized>;
 
       Inherited inherited;
-      typename Vector<std::pair<Synthesized, bool> >::type synthesized;
+      typedef std::pair<Synthesized, bool> AttributePair;
+      typedef typename Vector<AttributePair>::type
+      SynthesizedVector;
+      SynthesizedVector synthesized;
       unsigned int childNum;
       bool hasChild;
 
@@ -42,7 +48,38 @@ namespace mirv {
         synthesized[index].second = true;
       }
 
+      template<typename Pair>
+      struct select1st
+          : public std::unary_function<Pair, typename Pair::first_type> {
+        typename Pair::first_type&
+        operator()(Pair &x) const { return x.first; }
+
+        const typename Pair::first_type&
+        operator()(const Pair &x) const { return x.first; }
+      };
+
+      template<typename Pair>
+      struct select2nd
+          : public std::unary_function<Pair, typename Pair::second_type> {
+        typename Pair::second_type&
+        operator()(Pair &x) const { return x.second; }
+
+        const typename Pair::second_type&
+        operator()(const Pair &x) const { return x.second; }
+      };
+
+      typedef boost::filter_iterator<select2nd<AttributePair>,
+      typename SynthesizedVector::iterator> filter_iterator;
+
+      typedef boost::filter_iterator<select2nd<AttributePair>,
+      typename SynthesizedVector::const_iterator> const_filter_iterator;
+
     public:
+      typedef boost::transform_iterator<select1st<AttributePair>,
+      filter_iterator> iterator;
+      typedef boost::transform_iterator<select1st<AttributePair>,
+        const_filter_iterator> const_iterator;
+
       AttributeRecord(void)
           : synthesized(1, std::make_pair(Synthesized(), false)), childNum(0),
               hasChild(false) {}
@@ -79,7 +116,7 @@ namespace mirv {
           synthesized.resize(childNumber(),
                              std::make_pair(Synthesized(), false));
         }
-        
+
         synthesized[childNumber()].first = syn;
         synthesized[childNumber()].second = true;
       }
@@ -100,6 +137,30 @@ namespace mirv {
                        "Missing synthesized attribute");
         return synthesized[index].second;
       }
+
+      iterator begin(void) {
+        return iterator(select1st<AttributePair>(),
+                        filter_iterator(select2nd<AttributePair>(),            
+                                        synthesized.begin()));
+      }
+
+      const_iterator begin(void) const {
+        return iterator(select1st<AttributePair>(),
+                        filter_iterator(select2nd<AttributePair>(),
+                                        synthesized.begin()));
+      }
+
+      iterator end(void) {
+        return iterator(select1st<AttributePair>(),
+                        filter_iterator(select2nd<AttributePair>(),            
+                                        synthesized.end()));
+      }
+
+      const_iterator end(void) const {
+        return iterator(select1st<AttributePair>(),
+                        filter_iterator(select2nd<AttributePair>(),
+                                        synthesized.end()));
+      }
     };
 
     typedef typename Vector<AttributeRecord>::type AttributeStackType;
@@ -111,6 +172,9 @@ namespace mirv {
     };
 
   public:
+    typedef typename AttributeRecord::iterator iterator;
+    typedef typename AttributeRecord::const_iterator const_iterator;
+
     FlowAttributeManager(const Inherited &inherited) {
       attributeStack.push_back(AttributeRecord(inherited));
     }
@@ -218,6 +282,26 @@ namespace mirv {
       checkInvariant(attributeStack.size() > 1, "Attribute stack underflow");
       return (attributeStack.end() - 2)->
         setSynthesized((attributeStack.end() - 2)->childNumber());
+    }
+
+    iterator begin(void) {
+      checkInvariant(!attributeStack.empty(), "Attribute stack underflow");
+      return attributeStack.back().begin();
+    }
+
+    const_iterator begin(void) const {
+      checkInvariant(!attributeStack.empty(), "Attribute stack underflow");
+      return attributeStack.back().begin();
+    }
+
+    iterator end(void) {
+      checkInvariant(!attributeStack.empty(), "Attribute stack underflow");
+      return attributeStack.back().end();
+    }
+
+    const_iterator end(void) const {
+      checkInvariant(!attributeStack.empty(), "Attribute stack underflow");
+      return attributeStack.back().end();
     }
   };
 }
