@@ -1,7 +1,7 @@
 // Test building of string constants.
 //
 // STDOUT: mdef testmodule {
-// STDOUT:    gvdecl __str1__ (cref int32 7 x int8) cref (cref int32 7 x int8) "i = %d\n"
+// STDOUT:    gvdecl __str1__ (cref int64 7 x int8) cref (cref int64 7 x int8) "i = %d\n"
 // STDOUT:    fdecl printf int32 (int8 *, ...)
 // STDOUT:    fdecl testfunc void ()
 // STDOUT:    fdef testfunc {
@@ -21,7 +21,7 @@
 // STDOUT:             vref __ct0__
 // STDOUT:             &
 // STDOUT:                tref
-// STDOUT:                   cref (cref int32 7 x int8) * & __str1__
+// STDOUT:                   cref (cref int64 7 x int8) * & __str1__
 // STDOUT:                   cref int64 0
 // STDOUT:                cref int32 0
 // STDOUT:             tref
