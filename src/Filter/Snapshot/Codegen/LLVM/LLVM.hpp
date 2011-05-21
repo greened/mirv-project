@@ -358,6 +358,7 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
       void visit(ptr<Expression<Reference<GlobalVariable> > >::const_type expr);
       void visit(ptr<Expression<Reference<Tuple> > >::const_type expr);
+      void visit(ptr<Expression<Reference<TuplePointer> > >::const_type expr);
       void visit(ptr<Expression<Reference<Function> > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
     };
