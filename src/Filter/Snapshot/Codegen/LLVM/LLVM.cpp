@@ -2,6 +2,8 @@
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Filter/ConstSymbolFlow.hpp>
 
+#include <boost/mem_fn.hpp>
+
 #include "LLVM.hpp"
 
 namespace mirv {
@@ -926,14 +928,28 @@ namespace mirv {
 
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Tuple> > >::const_type expr)
   {
-    error("Unimplemented");
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
-    // llvm::Value *GEP = attributeManager.getInheritedAttribute().builder()->
-    //   CreateGEP(*syn.valueBegin(), syn.valueBegin()+1, syn.valueEnd(),
-    //             "trefgep");
-    // syn.setValue(attributeManager.getInheritedAttribute().builder()->
-    //              CreateLoad(GEP, "trefload"));
+    // LLVM expects a random-access iterator which these are not due
+    // to the filter_iterator component.  So copy values to a
+    // temporary vector.
+    auto indicesBegin = attributeManager.begin();
+    ++indicesBegin;
+
+    std::vector<llvm::Value *>
+      indices(boost::make_transform_iterator(
+                indicesBegin,
+                boost::mem_fn(&SynthesizedAttribute::getValue)),
+              boost::make_transform_iterator(
+                attributeManager.end(),
+                boost::mem_fn(&SynthesizedAttribute::getValue)));
+
+    llvm::Value *GEP = attributeManager.getInheritedAttribute().builder()->
+      CreateGEP(attributeManager.begin()->getValue(),
+                indices.begin(), indices.end(), "trefgep");
+
+    syn.setValue(attributeManager.getInheritedAttribute().builder()->
+                 CreateLoad(GEP, "trefload"));
 
     attributeManager.setSynthesizedAttribute(syn);
   }
@@ -953,7 +969,9 @@ namespace mirv {
     ConstantFlow valueCreator(inh);
     expr->getSymbol()->accept(valueCreator);
 
-    attributeManager.setSynthesizedAttribute(SynthesizedAttribute(inh));
+    attributeManager.
+      setSynthesizedAttribute(valueCreator.getAttributeManager().
+                              getLastSynthesizedAttribute());
   }
 
   void LLVMCodegenFilter::operator()(ptr<Node<Base> >::type node)
