@@ -954,6 +954,33 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<TuplePointer> > >::const_type expr)
+  {
+    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+
+    // LLVM expects a random-access iterator which these are not due
+    // to the filter_iterator component.  So copy values to a
+    // temporary vector.
+    auto indicesBegin = attributeManager.begin();
+    ++indicesBegin;
+
+    std::vector<llvm::Value *>
+      indices(boost::make_transform_iterator(
+                indicesBegin,
+                boost::mem_fn(&SynthesizedAttribute::getValue)),
+              boost::make_transform_iterator(
+                attributeManager.end(),
+                boost::mem_fn(&SynthesizedAttribute::getValue)));
+
+    llvm::Value *GEP = attributeManager.getInheritedAttribute().builder()->
+      CreateGEP(attributeManager.begin()->getValue(),
+                indices.begin(), indices.end(), "tptrgep");
+
+    syn.setValue(GEP);
+
+    attributeManager.setSynthesizedAttribute(syn);
+  }
+
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::const_type expr)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
