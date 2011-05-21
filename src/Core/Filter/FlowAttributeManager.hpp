@@ -139,27 +139,35 @@ namespace mirv {
       }
 
       iterator begin(void) {
-        return iterator(select1st<AttributePair>(),
-                        filter_iterator(select2nd<AttributePair>(),            
-                                        synthesized.begin()));
+        return boost::make_transform_iterator(
+          boost::make_filter_iterator(select2nd<AttributePair>(),            
+                                      synthesized.begin(),
+                                      synthesized.end()),
+          select1st<AttributePair>());
       }
 
       const_iterator begin(void) const {
-        return iterator(select1st<AttributePair>(),
-                        filter_iterator(select2nd<AttributePair>(),
-                                        synthesized.begin()));
+        return boost::make_transform_iterator(
+          boost::make_filter_iterator(select2nd<AttributePair>(),
+                                      synthesized.begin(),
+                                      synthesized.end()),
+          select1st<AttributePair>());
       }
 
       iterator end(void) {
-        return iterator(select1st<AttributePair>(),
-                        filter_iterator(select2nd<AttributePair>(),            
-                                        synthesized.end()));
+        return boost::make_transform_iterator(
+          boost::make_filter_iterator(select2nd<AttributePair>(),            
+                                      synthesized.end(),
+                                      synthesized.end()),
+          select1st<AttributePair>());
       }
 
       const_iterator end(void) const {
-        return iterator(select1st<AttributePair>(),
-                        filter_iterator(select2nd<AttributePair>(),
-                                        synthesized.end()));
+        return boost::make_transform_iterator(
+          boost::make_filter_iterator(select2nd<AttributePair>(),
+                                      synthesized.end(),
+                                      synthesized.end()),
+          select1st<AttributePair>());
       }
     };
 
