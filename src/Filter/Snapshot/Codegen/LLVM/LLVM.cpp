@@ -461,8 +461,46 @@ namespace mirv {
 
   void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Call> >::const_type stmt)
   {
-    error("Unimplemented");
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
+    std::string name("name");
+
+    // LLVM expects a random-access iterator which these are not due
+    // to the filter_iterator component.  So copy values to a
+    // temporary vector.
+    auto argumentsBegin = attributeManager.begin();
+    ++argumentsBegin;
+
+    // See if we have a return value.
+    llvm::Value *function = attributeManager.begin()->getValue();
+    const llvm::PointerType *pointerType =
+      llvm::cast<const llvm::PointerType>(function->getType());
+    const llvm::FunctionType *functionType =
+      llvm::cast<const llvm::FunctionType>(pointerType->getElementType());
+
+    if (functionType->getReturnType()) {
+      checkInvariant(argumentsBegin->getValue()->hasName(),
+                     "No name for value");
+      // Return value name.
+      name = argumentsBegin->getValue()->getName();
+      // Get to the first argument.
+      ++argumentsBegin;
+    }
+
+    std::vector<llvm::Value *>
+      arguments(boost::make_transform_iterator(
+                  argumentsBegin,
+                  boost::mem_fn(&SynthesizedAttribute::getValue)),
+                boost::make_transform_iterator(
+                  attributeManager.end(),
+                  boost::mem_fn(&SynthesizedAttribute::getValue)));
+
+    llvm::Value *Call = attributeManager.getInheritedAttribute().builder()->
+      CreateCall(attributeManager.begin()->getValue(),
+                arguments.begin(), arguments.end(), name);
+
+    syn.setValue(Call);
+
     attributeManager.setSynthesizedAttribute(syn);
   }
 
@@ -986,6 +1024,7 @@ namespace mirv {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
     syn.setReferencedFunction(syn.getModule()->
                               getFunction(expr->getSymbol()->name()));
+    syn.setValue(syn.getModule()->getFunction(expr->getSymbol()->name()));
     attributeManager.setSynthesizedAttribute(syn);
   }
 
