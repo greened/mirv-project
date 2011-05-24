@@ -22,6 +22,7 @@
 #include <mirv/Filter/Snapshot/Codegen/LLVM/LLVM.hpp>
 #include <mirv/Filter/Snapshot/Codegen/LLVM/JIT/JIT.hpp>
 
+#include <functional>
 #include <iostream>
 
 using mirv::Symbol;
@@ -70,7 +71,9 @@ int main(void)
   codegen(code);
   codegen.getModule()->dump();
 
-  mirv::JITAndRun(code, "testfunc");
+  std::function<void(void)>
+    testfunc(reinterpret_cast<void (*)(void)>(mirv::compile(code, "testfunc")));
+  testfunc();
 
   return(0);
 }

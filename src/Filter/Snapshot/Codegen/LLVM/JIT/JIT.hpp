@@ -6,10 +6,10 @@
 #include <mirv/Core/Memory/Heap.hpp>
 
 namespace mirv {
-  void *JIT(ptr<Symbol<Module> >::type module,
-            const std::string &functionName);
-  void JITAndRun(ptr<Symbol<Module> >::type module,
-                 const std::string &functionName);
+  void *compile(ptr<Symbol<Module> >::type module,
+                const std::string &functionName);
+  void compileAndRun(ptr<Symbol<Module> >::type module,
+                     const std::string &functionName);
 }
 
 #endif

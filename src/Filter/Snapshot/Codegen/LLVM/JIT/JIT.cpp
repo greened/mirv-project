@@ -17,12 +17,20 @@ namespace mirv {
     }
   }
 
-  void *JIT(ptr<Symbol<Module> >::type module,
-            const std::string &functionName) {
+  void *compile(ptr<Symbol<Module> >::type module,
+                const std::string &functionName) {
     llvm::Module *llvmModule = codegen(module);
     llvm::EngineBuilder builder(llvmModule);
+    std::string JITError;
     llvm::ExecutionEngine *engine =
-      builder.setEngineKind(llvm::EngineKind::JIT).create();
+      builder.
+      //setEngineKind(llvm::EngineKind::JIT).
+      setErrorStr(&JITError).
+      create();
+    if (engine == 0) {
+      error(JITError);
+    }
+    checkInvariant(engine != 0, "Could not create JIT");
     llvm::Function *function = llvmModule->getFunction(functionName);
     checkInvariant(function != 0, "Could not find function to jit");
     void *result = engine->getPointerToFunctionOrStub(function);
@@ -30,8 +38,8 @@ namespace mirv {
     return result;
   }
 
-  void JITAndRun(ptr<Symbol<Module> >::type module,
-                 const std::string &functionName) {
+  void compileAndRun(ptr<Symbol<Module> >::type module,
+                     const std::string &functionName) {
     llvm::Module *llvmModule = codegen(module);
     llvm::EngineBuilder builder(llvmModule);
     llvm::ExecutionEngine *engine =

@@ -86,7 +86,7 @@ int main(void)
         ]
       ));
 
-  mirv::JITAndRun(code, "testfunc");
+  mirv::compileAndRun(code, "testfunc");
 
   return(0);
 }
