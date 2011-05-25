@@ -675,7 +675,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       syn.builder()->CreateFAdd(rhs, lhs, "add") :
       syn.builder()->CreateAdd(rhs, lhs, "add");
 
@@ -691,7 +691,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       syn.builder()->CreateFSub(rhs, lhs, "sub") :
       syn.builder()->CreateSub(rhs, lhs, "sub");
     syn.setValue(value);
@@ -706,7 +706,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       syn.builder()->CreateFMul(rhs, lhs, "mul") :
       syn.builder()->CreateMul(rhs, lhs, "mul");
     syn.setValue(value);
@@ -721,7 +721,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       syn.builder()->CreateFDiv(rhs, lhs, "div") :
       // TODO: Support unsigned division and exact division.
       syn.builder()->CreateSDiv(rhs, lhs, "div");
@@ -737,7 +737,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       syn.builder()->CreateFRem(rhs, lhs, "mod") :
       // TODO: Support unsigned remainder.
       syn.builder()->CreateSRem(rhs, lhs, "mod");
@@ -752,7 +752,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(0));
 
-    llvm::Value *value = op->getType()->isFloatingPoint() ?
+    llvm::Value *value = op->getType()->isFloatTy() ?
       syn.builder()->CreateFNeg(op, "neg") :
       syn.builder()->CreateNeg(op, "neg");
     syn.setValue(value);
@@ -846,7 +846,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       // TODO: Handle unordered compares.
       syn.builder()->CreateFCmpOLT(rhs, lhs, "lt") :
       // TODO: Handle unsigned.
@@ -863,7 +863,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       // TODO: Handle unordered compares.
       syn.builder()->CreateFCmpOLE(rhs, lhs, "le") :
       // TODO: Handle unsigned.
@@ -880,7 +880,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       // TODO: Handle unordered compares.
       syn.builder()->CreateFCmpOEQ(rhs, lhs, "eq") :
       syn.builder()->CreateICmpEQ(rhs, lhs, "eq");
@@ -896,7 +896,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       // TODO: Handle unordered compares.
       syn.builder()->CreateFCmpONE(rhs, lhs, "ne") :
       syn.builder()->CreateICmpNE(rhs, lhs, "ne");
@@ -912,7 +912,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       // TODO: Handle unordered compares.
       syn.builder()->CreateFCmpOGT(rhs, lhs, "gt") :
       // TODO: Handle unsigned.
@@ -929,7 +929,7 @@ namespace mirv {
 
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
 
-    llvm::Value *value = lhs->getType()->isFloatingPoint() ?
+    llvm::Value *value = lhs->getType()->isFloatTy() ?
       // TODO: Handle unordered compares.
       syn.builder()->CreateFCmpOGE(rhs, lhs, "ge") :
       // TODO: Handle unsigned.

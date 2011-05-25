@@ -7,6 +7,8 @@
 #include <mirv/Filter/Snapshot/Codegen/LLVM/LLVM.hpp>
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/ExecutionEngine/JIT.h>
+#include <llvm/Target/TargetSelect.h>
 
 namespace mirv {
   namespace {
@@ -20,11 +22,12 @@ namespace mirv {
   void *compile(ptr<Symbol<Module> >::type module,
                 const std::string &functionName) {
     llvm::Module *llvmModule = codegen(module);
+    llvm::InitializeNativeTarget();
     llvm::EngineBuilder builder(llvmModule);
     std::string JITError;
     llvm::ExecutionEngine *engine =
       builder.
-      //setEngineKind(llvm::EngineKind::JIT).
+      setEngineKind(llvm::EngineKind::JIT).
       setErrorStr(&JITError).
       create();
     if (engine == 0) {
@@ -41,6 +44,7 @@ namespace mirv {
   void compileAndRun(ptr<Symbol<Module> >::type module,
                      const std::string &functionName) {
     llvm::Module *llvmModule = codegen(module);
+    llvm::InitializeNativeTarget();
     llvm::EngineBuilder builder(llvmModule);
     llvm::ExecutionEngine *engine =
       builder.setEngineKind(llvm::EngineKind::JIT).create();
