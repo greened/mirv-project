@@ -16,6 +16,7 @@
 #include <llvm/Function.h>
 #include <llvm/BasicBlock.h>
 #include <llvm/Instruction.h>
+#include <llvm/LLVMContext.h>
 #include <llvm/Support/IRBuilder.h>
 
 namespace mirv {

@@ -13,20 +13,22 @@ libmirvfilter_codegen_llvm_jit_test_LIBS = $(filter %.a,$(libmirvfilter_codegen_
 libmirvfilter_codegen_llvm_jit_test_INCLUDES = $(FINAL_BUILDDIR)/include
 
 # FIXME: Do not hardcode path to LLVM libraries.
-libmirvfilter_codegen_llvmjit_LIBS = $(shell llvm-config-2.7 --libs engine)
+libmirvfilter_codegen_llvmjit_LIBS = $(shell llvm-config-2.8 --libs engine)
+libmirvfilter_codegen_llvmjit_test_LIBDIRS = $(libmirvfilter_codegen_llvm_test_LIBDIRS) $(FINAL_BUILDDIR)/src/Filter/Snapshot/Codegen/LLVM/JIT
+libmirvfilter_codegen_llvmjit_test_LINK_FLAGS = $(addprefix -L,$(libmirvfilter_codegen_llvmjit_test_LIBDIRS)) $(addprefix -Xlinker -rpath -Xlinker ,$(libmirvfilter_codegen_llvmjit_test_LIBDIRS))
 
-$(call make_unittest,libmirvfilter_codegen_llvm_jit_test,$(libmirvfilter_codegen_llvm_jit_test_SRCDIR),$(libmirvfilter_codegen_llvm_jit_test_LIBS),$(libmirvfilter_codegen_llvm_jit_test_INCLUDES),,,,-static -L/usr/lib/llvm/lib $(libmirvfilter_codegen_llvmjit_LIBS) -lpthread -ldl -lm,$(libmirvfilter_codegen_llvm_jit_test_LIBS) $(libmirvfilter_codegen_llvm_jit_test_INCLUDES))
+$(call make_unittest,libmirvfilter_codegen_llvm_jit_test,$(libmirvfilter_codegen_llvm_jit_test_SRCDIR),$(libmirvfilter_codegen_llvm_jit_test_LIBS),$(libmirvfilter_codegen_llvm_jit_test_INCLUDES),,,, $(libmirvfilter_codegen_llvmjit_test_LINK_FLAGS) $(libmirvfilter_codegen_llvmjit_LIBS) $(LLVM_LINK_FLAGS),$(libmirvfilter_codegen_llvm_jit_test_LIBS) $(libmirvfilter_codegen_llvm_jit_test_INCLUDES))
 
 $(call debug, [llvm codegen test] libmirvfilter_codegen_llvm_jit_test_UNITTESTS = $(libmirvfilter_codegen_llvm_jit_test_UNITTESTS))
 
 $(libmirvfilter_codegen_llvm_jit_test_UNITTESTS): \
-  CPPFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+  CPPFLAGS += $(LLVM_COMPILE_FLAGS)
 $(libmirvfilter_codegen_llvm_jit_test_UNITTESTS): \
-  opt_CPPFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+  opt_CPPFLAGS += $(LLVM_COMPILE_FLAGS)
 $(libmirvfilter_codegen_llvm_jit_test_UNITTESTS): \
-  debug_CPPFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+  debug_CPPFLAGS += $(LLVM_COMPILE_FLAGS)
 $(libmirvfilter_codegen_llvm_jit_test_UNITTESTS): \
-  DFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+  DFLAGS += $(LLVM_COMPILE_FLAGS)
 
 TARGETS   += $(libmirvfilter_codegen_llvm_jit_test_UNITTESTS)
 UNITTESTS += $(libmirvfilter_codegen_llvm_jit_test_UNITTESTS)

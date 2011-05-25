@@ -11,7 +11,7 @@ include $(BUILDTOOLS)/autolib.mk
 $(call make_library,libmirvfilter_codegen_llvmjit,$(libmirvfilter_codegen_llvmjit_SRCDIR))
 
 $(libmirvfilter_codegen_llvmjit_LIBRARIES): \
-  CPPFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+  CPPFLAGS += $(LLVM_COMPILE_FLAGS)
 
 TARGETS += $(libmirvfilter_codegen_llvmjit_LIBRARIES)
 
