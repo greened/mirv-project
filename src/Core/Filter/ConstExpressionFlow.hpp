@@ -6,6 +6,8 @@
 #include <mirv/Core/IR/Expression.hpp>
 #include <mirv/Core/Filter/Action.hpp>
 
+#include <iostream>
+
 namespace mirv {
   /// This is the base class of all flows that operate on expressions.
   template<
