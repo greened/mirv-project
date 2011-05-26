@@ -329,7 +329,25 @@ namespace mirv {
           : VisitAction<LeaveStatementVisitor>(attributeManager) {}
     };
 
-    /// Leaveing each expression
+    /// Entering each expression
+    class EnterExpressionVisitor : public ConstExpressionVisitor {
+    private:
+      FlowAttributeManagerType &attributeManager;
+
+    public:
+      EnterExpressionVisitor(FlowAttributeManagerType &am)
+          : attributeManager(am) {}
+
+      void visit(ptr<Expression<TuplePointer> >::const_type expr);
+    };
+
+    class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {
+    public:
+      EnterExpressionAction(FlowAttributeManagerType &attributeManager) 
+          : VisitAction<EnterExpressionVisitor>(attributeManager) {}
+    };
+
+    /// Leaving each expression
     class LeaveExpressionVisitor : public ConstExpressionVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
@@ -359,7 +377,7 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
       void visit(ptr<Expression<Reference<GlobalVariable> > >::const_type expr);
       void visit(ptr<Expression<Reference<Tuple> > >::const_type expr);
-      void visit(ptr<Expression<Reference<TuplePointer> > >::const_type expr);
+      void visit(ptr<Expression<TuplePointer> >::const_type expr);
       void visit(ptr<Expression<Reference<Function> > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
     };
@@ -375,7 +393,7 @@ namespace mirv {
       InheritedAttribute,
       SynthesizedAttribute,
       ConstForwardExpressionFlowGenerator,
-      NullAction,
+      EnterExpressionAction,
       AttributeFlowInheritedToSynthesizedAction<
         LeaveExpressionAction,
         FlowAttributeManagerType
@@ -392,7 +410,7 @@ namespace mirv {
       InheritedAttribute,
       SynthesizedAttribute,
       ConstForwardExpressionFlowGenerator,
-      NullAction,
+      EnterExpressionAction,
       AttributeFlowInheritedToSynthesizedAction<
         LeaveExpressionAction,
         FlowAttributeManagerType

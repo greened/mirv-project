@@ -2,6 +2,7 @@
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Reference.hpp>
 
 #include <mirv/Filter/Snapshot/Codegen/LLVM/JIT/JIT.hpp>
 #include <mirv/Filter/Snapshot/Codegen/LLVM/LLVM.hpp>

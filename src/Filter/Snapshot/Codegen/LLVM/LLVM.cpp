@@ -986,13 +986,24 @@ namespace mirv {
       CreateGEP(attributeManager.begin()->getValue(),
                 indices.begin(), indices.end(), "trefgep");
 
-    syn.setValue(attributeManager.getInheritedAttribute().builder()->
-                 CreateLoad(GEP, "trefload"));
+    if (attributeManager.getInheritedAttribute().generateAddress()) {
+      syn.setValue(GEP);
+    }
+    else {
+      syn.setValue(attributeManager.getInheritedAttribute().builder()->
+                   CreateLoad(GEP, "trefload"));
+    }
 
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<TuplePointer> > >::const_type expr)
+  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<TuplePointer> >::const_type expr)
+  {
+    InheritedAttribute inh(attributeManager.getInheritedAttribute(), true);
+    attributeManager.setInheritedAttribute(inh);
+  }
+
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<TuplePointer> >::const_type expr)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
