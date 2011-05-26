@@ -157,6 +157,18 @@ namespace mirv {
 
       attributeManager.setSynthesizedAttribute(syn);
     }
+
+    llvm::Constant *
+    getConstant(ptr<Expression<Reference<Constant<Base> > > >::const_type constant,
+                LLVMCodegenFilter::InheritedAttribute &inh)
+    {
+      ConstantFlow valueCreator(inh);
+      constant->getSymbol()->accept(valueCreator);
+
+      return llvm::cast<llvm::Constant>(valueCreator.getAttributeManager().
+                                        getLastSynthesizedAttribute().
+                                        getValue());
+    }
   }
 
   void LLVMCodegenFilter::
@@ -191,16 +203,25 @@ namespace mirv {
 
   void LLVMCodegenFilter::
   FlowAttribute::
-  createGlobalVariable(const std::string &name,
-                       ptr<Symbol<Type<TypeBase> > >::const_type type)
+  createGlobalVariable(ptr<Symbol<GlobalVariable> >::const_type sym,
+                       const InheritedAttribute &inh)
   {
+    const std::string &name = sym->name();
+    ptr<Symbol<Type<TypeBase> > >::const_type type(sym->type());
+
     checkInvariant(TheModule, "No module for global variable");
     const llvm::Type *llvmType = getType(type);
-    llvm::Value *var = TheModule->getOrInsertGlobal(name, llvmType);
+    const llvm::Type *pointerType = llvm::PointerType::getUnqual(llvmType);
+    llvm::Value *var = TheModule->getOrInsertGlobal(name, pointerType);
     VariableMap::iterator pos;
     bool inserted;
     std::tie(pos, inserted) = ModuleMap->insert(std::make_pair(name, var));
     checkInvariant(inserted, "Global variable already exists");
+    if (sym->initializer()) {
+      InheritedAttribute inherited(inh);
+      llvm::GlobalVariable *gvar = llvm::cast<llvm::GlobalVariable>(var);
+      gvar->setInitializer(getConstant(sym->initializer(), inherited));
+    }
   }
 
   llvm::Value *LLVMCodegenFilter::
@@ -364,7 +385,7 @@ namespace mirv {
   LeaveSymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-    syn.createGlobalVariable(sym->name(), sym->type());
+    syn.createGlobalVariable(sym, attributeManager.getInheritedAttribute());
     attributeManager.setSynthesizedAttribute(syn);
   }
   
@@ -1042,13 +1063,9 @@ namespace mirv {
   void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr)
   {
     InheritedAttribute inh(attributeManager.getInheritedAttribute());
-
-    ConstantFlow valueCreator(inh);
-    expr->getSymbol()->accept(valueCreator);
-
-    attributeManager.
-      setSynthesizedAttribute(valueCreator.getAttributeManager().
-                              getLastSynthesizedAttribute());
+    SynthesizedAttribute syn(inh);
+    syn.setValue(getConstant(expr, inh));
+    attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::operator()(ptr<Node<Base> >::type node)
