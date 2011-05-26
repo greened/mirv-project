@@ -131,16 +131,34 @@ namespace mirv {
   class AttributeFlow : public BaseFlowGenerator::template apply<
     detail::AttributeFlowEnterAction<
       EnterAction,
-      FlowAttributeManager<Inherited, Synthesized>
+      FlowAttributeManager<
+        Inherited,
+        Synthesized
+        >
       >,
     detail::AttributeFlowLeaveAction<
       LeaveAction,
-      FlowAttributeManager<Inherited, Synthesized>
+      FlowAttributeManager<
+        Inherited,
+        Synthesized
+        >
       >,
         Actions...
     >::type {
   protected:
-    typedef FlowAttributeManager<Inherited, Synthesized> FlowAttributeManagerType;
+    typedef AttributeFlow<
+    Inherited,
+    Synthesized,
+    BaseFlowGenerator,
+    EnterAction,
+    LeaveAction,
+    Actions...
+    > ThisType;
+
+    typedef FlowAttributeManager<
+      Inherited,
+      Synthesized
+      > FlowAttributeManagerType;
 
   private:
     typedef typename BaseFlowGenerator::template apply<

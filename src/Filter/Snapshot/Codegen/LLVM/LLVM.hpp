@@ -23,6 +23,8 @@ namespace mirv {
   /// This is a filter to translate from MIRV IR to LLVM IR.
   class LLVMCodegenFilter : public Filter<Node<Base> > {
   public:
+    class InheritedAttribute;
+
     class FlowAttribute {
     private:
       llvm::LLVMContext *Context;
@@ -163,8 +165,8 @@ namespace mirv {
       void createVariable(const std::string &name,
                           ptr<Symbol<Type<TypeBase> > >::const_type type);
 
-      void createGlobalVariable(const std::string &name,
-                                ptr<Symbol<Type<TypeBase> > >::const_type type);
+      void createGlobalVariable(ptr<Symbol<GlobalVariable> >::const_type sym,
+                                const InheritedAttribute &inh);
 
       template<typename ValueType>
       void createIntegerConstant(ptr<Symbol<Type<TypeBase> > >::const_type type,
