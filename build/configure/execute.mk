@@ -17,7 +17,7 @@ include $(3)
 $$($(1)_execute_target): $(3)
 	$$(if $(3),$$(eval include $(3)))
 	$$(call debug,CXX = $$(CXX))
-	$(QUIET)$$(call mc_define_create,$(1),$$(shell $$($(2))),$$@,$(3))
+	$(QUIET)$$(call mc_define_create_nomsg,$(1),$$(shell $$($(2))),$$@,$(3))
 
 CONFIGURE_INCLUDES += $$($(1)_execute_target)
 
