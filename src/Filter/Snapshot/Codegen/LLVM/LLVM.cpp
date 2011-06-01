@@ -4,6 +4,8 @@
 
 #include <boost/mem_fn.hpp>
 
+#include <llvm/Support/raw_ostream.h>
+
 #include "LLVM.hpp"
 
 namespace mirv {
@@ -137,7 +139,15 @@ namespace mirv {
 
     void EnterConstantVisitor::visit(ptr<Symbol<Constant<std::string> > >::const_type sym)
     {
+      // This should return the string value but it's not clear what
+      // LLVM will do with that.  Typically we see this in global
+      // variable initializers so do this there.  Abort if we ever get
+      // here.
       error("Unimplemented");
+      SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+      llvm::Value *pointer = syn.builder()->CreateGlobalString(sym->value().c_str());
+      syn.setValue(pointer);
+      attributeManager.setSynthesizedAttribute(syn);
     }
 
     void EnterConstantVisitor::visit(ptr<Symbol<Constant<Address> > >::const_type sym)
@@ -212,6 +222,29 @@ namespace mirv {
     checkInvariant(TheModule, "No module for global variable");
     const llvm::Type *llvmType = getType(type);
     const llvm::Type *pointerType = llvm::PointerType::getUnqual(llvmType);
+
+    if (const llvm::ArrayType *arrayType =
+        llvm::dyn_cast<llvm::ArrayType>(llvmType)) {
+      
+      if (arrayType->getElementType() == inh.builder()->getInt8Ty()
+          && sym->initializer()) {
+        ptr<Symbol<Constant<std::string> > >::const_type str =
+          dyn_cast<const Symbol<Constant<std::string> > >(
+            sym->initializer()->getSymbol());
+        if (str) {
+          llvm::Value *pointer =
+            inh.builder()->CreateGlobalString(str->value().c_str(), name);
+
+          VariableMap::iterator pos;
+          bool inserted;
+          std::tie(pos, inserted) =
+            ModuleMap->insert(std::make_pair(name, pointer));
+          checkInvariant(inserted, "Global variable already exists");
+          return;
+        }
+      }
+    }
+
     llvm::Value *var = TheModule->getOrInsertGlobal(name, pointerType);
     VariableMap::iterator pos;
     bool inserted;
