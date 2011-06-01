@@ -21,12 +21,16 @@ include $(BUILDTOOLS)/configure/create.mk
 #mc_define = $(eval $(call mc_define_impl,$(1),$(2),$(3),$(4)))
 mc_define_create = $(call mc_create_start,$(3),$(4)); echo "\$$(call mc_info,$(1) := $(2))" >> $(3); $(if $(4),echo "include $(4)" >> $(3);) echo "override $(1) := $(2)" >> $(3); $(call mc_create_end,$(3))
 
+mc_define_create_nomsg = $(call mc_create_start,$(3),$(4)); $(if $(4),echo "include $(4)" >> $(3);) echo "override $(1) := $(2)" >> $(3); $(call mc_create_end,$(3))
+
 # $1: Variable name to define
 # $2: Value to define
 # $3: Target file
 # $4: Dependence
 #mc_define = $(eval $(call mc_define_impl,$(1),$(2),$(3),$(4)))
 mc_define_append = echo "\$$(call mc_info,$(1) := $(2))" >> $(3); $(if $(4),echo "include $(4)" >> $(3);) echo "override $(1) := $(2)" >> $(3)
+
+mc_define_append_nomsg = $(if $(4),echo "include $(4)" >> $(3);) echo "override $(1) := $(2)" >> $(3)
 
 mc_define = $(error "[mc_define] Use mc_define_create or mc_define_append")
 
