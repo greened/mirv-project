@@ -32,9 +32,9 @@ $$(call debug,[mc_link_impl] $$($(1)_link_target): $$($(1)_LDFILE))
 
 $$($(1)_link_target): $$($(1)_LDFILE)
 	$(QUIET)if [ -x $$(<) ]; then \
-	          $$(call mc_define_append,$(1)_link,yes,$$@); \
+	          $$(call mc_define_append_nomsg,$(1)_link,yes,$$@); \
 	        else \
-	          $$(call mc_define_append,$(1)_link,,$$@); \
+	          $$(call mc_define_append_nomsg,$(1)_link,,$$@); \
 	        fi
 
 CONFIGURE_INCLUDES += $$($(1)_link_target)
