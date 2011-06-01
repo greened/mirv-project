@@ -48,9 +48,9 @@ $$(call debug,[mc_compile_impl] $$($(1)_compile_target): $$($(1)_OFILE))
 
 $$($(1)_compile_target): $$($(1)_OFILE)
 	$(QUIET)if [ -e $$(<) ]; then \
-	          $$(call mc_define_append,$(1)_compile,yes,$$@); \
+	          $$(call mc_define_append_nomsg,$(1)_compile,yes,$$@); \
 	        else \
-	          $$(call mc_define_append,$(1)_compile,,$$@); \
+	          $$(call mc_define_append_nomsg,$(1)_compile,,$$@); \
 	        fi
 
 CONFIGURE_INCLUDES += $$($(1)_compile_target)
