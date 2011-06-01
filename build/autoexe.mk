@@ -23,7 +23,8 @@ $(1): LCC = $$($(4))
 endif
 
 $(1): $(2) $(3) $(6)
-	$$(LXX) -o $$(@) $$(filter %.o,$$(^)) $$(LDFLAGS)
+	@$(if $(QUIET),echo [LDX] $$@)
+	$(QUIET)$$(LXX) -o $$(@) $$(filter %.o,$$(^)) $$(LDFLAGS)
 
 endef
 
