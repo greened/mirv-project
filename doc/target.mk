@@ -13,7 +13,7 @@ $(call debug,[doc] SRCS = $(doc_SRCS))
 
 $(call make_doxyconfig,mirv,$(doc_SRCDIR),$(doc_SRCS))
 
-TARGETS += $(libmirv_core_DOXY_STAMPS)
+TARGETS += $(mirv_DOXY_STAMPS)
 
 $(call debug,[doc] TARGETS = $(TARGETS))
 
