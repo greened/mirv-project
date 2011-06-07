@@ -216,7 +216,8 @@ namespace mirv {
       }
     };
 
-    // Specialize for types which must be const.
+    /// This is a grammar action to look up type symbols.  We
+    /// speciailize it for types, which must be const.
     template<typename Tag>
     struct LookupSymbol<Symbol<Type<Tag> >, boost::proto::callable>
         : boost::proto::callable {
@@ -257,7 +258,8 @@ namespace mirv {
       }
     };
 
-    // Specialize for types as they must be const.
+    /// This is a grammar action to look up a type symbol.  Specialize
+    /// for types as they must be const.
     template<typename Tag>
     struct LookupAndAddSymbol<Symbol<Type<Tag> >, boost::proto::callable> 
         : boost::proto::callable {

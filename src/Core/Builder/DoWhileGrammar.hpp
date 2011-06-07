@@ -7,6 +7,7 @@
 
 namespace mirv {
   namespace Builder {
+    /// This is the grammar to construction do-while IR statements.
     struct DoWhileBuilder : boost::proto::when<
       DoWhileRule,
       ClearPendingStatementsDoWhile(

@@ -14,6 +14,9 @@ namespace mirv {
       typename ...Sequence> 
     struct Fold;
 
+    /// This is a metafunction to perform a fold operation.  It works
+    /// similarly to boost::mpl::fold but accepts a variable number of
+    /// arguments as the sequence.
     template<typename Start,
       typename Op,
       typename Item,
@@ -29,6 +32,8 @@ namespace mirv {
       typedef Start type;
     };
     
+    /// Translate a vararg template list to an mpl vector.  This
+    /// bridges the semantic gap between C++0x and mpl.
     template<typename ...Items>
     struct AsVector {
       typedef typename Fold<

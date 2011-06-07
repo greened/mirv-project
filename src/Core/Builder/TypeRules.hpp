@@ -19,11 +19,15 @@ namespace mirv {
      struct TypeRule;
      struct TypeList;
 
+     /// This is a rule to match a list of types.
+     /// StructTypeList -> TypeList, Type
      struct StrictTypeList : boost::proto::comma<
        TypeList,
        TypeRule
        > {};
 
+     /// Define a rule for a list of type.
+     /// TypeList: type | (TypeList type)
      struct TypeList : boost::proto::or_<
        TypeRule,
        StrictTypeList

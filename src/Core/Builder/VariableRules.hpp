@@ -27,6 +27,8 @@ namespace mirv {
        TypeTerminal
        > {};
 
+     /// Specify the rule for matching variable declarations.
+     /// var["name"].type["name"|type]
      struct VariableRule : boost::proto::subscript<
        VariableTypeMember,
        TypeAccessRule

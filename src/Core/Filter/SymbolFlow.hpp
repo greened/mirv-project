@@ -212,6 +212,8 @@ namespace mirv {
 
   /// This is a type generator for symbol flows.
   struct SymbolFlowGenerator {
+    /// This is a metafunction to generate a SymbolFlow with the
+    /// provided configuration.
     template<
       typename EnterAction,
       typename LeaveAction,

@@ -113,6 +113,7 @@ namespace mirv {
     typedef Symbol<Type<TypeBase> > VisitorBaseType;
   };
 
+  /// Define the base class for types with children.
   class InnerTypeBase : public Symbol<Type<Inner<detail::InnerTypeTraits> > > {
   private:
     typedef Symbol<Type<Inner<detail::InnerTypeTraits> > > BaseType;

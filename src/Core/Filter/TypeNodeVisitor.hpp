@@ -31,6 +31,8 @@ namespace mirv {
       }
     };
 
+    /// Implement the accept method for type symbols.  Specialze for
+    /// types, which must be const.
     template<typename Tag>
     class AcceptImpl<Symbol<Type<Tag> >, false> {
     public:

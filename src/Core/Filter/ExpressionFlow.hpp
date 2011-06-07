@@ -183,6 +183,8 @@ namespace mirv {
          typename AfterAction,
          typename BetweenAction
          >
+       /// This is a metafunction to generate a ForwardExpressionFlow
+       /// with the given configuration.
        struct apply {
          typedef ForwardExpressionFlow<
          EnterAction,
@@ -269,6 +271,8 @@ namespace mirv {
          typename AfterAction,
          typename BetweenAction
          >
+       /// This is the metafunction to return a BackwardExpressionFlow
+       /// type with the given configuration.
        struct apply {
          typedef BackwardExpressionFlow<
          EnterAction,

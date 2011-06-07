@@ -13,6 +13,8 @@ namespace mirv {
      typedef Wrapper<boost::proto::terminal<keyword::vararg>::type> VarargTerminal;
 
      // TODO: More strictly enforce that vararg should be at the end.
+     /// This is the rule to match a function type argument type.
+     /// ArgType -> Type | vararg
      struct ArgTypeRule : boost::proto::or_<
        TypeRule,
        VarargTerminal
