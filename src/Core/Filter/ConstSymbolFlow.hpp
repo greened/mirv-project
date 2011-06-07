@@ -281,6 +281,8 @@ namespace mirv {
 
   /// This is a type generator for symbol flows.
   struct ConstSymbolFlowGenerator {
+    /// This is a metafunction to generate a ConstSymbolFlow type with
+    /// the given configuration.
     template<
       typename EnterAction,
       typename LeaveAction,

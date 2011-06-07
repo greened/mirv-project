@@ -19,6 +19,9 @@
 namespace mirv {
   namespace Builder {
     namespace detail {
+      /// This holds dimension information for an array type.  The
+      /// builder adds to the list of dimension information as it
+      /// parses dimension expressions.
       class TypeSubscriptData {
       private:
         ptr<Symbol<Type<TypeBase> > >::const_type baseType;
@@ -70,6 +73,7 @@ namespace mirv {
         }
       };
 
+      /// Create an object representing a particular tuple dimension.
       struct CreateTypeSubscript : boost::proto::callable {
         typedef TypeSubscriptData result_type;
 
@@ -97,6 +101,8 @@ namespace mirv {
         }
       };
 
+      /// This is a grammar action to add dimension information to a
+      /// list of dimensions.
       struct AddTypeSubscript : boost::proto::callable {
         typedef TypeSubscriptData result_type;
 
@@ -124,6 +130,8 @@ namespace mirv {
                              detail::TypeSubscriptData subscripts);
     };
 
+    /// This is a grammar to construct a tuple type with multiple
+    /// dimensions.
     template<typename ElementTypeBuilder,
       typename Dummy = boost::proto::callable>
     struct MultiTypeSubscriptBuilder : boost::proto::when<
@@ -136,6 +144,7 @@ namespace mirv {
         boost::proto::_right)
       > {};
 
+    /// This is the grammar to build a tuple type dimension.
     template<typename ElementTypeBuilder,
       typename Dummy = boost::proto::callable>
     struct TypeSubscriptBuilder : boost::proto::when<
@@ -152,6 +161,8 @@ namespace mirv {
       typename Dummy>
     struct TypeSubscriptListBuilder;
   
+    /// This is a grammar add type dimension information to an
+    /// existing list of type dimensions.
     template<typename ElementTypeBuilder,
       typename Dummy = boost::proto::callable>
     struct StrictTypeSubscriptListBuilder : boost::proto::when<
@@ -162,6 +173,8 @@ namespace mirv {
         boost::proto::_value(boost::proto::_right))
       > {};
     
+    /// Translate a list of array type dimensions to a list of tuple
+    /// dimensions.
     template<typename ElementTypeBuilder,
       typename Dummy = boost::proto::callable>
     struct TypeSubscriptListBuilder : boost::proto::or_<
@@ -169,6 +182,8 @@ namespace mirv {
       TypeSubscriptBuilder<ElementTypeBuilder>
       > {};
 
+    /// This is the grammar to build a list of dimensions for array
+    /// types.
     template<typename ElementTypeBuilder,
       typename Dummy = boost::proto::callable>
     struct TypeDimensionListBuilder : boost::proto::or_<
@@ -176,7 +191,7 @@ namespace mirv {
       MultiTypeSubscriptBuilder<ElementTypeBuilder>
       > {};
 
-    // This is the grammar for array types.
+    /// This is the grammar for array types.
     struct ArrayTypeBuilder : boost::proto::when<
       ArrayTypeRule,
       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
@@ -184,10 +199,10 @@ namespace mirv {
         ConstructArrayTypeSymbol(
           boost::proto::_data,
           // TypeSubscript data
-          TypeDimensionListBuilder<TypeBuilder>(boost::proto::_)))
+        TypeDimensionListBuilder<TypeBuilder>(boost::proto::_)))
       > {};
 
-    // This is the grammar for looking up array types.
+    /// This is the grammar for looking up array types.
     struct ArrayTypeLookupBuilder : boost::proto::when<
       ArrayTypeRule,
       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(

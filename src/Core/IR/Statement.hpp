@@ -32,14 +32,17 @@ namespace mirv {
   template<typename Tag> class Statement;
 
   namespace detail {
+    /// Define the visitation base type for statements.
     template<typename Tag>
     struct VisitorBase<Statement<Tag> > {
       typedef typename Tag::VisitorBaseType VisitorBaseType;
     };
+    /// Define the base type for statements.
     template<typename Tag>
     struct BaseTypeOf<Statement<Tag> > {
       typedef typename Tag::BaseType BaseType;
     };
+    /// Define the visitation base class for base statements.
     template<>
     struct VisitorBase<Statement<Base> > {
       typedef Node<Base> VisitorBaseType;

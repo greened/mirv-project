@@ -4,6 +4,7 @@
 #include <mirv/Core/Memory/Heap.hpp>
 
 namespace mirv {
+  /// This is a visitor action to invoke a flow on an IR subtree.
   template<typename ParentFlow, typename Flow>
   class FlowAction : public VisitAction<Flow> {
   private:

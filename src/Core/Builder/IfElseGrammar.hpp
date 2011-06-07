@@ -7,6 +7,7 @@
 
 namespace mirv {
   namespace Builder {
+    /// This is the grammar to construct if-else IR statements.
     struct IfElseBuilder : boost::proto::when<
       IfElseRule,
       ClearPendingStatements(

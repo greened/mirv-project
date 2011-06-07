@@ -16,6 +16,8 @@
 namespace mirv {
   namespace Builder {
     namespace detail {
+      /// This is a helper functor to translate a proto list to a list
+      /// of IR objects.
       template<typename ResultType, bool Matches>
       class TranslateListImpl {
       public:
@@ -28,6 +30,8 @@ namespace mirv {
         }
       };
 
+      /// This is a helper functor to translate a proto expression
+      /// list to a list of type symbols.
       template<typename ResultType>
       class TranslateListImpl<ResultType, false> {
       public:
@@ -38,6 +42,9 @@ namespace mirv {
         }
       };
       
+      /// This is a grammar action to translate the elements of a list
+      /// to type symbols.  Various sequence types use it to construct
+      /// their member types.
       template<typename List>
       class TranslateList {
       public:
@@ -97,6 +104,7 @@ namespace mirv {
       }
     };
 
+    /// Create a Placeholder type with name <name>.
     struct AddPlaceholder : boost::proto::callable {
       typedef std::string result_type;
 
@@ -107,6 +115,8 @@ namespace mirv {
       }
     };
 
+    /// Given the name of a Placeholder type, return the corresponding
+    /// Placeholder type Symbol.
     struct LookupPlaceholder : boost::proto::callable {
       typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 
@@ -114,7 +124,7 @@ namespace mirv {
                              const std::string &name);
     };
 
-    // This is the grammar for struct types.
+    /// This is the grammar for struct types.
     struct StructTypeDefBuilder : boost::proto::when<
       StructTypeDefRule,
        LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
@@ -129,6 +139,9 @@ namespace mirv {
           boost::proto::_right))
       > {};
 
+  /// Given a struct declaration, return a placeholder type for it.
+  /// This will get replaced by the real struct type when we see its
+  /// definition.
     struct StructTypeDeclBuilder : boost::proto::when<
       StructTypeDeclRule,
       LookupPlaceholder(
@@ -139,11 +152,14 @@ namespace mirv {
           boost::proto::_value(boost::proto::_right)))
       > {};
 
-    struct StructTypeBuilder : boost::proto::or_<
-      StructTypeDeclBuilder,
-      StructTypeDefBuilder
-      > {};
+  /// This is the grammar to build a tuple type from a struct type.
+  struct StructTypeBuilder : boost::proto::or_<
+    StructTypeDeclBuilder,
+    StructTypeDefBuilder
+    > {};
 
+    /// Given a struct type declaration, return its corresponding
+    /// Symbol.  This may be a placeholder type.
     struct StructTypeLookupBuilder : boost::proto::when<
       StructTypeDeclRule,
       LookupSymbol<Symbol<Type<TypeBase> > >(

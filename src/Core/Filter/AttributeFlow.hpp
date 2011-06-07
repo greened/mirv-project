@@ -81,10 +81,10 @@ namespace mirv {
     }
   };
 
-  // This action transers an inherited attribute to a synthesized
-  // attribute.  It is useful for leaf nodes and other constructs
-  // where no explicit synthesized attribute is set but we would like
-  // to carry forward some information from the inherited attribute.
+  /// This action transfers an inherited attribute to a synthesized
+  /// attribute.  It is useful for leaf nodes and other constructs
+  /// where no explicit synthesized attribute is set but we would like
+  /// to carry forward some information from the inherited attribute.
   template<typename Action, typename FlowAttributeManager>
   class AttributeFlowInheritedToSynthesizedAction {
   private:

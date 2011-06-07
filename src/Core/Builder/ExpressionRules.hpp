@@ -47,27 +47,38 @@ namespace mirv {
      // Array reference rules.
      struct ArrayIndexRule;
 
-     struct MultiIndexRule 
+     /// This is the rule to match a list of indices.
+     /// MultiIndex -> ArrayIndex, ArrayIndex
+     struct MultiIndexRule
          : public boost::proto::comma<
        ArrayIndexRule,
        ArrayIndexRule
        > {};
 
+     /// This is the rule to match an array subscript.
+     /// ArrayIndex -> Expression | MultiIndex
      struct ArrayIndexRule : public boost::proto::or_<
        ConstructExpressionGrammar,
        MultiIndexRule
        > {};
 
+     /// Match a subscript expression with multiple indices.
+     /// MultiSubscript -> Expression[MultiIndex]
      struct MultiSubscriptRule :  boost::proto::subscript<
        ConstructExpressionGrammar,
        MultiIndexRule
        > {};
 
+     /// This is the rule to match single subscript expressions.
+     /// Subscript -> Expression[Expression]
      struct SubscriptRule : boost::proto::subscript<
        ConstructExpressionGrammar,
        ConstructExpressionGrammar
        > {};
 
+     /// Match an expression returning an address of a subscript
+     /// expression with multiple subscripts.
+     /// &expr[expr(,expr)*]
      struct MultiSubscriptAddressRule : boost::proto::address_of<
        boost::proto::subscript<
          ConstructExpressionGrammar,

@@ -143,6 +143,7 @@ namespace mirv {
     // TODO: Interface that checks for lvalues.
     // We need to manually define the interface to override
     // InnerExpression's type() implementation.
+    /// Define the interface for tuple address expressions.
     class Interface
         : public InnerExpression,
     //public Expression<Ref>,

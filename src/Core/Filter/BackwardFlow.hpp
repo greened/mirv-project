@@ -327,6 +327,8 @@ namespace mirv {
       typename ExprAction,
       typename AfterExprAction
       >
+    /// This is the metafunction to generate a BackwardFlow type with
+    /// the given configuration.
     struct apply {
       typedef BackwardFlow<
         EnterAction,

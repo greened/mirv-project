@@ -37,10 +37,13 @@ namespace mirv {
     struct VisitorBase<Expression<Tag> > {
       typedef typename Tag::VisitorBaseType VisitorBaseType;
     };
+    /// Define the base type of an expression.
     template<typename Tag>
     struct BaseTypeOf<Expression<Tag> > {
       typedef typename Tag::BaseType BaseType;
     };
+    /// Define the type to be visited as the base of a base
+    /// expression.
     template<>
     struct VisitorBase<Expression<Base> > {
       typedef Node<Base> VisitorBaseType;
@@ -197,6 +200,7 @@ namespace mirv {
     }
   };
 
+  /// Define the base for expressions with children.
   class InnerExpressionBase : public Expression<Inner<detail::InnerExpressionTraits> > {
   public:
     typedef Expression<Inner<detail::InnerExpressionTraits> > BaseType;
@@ -476,6 +480,7 @@ namespace mirv {
   namespace detail {
     template<int Num> struct constructor;
 
+    /// This is a functor to clone a unary expression.
     template<>
     struct constructor<1> {
       template<typename ExprType>
@@ -487,6 +492,7 @@ namespace mirv {
       }
     };
 
+    /// This is a helper functor to clone a binary expression.
     template<>
     struct constructor<2> {
       template<typename ExprType>
@@ -510,6 +516,10 @@ namespace mirv {
     typedef Root BaseType;
 
   public:
+    /// This is the base class for all Expression interfaces.  It
+    /// contains a lot of common code used to initialize and clone
+    /// expressions, making higher-level expression implementations
+    /// simpler.
     class ExpressionInterface
         : public Root,
           public Expression<Property>...,

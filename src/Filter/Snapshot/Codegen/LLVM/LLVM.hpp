@@ -25,6 +25,10 @@ namespace mirv {
   public:
     class InheritedAttribute;
 
+    /// This is the base of codegen inherited and synthesized
+    /// attributes.  It contains all of the necessary context for
+    /// creating IR constructs and references for holding codegen
+    /// results for parent nodes to examine.
     class FlowAttribute {
     private:
       llvm::LLVMContext *Context;
@@ -201,6 +205,9 @@ namespace mirv {
 
     class SynthesizedAttribute;
 
+    /// This is the inherited attribute for code generation.  It
+    /// carries the necessary context and utility functions to create
+    /// IR constructs.
     class InheritedAttribute 
         : public FlowAttribute {
     public:
@@ -222,6 +229,8 @@ namespace mirv {
       }
     };
 
+    /// This is the symthesized attribute for the code generator.  It
+    /// carrries result Values, Symbols, etc. to parent nodes.
     class SynthesizedAttribute 
         : public FlowAttribute {
     public:
@@ -255,6 +264,7 @@ namespace mirv {
       void visit(ptr<Symbol<Function> >::const_type sym);
     };
 
+    /// Invoke the EnterSymbolVisitor upon entering a symbol.
     class EnterSymbolAction : public VisitAction<EnterSymbolVisitor> {
     public:
       EnterSymbolAction(FlowAttributeManagerType &attributeManager) 
@@ -276,6 +286,7 @@ namespace mirv {
       void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
     };
 
+    /// Invoke the LeaveSymbolVisitor when exiting symbols.
     class LeaveSymbolAction : public VisitAction<LeaveSymbolVisitor> {
     public:
       LeaveSymbolAction(FlowAttributeManagerType &attributeManager) 
@@ -298,6 +309,7 @@ namespace mirv {
       void visit(ptr<Statement<Assignment> >::const_type stmt);
     };
 
+    /// Invoke the EnterStatementVisitor upon entry to a statement.
     class EnterStatementAction : public VisitAction<EnterStatementVisitor> {
     public:
       EnterStatementAction(FlowAttributeManagerType &attributeManager) 
@@ -325,6 +337,7 @@ namespace mirv {
       void visit(ptr<Statement<DoWhile> >::const_type stmt);
     };
 
+    /// Invoke the LeaveStatementVisitor upon exiting statements.
     class LeaveStatementAction : public VisitAction<LeaveStatementVisitor> {
     public:
       LeaveStatementAction(FlowAttributeManagerType &attributeManager) 
@@ -343,6 +356,7 @@ namespace mirv {
       void visit(ptr<Expression<TuplePointer> >::const_type expr);
     };
 
+    /// Invoke the EnterExpressionVisitor upon entering an expression.
     class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {
     public:
       EnterExpressionAction(FlowAttributeManagerType &attributeManager) 
@@ -384,6 +398,7 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
     };
 
+    /// Invoke the LeaveExpressionVisitor upon leaving an expression.
     class LeaveExpressionAction : public VisitAction<LeaveExpressionVisitor> {
     public:
       LeaveExpressionAction(FlowAttributeManagerType &attributeManager) 

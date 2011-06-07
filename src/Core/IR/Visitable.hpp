@@ -5,10 +5,17 @@
 
 namespace mirv {
   namespace detail {
+    /// Return the visitation base type for a given symbol, expression
+    /// or statement tag.
     template<typename Op>
     struct VisitorBase {
       typedef typename Op::VisitorBaseType VisitorBaseType;
     };
+
+    /// This is a metafunction to compute the base type of a symbol,
+    /// expression or statement.  It relies on a nested member
+    /// ::BaseType to specify the base type for the metafunction
+    /// argument.
     template<typename Op>
     struct BaseTypeOf {
       typedef typename Op::BaseType BaseType;
