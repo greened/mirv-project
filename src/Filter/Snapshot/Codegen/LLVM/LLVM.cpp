@@ -1057,6 +1057,7 @@ namespace mirv {
 
     if (attributeManager.getInheritedAttribute().generateAddress()) {
       syn.setValue(GEP);
+      syn.setNeedsDereference(true);
     }
     else {
       syn.setValue(attributeManager.getInheritedAttribute().builder()->
@@ -1080,22 +1081,30 @@ namespace mirv {
     // to the filter_iterator component.  So copy values to a
     // temporary vector.
     auto indicesBegin = attributeManager.begin();
+
+    std::vector<llvm::Value *> indices;
+
+    // This is the base pointer value attribute.
+    if (indicesBegin->needsDereference()) {
+      indices.push_back(llvm::ConstantInt::get(syn.builder()->getInt32Ty(),
+                                               0, false));
+    }
+
     ++indicesBegin;
 
-    std::vector<llvm::Value *>
-      indices(boost::make_transform_iterator(
+    std::copy(boost::make_transform_iterator(
                 indicesBegin,
                 boost::mem_fn(&SynthesizedAttribute::getValue)),
               boost::make_transform_iterator(
                 attributeManager.end(),
-                boost::mem_fn(&SynthesizedAttribute::getValue)));
+                boost::mem_fn(&SynthesizedAttribute::getValue)),
+              std::back_inserter(indices));
 
     llvm::Value *GEP = attributeManager.getInheritedAttribute().builder()->
       CreateGEP(attributeManager.begin()->getValue(),
                 indices.begin(), indices.end(), "tptrgep");
 
     syn.setValue(GEP);
-
     attributeManager.setSynthesizedAttribute(syn);
   }
 
