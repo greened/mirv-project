@@ -23,8 +23,8 @@ namespace mirv {
       }
     };
 
-    // This is the grammar to match a variable declaration, a type
-    // definition or a function definition.
+    /// This is the grammar to match a variable declaration, a type
+    /// definition or a function definition.
     struct VariableTypeOrFunctionBuilder : boost::proto::or_<
       GlobalVariableBuilder,
       TypeBuilder,

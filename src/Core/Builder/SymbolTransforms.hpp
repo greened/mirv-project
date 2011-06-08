@@ -23,6 +23,7 @@ namespace mirv {
       CurrentScope
     };
     namespace detail {
+      /// This is a functor to get the canonical name of a type.
       template<typename Tag>
       struct GetName {
         template<typename ...Args>
@@ -37,6 +38,8 @@ namespace mirv {
         }
       };
 
+      /// This is a helper functor to get the canonical name of an
+      /// integer type.
       template<>
       struct GetName<Integral> {
         std::string operator()(ptr<Symbol<Module> >::type module,
@@ -56,6 +59,8 @@ namespace mirv {
       template<typename SymbolType, Scope scope>
       struct Lookup;
 
+      /// This is a grammar action to look up a symbol in the corrent
+      /// function.
       template<typename SymbolType> 
       struct Lookup<SymbolType, CurrentScope> {
         typedef typename ptr<SymbolType>::type result_type;
@@ -83,6 +88,8 @@ namespace mirv {
       template<Scope scope>
       struct Add;
 
+      /// This is a grammar action to add a symbol to the current
+      /// function or module.
       template<> 
       struct Add<CurrentScope> {
         template<typename SymbolType>
@@ -92,6 +99,7 @@ namespace mirv {
         }
       };
 
+      /// This is a grammar action to add a symbol to a module.
       template<> 
       struct Add<ModuleScope> {
         template<typename SymbolType>
@@ -131,7 +139,9 @@ namespace mirv {
       }
     };
 
-    // Specialize for types, which need to be const.
+    /// This is a grammar action to construct Symbols with
+    /// one-argument constructors.  Specialize for types, which need
+    /// to be const.
     template<typename Tag>
     struct UnaryConstructSymbol<
       Symbol<Type<Tag> >,
@@ -198,7 +208,9 @@ namespace mirv {
       }
     };
 
-    // Specialize for types, which need to be const.
+    /// This is a grammar action to construct symbols with
+    /// two-argument constructors. Specialize for types, which need to
+    /// be const.
     template<typename Tag>
     struct BinaryConstructSymbol<
       Symbol<Type<Tag> >,
@@ -266,7 +278,9 @@ namespace mirv {
       }
     };
 
-    // Specialize for types which need to be const.
+    /// This is a grammar action to construct Symbols with
+    /// three-argument constructors.  Specialize for types, which need
+    /// to be const.
     template<typename Tag>
     struct TernaryConstructSymbol<
       Symbol<Type<Tag> >,
@@ -308,6 +322,8 @@ namespace mirv {
       }
     };
 
+    /// Given a GlobalVariable Symbol, construct an expression to
+    /// reference its value.
     struct ConstructGlobalReference : boost::proto::callable {
       typedef ptr<Expression<Base> >::type result_type;
 
@@ -337,7 +353,9 @@ namespace mirv {
       }
     };
 
-    // Specialize for types which must be const.
+    /// This is a grammar action to translate a proto expression to an
+    /// IR symbol.  This is a specialization for types, which must be
+    /// const.
     template<typename Tag>
     class TranslateToSymbol<Symbol<Type<Tag> > > : boost::proto::callable {
     private:

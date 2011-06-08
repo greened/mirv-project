@@ -27,6 +27,9 @@ namespace mirv {
             boost::proto::_expr)
         >
       > {};
+
+  /// Given a string constant, construct a reference to the address of
+  /// the first character, to give C semantics.
     struct StringRefBuilder : boost::proto::when<
       StringConstantRule,
       detail::GetCStringReference(

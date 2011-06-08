@@ -22,11 +22,15 @@ namespace mirv {
        TypeList
        > {};
 
+     /// This is the rule for struct type declarations.
+     /// StructTypeDecl -> struct_[string]
      struct StructTypeDeclRule : boost::proto::subscript<
        StructTerminal,
        StringTerminal
        > {};
 
+     /// This is a rule to match struct types.
+     /// StructType -> StructTypeDef | StructTypeDecl
      struct StructTypeRule : boost::proto::or_<
        StructTypeDefRule,
        StructTypeDeclRule

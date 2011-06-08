@@ -28,16 +28,23 @@ namespace mirv {
        TypeTerminal
        > {};
 
+     /// This is a rule to match a global variable declaration.
+     /// GlobalVariableDecl -> GlobalVariableTypeMember[TypeAccess]
      struct GlobalVariableDecl : boost::proto::subscript<
        GlobalVariableTypeMember,
        TypeAccessRule
        > {};
 
+     /// This is a rule to match a global variable declaration that
+     /// has an initializer.
+     /// GlobalVariableDecl
      struct GlobalVariableDeclWithInit : boost::proto::assign<
        GlobalVariableDecl,
        ConstantBuilder
        > {};
 
+     /// This is a rule to match a global variable declaration.
+     /// GlobalVariable -> GlobalVariableDeclWithInit | GlobalVariableDecl
      struct GlobalVariableRule : boost::proto::or_<
        GlobalVariableDeclWithInit,
        GlobalVariableDecl

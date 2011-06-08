@@ -15,6 +15,10 @@
 namespace mirv {
   namespace Printer {
     namespace detail {
+      /// This is the most common printer formatter.  It constructs
+      /// rather verbose output that is easier to read than that from
+      /// the CompactFormatter.  The Printer uses it to output general
+      /// IR.
       class DefaultFormatter {
       public:
         class Newline {
@@ -24,6 +28,8 @@ namespace mirv {
           }
         };
 
+        /// Output a delimiter between IR constructs.  The
+        /// DefaultFormatter does not use delimiters.
         class Delimit {
         public:
           Stream &operator()(Stream &out) const {
@@ -31,6 +37,7 @@ namespace mirv {
           }
         };
 
+        /// Represent the curent indent amount.
         class Indent {
         public:
           Indent(int ind) : val(ind) {};
@@ -55,8 +62,14 @@ namespace mirv {
         }
       };
 
+      /// This is a formatter that outputs IR in a very compact
+      /// representation.  The printer uses it primarity to generate
+      /// type names and constant initializers.
       class CompactFormatter {
       public:
+        /// This is a function class to output a newline.  For the
+        /// compact formatter, do nothing.  This causes all output to
+        /// be on a single line.
         class Newline {
         public:
           Stream &operator()(Stream &out) const {
@@ -64,6 +77,8 @@ namespace mirv {
           }
         };
 
+        /// Output a delimeter.  This does nothing for the compact
+        /// formatter.
         class Delimit {
         public:
           Stream &operator()(Stream &out) const {
@@ -71,6 +86,8 @@ namespace mirv {
           }
         };
 
+        /// This is an I/O manipulator to output whitespace to place
+        /// the output point at the current indent level.
         class Indent {
         public:
           Indent(int ind) : val(ind) {};
@@ -95,12 +112,18 @@ namespace mirv {
       };
     }
 
+    /// This is a functor to output newlines.  Delegate to the newline
+    /// functor of the particular formatter in use.
     template<typename Formatter>
     class Newline : public Formatter::Newline {};
-
+    
+    /// This is a functor to output delimiters.  Delegate to the
+    /// delimiter of the particular formatter in use.
     template<typename Formatter>
     class Delimit : public Formatter::Delimit {};
 
+    /// Represent the current indent level.  Delegate to the indent
+    /// representation of the particular formatter in use.
     template<typename Formatter>
     class Indent : public Formatter::Indent {
     public:
@@ -214,6 +237,7 @@ namespace mirv {
       void visit(ptr<Symbol<Type<Derived> > >::const_type);
     };
 
+    /// Apply the EnterTypeNameVisitor to type symbols upon entry.
     template<typename Formatter>
     class EnterTypeNameAction : public VisitAction<EnterTypeNameVisitor<Formatter>> {
     public:
@@ -221,6 +245,8 @@ namespace mirv {
           : VisitAction<EnterTypeNameVisitor<Formatter>>(attributeManager) {}
     };
 
+    /// Perform preorder traversal actions before visiting child
+    /// types.
     template<typename Formatter>
     class BeforeTypeNameVisitor : public ConstSymbolVisitor {
     private:
@@ -241,6 +267,8 @@ namespace mirv {
           : VisitAction<BeforeTypeNameVisitor<Formatter>>(attributeManager) {}
     };
 
+    /// Perform inorder traversal actions after visiting child
+    /// types.
     template<typename Formatter>
     class AfterTypeNameAction {
     private:
@@ -274,6 +302,8 @@ namespace mirv {
       } 
     };
 
+    /// Perform inorder traversal actions in between visits of child
+    /// types.
     template<typename Formatter>
     class BetweenTypeNameAction {
     private:
@@ -315,6 +345,8 @@ namespace mirv {
       }
     };
 
+    /// Perform post-order traversal leave actions when exiting a
+    /// symbol.
     template<typename Formatter>
     class LeaveTypeNameVisitor : public ConstSymbolVisitor {
     private:
@@ -330,6 +362,7 @@ namespace mirv {
       void visit(ptr<Symbol<Type<Derived> > >::const_type);
     };
 
+    /// Invoke the LeaveTypeNameVisitor upon exiting a type symbol.
     template<typename Formatter>
     class LeaveTypeNameAction : public VisitAction<LeaveTypeNameVisitor<Formatter>> {
     public:
@@ -337,6 +370,9 @@ namespace mirv {
           : VisitAction<LeaveTypeNameVisitor<Formatter>>(attributeManager) {}
     };
 
+    /// This is a flow to compute the name of some type.  It handles
+    /// including the names of member types.  This provides a
+    /// cononical name for each type.
     template<typename Formatter>
     class TypeNameFlow : public AttributeFlow<
       TypeNameInheritedAttribute,
@@ -439,6 +475,8 @@ namespace mirv {
       void visit(ptr<Symbol<Constant<Address> > >::const_type);
     };
 
+    /// Invoke the EnterConstantValueVisitor upon entry to a constant
+    /// symbol.
     template<typename Formatter>
     class EnterConstantValueAction : public VisitAction<EnterConstantValueVisitor<Formatter>> {
     public:
@@ -446,6 +484,7 @@ namespace mirv {
           : VisitAction<EnterConstantValueVisitor<Formatter>>(attributeManager) {}
     };
 
+    /// This is a flow to compute the value of some constant.
     template<typename Formatter>
     class ConstantValueFlow : public AttributeFlow<
       InheritedAttribute,
@@ -494,6 +533,8 @@ namespace mirv {
       void visit(ptr<Symbol<Type<Tuple> > >::const_type sym);
     };
 
+    /// Invoke the EnterDeclSymbolVisitor upon entry to a symbol
+    /// declaration.
     template<typename Formatter>
     class EnterDeclSymbolAction : public VisitAction<EnterDeclSymbolVisitor<Formatter>> {
     public:
@@ -501,6 +542,8 @@ namespace mirv {
           : VisitAction<EnterDeclSymbolVisitor<Formatter>>(attributeManager) {}
     };
 
+    /// Perform preorder traversal actions upon entering symbol
+    /// definitions.
     template<typename Formatter>
     class EnterDefSymbolVisitor : public ConstSymbolVisitor {
     private:
@@ -516,6 +559,8 @@ namespace mirv {
       void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
     };
 
+    /// Invoke the EnterDefSymbolVisitor upon entry to a symbol
+    /// definition.
     template<typename Formatter>
     class EnterDefSymbolAction : public VisitAction<EnterDefSymbolVisitor<Formatter>> {
     public:
@@ -543,6 +588,7 @@ namespace mirv {
       void visit(ptr<Symbol<Type<Tuple> > >::const_type);
     };
 
+    /// Invoke the LeaveDeclSymbolVisitor upon exiting a Symbol.
     template<typename Formatter>
     class LeaveDeclSymbolAction : public VisitAction<LeaveDeclSymbolVisitor<Formatter>> {
     public:
@@ -567,6 +613,8 @@ namespace mirv {
       void visit(ptr<Symbol<Function> >::const_type sym);
     };
 
+    /// Invoke the LeaveDefSymbolVisitor upon leaving the definition
+    /// of a symbol.
     template<typename Formatter>
     class LeaveDefSymbolAction : public VisitAction<LeaveDefSymbolVisitor<Formatter>> {
     public:
@@ -601,6 +649,7 @@ namespace mirv {
       void visit(ptr<Statement<Allocate> >::const_type stmt);
     };
 
+    /// Invoke the EnterStatementVisitor upon entry to a statement.
     template<typename Formatter>
     class EnterStatementAction : public VisitAction<EnterStatementVisitor<Formatter>> {
     public:
@@ -623,6 +672,7 @@ namespace mirv {
       void visit(ptr<Statement<Return> >::const_type stmt);
     };
 
+    /// Invoke the LeaveStatementVisitor when exiting statements.
     template<typename Formatter>
     class LeaveStatementAction : public VisitAction<LeaveStatementVisitor<Formatter>> {
     public:
@@ -679,6 +729,7 @@ namespace mirv {
       void visit(ptr<Expression<Reference<Constant<std::string> > > >::const_type expr);
     };
 
+    /// Invoke the EnterExpressionVisitor upon entry to an expression.
     template<typename Formatter>
     class EnterExpressionAction : public VisitAction<EnterExpressionVisitor<Formatter>> {
     public:
@@ -700,6 +751,7 @@ namespace mirv {
       void visit(ptr<InnerExpression>::const_type expr);
     };
 
+    /// Invoke the LeaveExpressionVisitor upon leaving an expression.
     template<typename Formatter>
     class LeaveExpressionAction : public VisitAction<LeaveExpressionVisitor<Formatter>> {
     public:

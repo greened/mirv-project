@@ -10,6 +10,7 @@
 
 namespace mirv {
   namespace lib {
+    /// This is a generic visitor class.
     template<typename Visited, typename Result = void>
     class visitor {
     public:
@@ -22,11 +23,18 @@ namespace mirv {
     public:
       virtual ~acyclic_visitor_base(void) {};
     };
-    
+
     // Exceptions
+
+    /// This is a catch-all "something bad happened" visitor
+    /// exception.
     class bad_visitor {};
-    
+
+    /// This is a metafunction class to throw an exception on a
+    /// visitor error.
     struct visitor_abort_function {
+      /// This is a metafunction to throw an exception on a visitor
+      /// error.
       template<typename Result, typename Visited>
       struct apply {
 	struct type {
@@ -37,12 +45,12 @@ namespace mirv {
       };
     };
     
-    // All class heirarchies that are to be visited must derive from
-    // this.  Metafunction must be an mpl-style metafunction class with
-    // operator() implemented for a reference to acyclic_visitable_base
-    // or the type of the target being visited.  The type returned by
-    // mpl::apply<Metafunction, Result, Visited>> must be
-    // default-constructable.
+    /// All class heirarchies that are to be visited must derive from
+    /// this.  Metafunction must be an mpl-style metafunction class with
+    /// operator() implemented for a reference to acyclic_visitable_base
+    /// or the type of the target being visited.  The type returned by
+    /// mpl::apply<Metafunction, Result, Visited>> must be
+    /// default-constructable.
     template<
       typename Result = void,
       typename Metafunction = visitor_abort_function
@@ -69,7 +77,7 @@ namespace mirv {
       return(accept_impl(*this, visitor));			\
     }
     
-    // A cyclic visitor
+    /// This is a generic cyclic visitor.
     template<typename Result, typename Typesequence>
     class cyclic_visitor
       : public boost::mpl::inherit_linearly<Typesequence,

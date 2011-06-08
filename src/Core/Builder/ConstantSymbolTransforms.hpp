@@ -21,6 +21,8 @@ namespace mirv {
                                size_t bitsize);
       };
  
+      /// This is a functor to generate a floating point type of some
+      /// bitsize.
       struct FloatingTypeGen {
         typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
         typedef double value_type;
@@ -29,6 +31,8 @@ namespace mirv {
                                size_t bitsize);
       };
 
+      /// This is a grammar action to generate the type for a C-style
+      /// string.
       struct StringTypeGen {
         typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
 

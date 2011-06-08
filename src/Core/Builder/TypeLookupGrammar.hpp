@@ -23,6 +23,8 @@ namespace mirv {
       TypeLookupBuilder
       > {};
 
+    /// Translate a Function type string representation to the
+    /// corresponding Function type.
     struct FunctionTypeAccessBuilder : boost::proto::or_<
       boost::proto::when<
         StringTerminal,
