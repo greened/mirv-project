@@ -6,8 +6,11 @@
 namespace mirv {
   struct SymbolVisitor;
 
+  /// A symbol tag for specifying address constants.
   struct Address {};
 
+  /// This represents a constant that is the address of some object.
+  /// The object must be in a fixed memory location.
   template<>
   class Constant<Address> {
   private:

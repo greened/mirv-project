@@ -26,7 +26,7 @@ namespace mirv {
                              boost::shared_ptr<Statement<Base> > stmt);
     };
     
-    // Get a variable symbol given a statement.
+    /// Get a variable symbol given a statement.
     struct ExtractVariable : boost::proto::callable {
       typedef ptr<Symbol<Variable> >::type VariablePointer;
       typedef VariablePointer result_type;
@@ -35,8 +35,8 @@ namespace mirv {
                              ptr<Statement<Base> >::type stmt);
     };
 
-    // Bundle any pending statements created from child expressions
-    // with this statement.
+    /// Bundle any pending statements created from child expressions
+    /// with the statement just processed.
     struct ClearPendingStatements : boost::proto::callable {
       typedef ptr<Statement<Base> >::type StatementPointer;
       typedef StatementPointer result_type;
@@ -45,7 +45,10 @@ namespace mirv {
                              StatementPointer stmt);
     };
 
-    // Loops need to be handled specially.
+    /// This is a grammar action to output statements generated as a
+    /// side-effect of translating do-while condition expressions.
+    /// These statements need to be placed in the loop body
+    /// immediately before the condition.
     struct ClearPendingStatementsDoWhile : boost::proto::callable {
       typedef ptr<Statement<DoWhile> >::type StatementPointer;
       typedef StatementPointer result_type;
@@ -58,6 +61,9 @@ namespace mirv {
     // specializing on the grammar rule.
     struct WhileRule;
 
+    /// Group any statements from subexpresissions of the current
+    /// statement with the current statement.  This handles things
+    /// like function calls in the condition expression.
     struct ClearPendingStatementsWhileRule : boost::proto::callable {
       typedef ptr<Statement<IfThen> >::type StatementPointer;
       typedef StatementPointer result_type;
@@ -160,7 +166,7 @@ namespace mirv {
       }
     };
 
-    // Transform for an n-ary expression
+    /// This is a grammar action to construct an N-ary expression.
     template<typename NodeType, typename Dummy = boost::proto::callable>
     struct ConstructNary : boost::proto::callable {
       typedef typename ptr<NodeType>::type result_type;

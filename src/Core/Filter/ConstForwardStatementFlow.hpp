@@ -338,6 +338,8 @@ namespace mirv {
       typename ExprAction,
       typename AfterExprAction
       >
+    /// This is a metafunction to create a ConstForwardStatementFlow
+    /// with the given configuration.
     struct apply {
       typedef ConstForwardStatementFlow<
         EnterAction,

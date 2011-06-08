@@ -22,18 +22,22 @@ namespace mirv {
   template<typename Tag> class Symbol;
   
   namespace detail {
-    template<typename Tag>
+    /// Define the vitiation base type for a symbol.
+    template<typename Tag
     struct VisitorBase<Symbol<Tag> > {
       typedef typename Tag::VisitorBaseType VisitorBaseType;
     };
+    /// Define the base type of a general Symbol.
     template<typename Tag>
     struct BaseTypeOf<Symbol<Tag> > {
       typedef typename Tag::BaseType BaseType;
     };
+    /// Define the visitation base type for base symbols.
     template<>
     struct VisitorBase<Symbol<Base> > {
       typedef Node<Base> VisitorBaseType;
     };
+    /// Define the base type of base symbols.
     template<>
     struct BaseTypeOf<Symbol<Base> > {
       typedef Node<Base> BaseType;
@@ -108,12 +112,14 @@ namespace mirv {
      }
   };
 
+  /// Specialize Visitable for base Symbols.
   template<>
   class Visitable<Symbol<Base>, SymbolVisitor> : public Node<Base> {
   public:
     virtual void accept(SymbolVisitor &V);
   };
 
+  /// Specialize ConstVisitable for base Symbols.
   template<>
   class ConstVisitable<
     Symbol<Base>,
@@ -152,6 +158,7 @@ namespace mirv {
     }
   };
 
+  /// This is a function class to look up a Symbol by name.
   template<typename TypeTag>
   class SymbolByName<Type<TypeTag> > :
       public std::binary_function<boost::shared_ptr<const Symbol<Type<TypeTag> > >,
@@ -210,6 +217,7 @@ namespace mirv {
     typedef Symbol<Base> VisitorBaseType;
   };
 
+  /// Define the base class for symbols with children.
   class InnerSymbolBase : public Symbol<Inner<detail::InnerSymbolTraits> > {};
 
   /// This is the implementation of inner symbols.  It is

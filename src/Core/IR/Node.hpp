@@ -62,6 +62,7 @@ namespace mirv {
   template<typename Traits>
   class Inner {
   public:
+    /// Define a base interface for nodes with children.
     class Interface : public Traits::BaseType {
     public:
       Interface(void) {}

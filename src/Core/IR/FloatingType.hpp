@@ -11,6 +11,7 @@ namespace mirv {
    struct Floating {
     typedef Symbol<Type<Simple> > InterfaceBaseType;
 
+     /// Define the interface for floating point type symbols.
      class Interface : public InterfaceBaseType,
                        public boost::enable_shared_from_this<Symbol<Type<Floating> > > {
      public:

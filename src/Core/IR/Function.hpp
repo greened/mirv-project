@@ -25,6 +25,7 @@ namespace mirv {
        > VariableBaseType;
 
    public:
+     /// Define the interface for function symbols.
      class Interface : public GlobalBaseType,
 		       public VariableBaseType,
 		       public StatementBaseType,

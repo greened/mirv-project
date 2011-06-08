@@ -23,7 +23,8 @@ namespace mirv {
   namespace Builder {
     namespace detail {
       /// This is a helper class so we don't do illegal fusion
-      /// operations when we don't have a vararg specifier.
+      /// operations when we don't have a vararg specifier.  It
+      /// handles the case where we do not have a vararg specifier.
       template<bool Vararg>
       struct Helper {
         typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
@@ -39,6 +40,9 @@ namespace mirv {
         }
       };
 
+      /// This is a helper class so we don't do illegal fusion
+      /// operations when we don't have a vararg specifier.  It
+      /// handles the case where we do have a vararg specifier.
       template<>
       struct Helper<true> {
         typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
@@ -113,6 +117,8 @@ namespace mirv {
     //     >
     //   > {};
 
+    /// Given a function type specification, return its corresponding
+    /// Symbol.
     struct FunctionTypeBuilder : boost::proto::when<
       FunctionTypeRule,
       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(

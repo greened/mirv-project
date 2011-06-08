@@ -7,6 +7,8 @@
 
 namespace mirv {
   namespace Builder {
+    /// This is the grammar to construct do-while IR statements from a
+    /// while statement.
     struct WhileBuilder : boost::proto::when<
       WhileRule,
       // Since there is not while statement, indicate a while by

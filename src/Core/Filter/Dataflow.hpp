@@ -4,6 +4,8 @@
 namespace mirv {
   /// This is a dataflow class that carries no information.
   struct NullDataflow {
+    /// Define the confluence operation of empty dataflow to do
+    /// nothing.
     struct Confluence {
       void operator()(NullDataflow &,
 		      const NullDataflow &,

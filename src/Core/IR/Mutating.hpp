@@ -21,6 +21,8 @@ namespace mirv {
     typedef boost::mpl::vector<> Properties;
     typedef Statement<Controlled> VisitorBaseType;
 
+    /// Define the interface for statesments with two child
+    /// expressions.
     class Interface : public InterfaceBaseType {
     public:
       template<typename E1, typename E2>
@@ -144,6 +146,7 @@ namespace mirv {
   /// Specify the interface for function call statements.
   class Call {
   public:
+    /// Define the interface for Call statements.
     class Interface  : public Statement<Controlled>,
 		       public LeafStatement,
                        public boost::enable_shared_from_this<Statement<Call> > {

@@ -16,6 +16,7 @@ namespace mirv {
   /// from the type tags and specific type interfaces.
   template<typename ValueType> class Constant;
 
+  /// Define the base class for all constants.
   template<>
   class Constant<Base> {
   public:
@@ -32,8 +33,10 @@ namespace mirv {
 
   public:
     typedef Interface BaseType;
-  };    
+  };
 
+  /// This is the generic constant tag.  Given a ValueType, it
+  /// represents a constant value of that type.
   template<typename ValueType>
   class Constant {
   private:

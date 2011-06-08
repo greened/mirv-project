@@ -186,6 +186,9 @@ namespace mirv {
          typename AfterAction,
          typename BetweenAction
          >
+       /// This is a metafunction to create a
+       /// ConstForwardExpressionFlow type with the given
+       /// configuration.
        struct apply {
          typedef ConstForwardExpressionFlow<
            EnterAction,

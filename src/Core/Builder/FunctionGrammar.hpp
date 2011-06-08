@@ -52,22 +52,28 @@ namespace mirv {
       }
     };
 
+    /// Given a statement, add it to the function.
     struct FunctionStatementBuilder : boost::proto::when<
       ConstructStatementGrammar,
       AddFunctionStatement(boost::proto::_data,
                            ConstructStatementGrammar(boost::proto::_))
       > {};
 
+    /// Given a variable declaration add it to the function, creating
+    /// a block statement if it does not already exist to hold its
+    /// allocation statement.
     struct FunctionVariableBuilder : boost::proto::when<
       VariableRule,
       AddFunctionBodyForVariable(boost::proto::_data,
                                  VariableBuilder)
       > {};
 
-    struct VariableCallOrStatementBuilder : boost::proto::or_<
-      FunctionVariableBuilder,
-      FunctionStatementBuilder
-      > {};
+  /// This is the grammar to build a variable, call or general
+  /// statement.
+  struct VariableCallOrStatementBuilder : boost::proto::or_<
+    FunctionVariableBuilder,
+    FunctionStatementBuilder
+    > {};
 
     /// This is the grammar for function bodies.  It can contain
     /// variable declarations and statements.  We add variables and

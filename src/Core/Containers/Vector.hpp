@@ -4,6 +4,8 @@
 #include <vector>
 
 namespace mirv {
+  /// This is a metafunction to compute a general vector type suitable
+  /// for use in many situations.
   template<typename Item>
   struct Vector {
     typedef std::vector<Item> type;

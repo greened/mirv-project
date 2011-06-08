@@ -340,6 +340,8 @@ namespace mirv {
       typename ExprAction,
       typename AfterExprAction
       >
+    /// This is a metafunction to generate a ForwardFlow type with the
+    /// given configutation.
     struct apply {
       typedef ForwardFlow<
         EnterAction,
