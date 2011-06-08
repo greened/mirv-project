@@ -221,7 +221,6 @@ namespace mirv {
 
     checkInvariant(TheModule, "No module for global variable");
     const llvm::Type *llvmType = getType(type);
-    const llvm::Type *pointerType = llvm::PointerType::getUnqual(llvmType);
 
     if (const llvm::ArrayType *arrayType =
         llvm::dyn_cast<llvm::ArrayType>(llvmType)) {
@@ -260,7 +259,7 @@ namespace mirv {
       }
     }
 
-    llvm::Value *var = TheModule->getOrInsertGlobal(name, pointerType);
+    llvm::Value *var = TheModule->getOrInsertGlobal(name, llvmType);
     VariableMap::iterator pos;
     bool inserted;
     std::tie(pos, inserted) = ModuleMap->insert(std::make_pair(name, var));

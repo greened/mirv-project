@@ -86,6 +86,8 @@ int main(void)
         ]
       ));
 
+  print(std::cout, code);
+  
   mirv::compileAndRun(code, "testfunc");
 
   return(0);
