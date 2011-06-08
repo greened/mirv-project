@@ -13,7 +13,8 @@ $(call debug,[doc] SRCS = $(doc_SRCS))
 
 $(call make_doxyconfig,mirv,$(doc_SRCDIR),$(doc_SRCS))
 
-TARGETS += $(mirv_DOXY_STAMPS)
+# Disable this for now due to doxygen bugs processing C++.
+#TARGETS += $(mirv_DOXY_STAMPS)
 
 $(call debug,[doc] TARGETS = $(TARGETS))
 
