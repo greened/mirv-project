@@ -23,7 +23,7 @@ namespace mirv {
   
   namespace detail {
     /// Define the vitiation base type for a symbol.
-    template<typename Tag
+    template<typename Tag>
     struct VisitorBase<Symbol<Tag> > {
       typedef typename Tag::VisitorBaseType VisitorBaseType;
     };
