@@ -1,5 +1,8 @@
 // Test building of variables.
 //
+// STDOUT: Hello, World!
+//
+
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
@@ -21,6 +24,8 @@
 #include <mirv/Core/Builder/Domain.hpp>
 #include <mirv/Filter/Snapshot/Codegen/LLVM/LLVM.hpp>
 #include <mirv/Filter/Snapshot/Codegen/LLVM/JIT/JIT.hpp>
+
+#include <boost/tuple/tuple.hpp>
 
 #include <functional>
 #include <iostream>
@@ -65,14 +70,13 @@ int main(void)
         ]
       ));
 
-  print(std::cout, code);
-
   mirv::LLVMCodegenFilter codegen;
   codegen(code);
-  codegen.getModule()->dump();
 
-  std::function<void(void)>
-    testfunc(reinterpret_cast<void (*)(void)>(mirv::compile(code, "testfunc")));
+  std::function<void(void)> testfunc;
+  mirv::JITContextHandle JITContext;
+  boost::tie(testfunc, JITContext) = mirv::compile<void(void)>(code, "testfunc");
+
   testfunc();
 
   return(0);

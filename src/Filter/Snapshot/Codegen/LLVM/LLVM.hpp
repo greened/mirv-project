@@ -40,6 +40,7 @@ namespace mirv {
       llvm::Value *TheValue;
       bool ReturnValue;
       bool GenerateAddress;
+      bool NeedsDereference;
 
       typedef Map<std::string, llvm::Value *>::type VariableMap;
       ptr<VariableMap>::type ModuleMap;
@@ -80,6 +81,7 @@ namespace mirv {
               TheValue(0),
               ReturnValue(false),
               GenerateAddress(false),
+              NeedsDereference(false),
               ModuleMap(new VariableMap),
               FunctionMap(new VariableMap) {}
 
@@ -92,6 +94,7 @@ namespace mirv {
               TheValue(other.TheValue),
               ReturnValue(other.ReturnValue),
               GenerateAddress(address),
+              NeedsDereference(other.NeedsDereference),
               ModuleMap(other.ModuleMap),
               FunctionMap(other.FunctionMap) {}
 
@@ -104,6 +107,7 @@ namespace mirv {
               TheValue(other.TheValue),
               ReturnValue(other.ReturnValue),
               GenerateAddress(false),
+              NeedsDereference(other.NeedsDereference),
               ModuleMap(other.ModuleMap),
               FunctionMap(other.FunctionMap) {}
 
@@ -143,6 +147,14 @@ namespace mirv {
 
       bool generateAddress(void) const {
         return GenerateAddress;
+      }
+
+      void setNeedsDereference(bool value) {
+        NeedsDereference = value;
+      }
+
+      bool needsDereference(void) const {
+        return NeedsDereference;
       }
 
       void createModule(const std::string &name) {
