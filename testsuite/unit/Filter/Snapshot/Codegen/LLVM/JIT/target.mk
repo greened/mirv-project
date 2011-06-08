@@ -13,7 +13,8 @@ libmirvfilter_codegen_llvm_jit_test_LIBS = $(filter %.a,$(libmirvfilter_codegen_
 libmirvfilter_codegen_llvm_jit_test_INCLUDES = $(FINAL_BUILDDIR)/include
 
 # FIXME: Do not hardcode path to LLVM libraries.
-libmirvfilter_codegen_llvmjit_LIBS = $(shell llvm-config-2.8 --libs engine)
+#libmirvfilter_codegen_llvmjit_LIBS = $(shell $(LLVM_PATH)/bin/llvm-config-2.8 --libs engine)
+libmirvfilter_codegen_llvmjit_LIBS = $(shell $(LLVM_PATH)/bin/llvm-config --libs engine)
 libmirvfilter_codegen_llvmjit_test_LIBDIRS = $(libmirvfilter_codegen_llvm_test_LIBDIRS) $(FINAL_BUILDDIR)/src/Filter/Snapshot/Codegen/LLVM/JIT
 libmirvfilter_codegen_llvmjit_test_LINK_FLAGS = $(addprefix -L,$(libmirvfilter_codegen_llvmjit_test_LIBDIRS)) $(addprefix -Xlinker -rpath -Xlinker ,$(libmirvfilter_codegen_llvmjit_test_LIBDIRS))
 

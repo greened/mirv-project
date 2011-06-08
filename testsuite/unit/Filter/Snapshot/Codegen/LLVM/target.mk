@@ -14,7 +14,8 @@ libmirvfilter_codegen_llvm_test_LIBDIRS = $(FINAL_BUILDDIR)/src/Core $(FINAL_BUI
 libmirvfilter_codegen_llvm_test_LINK_FLAGS = $(addprefix,-L,$(libmirvfilter_codegen_llvm_test_LIBDIRS)) $(addprefix,-Xlinker -rpath -Xlinker ,$(libmirvfilter_codegen_llvm_test_LIBDIRS))
 
 # FIXME: Do not hardcode path to LLVM libraries.
-libmirvfilter_codegen_llvm_LIBS = $(shell llvm-config-2.8 --libs core)
+#libmirvfilter_codegen_llvm_LIBS = $(shell $(LLVM_PATH)/bin/llvm-config-2.8 --libs core)
+libmirvfilter_codegen_llvm_LIBS = $(shell $(LLVM_PATH)/bin/llvm-config --libs core)
 
 $(call make_unittest,libmirvfilter_codegen_llvm_test,$(libmirvfilter_codegen_llvm_test_SRCDIR),$(libmirvfilter_codegen_llvm_test_LIBS),$(libmirvfilter_codegen_llvm_test_INCLUDES),,,, $(libmirvfilter_codegen_llvm_test_LINK_FLAGS) $(libmirvfilter_codegen_llvm_LIBS) $(LLVM_LINK_FLAGS),$(libmirvfilter_codegen_llvm_test_LIBS) $(libmirvfilter_codegen_llvm_test_INCLUDES))
 

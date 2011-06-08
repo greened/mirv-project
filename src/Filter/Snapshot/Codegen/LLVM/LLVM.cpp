@@ -232,8 +232,23 @@ namespace mirv {
           dyn_cast<const Symbol<Constant<std::string> > >(
             sym->initializer()->getSymbol());
         if (str) {
-          llvm::Value *pointer =
-            inh.builder()->CreateGlobalString(str->value().c_str(), name);
+          // This doesn't work because llvm's IRBuilder nonsensically
+          // requires a basic block to exist here.  The code below
+          // does the equivalent.
+
+          // llvm::Value *pointer =
+          //   inh.builder()->CreateGlobalString(str->value().c_str(), name);
+
+          llvm::Constant *StrConstant =
+            llvm::ConstantArray::get(inh.builder()->getContext(),
+                                     str->value().c_str(), true);
+          llvm::Module &M = *inh.getModule();
+          llvm::GlobalVariable *GV =
+            new llvm::GlobalVariable(M, StrConstant->getType(),
+                                     true, llvm::GlobalValue::InternalLinkage,
+                                     StrConstant, "", 0, false);
+          GV->setName(name);
+          llvm::Value *pointer = GV;
 
           VariableMap::iterator pos;
           bool inserted;
