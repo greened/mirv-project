@@ -21,8 +21,21 @@ int main(void)
 endef
 
 override LLVM_LIBRARY = libLLVMCore.a libLLVMSupport.a libLLVMSystem.a libpthread.a
-override LLVM_LINK_FLAGS = -L/usr/lib/llvm-2.8/lib -rdynamic -Xlinker -rpath -Xlinker /usr/lib/llvm-2.8/lib -lpthread -ldl -lm
-override LLVM_COMPILE_FLAGS = -I/usr/lib/llvm-2.8/include -fpermissive -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+
+ifndef LLVM_PATH
+LLVM_PATH=/usr/lib/llvm-2.8
+endif
+
+ifndef LLVM_LIBRARY_PATH
+LLVM_LIBRARY_PATH = $(LLVM_PATH)/lib
+endif
+
+ifndef LLVM_INCLUDE_PATH
+LLVM_INCLUDE_PATH = $(LLVM_PATH)/include
+endif
+
+override LLVM_LINK_FLAGS = -L$(LLVM_LIBRARY_PATH) -rdynamic -Xlinker -rpath -Xlinker $(LLVM_LIBRARY_PATH) -lpthread -ldl -lm
+override LLVM_COMPILE_FLAGS = -I$(LLVM_INCLUDE_PATH) -fpermissive -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 override LLVM_COMPILE_ERROR = $(call mc_error,Cannot find LLVM libraries)
 override LLVM_LINK_ERROR = $(call mc_error,Cannot link to LLVM libraries)
 override LLVM_COMPILE_TRUE = $(call mc_define_append_nomsg,CONFIG_LLVM_COMPILE,yes,$@); $(call mc_info_append,C++ compiler can find LLVM headers,$@)
