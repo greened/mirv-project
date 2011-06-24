@@ -424,7 +424,7 @@ namespace mirv {
   LeaveSymbolVisitor::visit(ptr<Symbol<Variable> >::const_type sym)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-    syn.createVariable(sym->name(), sym->type());
+    //syn.createVariable(sym->name(), sym->type());
     attributeManager.setSynthesizedAttribute(syn);
   }
 
@@ -525,6 +525,20 @@ namespace mirv {
     llvm::Value *inst = syn.builder()->CreateStore(rhs, lhs);
     syn.setValue(inst);
     attributeManager.setSynthesizedAttribute(syn);
+  }
+
+  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<Statement<Allocate> >::const_type stmt)
+  {
+    // LHS must be a vref.
+    ptr<Symbol<Variable> >::const_type variable =
+      safe_cast<const Expression<Reference<Variable> > >(stmt->getLeftExpression())->
+      getSymbol();
+  
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    inh.createVariable(variable->name(),
+                       safe_cast<const Symbol<Type<Pointer> > >(variable->type())->
+                       getBaseType());
+    attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Call> >::const_type stmt)
