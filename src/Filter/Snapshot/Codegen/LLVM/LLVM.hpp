@@ -319,6 +319,7 @@ namespace mirv {
       void visit(ptr<Statement<After> >::const_type stmt);
       void visit(ptr<Statement<Goto> >::const_type stmt);
       void visit(ptr<Statement<Assignment> >::const_type stmt);
+      void visit(ptr<Statement<Allocate> >::const_type stmt);
     };
 
     /// Invoke the EnterStatementVisitor upon entry to a statement.
