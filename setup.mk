@@ -1,8 +1,8 @@
 BUILDDIR := /home/$(USER)/mirv/obj
 FLAVORS := debug opt
 
-CC  := gcc-4.5
-CXX := g++-4.5
+CC  := gcc-4.6
+CXX := g++-4.6
 
 IFLAGS = -I$(SRCDIR)/src/Library -I$(FINAL_BUILDDIR)/include
 DFLAGS = -DBOOST_MPL_LIMIT_VECTOR_SIZE=50 -DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
