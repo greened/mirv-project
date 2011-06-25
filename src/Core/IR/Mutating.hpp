@@ -3,6 +3,7 @@
 
 #include <mirv/Core/IR/Statement.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
+#include <mirv/Core/IR/VariableFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
@@ -75,6 +76,89 @@ namespace mirv {
         return(expressionBack());
       }
     };
+  };
+
+  /// Specify the interface to phi statements.  Phis are statements
+  /// only, not expressions.  This is to cleanly separate changes in
+  /// program state from general computation.  Expression trees imply
+  /// assignmnets to temporary variables at some level of translate,
+  /// but we are not concerned about those.
+  class Phi {
+  private:
+    class Interface : public Statement<Controlled>,
+                      public LeafStatement,
+                      public boost::enable_shared_from_this<Statement<Phi> > {
+    private:
+      ptr<Symbol<Variable> >::type theTarget;
+
+      Statement<Base> *cloneImpl(void);
+
+    protected:
+      void setParents(void);
+
+    public:
+      typedef ExpressionIterator iterator;
+      typedef ConstExpressionIterator const_iterator;
+      typedef ReverseExpressionIterator reverse_iterator;
+      typedef ConstReverseExpressionIterator const_reverse_iterator;
+
+      Interface(ptr<Symbol<Variable> >::type target) :
+          Statement<Controlled>(), LeafStatement(), theTarget(target) {}
+
+      template<typename ...E>
+      Interface(ptr<Symbol<Variable> >::type target,
+                E ...exprs) :
+          Statement<Controlled>(exprs...), LeafStatement(), theTarget(target) {}
+
+      typedef ptr<Symbol<Variable> >::type TargetPtr;
+      typedef ptr<Symbol<Variable> >::const_type ConstTargetPtr;
+
+      typedef ExpressionPtr ChildPtr;
+      typedef ConstExpressionPtr ConstChildPtr;
+
+      ptr<Node<Base> >::type getSharedHandle(void) {
+        return fast_cast<Node<Base> >(shared_from_this());
+      }
+      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base> >(shared_from_this());
+      }
+
+      TargetPtr target(void) {
+        return theTarget;
+      }
+      ConstTargetPtr target(void) const {
+        return theTarget;
+      }
+
+      iterator begin(void) {
+        return expressionBegin();
+      }
+      const_iterator begin(void) const {
+        return expressionBegin();
+      }
+      reverse_iterator rbegin(void) {
+        return expressionRBegin();
+      }
+      const_reverse_iterator rbegin(void) const {
+        return expressionRBegin();
+      }
+
+      iterator end(void) {
+        return expressionEnd();
+      }
+      const_iterator end(void) const {
+        return expressionEnd();
+      }
+      reverse_iterator rend(void) {
+        return expressionREnd();
+      }
+      const_reverse_iterator rend(void) const {
+        return expressionREnd();
+      }
+    };
+  public:
+    typedef StatementBaseGenerator<Interface, Phi, Mutating>::type BaseType;
+    typedef Statement<Controlled> VisitorBaseType;
   };
 
   /// Specify the interface to assignment statements.  Assignments are
