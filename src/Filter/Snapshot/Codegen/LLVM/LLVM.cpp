@@ -501,6 +501,32 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Phi> >::const_type stmt)
+  {
+    // TODO: Handle return assignment.
+
+    // LLVM expects a random-access iterator which these are not due
+    // to the filter_iterator component.  So copy values to a
+    // temporary vector.
+    std::vector<llvm::Value *>
+      sources(boost::make_transform_iterator(
+                attributeManager.begin(),
+                boost::mem_fn(&SynthesizedAttribute::getValue)),
+              boost::make_transform_iterator(
+                attributeManager.end(),
+                boost::mem_fn(&SynthesizedAttribute::getValue)));
+
+    llvm::Value *phi = attributeManager.getInheritedAttribute().builder()->
+      CreatePHI(attributeManager.begin()->getValue()->getType(), "phi");
+    
+    // TODO: Add incoming values.
+
+    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+    syn.setValue(phi);
+
+    attributeManager.setSynthesizedAttribute(syn);
+  }
+
   void LLVMCodegenFilter::
   EnterStatementVisitor::visit(ptr<Statement<Assignment> >::const_type stmt)
   {
@@ -510,7 +536,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Assignment> >::const_type stmt)
-  {
+   {
     // TODO: Handle return assignment.
 
     // See LLVMCodeGenFlow::visit(...<Assignment>...) to see how we
@@ -571,6 +597,7 @@ namespace mirv {
 
     attributeManager.setSynthesizedAttribute(syn);
   }
+
 
   void LLVMCodegenFilter::
   LeaveStatementVisitor::visit(ptr<Statement<IfThen> >::const_type stmt)

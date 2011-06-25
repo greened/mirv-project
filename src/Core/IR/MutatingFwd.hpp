@@ -3,6 +3,7 @@
 
 namespace mirv {
   class DualExpression;
+  class Phi;
   class Assignment;
   class Call;
   class Allocate;
