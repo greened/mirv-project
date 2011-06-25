@@ -341,6 +341,7 @@ namespace mirv {
       void visit(ptr<Statement<After> >::const_type stmt);
       void visit(ptr<Statement<Goto> >::const_type stmt);
       void visit(ptr<Statement<Return> >::const_type stmt);
+      void visit(ptr<Statement<Phi> >::const_type stmt);
       void visit(ptr<Statement<Assignment> >::const_type stmt);
       void visit(ptr<Statement<Call> >::const_type stmt);
       void visit(ptr<Statement<IfElse> >::const_type stmt);

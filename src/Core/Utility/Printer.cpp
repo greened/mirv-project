@@ -644,6 +644,7 @@ namespace mirv {
       void visit(ptr<Statement<After> >::const_type stmt);
       void visit(ptr<Statement<Goto> >::const_type stmt);
       void visit(ptr<Statement<Return> >::const_type stmt);
+      void visit(ptr<Statement<Phi> >::const_type stmt);
       void visit(ptr<Statement<Assignment> >::const_type stmt);
       void visit(ptr<Statement<Call> >::const_type stmt);
       void visit(ptr<Statement<Allocate> >::const_type stmt);
@@ -1464,6 +1465,20 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind) << "return" << Newline<Formatter>();
+    }
+
+    template<typename Formatter>
+    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Phi> >::const_type stmt)
+    {
+      Stream &out = attributeManager.getInheritedAttribute().out();
+      int ind = attributeManager.getInheritedAttribute().indent();
+
+      out << Indent<Formatter>(ind) << "phi" << Newline<Formatter>();
+      out << Indent<Formatter>(ind + Formatter::indentFactor())
+          << stmt->target()->name() << Newline<Formatter>();
+
+      attributeManager.setInheritedAttribute(
+        InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
 
     template<typename Formatter>
