@@ -16,6 +16,8 @@
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/transform.hpp>
 
+#include <initializer_list>
+
 namespace mirv {
   namespace detail {
     /// Provide an ordering for properties.  This ensures that class
@@ -282,15 +284,8 @@ namespace mirv {
       ExpressionList expressions;
 
     protected:
-      template<typename A1>
-      Interface(A1 a1) {
-        expressions.push_back(a1);
-      }
-      template<typename A1, typename A2>
-      Interface(A1 a1, A2 a2) {
-        expressions.push_back(a1);
-        expressions.push_back(a2);
-      }
+      template<typename ...A1>
+      Interface(A1... args) : expressions{args...} {}
 
     public:
       typedef ExpressionList::iterator ExpressionIterator;

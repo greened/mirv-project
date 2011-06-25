@@ -2,6 +2,27 @@
 #include <mirv/Core/IR/Mutating.hpp>
 
 namespace mirv {
+  Statement<Base> *Phi::Interface::cloneImpl(void) 
+  {
+    ptr<Statement<Phi> >::type stmt(Statement<Phi>::make(this->target()));
+    Statement<Phi>::iterator i = this->begin();
+    while (++i != this->end()) {
+      stmt->expressionPushBack((*i)->clone());
+    }
+    Statement<Phi> *result = stmt.get();
+    stmt.reset();
+    return result;
+  }
+
+  void Phi::Interface::setParents(void)
+  {
+    for (ExpressionIterator i = expressionBegin();
+         i != expressionEnd();
+         ++i) {
+      (*i)->setParent(getSharedHandle());
+    }
+  }
+
   Statement<Base> *Assignment::Interface::cloneImpl(void) 
   {
     ptr<Statement<Assignment> >::type stmt(Statement<Assignment>::make(

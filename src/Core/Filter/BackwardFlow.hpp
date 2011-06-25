@@ -267,6 +267,21 @@ namespace mirv {
          leave(stmt);
       }
 
+     /// Visit Phi statements.
+      void visit(ptr<Statement<Phi> >::type stmt) {
+         this->doEnter(stmt);
+
+         for (auto i = stmt->expressionRBegin();
+              i != stmt->expressionREnd();
+              ++i) {
+           this->doBeforeExpression(stmt, i);
+           this->doExpression(stmt, i);
+           this->afterExpression(stmt, i);
+         }
+
+         this->doLeave(stmt);
+      }
+
      /// Visit Assignment statements, visiting the left-hand side,
      /// then the right-hand side.
       void visit(ptr<Statement<Assignment> >::type stmt) {
