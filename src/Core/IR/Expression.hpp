@@ -292,6 +292,7 @@ namespace mirv {
         else {
           *begin() = c;
         }
+        validate();
       };
 
       /// Get the child expression.
@@ -319,6 +320,8 @@ namespace mirv {
 
     /// The interface and implementation for binary expressions.
     class Interface : public InterfaceBaseType {
+    private:
+      void doValidation(void) const;
     public:
       enum {
         NumInitializers = 2
@@ -326,8 +329,7 @@ namespace mirv {
 
       Interface(ChildPtr Child1,
                 ChildPtr Child2) : InterfaceBaseType(Child1, Child2) {
-        checkInvariant(Child1->type() == Child2->type(),
-                       "Expression type mismatch");
+        validate();
       }
 
       // Interface(ConstChildPtr Child1,
@@ -338,14 +340,13 @@ namespace mirv {
 
       /// Set the left child expression.
       void setLeftOperand(ChildPtr c) {
-        checkInvariant(c->type() == getLeftOperand()->type(),
-                       "Expression type mismatch");
         if (empty()) {
           push_back(c);
         }
         else {
           *begin() = c;
         }
+        validate();
       }
 
       /// Set the right child expression.
@@ -357,6 +358,7 @@ namespace mirv {
         else {
           *--end() = c;
         }
+        validate();
       }
 
       /// Get the left child expression.
