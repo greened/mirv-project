@@ -31,6 +31,9 @@ namespace mirv {
      // will ever live.
      mutable ptr<Node<Base>>::weak_type theParent;
 
+     // Do internal consistency checks.
+     virtual void doValidation(void) const;
+
    public:
      virtual ~Node<Base>(void);
 
@@ -52,6 +55,10 @@ namespace mirv {
 
      void setParent(ptr<Node<Base>>::weak_type parent) const {
        theParent = parent;
+     }
+     
+     void validate(void) const {
+       doValidation();
      }
    };
    

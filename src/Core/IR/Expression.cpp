@@ -6,18 +6,29 @@
 #include <mirv/Core/IR/Bitwise.hpp>
 #include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/IR/Relational.hpp>
-#include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-
 #include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Visitable.ipp>
+#include <mirv/Core/Utility/Cast.hpp>
+#include <mirv/Core/Utility/Printer.hpp>
 
 namespace mirv {
+  void Binary::Interface::doValidation(void) const {
+    if (size() > 1 && *begin()) {
+      if (getLeftOperand()->type() != getRightOperand()->type()) {
+        std::cerr << "Offending expression:\n";
+        print(std::cerr, this->getSharedHandle());
+      }
+      checkInvariant(getLeftOperand()->type() == getRightOperand()->type(),
+                     "Expression type mismatch");
+    }
+  }
+
   void
   Visitable<
     Expression<Base>,
