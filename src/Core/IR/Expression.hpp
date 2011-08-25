@@ -94,6 +94,7 @@ namespace mirv {
     make(A1 a1) {
       typename ptr<Expression<Op> >::type result(new Expression<Op>(a1));
       result->setParents();
+      result->validate();
       return result;
     }
 
@@ -102,6 +103,7 @@ namespace mirv {
     make(A1 a1, A2 a2) {
       typename ptr<Expression<Op> >::type result(new Expression<Op>(a1, a2));
       result->setParents();
+      result->validate();
       return result;
     } 
 
@@ -111,6 +113,7 @@ namespace mirv {
       typename ptr<Expression<Op> >::type
         result(new Expression<Op>(a1, a2, a3));
       result->setParents();
+      result->validate();
       return result;
     } 
   };
@@ -328,15 +331,7 @@ namespace mirv {
       };
 
       Interface(ChildPtr Child1,
-                ChildPtr Child2) : InterfaceBaseType(Child1, Child2) {
-        validate();
-      }
-
-      // Interface(ConstChildPtr Child1,
-      //           ConstChildPtr Child2) : InterfaceBaseType(Child1, Child2) {
-      //   checkInvariant(Child1->type() == Child2->type(),
-      //                  "Expression type mismatch");
-      // }
+                ChildPtr Child2) : InterfaceBaseType(Child1, Child2) {}
 
       /// Set the left child expression.
       void setLeftOperand(ChildPtr c) {
