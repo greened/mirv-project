@@ -11,6 +11,7 @@ namespace mirv {
     typedef std::ostream Stream;
   }
   void print(Printer::Stream &out, ptr<Node<Base> >::const_type node);
+  void printWithTypes(Printer::Stream &out, ptr<Node<Base> >::const_type node);
 }
 
 #endif

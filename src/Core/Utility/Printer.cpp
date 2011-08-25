@@ -21,6 +21,14 @@ namespace mirv {
       /// IR.
       class DefaultFormatter {
       public:
+        /// Do something after printing an expression operator.
+        class Operator {
+        public:
+          Operator(typename ptr<Expression<Base> >::const_type expr) {}
+          Stream &operator()(Stream &out) const { return out; }
+        };
+
+        /// Terminate the line.
         class Newline {
         public:
           Stream &operator()(Stream &out) const {
@@ -67,6 +75,13 @@ namespace mirv {
       /// type names and constant initializers.
       class CompactFormatter {
       public:
+        /// Do something after printing an expression operator.
+        class Operator {
+        public:
+          Operator(typename ptr<Expression<Base> >::const_type expr) {}
+          Stream &operator()(Stream &out) const { return out; }
+        };
+
         /// This is a function class to output a newline.  For the
         /// compact formatter, do nothing.  This causes all output to
         /// be on a single line.
@@ -112,6 +127,15 @@ namespace mirv {
       };
     }
 
+    /// This is a functor to annotate operators.  Delegate to the
+    /// operator functor of the particular formatter in use.
+    template<typename Formatter>
+    class Operator : public Formatter::Operator {
+    public:
+      Operator(typename ptr<Expression<Base> >::const_type expr) 
+          : Formatter::Operator(expr) {}
+    };
+
     /// This is a functor to output newlines.  Delegate to the newline
     /// functor of the particular formatter in use.
     template<typename Formatter>
@@ -129,6 +153,14 @@ namespace mirv {
     public:
       Indent(int ind) : Formatter::Indent(ind) {}
     };
+
+    template<typename Formatter>
+    inline Stream &
+    operator<<(Stream &out,
+               const Operator<Formatter> &formatter) 
+    {
+      return formatter(out);
+    }
 
     template<typename Formatter>
     inline Stream &
@@ -402,7 +434,7 @@ namespace mirv {
       TypeNameFlow(std::ostream &out)
           : BaseType(TypeNameInheritedAttribute(out, typeStack)) {}
     };
- 
+
     /// Define the inherited attibute.
     class InheritedAttribute {
     private:
@@ -645,7 +677,7 @@ namespace mirv {
       void visit(ptr<Statement<Goto> >::const_type stmt);
       void visit(ptr<Statement<Return> >::const_type stmt);
       void visit(ptr<Statement<Phi> >::const_type stmt);
-      void visit(ptr<Statement<Assignment> >::const_type stmt);
+      void visit(ptr<Statement<Store> >::const_type stmt);
       void visit(ptr<Statement<Call> >::const_type stmt);
       void visit(ptr<Statement<Allocate> >::const_type stmt);
     };
@@ -715,7 +747,7 @@ namespace mirv {
       void visit(ptr<Expression<TuplePointer> >::const_type expr);
       void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
       void visit(ptr<Expression<Reference<Function> > >::const_type expr);
-      void visit(ptr<Expression<Reference<Tuple> > >::const_type expr);
+      void visit(ptr<Expression<Load> >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::const_type expr);
@@ -837,7 +869,7 @@ namespace mirv {
 
       // We need to reverse the order in which we visit the
       // assignment operands.
-      void visit(ptr<Statement<Assignment> >::const_type stmt) {
+      void visit(ptr<Statement<Store> >::const_type stmt) {
         this->doEnter(stmt);
 
         for (auto i = stmt->expressionBegin();
@@ -1482,12 +1514,12 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Assignment> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Store> >::const_type stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
 
-      out << Indent<Formatter>(ind) << "assign" << Newline<Formatter>();
+      out << Indent<Formatter>(ind) << "store" << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1559,7 +1591,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '+' << Newline<Formatter>();
+      out << '+' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1571,7 +1603,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '-' << Newline<Formatter>();
+      out << '-' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1583,7 +1615,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '*' << Newline<Formatter>();
+      out << '*' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1595,7 +1627,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '/' << Newline<Formatter>();
+      out << '/' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1607,7 +1639,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '%' << Newline<Formatter>();
+      out << '%' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1619,7 +1651,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "neg" << Newline<Formatter>();
+      out << "neg" << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1631,7 +1663,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "&&" << Newline<Formatter>();
+      out << "&&" << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1643,7 +1675,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "||" << Newline<Formatter>();
+      out << "||" << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1655,7 +1687,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '!' << Newline<Formatter>();
+      out << '!' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1667,7 +1699,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '&' << Newline<Formatter>();
+      out << '&' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1679,7 +1711,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '|' << Newline<Formatter>();
+      out << '|' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1691,7 +1723,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '~' << Newline<Formatter>();
+      out << '~' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1703,7 +1735,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '<' << Newline<Formatter>();
+      out << '<' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1715,7 +1747,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "<=" << Newline<Formatter>();
+      out << "<=" << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1727,7 +1759,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "==" << Newline<Formatter>();
+      out << "==" << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1739,7 +1771,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "!=" << Newline<Formatter>();
+      out << "!=" << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1751,7 +1783,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '>' << Newline<Formatter>();
+      out << '>' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1763,7 +1795,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << ">=" << Newline<Formatter>();
+      out << ">=" << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1775,7 +1807,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << '&' << Newline<Formatter>();
+      out << '&' << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1787,7 +1819,7 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "vref " << expr->getSymbol()->name();
+      out << "vref " << expr->getSymbol()->name() << Operator<Formatter>(expr);
     }
 
     template<typename Formatter>
@@ -1804,6 +1836,7 @@ namespace mirv {
       out << ' ';
       ConstantValueFlow<Formatter> valuePrinter(out);
       expr->getSymbol()->accept(valuePrinter);
+      out << Operator<Formatter>(expr);
     }
 
     template<typename Formatter>
@@ -1885,6 +1918,7 @@ namespace mirv {
       out << ' ';
       ConstantValueFlow<Formatter> valuePrinter(out);
       expr->getSymbol()->accept(valuePrinter);
+      out << Operator<Formatter>(expr);
     }
 
     template<typename Formatter>
@@ -1894,17 +1928,17 @@ namespace mirv {
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "fref " << expr->getSymbol()->name();
+      out << "fref " << expr->getSymbol()->name() << Operator<Formatter>(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Tuple> > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Load> >::const_type expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
 
       out << Indent<Formatter>(ind);
-      out << "tref" << Newline<Formatter>();
+      out << "load" << Operator<Formatter>(expr) << Newline<Formatter>();
       attributeManager.setInheritedAttribute(
         InheritedAttribute(ind + Formatter::indentFactor(), out));
     }
@@ -1957,8 +1991,40 @@ namespace mirv {
     }
   }
 
+  namespace Printer {
+    namespace detail {
+      /// This is a debugging formatter to annotate expressions with
+      /// their types.  Error reporting uses this to give useful
+      /// information in the case of validation failures.
+      class TypeFormatter : public DefaultFormatter {
+      public:
+        /// Print the type of expression after its operator.
+        class Operator {
+        private:
+          typename ptr<Expression<Base> >::const_type expression;
+
+        public:
+          Operator(typename ptr<Expression<Base> >::const_type expr)
+              : expression(expr) {}
+          Stream &operator()(Stream &out) const {
+            out << ' ';
+            TypeNameFlow<DefaultFormatter> typePrinter(out);
+            expression->type()->accept(typePrinter);
+            out << ' ';
+            return out;
+          }
+        };
+      };
+    }
+  }
+
   void print(Printer::Stream &out, ptr<Node<Base>>::const_type node)
   {
     Printer::printImpl(out, node);
+  }
+
+  void printWithTypes(Printer::Stream &out, ptr<Node<Base>>::const_type node)
+  {
+    Printer::printImpl<Printer::detail::TypeFormatter>(out, node);
   }
 }
