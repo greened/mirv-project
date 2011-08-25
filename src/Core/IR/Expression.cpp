@@ -22,7 +22,7 @@ namespace mirv {
     if (size() > 1 && *begin()) {
       if (getLeftOperand()->type() != getRightOperand()->type()) {
         std::cerr << "Offending expression:\n";
-        print(std::cerr, this->getSharedHandle());
+        printWithTypes(std::cerr, this->getSharedHandle());
       }
       checkInvariant(getLeftOperand()->type() == getRightOperand()->type(),
                      "Expression type mismatch");
