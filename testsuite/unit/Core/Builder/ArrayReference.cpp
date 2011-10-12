@@ -10,26 +10,21 @@
 // STDOUT:       allocate int32
 // STDOUT:          vref b
 // STDOUT:          cref int64 1
-// STDOUT:       assign
-// STDOUT:          tref
-// STDOUT:             vref b
-// STDOUT:             cref int64 0
+// STDOUT:       store
+// STDOUT:          vref b
 // STDOUT:          cref int32 1
-// STDOUT:       assign
-// STDOUT:          tref
-// STDOUT:             vref b
-// STDOUT:             cref int64 0
+// STDOUT:       store
+// STDOUT:          vref b
 // STDOUT:          +
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                vref b
-// STDOUT:                cref int64 0
-// STDOUT:             tref
-// STDOUT:                tref
+// STDOUT:             load
+// STDOUT:                &
 // STDOUT:                   vref a
 // STDOUT:                   cref int64 0
-// STDOUT:                cref int32 2
-// STDOUT:                cref int32 0
-// STDOUT:                cref int32 1
+// STDOUT:                   cref int32 2
+// STDOUT:                   cref int32 0
+// STDOUT:                   cref int32 1
 // STDOUT:    }
 // STDOUT: }
 

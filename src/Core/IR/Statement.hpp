@@ -85,6 +85,8 @@ namespace mirv {
     Statement(A1 a1, A2 a2) : BaseType(a1, a2) {}
     template<typename A1, typename A2, typename A3>
     Statement(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
+    template<typename A1, typename A2, typename A3, typename A4>
+    Statement(A1 a1, A2 a2, A3 a3, A4 a4) : BaseType(a1, a2, a3, a4) {}
 
   public:
     static typename ptr<Statement<Tag> >::type
@@ -113,6 +115,14 @@ namespace mirv {
     static typename ptr<Statement<Tag> >::type
     make(A1 a1, A2 a2, A3 a3) {
       typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2, a3));
+      p->setParents();
+      return p;
+    }
+
+    template<typename A1, typename A2, typename A3, typename A4>
+    static typename ptr<Statement<Tag> >::type
+    make(A1 a1, A2 a2, A3 a3, A4 a4) {
+      typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2, a3, a4));
       p->setParents();
       return p;
     }
@@ -210,6 +220,13 @@ namespace mirv {
     InnerStatement(ChildPtr Child) : BaseType(Child) {}
     InnerStatement(ChildPtr Child1,
                    ChildPtr Child2) : BaseType(Child1, Child2) {}
+    InnerStatement(ChildPtr Child1,
+                   ChildPtr Child2,
+                   ChildPtr Child3) : BaseType(Child1, Child2, Child3) {}
+    InnerStatement(ChildPtr Child1,
+                   ChildPtr Child2,
+                   ChildPtr Child3,
+                   ChildPtr Child4) : BaseType(Child1, Child2, Child3, Child4) {}
   };
  
   /// This is a statement with no children.

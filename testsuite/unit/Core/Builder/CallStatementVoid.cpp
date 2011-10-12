@@ -2,19 +2,15 @@
 // STDOUT: fdef testfunc {
 // STDOUT:    vdecl __ct0__ int32
 // STDOUT:    {
-// STDOUT:       assign
-// STDOUT:          tref
-// STDOUT:             cref int32 * & b
-// STDOUT:             cref int64 0
-// STDOUT:          tref
+// STDOUT:       store
+// STDOUT:          cref int32 * & b
+// STDOUT:          load
 // STDOUT:             cref int32 * & a
-// STDOUT:             cref int64 0
 // STDOUT:       call
 // STDOUT:          fref foo
 // STDOUT:          vref __ct0__
-// STDOUT:          tref
+// STDOUT:          load
 // STDOUT:             cref int32 * & b
-// STDOUT:             cref int64 0
 // STDOUT:    }
 // STDOUT: }
 

@@ -5,6 +5,7 @@
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
+#include <mirv/Core/Utility/Printer.hpp>
 
 #include <boost/bind/bind.hpp>
 #include <boost/fusion/iterator.hpp>
@@ -12,6 +13,7 @@
 #include <boost/mpl/vector.hpp>
 
 #include <algorithm>
+#include <iosfwd>
 #include <list>
 
 namespace mirv {
@@ -166,9 +168,27 @@ namespace mirv {
        children.push_back(C1);
        children.push_back(C2);
      }
+       InnerImpl(ChildPtr C1, ChildPtr C2, ChildPtr C3) {
+       children.push_back(C1);
+       children.push_back(C2);
+       children.push_back(C3);
+     }
+       InnerImpl(ChildPtr C1, ChildPtr C2, ChildPtr C3, ChildPtr C4) {
+       children.push_back(C1);
+       children.push_back(C2);
+       children.push_back(C3);
+       children.push_back(C4);
+     }
        template<typename Sequence>
        InnerImpl(ChildPtr C1, Sequence Children) {  
          children.push_back(C1);
+         boost::fusion::for_each(Children,
+                                 boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
+       }
+       template<typename Sequence>
+       InnerImpl(ChildPtr C1, ChildPtr C2, Sequence Children) {  
+         children.push_back(C1);
+         children.push_back(C2);
          boost::fusion::for_each(Children,
                                  boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
        }
@@ -262,6 +282,21 @@ namespace mirv {
      template<typename A>
      LeafImpl(A a) : Tag(a) {}
    };
+
+  /// This is a safe_cast overload for node types.  We can dump some
+  /// additional information.
+  template<typename To>
+  inline typename boost::shared_ptr<To> safe_cast(boost::shared_ptr<Node<Base> > val)
+  {
+    typename boost::shared_ptr<To> ret = boost::dynamic_pointer_cast<To>(val);
+    if (!ret) {
+      std::cerr << "Offending node:\n";
+      print(std::cerr, val);
+    }
+    checkInvariant(ret, "Failed safe_cast");
+
+    return ret;
+  }
 }
 
 #endif

@@ -1,18 +1,14 @@
 // Test building of function calls combined with another statement.
 // STDOUT: fdef testfunc {
 // STDOUT:    {
-// STDOUT:       assign
-// STDOUT:          tref
-// STDOUT:             cref int32 * & b
-// STDOUT:             cref int64 0
-// STDOUT:          tref
+// STDOUT:       store
+// STDOUT:          cref int32 * & b
+// STDOUT:          load
 // STDOUT:             cref int32 * & a
-// STDOUT:             cref int64 0
 // STDOUT:       call
 // STDOUT:          fref foo
-// STDOUT:          tref
+// STDOUT:          load
 // STDOUT:             cref int32 * & b
-// STDOUT:             cref int64 0
 // STDOUT:    }
 // STDOUT: }
 

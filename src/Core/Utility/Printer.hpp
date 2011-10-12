@@ -1,7 +1,7 @@
 #ifndef mirv_Core_Utility_Printer_hpp
 #define mirv_Core_Utility_Printer_hpp
 
-#include <mirv/Core/IR/Node.hpp>
+#include <mirv/Core/IR/NodeFwd.hpp>
 
 #include <cstdint>
 

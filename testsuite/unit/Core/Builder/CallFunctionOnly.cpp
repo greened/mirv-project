@@ -3,9 +3,8 @@
 // STDOUT:    {
 // STDOUT:       call
 // STDOUT:          fref foo
-// STDOUT:          tref
+// STDOUT:          load
 // STDOUT:             cref int32 * & b
-// STDOUT:             cref int64 0
 // STDOUT:    }
 // STDOUT: }
 

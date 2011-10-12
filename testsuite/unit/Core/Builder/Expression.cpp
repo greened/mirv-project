@@ -2,25 +2,20 @@
 //
 //
 // STDOUT: +
-// STDOUT:    tref
+// STDOUT:    load
 // STDOUT:       vref a
-// STDOUT:       cref int64 0
 // STDOUT:    /
 // STDOUT:       *
 // STDOUT:          -
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                cref int32 * & b
-// STDOUT:                cref int64 0
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                vref c
-// STDOUT:                cref int64 0
-// STDOUT:          tref
+// STDOUT:          load
 // STDOUT:             vref d
-// STDOUT:             cref int64 0
 // STDOUT:       neg
-// STDOUT:          tref
+// STDOUT:          load
 // STDOUT:             vref e
-// STDOUT:             cref int64 0
 
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>

@@ -1,5 +1,7 @@
 #include <mirv/Core/IR/Expression.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
+#include <mirv/Core/IR/PointerType.hpp>
+#include <mirv/Core/Utility/Printer.hpp>
 
 namespace mirv {
   Statement<Base> *Phi::Interface::cloneImpl(void) 
@@ -23,20 +25,36 @@ namespace mirv {
     }
   }
 
-  Statement<Base> *Assignment::Interface::cloneImpl(void) 
+  Statement<Base> *Store::Interface::cloneImpl(void) 
   {
-    ptr<Statement<Assignment> >::type stmt(Statement<Assignment>::make(
+    ptr<Statement<Store> >::type stmt(Statement<Store>::make(
                                              getLeftExpression()->clone(),
                                              getRightExpression()->clone()));
-    Statement<Assignment> *result = stmt.get();
+    Statement<Store> *result = stmt.get();
     stmt.reset();
     return result;
   }
 
-  void Assignment::Interface::setParents(void)
+  Store::Interface::Interface(ptr<Expression<Base> >::type e1,
+                              ptr<Expression<Base> >::type e2)
+      : Statement<DualExpression>(e1, e2), LeafStatement() {
+    doValidation();
+  }
+
+  void Store::Interface::setParents(void)
   {
     getLeftExpression()->setParent(getSharedHandle());
     getRightExpression()->setParent(getSharedHandle());
+  }
+
+  void Store::Interface::doValidation(void) const {
+    // Make sure e1 is of pointer type.
+    if (!dyn_cast<const Symbol<Type<Pointer> > >(getLeftExpression()->type())) {
+      std::cerr << "Offending statement:\n";
+      print(std::cerr, this->getSharedHandle());
+    }
+    checkInvariant(dyn_cast<const Symbol<Type<Pointer> > >(getLeftExpression()->type()),
+                   "Store target must have pointer type");
   }
 
   Statement<Base> *Call::Interface::cloneImpl(void) 

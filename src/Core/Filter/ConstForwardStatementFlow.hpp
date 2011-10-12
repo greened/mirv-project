@@ -296,9 +296,9 @@ namespace mirv {
       this->doLeave(stmt);
     }
 
-    /// Visit Assignment statements, starting with the right-hand
+    /// Visit Store statements, starting with the right-hand
     /// side, followed by the left-hand side.
-    void visit(ptr<Statement<Assignment> >::const_type stmt) {
+    void visit(ptr<Statement<Store> >::const_type stmt) {
       this->doEnter(stmt);
 
       for (auto i = stmt->expressionRBegin();

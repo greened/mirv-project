@@ -5,8 +5,11 @@
 #include <boost/mem_fn.hpp>
 
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/CFG.h>
 
 #include "LLVM.hpp"
+
+#include <algorithm>
 
 namespace mirv {
   namespace {
@@ -204,11 +207,23 @@ namespace mirv {
   {
     checkInvariant(TheFunction != 0, "No function to hold variable");
     const llvm::Type *llvmType = getType(type);
-    llvm::Value *var = builder()->CreateAlloca(llvmType, 0, name);
     VariableMap::iterator pos;
     bool inserted;
-    std::tie(pos, inserted) = FunctionMap->insert(std::make_pair(name, var));
+    std::tie(pos, inserted) = FunctionMap->insert(std::make_pair(name, 0));
     checkInvariant(inserted, "Variable already exists");
+  }
+
+  void LLVMCodegenFilter::
+  FlowAttribute::
+  createAlloca(const std::string &name,
+               ptr<Symbol<Type<TypeBase> > >::const_type type)
+  {
+    checkInvariant(TheFunction != 0, "No function to hold variable");
+    const llvm::Type *llvmType = getType(type);
+    llvm::Value *var = builder()->CreateAlloca(llvmType, 0, name);
+    VariableMap::iterator pos = FunctionMap->find(name);
+    checkInvariant(pos != FunctionMap->end(), "Cannot find variable");
+    pos->second = var;
   }
 
   void LLVMCodegenFilter::
@@ -259,25 +274,34 @@ namespace mirv {
       }
     }
 
-    llvm::Value *var = TheModule->getOrInsertGlobal(name, llvmType);
+    llvm::GlobalVariable *GV =
+      new llvm::GlobalVariable(*TheModule, llvmType,
+                               false, llvm::GlobalValue::InternalLinkage,
+                               0, name);
+
     VariableMap::iterator pos;
     bool inserted;
-    std::tie(pos, inserted) = ModuleMap->insert(std::make_pair(name, var));
+    std::tie(pos, inserted) = ModuleMap->insert(std::make_pair(name, GV));
     checkInvariant(inserted, "Global variable already exists");
     if (sym->initializer()) {
       InheritedAttribute inherited(inh);
-      llvm::GlobalVariable *gvar = llvm::cast<llvm::GlobalVariable>(var);
-      gvar->setInitializer(getConstant(sym->initializer(), inherited));
+      GV->setInitializer(getConstant(sym->initializer(), inherited));
     }
   }
 
   llvm::Value *LLVMCodegenFilter::
   FlowAttribute::
-  getVariable(const std::string &name)
+  getVariable(ptr<Symbol<Variable> >::const_type sym)
   {
     checkInvariant(FunctionMap, "No variables available");
-    auto v = FunctionMap->find(name);
+    auto v = FunctionMap->find(sym->name());
     checkInvariant(v != FunctionMap->end(), "Cannot find variable");
+    if (!v->second) {
+      // We need an alloca for this.
+      createAlloca(sym->name(), sym->type());
+      v = FunctionMap->find(sym->name());
+      checkInvariant(v->second, "Could not create alloca for temporary");
+    }
     return v->second;
   }
 
@@ -424,7 +448,7 @@ namespace mirv {
   LeaveSymbolVisitor::visit(ptr<Symbol<Variable> >::const_type sym)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-    //syn.createVariable(sym->name(), sym->type());
+    syn.createVariable(sym->name(), sym->type());
     attributeManager.setSynthesizedAttribute(syn);
   }
 
@@ -527,19 +551,11 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::
-  EnterStatementVisitor::visit(ptr<Statement<Assignment> >::const_type stmt)
-  {
-    // Make lhs return an address.
-    InheritedAttribute inh(attributeManager.getInheritedAttribute(), true);
-    attributeManager.setInheritedAttribute(inh);
-  }
-
-  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Assignment> >::const_type stmt)
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<Statement<Store> >::const_type stmt)
    {
     // TODO: Handle return assignment.
 
-    // See LLVMCodeGenFlow::visit(...<Assignment>...) to see how we
+    // See LLVMCodeGenFlow::visit(...<Store>...) to see how we
     // changed the order of visitation from normal forward flow.  This
     // is why the lhs and rhs indices are reversed.
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
@@ -561,9 +577,9 @@ namespace mirv {
       getSymbol();
   
     InheritedAttribute inh(attributeManager.getInheritedAttribute());
-    inh.createVariable(variable->name(),
-                       safe_cast<const Symbol<Type<Pointer> > >(variable->type())->
-                       getBaseType());
+    inh.createAlloca(variable->name(),
+                     safe_cast<const Symbol<Type<Pointer> > >(variable->type())->
+                     getBaseType());
     attributeManager.setInheritedAttribute(inh);
   }
 
@@ -676,7 +692,7 @@ namespace mirv {
     SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(0));
 
     // Start a new block after the else block.  This continues the
-    // block we started before encuntering this statement.
+    // block we started before encountering this statement.
     llvm::BasicBlock *after = syn.createBlock("ae");
 
     // Create the terminator for the if block.
@@ -694,14 +710,12 @@ namespace mirv {
         if (branch->isUnconditional() && branch->getSuccessor(0) == thn) {
           // We can't make an unconditional branch into a conditional
           // one so just remove it.
-          terminator->removeFromParent();
+          syn.builder()->SetInsertPoint(cond->getParent());
+          syn.builder()->CreateCondBr(cond, thn, els);
+          terminator->eraseFromParent();
           terminator = 0;
         }
       }
-    }
-    if (!terminator) {
-      syn.builder()->SetInsertPoint(cond->getParent());
-      syn.builder()->CreateCondBr(cond, thn, els);
     }
 
     // Create the terminator for the then block.
@@ -752,8 +766,13 @@ namespace mirv {
       llvm::cast<llvm::Instruction>(attributeManager.getSynthesizedAttribute(1).
                                     getValue());
 
-    llvm::BasicBlock *bodybegin = attributeManager.getInheritedAttribute().
+    llvm::BasicBlock *before = attributeManager.getInheritedAttribute().
       getBlock();
+
+    checkInvariant(std::distance(succ_begin(before), succ_end(before)) == 1,
+                   "More than one successor to loop entrence predecessor");
+
+    llvm::BasicBlock *bodybegin = *succ_begin(before);
     llvm::BasicBlock *bodyend = attributeManager.getSynthesizedAttribute(0).
       getBlock();
 
@@ -1053,7 +1072,7 @@ namespace mirv {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
     // Get the alloca for this variable.
-    llvm::Value *value = syn.getVariable(expr->getSymbol()->name());
+    llvm::Value *value = syn.getVariable(expr->getSymbol());
 
     syn.setValue(value);
 
@@ -1073,43 +1092,21 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Reference<Tuple> > >::const_type expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<Expression<Load> >::const_type expr)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
-    // LLVM expects a random-access iterator which these are not due
-    // to the filter_iterator component.  So copy values to a
-    // temporary vector.
-    auto indicesBegin = attributeManager.begin();
-    ++indicesBegin;
+    llvm::Value *address = attributeManager.getSynthesizedAttribute(0).getValue();
 
-    std::vector<llvm::Value *>
-      indices(boost::make_transform_iterator(
-                indicesBegin,
-                boost::mem_fn(&SynthesizedAttribute::getValue)),
-              boost::make_transform_iterator(
-                attributeManager.end(),
-                boost::mem_fn(&SynthesizedAttribute::getValue)));
-
-    llvm::Value *GEP = attributeManager.getInheritedAttribute().builder()->
-      CreateGEP(attributeManager.begin()->getValue(),
-                indices.begin(), indices.end(), "trefgep");
-
-    if (attributeManager.getInheritedAttribute().generateAddress()) {
-      syn.setValue(GEP);
-      syn.setNeedsDereference(true);
-    }
-    else {
-      syn.setValue(attributeManager.getInheritedAttribute().builder()->
-                   CreateLoad(GEP, "trefload"));
-    }
+    syn.setValue(attributeManager.getInheritedAttribute().builder()->
+                 CreateLoad(address, "load"));
 
     attributeManager.setSynthesizedAttribute(syn);
   }
 
   void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<Expression<TuplePointer> >::const_type expr)
   {
-    InheritedAttribute inh(attributeManager.getInheritedAttribute(), true);
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
     attributeManager.setInheritedAttribute(inh);
   }
 
@@ -1122,15 +1119,9 @@ namespace mirv {
     // temporary vector.
     auto indicesBegin = attributeManager.begin();
 
-    std::vector<llvm::Value *> indices;
-
-    // This is the base pointer value attribute.
-    if (indicesBegin->needsDereference()) {
-      indices.push_back(llvm::ConstantInt::get(syn.builder()->getInt32Ty(),
-                                               0, false));
-    }
-
     ++indicesBegin;
+
+    std::vector<llvm::Value *> indices;
 
     std::copy(boost::make_transform_iterator(
                 indicesBegin,

@@ -1,7 +1,7 @@
 // Test building of variables.
 //
-// STDOUT: Hello, World!
 //
+// STDOUT: Hello, World!
 
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>

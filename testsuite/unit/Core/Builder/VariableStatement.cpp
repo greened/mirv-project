@@ -16,66 +16,47 @@
 // STDOUT:          cref int64 1
 // STDOUT:       doWhile
 // STDOUT:          {
-// STDOUT:             assign
-// STDOUT:                tref
-// STDOUT:                   vref a
-// STDOUT:                   cref int64 0
+// STDOUT:             store
+// STDOUT:                vref a
 // STDOUT:                +
-// STDOUT:                   tref
+// STDOUT:                   load
 // STDOUT:                      vref a
-// STDOUT:                      cref int64 0
-// STDOUT:                   tref
+// STDOUT:                   load
 // STDOUT:                      vref b
-// STDOUT:                      cref int64 0
 // STDOUT:             ifElse
 // STDOUT:                >
-// STDOUT:                   tref
+// STDOUT:                   load
 // STDOUT:                      vref b
-// STDOUT:                      cref int64 0
-// STDOUT:                   tref
+// STDOUT:                   load
 // STDOUT:                      vref c
-// STDOUT:                      cref int64 0
 // STDOUT:                {
-// STDOUT:                   assign
-// STDOUT:                      tref
-// STDOUT:                         vref a
-// STDOUT:                         cref int64 0
+// STDOUT:                   store
+// STDOUT:                      vref a
 // STDOUT:                      +
-// STDOUT:                         tref
+// STDOUT:                         load
 // STDOUT:                            vref a
-// STDOUT:                            cref int64 0
-// STDOUT:                         tref
+// STDOUT:                         load
 // STDOUT:                            vref b
-// STDOUT:                            cref int64 0
 // STDOUT:                }
 // STDOUT:                {
-// STDOUT:                   assign
-// STDOUT:                      tref
-// STDOUT:                         vref a
-// STDOUT:                         cref int64 0
+// STDOUT:                   store
+// STDOUT:                      vref a
 // STDOUT:                      +
-// STDOUT:                         tref
+// STDOUT:                         load
 // STDOUT:                            vref a
-// STDOUT:                            cref int64 0
-// STDOUT:                         tref
+// STDOUT:                         load
 // STDOUT:                            vref c
-// STDOUT:                            cref int64 0
 // STDOUT:                }
 // STDOUT:          }
 // STDOUT:          <
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                vref a
-// STDOUT:                cref int64 0
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                vref c
-// STDOUT:                cref int64 0
-// STDOUT:       assign
-// STDOUT:          tref
-// STDOUT:             vref c
-// STDOUT:             cref int64 0
-// STDOUT:          tref
+// STDOUT:       store
+// STDOUT:          vref c
+// STDOUT:          load
 // STDOUT:             vref a
-// STDOUT:             cref int64 0
 // STDOUT:    }
 // STDOUT: }
 
