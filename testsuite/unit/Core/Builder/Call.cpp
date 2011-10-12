@@ -17,9 +17,8 @@
 // STDOUT:             cref int64 1
 // STDOUT:          call
 // STDOUT:             fref foo
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                vref c
-// STDOUT:                cref int64 0
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }

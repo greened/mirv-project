@@ -6,18 +6,14 @@
 // STDOUT:       allocate int32
 // STDOUT:          vref c
 // STDOUT:          cref int64 1
-// STDOUT:       assign
-// STDOUT:          tref
-// STDOUT:             cref int32 * & b
-// STDOUT:             cref int64 0
-// STDOUT:          tref
+// STDOUT:       store
+// STDOUT:          cref int32 * & b
+// STDOUT:          load
 // STDOUT:             cref int32 * & a
-// STDOUT:             cref int64 0
 // STDOUT:       call
 // STDOUT:          fref foo
-// STDOUT:          tref
+// STDOUT:          load
 // STDOUT:             cref int32 * & b
-// STDOUT:             cref int64 0
 // STDOUT:    }
 // STDOUT: }
 

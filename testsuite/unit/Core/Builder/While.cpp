@@ -2,68 +2,50 @@
 //
 // STDOUT: ifThen
 // STDOUT:    <
-// STDOUT:       tref
+// STDOUT:       load
 // STDOUT:          vref a
-// STDOUT:          cref int64 0
-// STDOUT:       tref
+// STDOUT:       load
 // STDOUT:          vref c
-// STDOUT:          cref int64 0
 // STDOUT:    {
 // STDOUT:       doWhile
 // STDOUT:          {
-// STDOUT:             assign
-// STDOUT:                tref
-// STDOUT:                   vref a
-// STDOUT:                   cref int64 0
+// STDOUT:             store
+// STDOUT:                vref a
 // STDOUT:                +
-// STDOUT:                   tref
+// STDOUT:                   load
 // STDOUT:                      vref a
-// STDOUT:                      cref int64 0
-// STDOUT:                   tref
+// STDOUT:                   load
 // STDOUT:                      cref int32 * & b
-// STDOUT:                      cref int64 0
 // STDOUT:             ifElse
 // STDOUT:                >
-// STDOUT:                   tref
+// STDOUT:                   load
 // STDOUT:                      cref int32 * & b
-// STDOUT:                      cref int64 0
-// STDOUT:                   tref
+// STDOUT:                   load
 // STDOUT:                      vref c
-// STDOUT:                      cref int64 0
 // STDOUT:                {
-// STDOUT:                   assign
-// STDOUT:                      tref
-// STDOUT:                         vref a
-// STDOUT:                         cref int64 0
+// STDOUT:                   store
+// STDOUT:                      vref a
 // STDOUT:                      +
-// STDOUT:                         tref
+// STDOUT:                         load
 // STDOUT:                            vref a
-// STDOUT:                            cref int64 0
-// STDOUT:                         tref
+// STDOUT:                         load
 // STDOUT:                            cref int32 * & b
-// STDOUT:                            cref int64 0
 // STDOUT:                }
 // STDOUT:                {
-// STDOUT:                   assign
-// STDOUT:                      tref
-// STDOUT:                         vref a
-// STDOUT:                         cref int64 0
+// STDOUT:                   store
+// STDOUT:                      vref a
 // STDOUT:                      +
-// STDOUT:                         tref
+// STDOUT:                         load
 // STDOUT:                            vref a
-// STDOUT:                            cref int64 0
-// STDOUT:                         tref
+// STDOUT:                         load
 // STDOUT:                            vref c
-// STDOUT:                            cref int64 0
 // STDOUT:                }
 // STDOUT:          }
 // STDOUT:          <
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                vref a
-// STDOUT:                cref int64 0
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                vref c
-// STDOUT:                cref int64 0
 // STDOUT:    }
 
 #include <mirv/Core/IR/Module.hpp>

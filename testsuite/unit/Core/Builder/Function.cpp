@@ -2,17 +2,13 @@
 //
 // STDOUT: fdef testfunc {
 // STDOUT:    {
-// STDOUT:       assign
-// STDOUT:          tref
-// STDOUT:             cref int32 * & a
-// STDOUT:             cref int64 0
+// STDOUT:       store
+// STDOUT:          cref int32 * & a
 // STDOUT:          +
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                cref int32 * & a
-// STDOUT:                cref int64 0
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                cref int32 * & b
-// STDOUT:                cref int64 0
 // STDOUT:    }
 // STDOUT: }
 

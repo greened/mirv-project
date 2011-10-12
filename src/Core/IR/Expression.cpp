@@ -322,8 +322,9 @@ namespace mirv {
 
   template
   void
-  Visitable<Expression<Reference<Tuple> >, ExpressionVisitor>::accept(ExpressionVisitor &);
+  Visitable<Expression<Load>, ExpressionVisitor>::accept(ExpressionVisitor &);
   template
   void
-  ConstVisitable<Expression<Reference<Tuple> >, ConstExpressionVisitor, ExpressionVisitor>::accept(ConstExpressionVisitor &) const;
+  ConstVisitable<Expression<Load>, ConstExpressionVisitor, ExpressionVisitor>::
+  accept(ConstExpressionVisitor &) const;
 }

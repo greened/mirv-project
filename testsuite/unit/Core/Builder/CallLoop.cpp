@@ -6,12 +6,10 @@
 // STDOUT:          fref foo
 // STDOUT:    }
 // STDOUT:    <
-// STDOUT:       tref
+// STDOUT:       load
 // STDOUT:          cref int32 * & a
-// STDOUT:          cref int64 0
-// STDOUT:       tref
+// STDOUT:       load
 // STDOUT:          cref int32 * & b
-// STDOUT:          cref int64 0
 
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>

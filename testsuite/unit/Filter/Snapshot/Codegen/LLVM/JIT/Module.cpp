@@ -62,8 +62,8 @@ int main(void)
         module["testmodule"] [
           func["printf"].type[int_(32)(*int_(8), vararg)],
 
-          var[a].type[int_(32)],
-          var[b].type[int_(32)],
+          var[a].type[int_(32)] = boost::proto::lit(0),
+          var[b].type[int_(32)] = boost::proto::lit(0),
 
           func["testfunc"].type[void_()] [
             var[c].type[int_(32)],
@@ -86,8 +86,6 @@ int main(void)
         ]
       ));
 
-  print(std::cout, code);
-  
   mirv::compileAndRun(code, "testfunc");
 
   return(0);

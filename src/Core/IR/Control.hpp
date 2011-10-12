@@ -28,6 +28,10 @@ namespace mirv {
       Interface(A1 a1) : InterfaceBaseType(a1)  {}
       template<typename A1, typename A2>
       Interface(A1 a1, A2 a2) : InterfaceBaseType(a1, a2)  {}
+      template<typename A1, typename A2, typename A3>
+      Interface(A1 a1, A2 a2, A3 a3) : InterfaceBaseType(a1, a2, a3)  {}
+      template<typename A1, typename A2, typename A3, typename A4>
+      Interface(A1 a1, A2 a2, A3 a3, A4 a4) : InterfaceBaseType(a1, a2, a3, a4)  {}
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());

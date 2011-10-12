@@ -161,18 +161,19 @@ namespace mirv {
     typedef Statement<Controlled> VisitorBaseType;
   };
 
-  /// Specify the interface to assignment statements.  Assignments are
+  /// Specify the interface to store statements.  Stores are
   /// statements only, not expressions.  This is to cleanly separate
   /// changes in program state from general computation.  Expression
-  /// trees imply assignmnets to temporary variables at some level of
-  /// translate, but we are not concerned about those.
-  class Assignment {
+  /// trees imply assignments to temporary variables at some level of
+  /// translation, but we are not concerned about those.
+  class Store {
   private:
     class Interface : public Statement<DualExpression>,
                       public LeafStatement,
-                      public boost::enable_shared_from_this<Statement<Assignment> > {
+                      public boost::enable_shared_from_this<Statement<Store> > {
     private:
       Statement<Base> *cloneImpl(void);
+      void doValidation(void) const;
 
     protected:
       void setParents(void);
@@ -183,9 +184,9 @@ namespace mirv {
       typedef ReverseExpressionIterator reverse_iterator;
       typedef ConstReverseExpressionIterator const_reverse_iterator;
 
-      template<typename E1, typename E2>
-      Interface(E1 e1, E2 e2) : Statement<DualExpression>(e1, e2),
-                                  LeafStatement() {}
+      Interface(ptr<Expression<Base> >::type e1,
+                ptr<Expression<Base> >::type e2);
+
       typedef ExpressionPtr ChildPtr;
       typedef ConstExpressionPtr ConstChildPtr;
 
@@ -223,7 +224,7 @@ namespace mirv {
       }
     };
   public:
-    typedef StatementBaseGenerator<Interface, Assignment, Mutating>::type BaseType;
+    typedef StatementBaseGenerator<Interface, Store, Mutating>::type BaseType;
     typedef Statement<DualExpression> VisitorBaseType;
   };
 

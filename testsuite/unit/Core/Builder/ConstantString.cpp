@@ -11,22 +11,18 @@
 // STDOUT:          allocate int32
 // STDOUT:             vref i
 // STDOUT:             cref int64 1
-// STDOUT:          assign
-// STDOUT:             tref
-// STDOUT:                vref i
-// STDOUT:                cref int64 0
+// STDOUT:          store
+// STDOUT:             vref i
 // STDOUT:             cref int32 0
 // STDOUT:          call
 // STDOUT:             fref printf
 // STDOUT:             vref __ct0__
 // STDOUT:             &
-// STDOUT:                tref
-// STDOUT:                   cref (cref int64 7 x int8) * & __str1__
-// STDOUT:                   cref int64 0
+// STDOUT:                cref (cref int64 7 x int8) * & __str1__
 // STDOUT:                cref int32 0
-// STDOUT:             tref
+// STDOUT:                cref int32 0
+// STDOUT:             load
 // STDOUT:                vref i
-// STDOUT:                cref int64 0
 // STDOUT:       }
 // STDOUT:    }
 // STDOUT: }

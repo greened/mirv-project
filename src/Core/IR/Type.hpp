@@ -4,6 +4,7 @@
 #include <mirv/Core/IR/Base.hpp>
 #include <mirv/Core/IR/ExpressionFwd.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
+#include <mirv/Core/Utility/Printer.hpp>
 
 namespace mirv {
   struct SymbolVisitor;
@@ -175,6 +176,22 @@ namespace mirv {
     typedef Interface BaseType;
     typedef InnerType VisitorBaseType;
   };
+
+  /// This is a safe_cast overload for type nodes.  We can dump some
+  /// additional information.
+  template<typename To>
+  inline typename boost::shared_ptr<To> safe_cast(boost::shared_ptr<const Symbol<Type<TypeBase> > > val)
+  {
+    typename boost::shared_ptr<To> ret = boost::dynamic_pointer_cast<To>(val);
+    if (!ret) {
+      std::cerr << "Offending node:\n";
+      print(std::cerr, val);
+      std::cerr << "\n";
+    }
+    checkInvariant(ret, "Failed safe_cast");
+
+    return ret;
+  }
 }
 
 #endif

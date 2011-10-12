@@ -23,12 +23,9 @@ namespace mirv {
         symtab,
         Symbol<Type<Pointer> >::make(global->type()));
 
-      return make<Expression<Reference<Tuple> > >(
+      return make<Expression<Load> >(
         make<Expression<Reference<Constant<Base> > > >(
-          make<Symbol<Constant<Address> > >(ptrtype, global)),
-        make<Expression<Reference<Constant<Base> > > >(
-          make<Symbol<Constant<std::uint64_t> > >(
-            inttype, 0)));
+          make<Symbol<Constant<Address> > >(ptrtype, global)));
     }
   }
 }

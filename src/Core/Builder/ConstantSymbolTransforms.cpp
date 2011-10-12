@@ -1,4 +1,5 @@
 #include <mirv/Core/Builder/ConstantSymbolTransforms.hpp>
+#include <mirv/Core/Utility/Printer.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Module.hpp>
@@ -15,6 +16,8 @@
 #include <mirv/Core/IR/Reference.hpp>
 
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
+
+#include <iostream>
 
 namespace mirv {
   namespace Builder {
@@ -93,8 +96,16 @@ namespace mirv {
 
         ptr<Expression<Base> >::type zeroReference =
           mirv::make<Expression<Reference<Constant<Base> > > >(zero);
+
+        ptr<Expression<Base> >::type zeroReference2 =
+          mirv::make<Expression<Reference<Constant<Base> > > >(zero);
+
+        ptr<Expression<Load> >::type load = safe_cast<Expression<Load> >(str);
+
         ptr<Expression<Base> >::type address =
-          mirv::make<Expression<TuplePointer> >(str, zeroReference);
+          mirv::make<Expression<TuplePointer> >(load->getOperand(),
+                                                zeroReference,
+                                                zeroReference2);
 
         return address;
       }

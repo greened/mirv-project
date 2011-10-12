@@ -10,20 +10,16 @@
 // STDOUT:             cref int64 1
 // STDOUT:          doWhile
 // STDOUT:             {
-// STDOUT:                assign
-// STDOUT:                   tref
-// STDOUT:                      vref i
-// STDOUT:                      cref int64 0
+// STDOUT:                store
+// STDOUT:                   vref i
 // STDOUT:                   +
-// STDOUT:                      tref
+// STDOUT:                      load
 // STDOUT:                         vref i
-// STDOUT:                         cref int64 0
 // STDOUT:                      cref int32 1
 // STDOUT:             }
 // STDOUT:             <
-// STDOUT:                tref
+// STDOUT:                load
 // STDOUT:                   vref i
-// STDOUT:                   cref int64 0
 // STDOUT:                cref int32 10
 // STDOUT:       }
 // STDOUT:    }

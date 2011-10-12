@@ -9,47 +9,68 @@
 #include <iostream>
 
 namespace mirv {
-  Reference<Tuple>::Interface::TypePtr
-  Reference<Tuple>::Interface::type(void) const 
+  Load::Interface::Interface(ChildPtr address)
+      : Expression<Unary>(address) 
   {
-    ptr<Symbol<Type<TypeBase> > >::const_type elementType =
+    checkInvariant(dyn_cast<const Symbol<Type<Pointer> > >(address->type()),
+      "Load source must have pointer type");
+  }
+  
+  Load::Interface::TypePtr
+  Load::Interface::type(void) const 
+  {
+    ptr<Symbol<Type<TypeBase> > >::const_type ptrType =
       (*this->begin())->type();
 
-    auto index = begin();
-    // Skip base expression to get to the first dimension.
-    ++index;
+    ptr<Symbol<Type<Pointer> > >::const_type pointerType =
+      safe_cast<const Symbol<Type<Pointer> > >((*this->begin())->type());
 
-    do {
-      if (ptr<Symbol<Type<Tuple> > >::const_type tupleType =
-          dyn_cast<const Symbol<Type<Tuple> > >(elementType)) {
-        elementType = tupleType->elementType(*index);
-      }
-      else {
-        ptr<Symbol<Type<Pointer> > >::const_type pointerType =
-          safe_cast<const Symbol<Type<Pointer> > >(elementType);
-        // The index is simply a pointer offset, so the type returned
-        // is always the same.
-        elementType = pointerType->getBaseType();
-      }
-    } while (++index != end());
-
-    return elementType;
+    return pointerType->getBaseType();
   }
 
   TuplePointer::Interface::TypePtr
   TuplePointer::Interface::type(void) const 
   {
+    // std::cerr << "TuplePointer::type expr:\n";
+    // print(std::cerr, this->getSharedHandle());
+    // std::cerr << "\n";
+
     ptr<Symbol<Type<TypeBase> > >::const_type elementType =
       (*this->begin())->type();
+
+    // std::cerr << "TuplePointer::type element:\n";
+    // print(std::cerr, elementType);
+    // std::cerr << "\n";
 
     auto index = begin();
     // Skip base expression to get to the first dimension.
     ++index;
-    do {
+
+    // The top-level type could be a pointer.  If there are any
+    // pointers down in lower positions there should have been a load
+    // to access them.
+    if (ptr<Symbol<Type<Pointer> > >::const_type pointerType =
+        dyn_cast<const Symbol<Type<Pointer> > >(elementType)) {
+      elementType = pointerType->getBaseType();
+      // std::cerr << "TuplePointer::type element:\n";
+      // print(std::cerr, elementType);
+      // std::cerr << "\n";
+      // Account for the pointer index.
+      checkInvariant(index != end(), "Not enough operands for TuplePointer");
+      ++index;
+    }
+
+    while (index != end()) {
       ptr<Symbol<Type<Tuple> > >::const_type tupleType =
         safe_cast<const Symbol<Type<Tuple> > >(elementType);
+
       elementType = tupleType->elementType(*index);
-    } while (++index != end());
+      // std::cerr << "TuplePointer::type element:\n";
+      // print(std::cerr, elementType);
+      // std::cerr << "\n";
+
+      ++index;
+    }
 
     // Return a pointer to this type.
     ptr<Symbol<Module> >::type module = elementType->parent<Symbol<Module> >();
@@ -67,5 +88,18 @@ namespace mirv {
       make<Symbol<Type<Pointer> > >(elementType);
     module->typePushBack(pointerType);
     return pointerType;
+  }
+
+  void Load::Interface::doValidation(void) const {
+    if (!empty() && getOperand()) {
+      ptr<Symbol<Type<Pointer> > >::const_type pointerType
+        = safe_cast<const Symbol<Type<Pointer> > >(getOperand()->type());
+      if (this->type() != pointerType->getBaseType()) {
+        std::cerr << "Offending expression:\n";
+        printWithTypes(std::cerr, this->getSharedHandle());
+      }
+      checkInvariant(this->type() == pointerType->getBaseType(),
+                     "Load type does not match pointer base type");
+    }
   }
 }

@@ -19,17 +19,13 @@
 // STDOUT:          call
 // STDOUT:             fref foo
 // STDOUT:             vref __ct0__
-// STDOUT:             tref
+// STDOUT:             load
 // STDOUT:                vref c
-// STDOUT:                cref int64 0
-// STDOUT:          assign
-// STDOUT:             tref
-// STDOUT:                vref d
-// STDOUT:                cref int64 0
+// STDOUT:          store
+// STDOUT:             vref d
 // STDOUT:             +
-// STDOUT:                tref
+// STDOUT:                load
 // STDOUT:                   vref c
-// STDOUT:                   cref int64 0
 // STDOUT:                vref __ct0__
 // STDOUT:       }
 // STDOUT:    }

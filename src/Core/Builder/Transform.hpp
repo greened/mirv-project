@@ -2,11 +2,18 @@
 #define mirv_Core_Builder_Transform_hpp
 
 #include <mirv/Core/Memory/Heap.hpp>
+#include <mirv/Core/Builder/ConstantSymbolTransforms.hpp>
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
 #include <mirv/Core/Builder/SymbolTable.hpp>
 #include <mirv/Core/Builder/TranslateFwd.hpp>
 #include <mirv/Core/IR/Control.hpp>
+#include <mirv/Core/IR/Reference.hpp>
+#include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Type.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/proto/fusion.hpp>
@@ -221,8 +228,57 @@ namespace mirv {
         return mirv::make<NodeType>(a1,
                                     a2,
                                     boost::fusion::transform(
-                                      expr,
+                                      boost::proto::flatten(expr),
                                       translator));
+      }
+    };
+
+    namespace detail {
+      /// Given a value which should be a load, return the address
+      /// loaded from.  If the load produces an address, return an
+      /// empty result.
+      ptr<Expression<Base> >::type
+      extractLoadAddress(boost::shared_ptr<SymbolTable> symtab,
+                         ptr<Expression<Base> >::type value);
+
+      /// Given a value to store to, obtain its address to feed to a
+      /// store operation.
+      ptr<Expression<Base> >::type
+      extractStoreAddress(boost::shared_ptr<SymbolTable> symtab,
+                          ptr<Expression<Base> >::type value);
+    }
+
+    /// Given a sequnce of indices, construct a tuple pointer.
+    struct ConstructAddress : boost::proto::callable {
+      typedef ptr<Expression<Base> >::type result_type;
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             ptr<Expression<Base> >::type base,
+                             ptr<Expression<Base> >::type index);
+    };
+
+    /// Given a sequnce of indices, construct a tuple pointer.
+    struct ConstructAddressFromSequence : boost::proto::callable {
+      typedef ptr<Expression<Base> >::type result_type;
+
+      template<typename Sequence>
+      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+                             ptr<Expression<Base> >::type base,
+                             Sequence indices) {
+        result_type basePointer = detail::extractLoadAddress(symtab, base);
+        if (basePointer) {
+          ptr<Expression<Base> >::type offset =
+            Expression<Reference<Constant<Base> > >::make(
+              ConstructIntegerConstantSymbol<0>()(symtab));
+          return ConstructNaryFlat<Expression<TuplePointer> >()(symtab,
+                                                                basePointer,
+                                                                offset,
+                                                                indices);
+        }
+        // Base is already a pointer.  Don't add an extra zero offset
+        // because the indices include it.
+        return ConstructNaryFlat<Expression<TuplePointer> >()(symtab,
+                                                              base,
+                                                              indices);
       }
     };
   }

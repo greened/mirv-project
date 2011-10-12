@@ -54,25 +54,22 @@ namespace mirv {
     }
 
     /// Given a variable reference, construct a reference to its
-    /// value.
+    /// value.  Variables are always put on the stack and accessed
+    /// via load/store.
     struct VariableRefBuilder : boost::proto::when<
       VariableTerminal,
-      ConstructBinary<Expression<Reference<Tuple> > >(
+      // Pointer
+      ConstructUnary<Expression<Load> >(
         boost::proto::_data,
-        // Tuple pointer
         ConstructUnary<
           Expression<Reference<Variable> >
           >(boost::proto::_data,
             LookupSymbol<Symbol<Variable> >(boost::proto::_data,
-                                            boost::proto::_value)),
-        // Index
-        ConstructUnary<
-          Expression<Reference<Constant<Base> > >
-          >(boost::proto::_data,
-            ConstructIntegerConstantSymbol<0>(boost::proto::_data)))
+                                            boost::proto::_value)))
       > {};
 
     /// Given a global variable, construct a reference to its value.
+    /// Globals are always accessed via load/store.
     struct GlobalVariableRefBuilder : boost::proto::when<
       GlobalVariableTerminal,
       ConstructGlobalReference(
@@ -274,7 +271,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
 
     /// Group logical and rules.
     template<>
-struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
         : AndBuilder {};
 
     /// This is the grammar for bitwise or expressions.
@@ -308,17 +305,21 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
     struct ArrayRefBuilder : boost::proto::or_<
       boost::proto::when<
         MultiSubscriptRule,
-        ConstructNaryFlat<Expression<Reference<Tuple> > >(
+        ConstructUnary<Expression<Load> >(
           boost::proto::_data,
-          ConstructExpressionGrammar(boost::proto::_left),
-          boost::proto::_right)
+          ConstructAddressFromSequence(
+            boost::proto::_data,
+            ConstructExpressionGrammar(boost::proto::_left),
+            boost::proto::_right))
         >,
       boost::proto::when<
         SubscriptRule,
-        ConstructBinary<Expression<Reference<Tuple> > >(
+        ConstructUnary<Expression<Load> >(
           boost::proto::_data,
-          ConstructExpressionGrammar(boost::proto::_left),
-          ConstructExpressionGrammar(boost::proto::_right))
+          ConstructAddress(
+            boost::proto::_data,
+            ConstructExpressionGrammar(boost::proto::_left),
+            ConstructExpressionGrammar(boost::proto::_right)))
         > 
       > {};
 
@@ -331,14 +332,14 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::logical_and>
     struct ArrayAddressBuilder : boost::proto::or_<
       boost::proto::when<
         MultiSubscriptAddressRule,
-        ConstructNaryFlat<Expression<TuplePointer> >(
+        ConstructAddressFromSequence(
           boost::proto::_data,
           ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),
           boost::proto::_right(boost::proto::_left))
         >,
       boost::proto::when<
         SubscriptAddressRule,
-        ConstructBinary<Expression<TuplePointer> >(
+        ConstructAddress(
           boost::proto::_data,
           ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),
           ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)))

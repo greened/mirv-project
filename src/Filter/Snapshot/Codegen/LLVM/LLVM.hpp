@@ -39,8 +39,6 @@ namespace mirv {
       llvm::BasicBlock *TheBlock;
       llvm::Value *TheValue;
       bool ReturnValue;
-      bool GenerateAddress;
-      bool NeedsDereference;
 
       typedef Map<std::string, llvm::Value *>::type VariableMap;
       ptr<VariableMap>::type ModuleMap;
@@ -80,23 +78,8 @@ namespace mirv {
               TheBlock(0),
               TheValue(0),
               ReturnValue(false),
-              GenerateAddress(false),
-              NeedsDereference(false),
               ModuleMap(new VariableMap),
               FunctionMap(new VariableMap) {}
-
-      FlowAttribute(const FlowAttribute &other, bool address) 
-          : Context(other.Context),
-              Builder(other.Builder),
-              TheModule(other.TheModule),
-              TheFunction(other.TheFunction),
-              TheBlock(other.TheBlock),
-              TheValue(other.TheValue),
-              ReturnValue(other.ReturnValue),
-              GenerateAddress(address),
-              NeedsDereference(other.NeedsDereference),
-              ModuleMap(other.ModuleMap),
-              FunctionMap(other.FunctionMap) {}
 
       FlowAttribute(const FlowAttribute &other) 
           : Context(other.Context),
@@ -106,8 +89,6 @@ namespace mirv {
               TheBlock(other.TheBlock),
               TheValue(other.TheValue),
               ReturnValue(other.ReturnValue),
-              GenerateAddress(false),
-              NeedsDereference(other.NeedsDereference),
               ModuleMap(other.ModuleMap),
               FunctionMap(other.FunctionMap) {}
 
@@ -145,18 +126,6 @@ namespace mirv {
       const llvm::Type *
       getType(ptr<Symbol<Type<TypeBase> > >::const_type) const;
 
-      bool generateAddress(void) const {
-        return GenerateAddress;
-      }
-
-      void setNeedsDereference(bool value) {
-        NeedsDereference = value;
-      }
-
-      bool needsDereference(void) const {
-        return NeedsDereference;
-      }
-
       void createModule(const std::string &name) {
         checkInvariant(TheModule == 0, "Module already exists");
         TheModule = new llvm::Module(name, *Context);
@@ -181,6 +150,9 @@ namespace mirv {
       void createVariable(const std::string &name,
                           ptr<Symbol<Type<TypeBase> > >::const_type type);
 
+      void createAlloca(const std::string &name,
+                        ptr<Symbol<Type<TypeBase> > >::const_type type);
+
       void createGlobalVariable(ptr<Symbol<GlobalVariable> >::const_type sym,
                                 const InheritedAttribute &inh);
 
@@ -201,7 +173,7 @@ namespace mirv {
         setValue(constant);
       }
 
-      llvm::Value *getVariable(const std::string &name);
+      llvm::Value *getVariable(ptr<Symbol<Variable> >::const_type sym);
       llvm::Value *getGlobalVariable(const std::string &name);
 
       llvm::BasicBlock *createBlock(const std::string &name) {
@@ -225,8 +197,8 @@ namespace mirv {
     public:
       InheritedAttribute(void) = default;
 
-      InheritedAttribute(const InheritedAttribute &inherited, bool address)
-          : FlowAttribute(inherited, address) {}
+      InheritedAttribute(const InheritedAttribute &inherited)
+          : FlowAttribute(inherited) {}
 
       InheritedAttribute(const SynthesizedAttribute &synthesized) 
           : FlowAttribute(synthesized) {
@@ -318,7 +290,6 @@ namespace mirv {
       void visit(ptr<Statement<Before> >::const_type stmt);
       void visit(ptr<Statement<After> >::const_type stmt);
       void visit(ptr<Statement<Goto> >::const_type stmt);
-      void visit(ptr<Statement<Assignment> >::const_type stmt);
       void visit(ptr<Statement<Allocate> >::const_type stmt);
     };
 
@@ -343,7 +314,7 @@ namespace mirv {
       void visit(ptr<Statement<Goto> >::const_type stmt);
       void visit(ptr<Statement<Return> >::const_type stmt);
       void visit(ptr<Statement<Phi> >::const_type stmt);
-      void visit(ptr<Statement<Assignment> >::const_type stmt);
+      void visit(ptr<Statement<Store> >::const_type stmt);
       void visit(ptr<Statement<Call> >::const_type stmt);
       void visit(ptr<Statement<IfElse> >::const_type stmt);
       void visit(ptr<Statement<IfThen> >::const_type stmt);
@@ -406,7 +377,7 @@ namespace mirv {
       void visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr);
       void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
       void visit(ptr<Expression<Reference<GlobalVariable> > >::const_type expr);
-      void visit(ptr<Expression<Reference<Tuple> > >::const_type expr);
+      void visit(ptr<Expression<Load> >::const_type expr);
       void visit(ptr<Expression<TuplePointer> >::const_type expr);
       void visit(ptr<Expression<Reference<Function> > >::const_type expr);
       void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
@@ -531,7 +502,7 @@ namespace mirv {
       // between-expression action when flowing through statements
       // (assignment is the only multiple-expression statement and we
       // don't want to special-case it) we solve the problem this way.
-      void visit(ptr<Statement<Assignment> >::const_type stmt) {
+      void visit(ptr<Statement<Store> >::const_type stmt) {
         this->doEnter(stmt);
 
         for (auto i = stmt->expressionBegin();

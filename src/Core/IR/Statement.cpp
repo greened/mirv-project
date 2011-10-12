@@ -207,10 +207,10 @@ namespace mirv{
 
   template
   void
-  Visitable<Statement<Assignment>, StatementVisitor>::accept(StatementVisitor &);
+  Visitable<Statement<Store>, StatementVisitor>::accept(StatementVisitor &);
   template
   void
-  ConstVisitable<Statement<Assignment>, ConstStatementVisitor, StatementVisitor>::accept(ConstStatementVisitor &) const;
+  ConstVisitable<Statement<Store>, ConstStatementVisitor, StatementVisitor>::accept(ConstStatementVisitor &) const;
 
   template
   void

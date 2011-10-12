@@ -77,49 +77,27 @@ namespace mirv {
      typedef Interface BaseType;
    };
 
-  /// Specify the interface for array index expressions.
-  template<>
-  class Reference<Tuple> { 
+  /// Specify the interface for load expressions.
+  class Load { 
   private:
     // We need to manually define the interface to override
     // InnerExpression's type() implementation.
-    class Interface
-        : public InnerExpression,
+    class Interface : public Expression<Unary>,
     //public Expression<Ref>,
-          public boost::enable_shared_from_this<Expression<Reference<Tuple> > > {
+          public boost::enable_shared_from_this<Expression<Load> > {
     private:
       Expression<Base> *cloneImpl(void) {
-        std::vector<ptr<Expression<Base> >::type> children;
-
-        for (auto i = begin(); i != end(); ++i) {
-          children.push_back((*i)->clone());
-        }
-
-        ptr<Expression<Reference<Tuple> > >::type expr(
-          mirv::make<Expression<Reference<Tuple> > >(*children.begin(),
-                                                     children.begin() + 1,
-                                                     children.end()));
-        Expression<Reference<Tuple> > *result = expr.get();
+        ptr<Expression<Load> >::type expr(
+          mirv::make<Expression<Load> >(getOperand()->clone()));
+        Expression<Load> *result = expr.get();
         expr.reset();
         return result;
       }
- 
+
+      void doValidation(void) const;
+
     public:
-      Interface(ChildPtr Base, ChildPtr Index)
-          : InnerExpression(Base, Index) {}
-
-      template<typename ExprType>
-      Interface(ChildPtr Base,
-                const boost::shared_ptr<Expression<ExprType> > &Index)
-          : InnerExpression(Base, fast_cast<Expression<mirv::Base> >(Index)) {}
-
-      template<typename Sequence>
-      Interface(ChildPtr Base, const Sequence &indices)
-          : InnerExpression(Base, indices) {}
-
-      template<typename InputIterator>
-      Interface(ChildPtr Base, InputIterator start, InputIterator end)
-          : InnerExpression(Base, start, end) {}
+      Interface(ChildPtr address);
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
@@ -133,8 +111,8 @@ namespace mirv {
     };
 
    public:
-     typedef InnerExpression VisitorBaseType;
-     typedef Interface BaseType;
+    typedef Expression<Unary> VisitorBaseType;
+    typedef Interface BaseType;
   };
 
   /// Take the address of a tuple item.
@@ -172,6 +150,13 @@ namespace mirv {
       template<typename Sequence>
       Interface(ChildPtr Base, const Sequence &indices)
           : InnerExpression(Base, indices) {}
+
+      Interface(ChildPtr Base, ChildPtr Index1, ChildPtr Index2)
+          : InnerExpression(Base, Index1, Index2) {}
+
+      template<typename Sequence>
+      Interface(ChildPtr Base, ChildPtr Index, const Sequence &indices)
+          : InnerExpression(Base, Index, indices) {}
 
       template<typename InputIterator>
       Interface(ChildPtr Base, InputIterator start, InputIterator end)
