@@ -2,6 +2,7 @@
 #define mirv_Core_Builder_ExpressionGrammar_hpp
 
 #include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
+#include <mirv/Core/Builder/ExpressionTransforms.hpp>
 
 #include <mirv/Core/Builder/CallExpressionGrammar.hpp>
 #include <mirv/Core/Builder/ConstantGrammar.hpp>
@@ -58,42 +59,26 @@ namespace mirv {
     /// via load/store.
     struct VariableRefBuilder : boost::proto::when<
       VariableTerminal,
-      // Pointer
-      ConstructUnary<Expression<Load> >(
-        boost::proto::_data,
-        ConstructUnary<
-          Expression<Reference<Variable> >
-          >(boost::proto::_data,
-            LookupSymbol<Symbol<Variable> >(boost::proto::_data,
-                                            boost::proto::_value)))
-      > {};
+      VariableRefTransform(boost::proto::_data, boost::proto::_value)
+       > {};
 
     /// Given a global variable, construct a reference to its value.
     /// Globals are always accessed via load/store.
     struct GlobalVariableRefBuilder : boost::proto::when<
       GlobalVariableTerminal,
-      ConstructGlobalReference(
-        boost::proto::_data,
-        LookupSymbol<Symbol<GlobalVariable> >(boost::proto::_data,
-                                              boost::proto::_value))
+      GlobalVariableRefTransform(boost::proto::_data, boost::proto::_value)
       > {};
 
   /// This is the grammar to build a reference to a function.
   struct FunctionRefBuilder : boost::proto::when<
     FunctionTerminal,
-    ConstructUnary<
-      Expression<Reference<Function> >
-      >(boost::proto::_data,
-        LookupSymbol<Symbol<Function> >(boost::proto::_data,
-                                        boost::proto::_value))
+    FunctionRefTransform(boost::proto::_data, boost::proto::_value)
     > {};
 
     /// This is the grammar to construct references to constants.
     struct ConstantRefBuilder : boost::proto::when<
       ConstantBuilder,
-      ConstructUnary<
-        Expression<Reference<Constant<Base> > >
-        >(boost::proto::_data, ConstantBuilder(boost::proto::_))
+      ConstantRefTransform(boost::proto::_data, ConstantBuilder(boost::proto::_))
       > {};
 
     /// This is the grammar for all terminal expressions.
@@ -305,7 +290,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
     struct ArrayRefBuilder : boost::proto::or_<
       boost::proto::when<
         MultiSubscriptRule,
-        ConstructUnary<Expression<Load> >(
+        ArrayRefSequenceTransform(
           boost::proto::_data,
           ConstructAddressFromSequence(
             boost::proto::_data,
@@ -314,14 +299,12 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
         >,
       boost::proto::when<
         SubscriptRule,
-        ConstructUnary<Expression<Load> >(
+        ArrayRefIndexTransform(
           boost::proto::_data,
-          ConstructAddress(
-            boost::proto::_data,
-            ConstructExpressionGrammar(boost::proto::_left),
-            ConstructExpressionGrammar(boost::proto::_right)))
+          ConstructExpressionGrammar(boost::proto::_left),
+          ConstructExpressionGrammar(boost::proto::_right))
         > 
-      > {};
+      >{};
 
     /// Group subscript expression grammars.
     template<>
@@ -332,14 +315,15 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
     struct ArrayAddressBuilder : boost::proto::or_<
       boost::proto::when<
         MultiSubscriptAddressRule,
-        ConstructAddressFromSequence(
-          boost::proto::_data,
-          ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),
-          boost::proto::_right(boost::proto::_left))
+        ArrayAddressSequenceTransform(
+          ConstructAddressFromSequence(
+            boost::proto::_data,
+            ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),
+            boost::proto::_right(boost::proto::_left)))
         >,
       boost::proto::when<
         SubscriptAddressRule,
-        ConstructAddress(
+        ArrayAddressIndexTransform(
           boost::proto::_data,
           ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),
           ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)))
