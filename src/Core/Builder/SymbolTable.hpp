@@ -10,6 +10,7 @@
 #include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/IR/StatementFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
+#include <mirv/Core/IR/PlaceholderTypeFwd.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/proto/proto.hpp>

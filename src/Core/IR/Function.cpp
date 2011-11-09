@@ -4,15 +4,15 @@
 #include <mirv/Core/IR/Variable.hpp>
 
 namespace mirv {
-  Function::Interface::Interface(const std::string &n,
-                                 TypePtr t,
-                                 StatementPtr s)
+  detail::FunctionInterface::FunctionInterface(const std::string &n,
+                                               TypePtr t,
+                                               StatementPtr s)
       : GlobalBaseType(n, t),
           // If the statement is not a block, make it one.
           StatementBaseType(dyn_cast<Statement<Block> >(s) ?
                             s : boost::static_pointer_cast<Statement<Base> >(mirv::make<Statement<Block> >(s))) {}
 
-  void Function::Interface::statementPushBack(StatementPtr stmt)
+  void detail::FunctionInterface::statementPushBack(StatementPtr stmt)
   {
     // If the statement is not a block, make it one.
     if (StatementBaseType::empty())  {
@@ -33,7 +33,7 @@ namespace mirv {
     }
   }
 
-  void Function::Interface::variablePushBack(VariablePtr v)
+  void detail::FunctionInterface::variablePushBack(VariablePtr v)
   {
     VariableBaseType::push_back(v); 
     v->setParent(this->getSharedHandle());

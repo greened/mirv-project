@@ -1,37 +1,42 @@
 #ifndef mirv_Core_IR_IntegralType_hpp
 #define mirv_Core_IR_IntegralType_hpp
 
+#include <mirv/Core/IR/IntegralTypeFwd.hpp>
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/Type.hpp>
 
 #include <boost/lexical_cast.hpp>
 
 namespace mirv {
+  struct Integral;
+
   /// Integer types.
-   struct Integral {
-   private:
-    typedef Symbol<Type<Simple> > InterfaceBaseType;
+  namespace detail {
+    class IntegralInterface : public Symbol<Type<Simple> >,
+                              public boost::enable_shared_from_this<Symbol<Type<Integral> > > {
+    private:
+      typedef Symbol<Type<Simple> > BaseType;
+      std::uint64_t typeSize;
+ 
+    public:
+      IntegralInterface(std::uint64_t size);
 
-     class Interface : public InterfaceBaseType,
-                       public boost::enable_shared_from_this<Symbol<Type<Integral> > > {
-     private:
-       typedef InterfaceBaseType BaseType;
-       std::uint64_t typeSize;
+      ptr<Node<Base>>::type getSharedHandle(void) {
+        return fast_cast<Node<Base>>(shared_from_this());
+      }
+      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+        return fast_cast<const Node<Base>>(shared_from_this());
+      }
+    };
+  }
 
-     public:
-       Interface(std::uint64_t size);
+  struct Integral {
+  private:
+    typedef detail::IntegralInterface Interface;
 
-       ptr<Node<Base>>::type getSharedHandle(void) {
-         return fast_cast<Node<Base>>(shared_from_this());
-       };
-       ptr<Node<Base>>::const_type getSharedHandle(void) const {
-         return fast_cast<const Node<Base>>(shared_from_this());
-       };
-     };
-
-   public:
-     typedef Interface BaseType;
-     typedef Symbol<Type<Simple> > VisitorBaseType;
+  public:
+    typedef Interface BaseType;
+    typedef Symbol<Type<Simple> > VisitorBaseType;
   };
 }
 

@@ -22,8 +22,8 @@
 
 namespace mirv {
   void
-  Tuple::Interface::construct_optimized(ptr<Symbol<Type<TypeBase> > >::const_type t,
-                                        std::uint64_t count) 
+  detail::TupleInterface::construct_optimized(ptr<Symbol<Type<TypeBase> > >::const_type t,
+                                              std::uint64_t count) 
   {
     push_back(t);
     multiplier =
@@ -31,7 +31,7 @@ namespace mirv {
   }
 
   ptr<Symbol<Type<TypeBase> > >::const_type
-  Tuple::Interface::elementType(ptr<Expression<Base> >::const_type index) const
+  detail::TupleInterface::elementType(ptr<Expression<Base> >::const_type index) const
   {
     if (multiplier) {
       // Types are uniform.
@@ -47,7 +47,8 @@ namespace mirv {
     return *type;
   }
 
-  Tuple::Interface::BitSizeType Tuple::Interface::bitsize(void) const
+  detail::TupleInterface::BitSizeType
+  detail::TupleInterface::bitsize(void) const
   {
     if (empty()) {
       return Builder::makeExpression(0, this->parent<Symbol<Module> >());

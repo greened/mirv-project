@@ -9,19 +9,19 @@
 #include <functional>
 
 namespace mirv {
-  Module::Interface::Interface(const std::string &n) : Symbol<Named>(n)
+  detail::ModuleInterface::ModuleInterface(const std::string &n) : Symbol<Named>(n)
   {
   }
 
   void
-  Module::Interface::functionPushBack(FunctionPointer f)
+  detail::ModuleInterface::functionPushBack(FunctionPointer f)
   {
     FunctionBaseType::push_back(f);
     f->setParent(this->getSharedHandle());
   }
 
-  Module::Interface::FunctionIterator
-  Module::Interface::functionFind(const std::string &name) 
+  detail::ModuleInterface::FunctionIterator
+  detail::ModuleInterface::functionFind(const std::string &name) 
   {
     return std::find_if(functionBegin(), functionEnd(),
                         std::bind(SymbolByName<Function>(),
@@ -29,14 +29,14 @@ namespace mirv {
   }
 
   void
-  Module::Interface::globalVariablePushBack(GlobalVariablePointer v)
+  detail::ModuleInterface::globalVariablePushBack(GlobalVariablePointer v)
   {
     GlobalVariableBaseType::push_back(v);
     v->setParent(this->getSharedHandle());
   }
 
-  Module::Interface::GlobalVariableIterator
-  Module::Interface::globalVariableFind(const std::string &name) 
+  detail::ModuleInterface::GlobalVariableIterator
+  detail::ModuleInterface::globalVariableFind(const std::string &name) 
   {
     return std::find_if(globalVariableBegin(), globalVariableEnd(),
                         std::bind(SymbolByName<GlobalVariable>(),
@@ -44,14 +44,14 @@ namespace mirv {
   }
 
   void
-  Module::Interface::typePushBack(TypePointer t)
+  detail::ModuleInterface::typePushBack(TypePointer t)
   {
     TypeBaseType::push_back(t);
     t->setParent(this->getSharedHandle());
   }
 
-  Module::Interface::TypeIterator
-  Module::Interface::typeFind(const std::string &name) 
+  detail::ModuleInterface::TypeIterator
+  detail::ModuleInterface::typeFind(const std::string &name) 
   {
     return std::find_if(typeBegin(), typeEnd(),
                         std::bind(SymbolByName<Type<TypeBase> >(),

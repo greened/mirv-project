@@ -19,8 +19,8 @@ namespace mirv {
   template<typename Tag>
   class Type {
   public:
-    typedef typename Tag::BaseType BaseType;
-    typedef typename Tag::VisitorBaseType VisitorBaseType;
+    typedef typename detail::BaseTypeOfTypeSymbol<Tag>::BaseType BaseType;
+    typedef typename detail::VisitorBaseTypeOfTypeSymbol<Tag>::VisitorBaseType VisitorBaseType;
 
     Type() {}
 
@@ -43,12 +43,8 @@ namespace mirv {
     }
   };
 
-  /// A type tag for the base type of all types.
-  class TypeBase {
-  private:
-    typedef Symbol<Base> InterfaceBaseType;
-
-    class Interface : public InterfaceBaseType {
+  namespace detail {
+    class TypeBaseInterface : public Symbol<Base> {
     public:
       typedef ptr<Expression<Base> >::type BitSizeType;
       virtual BitSizeType bitsize(void) const = 0;
@@ -56,6 +52,12 @@ namespace mirv {
       resolve(ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
               ptr<Symbol<Type<TypeBase> > >::const_type replacement) {}
     };
+  }
+
+  /// A type tag for the base type of all types.
+  class TypeBase {
+  private:
+    typedef detail::TypeBaseInterface Interface;
 
   public:
     typedef Interface BaseType;
@@ -135,18 +137,13 @@ namespace mirv {
     false> BaseType;
   };
 
-  /// A type with no children that has a specific bit size, for
-  /// example integer and floating point types.
-  class Simple {
-  private:
-    typedef LeafType InterfaceBaseType;
-
-    class Interface : public InterfaceBaseType {
+  namespace detail {
+    class SimpleInterface : public LeafType {
     private:
       std::uint64_t bsize;
 
     public:
-      Interface(std::uint64_t s) : bsize(s) {};
+      SimpleInterface(std::uint64_t s) : bsize(s) {};
 
       std::uint64_t integerBitSize(void) const {
         return bsize;
@@ -154,23 +151,32 @@ namespace mirv {
 
       BitSizeType bitsize(void) const;
     };
+  }
+
+  /// A type with no children that has a specific bit size, for
+  /// example integer and floating point types.
+  class Simple {
+  private:
+    typedef detail::SimpleInterface Interface;
 
   public:
     typedef Interface BaseType;
     typedef LeafType VisitorBaseType;
   };
 
-  /// A type that is built upon other types.  For example structures
-  /// and pointers.
-  struct Derived {
-  private:
-    typedef InnerType InterfaceBaseType;
-
-    class Interface : public InterfaceBaseType {
+  namespace detail {
+    class DerivedInterface : public InnerType {
     public:
       void resolve(ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
                    ptr<Symbol<Type<TypeBase> > >::const_type replacement);
     };
+  }
+
+  /// A type that is built upon other types.  For example structures
+  /// and pointers.
+  struct Derived {
+  private:
+    typedef detail::DerivedInterface Interface;
 
   public:
     typedef Interface BaseType;

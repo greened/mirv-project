@@ -1,6 +1,8 @@
 #ifndef mirv_Core_IR_Symbol_hpp
 #define mirv_Core_IR_Symbol_hpp
 
+#include <mirv/Core/IR/SymbolFwd.hpp>
+
 #include <mirv/Core/IR/Base.hpp>
 #include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/Node.hpp>
@@ -19,30 +21,7 @@ namespace mirv {
   struct SymbolVisitor;
   struct ConstSymbolVisitor;
 
-  template<typename Tag> class Symbol;
-  
-  namespace detail {
-    /// Define the vitiation base type for a symbol.
-    template<typename Tag>
-    struct VisitorBase<Symbol<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    /// Define the base type of a general Symbol.
-    template<typename Tag>
-    struct BaseTypeOf<Symbol<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-    /// Define the visitation base type for base symbols.
-    template<>
-    struct VisitorBase<Symbol<Base> > {
-      typedef Node<Base> VisitorBaseType;
-    };
-    /// Define the base type of base symbols.
-    template<>
-    struct BaseTypeOf<Symbol<Base> > {
-      typedef Node<Base> BaseType;
-    };
-  }
+  template<typename Tag> class Symbol;  
 
   /// This is the symbol implementation for all symbol types.  Each
   /// symbol type is an instance of this template (Symbol<Variable>,
@@ -58,7 +37,7 @@ namespace mirv {
     ConstSymbolVisitor,
     SymbolVisitor
     > BaseType;
-    typedef typename Tag::VisitorBaseType VisitorBaseType;
+    typedef typename detail::VisitorBaseTypeOfSymbol<Tag>::VisitorBaseType VisitorBaseType;
 
   protected:
     Symbol(void) {}
@@ -238,10 +217,8 @@ namespace mirv {
     typedef Symbol<Base> VisitorBaseType;
   };
 
-  /// A symbol that has a type associated with it.
-  class Typed {
-  private:
-    class Interface : public virtual Symbol<Base> { 
+  namespace detail {
+    class TypedInterface : public virtual Symbol<Base> { 
     public:
       typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
 
@@ -249,48 +226,54 @@ namespace mirv {
       TypePtr theType;
 
     public:
-      Interface(TypePtr t) : theType(t) {};
+      TypedInterface(TypePtr t) : theType(t) {};
 
       TypePtr type(void) const {
 	return(theType);
       }
     };
+  }
+
+  /// A symbol that has a type associated with it.
+  class Typed {
+  private:
+    typedef detail::TypedInterface Interface;
 
   public:
     typedef Interface BaseType;
     typedef Symbol<Base> VisitorBaseType;
   };
 
-  /// A symbol that has a name associated with it.
-  class Named {
-  private:
-    class Interface : public virtual Symbol<Base> { 
+  namespace detail {
+    class NamedInterface : public virtual Symbol<Base> { 
     private:
       std::string the_name;
 
     public:
-      Interface(const std::string &n) : the_name(n) {};
+      NamedInterface(const std::string &n) : the_name(n) {};
 
       virtual std::string name(void) const {
 	return(the_name);
       }
     };
+  }
+
+  /// A symbol that has a name associated with it.
+  class Named {
+  private:
+    typedef detail::NamedInterface Interface;
 
   public:
     typedef Interface BaseType;
     typedef Symbol<Base> VisitorBaseType;
   };
 
-  /// A global symbol, a function or global variable.
-  class Global {
-  private:
-    typedef Symbol<Named> NamedBaseType;
-    typedef Symbol<Typed> TypedBaseType;
-    class Interface : public NamedBaseType,
-                      public TypedBaseType { 
+  namespace detail {
+    class GlobalInterface : public Symbol<Named>,
+                            public Symbol<Typed> { 
     public:
-      Interface(const std::string &n, TypePtr t)
-          : NamedBaseType(n), TypedBaseType(t) {};
+      GlobalInterface(const std::string &n, TypePtr t)
+          : Symbol<Named>(n), Symbol<Typed>(t) {};
 
        // We need these to be the final overriders for
        // Visitable::accept functions.
@@ -301,6 +284,12 @@ namespace mirv {
          error("Global::Interface::accept called!");
        }
     };
+  }
+
+  /// A global symbol, a function or global variable.
+  class Global {
+  private:
+    typedef detail::GlobalInterface Interface;
 
   public:
     typedef Interface BaseType;

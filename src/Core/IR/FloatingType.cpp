@@ -2,8 +2,8 @@
 #include <mirv/Core/IR/FloatingType.hpp>
 
 namespace mirv {
-  Floating::Interface::Interface(std::uint64_t size)
-      : InterfaceBaseType(size)
+  detail::FloatingInterface::FloatingInterface(std::uint64_t size)
+      : BaseType(size)
   {
   }
 }

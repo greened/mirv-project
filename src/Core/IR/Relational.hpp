@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_Relational_hpp
 #define mirv_Core_IR_Relational_hpp
 
+#include <mirv/Core/IR/RelationalFwd.hpp>
 #include <mirv/Core/IR/Expression.hpp>
 #include <boost/mpl/vector.hpp>
 

@@ -197,8 +197,8 @@ namespace mirv {
 
   ConstSymbolVisitor::result_type
   ConstSymbolVisitor::visit(ptr<Symbol<Type<FunctionType> > >::const_type s) {
-    ptr<Symbol<Type<FunctionType> >::VisitorBaseType>::const_type p =
-      fast_cast<const Symbol<Type<FunctionType> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOf<Symbol<Type<FunctionType> > >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(s);
     visit(p);
   }
 

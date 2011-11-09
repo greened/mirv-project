@@ -31,30 +31,6 @@ namespace mirv {
   struct StatementVisitor;
   struct ConstStatementVisitor;
 
-  template<typename Tag> class Statement;
-
-  namespace detail {
-    /// Define the visitation base type for statements.
-    template<typename Tag>
-    struct VisitorBase<Statement<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    /// Define the base type for statements.
-    template<typename Tag>
-    struct BaseTypeOf<Statement<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-    /// Define the visitation base class for base statements.
-    template<>
-    struct VisitorBase<Statement<Base> > {
-      typedef Node<Base> VisitorBaseType;
-    };
-    template<>
-    struct BaseTypeOf<Statement<Base> > {
-      typedef Node<Base> BaseType;
-    };
-  }
-
   /// This is the statement implementation for all statement types.
   /// Each statement type is an instance of this template
   /// (Statement<IfThen>, Statement<DoWhile>, etc.).  It keeps all of
@@ -75,7 +51,7 @@ namespace mirv {
     ConstStatementVisitor,
     StatementVisitor
     > BaseType;
-    typedef typename Tag::VisitorBaseType VisitorBaseType;
+    typedef typename detail::VisitorBaseTypeOfStatement<Tag>::VisitorBaseType VisitorBaseType;
 
   protected:
     Statement(void) {}
@@ -262,36 +238,8 @@ namespace mirv {
     typedef Statement<Base> VisitorBaseType;
   };
 
-  /// This is a metafunction to generate a scattered base class
-  /// hierarchy of property statements.  The Sequence is a sorted
-  /// list of property tags and Root is the base type of the whole
-  /// hierarchy.
-  template<typename Root, typename Tag, typename ...Property>
-  class StatementBaseGenerator {
-    template<typename ...BaseProperty>
-    class StatementBase 
-        : public Root,
-          public Statement<BaseProperty>... {
-    public:
-      StatementBase(void) : Root() {}
-      template<typename ...Args>
-        StatementBase(const Args &...args) : Root(args...) {}
-      virtual void accept(StatementVisitor &) {
-        error("StatementBase::accept called!");
-      }
-      virtual void accept(ConstStatementVisitor &) const {
-        error("StatementBase::accept called!");
-      }
-    };
-
-  public:
-    typedef StatementBase<Property...> type;
-  };
-
-  /// Statement semantics are somehow affected by expressions
-  class Controlled {
-  private:
-    class Interface : public virtual Statement<Base> {
+  namespace detail {
+    class ControlledInterface : public virtual Statement<Base> {
     protected:
       typedef ptr<Expression<Base> >::type ExpressionPtr;
       typedef ptr<Expression<Base> >::const_type ConstExpressionPtr;
@@ -302,7 +250,7 @@ namespace mirv {
 
     protected:
       template<typename ...A1>
-      Interface(A1... args) : expressions{args...} {}
+      ControlledInterface(A1... args) : expressions{args...} {}
 
     public:
       typedef ExpressionList::iterator ExpressionIterator;
@@ -373,22 +321,26 @@ namespace mirv {
 
       bool expressionEmpty(void) const { return(expressions.empty()); };
     };
+  }
+
+  /// Statement semantics are somehow affected by expressions
+  class Controlled {
+  private:
+    typedef detail::ControlledInterface Interface;
 
   public:
     typedef Statement<Base> VisitorBaseType;
     typedef Interface BaseType;
   };
 
-  /// A statement with a single expression child.  It may have one of
-  /// more children of other types.
-  class SingleExpression { 
-  private: 
-    typedef Statement<Controlled> InterfaceBaseType;
+  namespace detail {
+    class SingleExpressionInterface : public Statement<Controlled> {
+    private:
+      typedef Statement<Controlled> InterfaceBaseType;
 
-    class Interface : public InterfaceBaseType {
     public:
       template<typename A1>
-      Interface(A1 a1) : InterfaceBaseType(a1) {}
+      SingleExpressionInterface(A1 a1) : InterfaceBaseType(a1) {}
 
       typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
       typedef InterfaceBaseType::ConstExpressionPtr
@@ -417,6 +369,13 @@ namespace mirv {
         return(*this->expressionBegin());
       }
     }; 
+  }
+
+  /// A statement with a single expression child.  It may have one of
+  /// more children of other types.
+  class SingleExpression { 
+  private: 
+    typedef detail::SingleExpressionInterface Interface;
 
   public:
     typedef Statement<Controlled> VisitorBaseType;

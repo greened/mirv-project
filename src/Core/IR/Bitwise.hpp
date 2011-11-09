@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_Bitwise_hpp
 #define mirv_Core_IR_Bitwise_hpp
 
+#include <mirv/Core/IR/BitwiseFwd.hpp>
 #include <mirv/Core/IR/Expression.hpp>
 #include <boost/mpl/vector.hpp>
 
