@@ -16,6 +16,12 @@
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
+#include <mirv/Core/IR/IntegralTypeFwd.hpp>
+#include <mirv/Core/IR/FloatingTypeFwd.hpp>
+#include <mirv/Core/IR/FunctionTypeFwd.hpp>
+#include <mirv/Core/IR/PlaceholderTypeFwd.hpp>
+#include <mirv/Core/IR/PointerTypeFwd.hpp>
+#include <mirv/Core/IR/TupleTypeFwd.hpp>
 #include <mirv/Core/Memory/Heap.hpp>
 
 #include <boost/mpl/vector.hpp>

@@ -3,10 +3,21 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <mirv/Core/IR/ConstantFwd.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
 
 namespace mirv {
   struct SymbolVisitor;
+
+  namespace detail {
+    class BaseConstantInterface
+        : public Symbol<Typed>,
+          public LeafSymbol {
+    public:
+      BaseConstantInterface(ptr<Symbol<Type<TypeBase> > >::const_type type)
+          : Symbol<Typed>(type) {}
+    };
+  }
 
   /// This is the type implementation for all constant symbols.  It is
   /// a templated Symbol tag.  Each type is an instance of this
@@ -23,32 +34,23 @@ namespace mirv {
     typedef LeafSymbol VisitorBaseType;
 
   private:
-    class Interface
-        : public Symbol<Typed>,
-          public LeafSymbol {
-    public:
-      Interface(ptr<Symbol<Type<TypeBase> > >::const_type type)
-          : Symbol<Typed>(type) {}
-    };
+    typedef detail::BaseConstantInterface Interface;
 
   public:
     typedef Interface BaseType;
   };
 
-  /// This is the generic constant tag.  Given a ValueType, it
-  /// represents a constant value of that type.
-  template<typename ValueType>
-  class Constant {
-  private:
-    class Interface 
+  namespace detail {
+    template<typename ValueType>
+    class ConstantInterface 
         : public Symbol<Constant<Base>>,
           public boost::enable_shared_from_this<Symbol<Constant<ValueType> > > {
     private:
       ValueType val;
 
     public:
-      Interface(typename ptr<Symbol<Type<TypeBase> > >::const_type type,
-                ValueType v) : Symbol<Constant<Base>>(type), val(v) {}
+      ConstantInterface(typename ptr<Symbol<Type<TypeBase> > >::const_type type,
+                        ValueType v) : Symbol<Constant<Base>>(type), val(v) {}
 
       ValueType value(void) const {
         return val;
@@ -61,6 +63,14 @@ namespace mirv {
          return fast_cast<const Node<Base>>(this->shared_from_this());
        };
     };
+  }
+
+  /// This is the generic constant tag.  Given a ValueType, it
+  /// represents a constant value of that type.
+  template<typename ValueType>
+  class Constant {
+  private:
+    typedef detail::ConstantInterface<ValueType> Interface;
 
   public:
     static void

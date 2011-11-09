@@ -10,8 +10,8 @@
 #include <cstdint>
 
 namespace mirv {
-  Placeholder::Interface::BitSizeType
-  Placeholder::Interface::bitsize(void) const
+  detail::PlaceholderInterface::BitSizeType
+  detail::PlaceholderInterface::bitsize(void) const
   {
     BitSizeType size =
       Builder::makeExpression(static_cast<std::uint64_t>(0ull),

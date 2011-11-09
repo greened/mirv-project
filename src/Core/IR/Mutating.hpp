@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_Mutating_hpp
 #define mirv_Core_IR_Mutating_hpp
 
+#include <mirv/Core/IR/MutatingFwd.hpp>
 #include <mirv/Core/IR/Statement.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/VariableFwd.hpp>
@@ -12,26 +13,19 @@
 #include <boost/bind/bind.hpp>
 
 namespace mirv {
-  /// This is the interface to statements that have two child
-  /// expressions.
-  class DualExpression {
-  public:
-    class Interface;
-    typedef Interface BaseType;
-    typedef Statement<Controlled> InterfaceBaseType;
-    typedef boost::mpl::vector<> Properties;
-    typedef Statement<Controlled> VisitorBaseType;
-
+  namespace detail {
     /// Define the interface for statesments with two child
     /// expressions.
-    class Interface : public InterfaceBaseType {
+    class DualExpressionInterface : public Statement<Controlled> {
+    private:
+      typedef Statement<Controlled> BaseType;
+
     public:
       template<typename E1, typename E2>
-      Interface(E1 e1, E2 e2) : Statement<Controlled>(e1, e2) {}
+      DualExpressionInterface(E1 e1, E2 e2) : BaseType(e1, e2) {}
 
-      typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
-      typedef InterfaceBaseType::ConstExpressionPtr 
-      ConstExpressionPtr;
+      typedef BaseType::ExpressionPtr ExpressionPtr;
+      typedef BaseType::ConstExpressionPtr ConstExpressionPtr;
          
       void setLeftExpression(ExpressionPtr e) {
         if (expressionEmpty()) {
@@ -76,18 +70,23 @@ namespace mirv {
         return(expressionBack());
       }
     };
+  }
+  /// This is the interface to statements that have two child
+  /// expressions.
+  class DualExpression {
+  private:
+    typedef detail::DualExpressionInterface Interface;
+
+  public:
+    typedef Interface BaseType;
+    typedef boost::mpl::vector<> Properties;
+    typedef Statement<Controlled> VisitorBaseType;
   };
 
-  /// Specify the interface to phi statements.  Phis are statements
-  /// only, not expressions.  This is to cleanly separate changes in
-  /// program state from general computation.  Expression trees imply
-  /// assignmnets to temporary variables at some level of translate,
-  /// but we are not concerned about those.
-  class Phi {
-  private:
-    class Interface : public Statement<Controlled>,
-                      public LeafStatement,
-                      public boost::enable_shared_from_this<Statement<Phi> > {
+  namespace detail {
+    class PhiInterface : public Statement<Controlled>,
+                         public LeafStatement,
+                         public boost::enable_shared_from_this<Statement<Phi> > {
     private:
       ptr<Symbol<Variable> >::type theTarget;
 
@@ -102,11 +101,11 @@ namespace mirv {
       typedef ReverseExpressionIterator reverse_iterator;
       typedef ConstReverseExpressionIterator const_reverse_iterator;
 
-      Interface(ptr<Symbol<Variable> >::type target) :
+      PhiInterface(ptr<Symbol<Variable> >::type target) :
           Statement<Controlled>(), LeafStatement(), theTarget(target) {}
 
       template<typename ...E>
-      Interface(ptr<Symbol<Variable> >::type target,
+      PhiInterface(ptr<Symbol<Variable> >::type target,
                 E ...exprs) :
           Statement<Controlled>(exprs...), LeafStatement(), theTarget(target) {}
 
@@ -156,21 +155,26 @@ namespace mirv {
         return expressionREnd();
       }
     };
+  }
+
+  /// Specify the interface to phi statements.  Phis are statements
+  /// only, not expressions.  This is to cleanly separate changes in
+  /// program state from general computation.  Expression trees imply
+  /// assignmnets to temporary variables at some level of translate,
+  /// but we are not concerned about those.
+  class Phi {
+  private:
+    typedef detail::PhiInterface Interface;
+
   public:
     typedef StatementBaseGenerator<Interface, Phi, Mutating>::type BaseType;
     typedef Statement<Controlled> VisitorBaseType;
   };
 
-  /// Specify the interface to store statements.  Stores are
-  /// statements only, not expressions.  This is to cleanly separate
-  /// changes in program state from general computation.  Expression
-  /// trees imply assignments to temporary variables at some level of
-  /// translation, but we are not concerned about those.
-  class Store {
-  private:
-    class Interface : public Statement<DualExpression>,
-                      public LeafStatement,
-                      public boost::enable_shared_from_this<Statement<Store> > {
+  namespace detail {
+    class StoreInterface : public Statement<DualExpression>,
+                           public LeafStatement,
+                           public boost::enable_shared_from_this<Statement<Store> > {
     private:
       Statement<Base> *cloneImpl(void);
       void doValidation(void) const;
@@ -184,8 +188,8 @@ namespace mirv {
       typedef ReverseExpressionIterator reverse_iterator;
       typedef ConstReverseExpressionIterator const_reverse_iterator;
 
-      Interface(ptr<Expression<Base> >::type e1,
-                ptr<Expression<Base> >::type e2);
+      StoreInterface(ptr<Expression<Base> >::type e1,
+                     ptr<Expression<Base> >::type e2);
 
       typedef ExpressionPtr ChildPtr;
       typedef ConstExpressionPtr ConstChildPtr;
@@ -223,18 +227,27 @@ namespace mirv {
         return expressionREnd();
       }
     };
+  }
+
+  /// Specify the interface to store statements.  Stores are
+  /// statements only, not expressions.  This is to cleanly separate
+  /// changes in program state from general computation.  Expression
+  /// trees imply assignments to temporary variables at some level of
+  /// translation, but we are not concerned about those.
+  class Store {
+  private:
+    typedef detail::StoreInterface Interface;
+
   public:
     typedef StatementBaseGenerator<Interface, Store, Mutating>::type BaseType;
     typedef Statement<DualExpression> VisitorBaseType;
   };
 
-  /// Specify the interface for function call statements.
-  class Call {
-  public:
+  namespace detail {
     /// Define the interface for Call statements.
-    class Interface  : public Statement<Controlled>,
-		       public LeafStatement,
-                       public boost::enable_shared_from_this<Statement<Call> > {
+    class CallInterface  : public Statement<Controlled>,
+                           public LeafStatement,
+                           public boost::enable_shared_from_this<Statement<Call> > {
     private:
       Statement<Base> *cloneImpl(void);
 
@@ -251,28 +264,28 @@ namespace mirv {
       typedef ConstReverseExpressionIterator const_reverse_iterator;
 
       // Require a function reference to construct.
-      Interface(ExpressionPtr function) : Statement<Controlled>(function) {}
-      Interface(ExpressionPtr function, ExpressionPtr returnValue)
+      CallInterface(ExpressionPtr function) : Statement<Controlled>(function) {}
+      CallInterface(ExpressionPtr function, ExpressionPtr returnValue)
           : Statement<Controlled>(function, returnValue) {}
 
       template<typename Sequence>
-      Interface(ExpressionPtr function, const Sequence &args)
+      CallInterface(ExpressionPtr function, const Sequence &args)
           : Statement<Controlled>(function) {
         // Add the parameters.
         boost::fusion::for_each(args,
-                                boost::bind(&Interface::expressionPushBack,
+                                boost::bind(&CallInterface::expressionPushBack,
                                             this,
                                             _1));
       }
 
       template<typename Sequence>
-      Interface(ExpressionPtr function,
-                ExpressionPtr returnValue,
-                const Sequence &args)
+      CallInterface(ExpressionPtr function,
+                    ExpressionPtr returnValue,
+                    const Sequence &args)
           : Statement<Controlled>(function, returnValue) {
         // Add the parameters.
         boost::fusion::for_each(args,
-                                boost::bind(&Interface::expressionPushBack,
+                                boost::bind(&CallInterface::expressionPushBack,
                                             this,
                                             _1));
       }
@@ -359,19 +372,22 @@ namespace mirv {
         return argumentREnd();
       }
     };
+  }
+
+  /// Specify the interface for function call statements.
+  class Call {
+  private:
+    typedef detail::CallInterface Interface;
 
   public:
     typedef StatementBaseGenerator<Interface, Call, Mutating>::type BaseType;
     typedef Statement<Controlled> VisitorBaseType;
   };
 
-  /// Specify the interface to alloc statements.
-  // TODO: Add alignment information.
-  class Allocate {
-  private:
-    class Interface : public Statement<DualExpression>,
-                      public LeafStatement,
-                      public boost::enable_shared_from_this<Statement<Allocate> > {
+  namespace detail {
+    class AllocateInterface : public Statement<DualExpression>,
+                              public LeafStatement,
+                              public boost::enable_shared_from_this<Statement<Allocate> > {
     public:
       typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
 
@@ -390,7 +406,7 @@ namespace mirv {
       typedef ConstReverseExpressionIterator const_reverse_iterator;
 
       template<typename E1, typename E2, typename T>
-      Interface(E1 e1, E2 e2, T t)
+      AllocateInterface(E1 e1, E2 e2, T t)
           : Statement<DualExpression>(e1, e2), LeafStatement(), theType(t) {}
 
       typedef ExpressionPtr ChildPtr;
@@ -433,6 +449,14 @@ namespace mirv {
         return expressionREnd();
       }
     };
+  }
+
+  /// Specify the interface to alloc statements.
+  // TODO: Add alignment information.
+  class Allocate {
+  private:
+    typedef detail::AllocateInterface Interface;
+
   public:
     typedef StatementBaseGenerator<Interface, Allocate, Mutating>::type BaseType;
     typedef Statement<DualExpression> VisitorBaseType;

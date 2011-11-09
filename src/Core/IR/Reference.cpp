@@ -9,15 +9,15 @@
 #include <iostream>
 
 namespace mirv {
-  Load::Interface::Interface(ChildPtr address)
+  detail::LoadInterface::LoadInterface(ChildPtr address)
       : Expression<Unary>(address) 
   {
     checkInvariant(dyn_cast<const Symbol<Type<Pointer> > >(address->type()),
       "Load source must have pointer type");
   }
   
-  Load::Interface::TypePtr
-  Load::Interface::type(void) const 
+  detail::LoadInterface::TypePtr
+  detail::LoadInterface::type(void) const 
   {
     ptr<Symbol<Type<TypeBase> > >::const_type ptrType =
       (*this->begin())->type();
@@ -28,8 +28,8 @@ namespace mirv {
     return pointerType->getBaseType();
   }
 
-  TuplePointer::Interface::TypePtr
-  TuplePointer::Interface::type(void) const 
+  detail::TuplePointerInterface::TypePtr
+  detail::TuplePointerInterface::type(void) const 
   {
     // std::cerr << "TuplePointer::type expr:\n";
     // print(std::cerr, this->getSharedHandle());
@@ -90,7 +90,7 @@ namespace mirv {
     return pointerType;
   }
 
-  void Load::Interface::doValidation(void) const {
+  void detail::LoadInterface::doValidation(void) const {
     if (!empty() && getOperand()) {
       ptr<Symbol<Type<Pointer> > >::const_type pointerType
         = safe_cast<const Symbol<Type<Pointer> > >(getOperand()->type());

@@ -6,8 +6,8 @@
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
-#include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/AddressConstant.hpp>
+#include <mirv/Core/IR/Constant.hpp>
 #include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/IR/Expression.hpp>
 #include <mirv/Core/IR/Arithmetic.hpp>

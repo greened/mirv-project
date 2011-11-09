@@ -4,8 +4,8 @@
 #include <mirv/Core/IR/Module.hpp>
 
 namespace mirv {
-  Integral::Interface::Interface(std::uint64_t size)
-      : InterfaceBaseType(size)
+  detail::IntegralInterface::IntegralInterface(std::uint64_t size)
+      : BaseType(size)
   {
   }
 }

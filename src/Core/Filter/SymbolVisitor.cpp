@@ -10,7 +10,7 @@
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
+//#include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/TupleType.hpp>
 #include <mirv/Core/IR/PlaceholderType.hpp>
 
