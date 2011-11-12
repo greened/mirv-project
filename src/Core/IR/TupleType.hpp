@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_TupleType_hpp
 #define mirv_Core_IR_TupleType_hpp
 
+#include <mirv/Core/IR/TupleTypeFwd.hpp>
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/Type.hpp>
 
@@ -14,15 +15,14 @@
 #include <algorithm>
 
 namespace mirv {
-  /// A tuple type.  Multidimensional tuples are represented by tuples
-  /// of tuples.
-  struct Tuple {
-  private:
-    typedef Symbol<Type<Derived> > InterfaceBaseType;
+  struct Tuple;
 
-    class Interface : public InterfaceBaseType,
-                      public boost::enable_shared_from_this<Symbol<Type<Tuple> > > {
+  namespace detail {
+    class TupleInterface : public Symbol<Type<Derived> >,
+                           public boost::enable_shared_from_this<Symbol<Type<Tuple> > > {
     private:
+      typedef Symbol<Type<Derived> > BaseType;
+
       ptr<Expression<Base> >::type multiplier;
 
       // If all the members are the same, remove all but one and add
@@ -56,20 +56,20 @@ namespace mirv {
       typedef Symbol<Type<TypeBase> > ChildType;
       typedef ptr<ChildType>::const_type ConstChildPtr;
 
-      Interface(ConstChildPtr ElementType,
-                ptr<Expression<Base> >::type count) :
-          InterfaceBaseType(), multiplier(count) {
+      TupleInterface(ConstChildPtr ElementType,
+                     ptr<Expression<Base> >::type count) :
+          BaseType(), multiplier(count) {
         push_back(ElementType);
       }
 
       template<typename InputIterator>
-      Interface(InputIterator start, InputIterator end) 
-          : InterfaceBaseType() {
+      TupleInterface(InputIterator start, InputIterator end) 
+          : BaseType() {
         construct(start, end);
       }
 
       template<typename Sequence>
-      Interface(const Sequence &members) : InterfaceBaseType() {
+      TupleInterface(const Sequence &members) : BaseType() {
         // Add the member types.
         typedef std::vector<ConstChildPtr> ChildList;
         ChildList temp;
@@ -83,13 +83,13 @@ namespace mirv {
       }
 
       /// Construct a tuple type with a single member.
-      Interface(ptr<Symbol<Type<TypeBase> > >::const_type member)
-          : InterfaceBaseType() {
+      TupleInterface(ptr<Symbol<Type<TypeBase> > >::const_type member)
+          : BaseType() {
         push_back(member);
       }
 
       /// Construct a tuple type with no members.
-      Interface() : InterfaceBaseType() {}
+      TupleInterface() : BaseType() {}
 
       ptr<Symbol<Type<TypeBase> > >::const_type
       elementType(ptr<Expression<Base> >::const_type) const;
@@ -112,11 +112,11 @@ namespace mirv {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
     };
+  }
 
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Type<Derived> > VisitorBaseType;
-  };
+  /// A tuple type.  Multidimensional tuples are represented by tuples
+  /// of tuples.
+  struct Tuple {};
 }
 
 #endif

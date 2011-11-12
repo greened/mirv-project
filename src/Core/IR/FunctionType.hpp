@@ -13,17 +13,12 @@
 #include <boost/fusion/include/size.hpp>
 
 namespace mirv {
-  /// A function type.  Function types have a return type and a list
-  /// of parameter types.  A function that does not return anything
-  /// will have a pointer to zero as its return type.  A funtion that
-  /// does not take any arguments will have an empty argument
-  /// sequence.
-  struct FunctionType {
-  private:
-    typedef Symbol<Type<Derived> > InterfaceBaseType;
+  namespace detail {
+    class FunctionTypeInterface : public Symbol<Type<Derived> >,
+                                  public boost::enable_shared_from_this<Symbol<Type<FunctionType> > > {
+    private:
+      typedef Symbol<Type<Derived> > BaseType;
 
-    class Interface : public InterfaceBaseType,
-                      public boost::enable_shared_from_this<Symbol<Type<FunctionType> > > {
     public:
       typedef Symbol<Type<TypeBase> > ChildType;
       typedef ptr<ChildType>::const_type ChildPtr;
@@ -46,31 +41,31 @@ namespace mirv {
       }
 
     public:
-      Interface(ChildPtr returnType, VarargMark v = VarargMark::NotVararg)
-          : InterfaceBaseType(), vararg(v) {
+      FunctionTypeInterface(ChildPtr returnType, VarargMark v = VarargMark::NotVararg)
+          : BaseType(), vararg(v) {
         setReturnType(returnType);
       }
 
       template<typename Iterator>
-      Interface(ChildPtr returnType,
-                Iterator start,
-                Iterator end,
-                VarargMark v = VarargMark::NotVararg)
-          : InterfaceBaseType(), vararg(v) {
+      FunctionTypeInterface(ChildPtr returnType,
+                            Iterator start,
+                            Iterator end,
+                            VarargMark v = VarargMark::NotVararg)
+          : BaseType(), vararg(v) {
         setReturnType(returnType);
         // Add the parameter types.
         std::copy(start, end, std::back_inserter(*this));
       }
 
       template<typename Sequence>
-      Interface(ChildPtr returnType,
-                const Sequence &args,
-                VarargMark v)
-          : InterfaceBaseType(), vararg(v) {
+      FunctionTypeInterface(ChildPtr returnType,
+                            const Sequence &args,
+                            VarargMark v)
+          : BaseType(), vararg(v) {
         setReturnType(returnType);
         // Add the parameter types.
         boost::fusion::for_each(args,
-                                boost::bind(&Interface::push_back,
+                                boost::bind(&FunctionTypeInterface::push_back,
                                             this,
                                             _1));
       }
@@ -119,11 +114,14 @@ namespace mirv {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
     };
+  }
 
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Type<Derived> > VisitorBaseType;
-  };
+  /// A function type.  Function types have a return type and a list
+  /// of parameter types.  A function that does not return anything
+  /// will have a pointer to zero as its return type.  A funtion that
+  /// does not take any arguments will have an empty argument
+  /// sequence.
+  struct FunctionType {};
 }
 
 #endif

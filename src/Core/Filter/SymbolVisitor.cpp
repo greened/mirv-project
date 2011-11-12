@@ -10,129 +10,129 @@
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
+//#include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/TupleType.hpp>
 #include <mirv/Core/IR/PlaceholderType.hpp>
 
 namespace mirv {
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Base> >::type s) {}
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<InnerSymbol>::type s) {
-    ptr<InnerSymbol::VisitorBaseType>::type p =
-      fast_cast<InnerSymbol::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOf<InnerSymbol>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<LeafSymbol>::type s) {
-    ptr<LeafSymbol::VisitorBaseType>::type p =
-      fast_cast<LeafSymbol::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOf<LeafSymbol>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Typed> >::type s) {
-    ptr<Symbol<Typed>::VisitorBaseType>::type p =
-      fast_cast<Symbol<Typed>::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Typed>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Named> >::type s) {
-    ptr<Symbol<Named>::VisitorBaseType>::type p =
-      fast_cast<Symbol<Named>::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Named>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Global> >::type s) {
-    ptr<Symbol<Global>::VisitorBaseType>::type p =
-      fast_cast<Symbol<Global>::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Global>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Module> >::type s) {
-    ptr<Symbol<Module>::VisitorBaseType>::type p =
-      fast_cast<Symbol<Module>::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Module>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Function> >::type s) {
-    ptr<Symbol<Function>::VisitorBaseType>::type p =
-      fast_cast<Symbol<Function>::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Function>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Variable> >::type s) {
-    ptr<Symbol<Variable>::VisitorBaseType>::type p =
-      fast_cast<Symbol<Variable>::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Variable>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<GlobalVariable> >::type s) {
-    ptr<Symbol<GlobalVariable>::VisitorBaseType>::type p =
-      fast_cast<Symbol<GlobalVariable>::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<GlobalVariable>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<Base> > >::type s) {
-    ptr<Symbol<Constant<Base> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<Base> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<Base> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::int8_t> > >::type s) {
-    ptr<Symbol<Constant<std::int8_t> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::int8_t> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::int8_t> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::uint8_t> > >::type s) {
-    ptr<Symbol<Constant<std::uint8_t> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::uint8_t> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::uint8_t> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::int16_t> > >::type s) {
-    ptr<Symbol<Constant<std::int16_t> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::int16_t> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::int16_t> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::uint16_t> > >::type s) {
-    ptr<Symbol<Constant<std::uint16_t> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::uint16_t> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::uint16_t> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::int32_t> > >::type s) {
-    ptr<Symbol<Constant<std::int32_t> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::int32_t> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::int32_t> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::uint32_t> > >::type s) {
-    ptr<Symbol<Constant<std::uint32_t> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::uint32_t> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::uint32_t> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::int64_t> > >::type s) {
-    ptr<Symbol<Constant<std::int64_t> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::int64_t> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::int64_t> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::uint64_t> > >::type s) {
-    ptr<Symbol<Constant<std::uint64_t> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::uint64_t> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::uint64_t> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<float> > >::type s) {
-    ptr<Symbol<Constant<float> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<float> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<float> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<double> > >::type s) {
-    ptr<Symbol<Constant<double> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<double> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<double> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<std::string> > >::type s) {
-    ptr<Symbol<Constant<std::string> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<std::string> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<std::string> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 
   SymbolVisitor::result_type SymbolVisitor::visit(ptr<Symbol<Constant<Address> > >::type s) {
-    ptr<Symbol<Constant<Address> >::VisitorBaseType>::type p =
-      fast_cast<Symbol<Constant<Address> >::VisitorBaseType>(s);
+    typedef detail::VisitorBaseTypeOfSymbol<Constant<Address> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::type p = fast_cast<VisitorBaseType>(s);
     visit(p);
   }
 }

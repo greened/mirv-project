@@ -4,8 +4,8 @@
 #include <mirv/Core/IR/Module.hpp>
 
 namespace mirv {
-  FunctionType::Interface::BitSizeType
-  FunctionType::Interface::bitsize(void) const 
+  detail::FunctionTypeInterface::BitSizeType
+  detail::FunctionTypeInterface::bitsize(void) const 
   {
     // FIXME: This is target-dependent.
     return Builder::makeExpression(static_cast<std::uint64_t>(0),

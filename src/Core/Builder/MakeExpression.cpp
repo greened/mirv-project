@@ -9,7 +9,7 @@
 #include <mirv/Core/IR/Relational.hpp>
 #include <mirv/Core/IR/FloatingType.hpp>
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
+//#include <mirv/Core/IR/FunctionType.hpp>
 #include <mirv/Core/IR/IntegralType.hpp>
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/PlaceholderType.hpp>

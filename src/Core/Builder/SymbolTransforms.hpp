@@ -6,6 +6,8 @@
 #include <mirv/Core/Builder/SymbolGrammarFwd.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/IR/Base.hpp>
+#include <mirv/Core/IR/FloatingTypeFwd.hpp>
+#include <mirv/Core/IR/IntegralTypeFwd.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Printer.hpp>
 
