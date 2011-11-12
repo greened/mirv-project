@@ -3,19 +3,21 @@
 
 #include <vector>
 
+#include <mirv/Core/IR/PointerTypeFwd.hpp>
 #include <mirv/Core/IR/Type.hpp>
 
 namespace mirv {
-  /// A pointer type.
-  struct Pointer {
-  private:
-    typedef Symbol<Type<Derived> > InterfaceBaseType;
+  struct Pointer;
 
-    class Interface : public InterfaceBaseType,
-                      public boost::enable_shared_from_this<Symbol<Type<Pointer> > > {
+  namespace detail {
+    class PointerInterface : public Symbol<Type<Derived> >,
+                             public boost::enable_shared_from_this<Symbol<Type<Pointer> > > {
+    private:
+      typedef Symbol<Type<Derived> > BaseType;
+
     public:
-      Interface(ptr<Symbol<Type<TypeBase>>>::const_type base)
-          : InterfaceBaseType() {
+      PointerInterface(ptr<Symbol<Type<TypeBase> > >::const_type base)
+          : BaseType() {
         setBaseType(base);
       }
       typedef const Symbol<Type<TypeBase> > ChildType;
@@ -49,11 +51,10 @@ namespace mirv {
       // FIXME: This is target-dependent.
       BitSizeType bitsize(void) const;
     };
+  }
 
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Type<Derived> > VisitorBaseType;
-  };
+  /// A pointer type.
+  struct Pointer {};
 }
 
 #endif

@@ -4,7 +4,7 @@
 #include <mirv/Core/Utility/Printer.hpp>
 
 namespace mirv {
-  Statement<Base> *Phi::Interface::cloneImpl(void) 
+  Statement<Base> *detail::PhiInterface::cloneImpl(void) 
   {
     ptr<Statement<Phi> >::type stmt(Statement<Phi>::make(this->target()));
     Statement<Phi>::iterator i = this->begin();
@@ -16,7 +16,7 @@ namespace mirv {
     return result;
   }
 
-  void Phi::Interface::setParents(void)
+  void detail::PhiInterface::setParents(void)
   {
     for (ExpressionIterator i = expressionBegin();
          i != expressionEnd();
@@ -25,7 +25,7 @@ namespace mirv {
     }
   }
 
-  Statement<Base> *Store::Interface::cloneImpl(void) 
+  Statement<Base> *detail::StoreInterface::cloneImpl(void) 
   {
     ptr<Statement<Store> >::type stmt(Statement<Store>::make(
                                              getLeftExpression()->clone(),
@@ -35,19 +35,19 @@ namespace mirv {
     return result;
   }
 
-  Store::Interface::Interface(ptr<Expression<Base> >::type e1,
-                              ptr<Expression<Base> >::type e2)
+  detail::StoreInterface::StoreInterface(ptr<Expression<Base> >::type e1,
+                                         ptr<Expression<Base> >::type e2)
       : Statement<DualExpression>(e1, e2), LeafStatement() {
     doValidation();
   }
 
-  void Store::Interface::setParents(void)
+  void detail::StoreInterface::setParents(void)
   {
     getLeftExpression()->setParent(getSharedHandle());
     getRightExpression()->setParent(getSharedHandle());
   }
 
-  void Store::Interface::doValidation(void) const {
+  void detail::StoreInterface::doValidation(void) const {
     // Make sure e1 is of pointer type.
     if (!dyn_cast<const Symbol<Type<Pointer> > >(getLeftExpression()->type())) {
       std::cerr << "Offending statement:\n";
@@ -57,7 +57,7 @@ namespace mirv {
                    "Store target must have pointer type");
   }
 
-  Statement<Base> *Call::Interface::cloneImpl(void) 
+  Statement<Base> *detail::CallInterface::cloneImpl(void) 
   {
     ptr<Statement<Call> >::type stmt(Statement<Call>::make(this->function()->clone()));
     Statement<Call>::iterator i = this->begin();
@@ -69,7 +69,7 @@ namespace mirv {
     return result;
   }
 
-  void Call::Interface::setParents(void) 
+  void detail::CallInterface::setParents(void) 
   {
     for (ExpressionIterator i = expressionBegin();
          i != expressionEnd();
@@ -78,7 +78,7 @@ namespace mirv {
     }
   }
 
-  Statement<Base> *Allocate::Interface::cloneImpl(void) 
+  Statement<Base> *detail::AllocateInterface::cloneImpl(void) 
   {
     ptr<Statement<Allocate> >::type stmt(Statement<Allocate>::make(
                                            getLeftExpression()->clone(),
@@ -89,7 +89,7 @@ namespace mirv {
     return result;
   }
 
-  void Allocate::Interface::setParents(void)
+  void detail::AllocateInterface::setParents(void)
   {
     getLeftExpression()->setParent(getSharedHandle());
     getRightExpression()->setParent(getSharedHandle());

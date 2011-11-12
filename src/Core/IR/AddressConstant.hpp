@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_AddressConstant_hpp
 #define mirv_Core_IR_AddressConstant_hpp
 
+#include <mirv/Core/IR/AddressConstantFwd.hpp>
 #include <mirv/Core/IR/Constant.hpp>
 
 namespace mirv {
@@ -9,12 +10,8 @@ namespace mirv {
   /// A symbol tag for specifying address constants.
   struct Address {};
 
-  /// This represents a constant that is the address of some object.
-  /// The object must be in a fixed memory location.
-  template<>
-  class Constant<Address> {
-  private:
-    class Interface
+  namespace detail {
+    class AddressConstantInterface
         : public Symbol<Constant<Base> >,
           public boost::enable_shared_from_this<Symbol<Constant<Address> > > {
     private:
@@ -23,8 +20,8 @@ namespace mirv {
       SymbolPtr sym;
 
     public:
-      Interface(ptr<Symbol<Type<TypeBase> > >::const_type type,
-                SymbolPtr s)
+      AddressConstantInterface(ptr<Symbol<Type<TypeBase> > >::const_type type,
+                               SymbolPtr s)
           : BaseType(type), sym(s) {}
 
       SymbolPtr symbol(void) const {
@@ -42,13 +39,15 @@ namespace mirv {
         return fast_cast<const Node<Base>>(this->shared_from_this());
       };
     };
+  }
 
+  /// This represents a constant that is the address of some object.
+  /// The object must be in a fixed memory location.
+  template<>
+  class Constant<Address> {
   public:
     static void
     initialize(typename ptr<Symbol<Constant<Address> > >::type constant) {}
-
-    typedef Interface BaseType;
-    typedef Symbol<Constant<Base> > VisitorBaseType;
   };    
 }
 

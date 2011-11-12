@@ -8,6 +8,7 @@
 #include <mirv/Core/Builder/Transform.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/FunctionTypeFwd.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/IR/Reference.hpp>
 

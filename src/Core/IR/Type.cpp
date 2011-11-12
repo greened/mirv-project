@@ -4,30 +4,32 @@
 #include <mirv/Core/IR/Module.hpp>
 
 namespace mirv {
-  Simple::Interface::BitSizeType
-  Simple::Interface::bitsize(void) const
-  {
-    BitSizeType size =
-      Builder::makeExpression(bsize, this->parent<Symbol<Module> >());
-    return size;
-  }
+  namespace detail {
+    SimpleInterface::BitSizeType
+    SimpleInterface::bitsize(void) const
+    {
+      BitSizeType size =
+        Builder::makeExpression(bsize, this->parent<Symbol<Module> >());
+      return size;
+    }
 
-  void
-  Derived::Interface::resolve(ptr<Symbol<Type<Placeholder> > >::const_type
+    void
+    DerivedInterface::resolve(ptr<Symbol<Type<Placeholder> > >::const_type
                               placeholder,
                               ptr<Symbol<Type<TypeBase> > >::const_type
                               replacement) 
-  {  
-    for (auto member = begin(); member != end(); ++member) {
-      if (*member == placeholder) {
-        *member = replacement;
-        continue;
+    {  
+      for (auto member = begin(); member != end(); ++member) {
+        if (*member == placeholder) {
+          *member = replacement;
+          continue;
+        }
+        if (*member == replacement) {
+          continue;
+        }
+        boost::const_pointer_cast<Symbol<Type<TypeBase> > >((*member))->
+          resolve(placeholder, replacement);
       }
-      if (*member == replacement) {
-        continue;
-      }
-      boost::const_pointer_cast<Symbol<Type<TypeBase> > >((*member))->
-        resolve(placeholder, replacement);
     }
   }
 }

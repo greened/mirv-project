@@ -31,30 +31,6 @@ namespace mirv {
   struct StatementVisitor;
   struct ConstStatementVisitor;
 
-  template<typename Tag> class Statement;
-
-  namespace detail {
-    /// Define the visitation base type for statements.
-    template<typename Tag>
-    struct VisitorBase<Statement<Tag> > {
-      typedef typename Tag::VisitorBaseType VisitorBaseType;
-    };
-    /// Define the base type for statements.
-    template<typename Tag>
-    struct BaseTypeOf<Statement<Tag> > {
-      typedef typename Tag::BaseType BaseType;
-    };
-    /// Define the visitation base class for base statements.
-    template<>
-    struct VisitorBase<Statement<Base> > {
-      typedef Node<Base> VisitorBaseType;
-    };
-    template<>
-    struct BaseTypeOf<Statement<Base> > {
-      typedef Node<Base> BaseType;
-    };
-  }
-
   /// This is the statement implementation for all statement types.
   /// Each statement type is an instance of this template
   /// (Statement<IfThen>, Statement<DoWhile>, etc.).  It keeps all of
@@ -67,15 +43,12 @@ namespace mirv {
     ConstStatementVisitor,
     StatementVisitor
     > {
-  public:
-    /// The immediate base type of this statement, distinct from
-    /// the base type that will be visited by a StatementVisitor.
+  private:
     typedef ConstVisitable<
     Statement<Tag>,
     ConstStatementVisitor,
     StatementVisitor
     > BaseType;
-    typedef typename Tag::VisitorBaseType VisitorBaseType;
 
   protected:
     Statement(void) {}
@@ -152,11 +125,7 @@ namespace mirv {
   /// is available.
   template<>
   class Statement<Base>
-      : public virtual ConstVisitable<
-    Statement<Base>,
-    ConstStatementVisitor,
-    StatementVisitor
-    > {
+      : public virtual detail::BaseTypeOfStatement<Base>::BaseType {
   private:
     virtual Statement<Base> *cloneImpl(void) = 0;
 
@@ -201,21 +170,17 @@ namespace mirv {
   /// operands) but we do not want to force subclasses to explicitly
   /// initialize the inner statement object.  Separating the
   /// Interface from the implementation solves that problem.
-  class InnerStatementBase : public Statement<Inner<detail::InnerStatementTraits> > {
-  };
+  class InnerStatementBase : public detail::BaseTypeOf<InnerStatementBase>::BaseType {};
 
   /// This is the implementation of inner statements.  It is
   /// inherited from once in the hierarchy for any inner statements.
   /// This holds the child pointers and other data necessary for inner
   /// statements.
-  class InnerStatement : public InnerImpl<
-    Statement<Base>,
-    Virtual<InnerStatementBase>
-    > {
-  public:
+  class InnerStatement : public detail::BaseTypeOf<InnerStatement>::BaseType {
+  private:
     typedef InnerImpl<Statement<Base>, Virtual<InnerStatementBase> > BaseType;
-    typedef Statement<Base> VisitorBaseType;
 
+  public:
     InnerStatement(void) : BaseType() {}
     InnerStatement(ChildPtr Child) : BaseType(Child) {}
     InnerStatement(ChildPtr Child1,
@@ -230,11 +195,7 @@ namespace mirv {
   };
  
   /// This is a statement with no children.
-  class LeafStatement : public LeafImpl<Virtual<Statement<Base> > > {
-  public:
-    typedef LeafImpl<Virtual<Statement<Base> > > BaseType;
-    typedef Statement<Base> VisitorBaseType;
-  };
+  class LeafStatement : public detail::BaseTypeOf<LeafStatement>::BaseType {};
 
   // Statement property semantics
 
@@ -242,56 +203,22 @@ namespace mirv {
   class Conditional {
   public:
     typedef boost::mpl::int_<0> order;
-    typedef Virtual<Statement<Base> > BaseType;
-    typedef Statement<Base> VisitorBaseType;
   };
 
   /// Child statements may be executed multiple times
   class Iterative {
   public:
     typedef boost::mpl::int_<1> order;
-    typedef Virtual<Statement<Base> > BaseType;
-    typedef Statement<Base> VisitorBaseType;
   };
 
   /// Modifies program state
   class Mutating {
   public:
     typedef boost::mpl::int_<2> order;
-    typedef Virtual<Statement<Base> > BaseType;
-    typedef Statement<Base> VisitorBaseType;
   };
 
-  /// This is a metafunction to generate a scattered base class
-  /// hierarchy of property statements.  The Sequence is a sorted
-  /// list of property tags and Root is the base type of the whole
-  /// hierarchy.
-  template<typename Root, typename Tag, typename ...Property>
-  class StatementBaseGenerator {
-    template<typename ...BaseProperty>
-    class StatementBase 
-        : public Root,
-          public Statement<BaseProperty>... {
-    public:
-      StatementBase(void) : Root() {}
-      template<typename ...Args>
-        StatementBase(const Args &...args) : Root(args...) {}
-      virtual void accept(StatementVisitor &) {
-        error("StatementBase::accept called!");
-      }
-      virtual void accept(ConstStatementVisitor &) const {
-        error("StatementBase::accept called!");
-      }
-    };
-
-  public:
-    typedef StatementBase<Property...> type;
-  };
-
-  /// Statement semantics are somehow affected by expressions
-  class Controlled {
-  private:
-    class Interface : public virtual Statement<Base> {
+  namespace detail {
+    class ControlledInterface : public virtual Statement<Base> {
     protected:
       typedef ptr<Expression<Base> >::type ExpressionPtr;
       typedef ptr<Expression<Base> >::const_type ConstExpressionPtr;
@@ -302,7 +229,7 @@ namespace mirv {
 
     protected:
       template<typename ...A1>
-      Interface(A1... args) : expressions{args...} {}
+      ControlledInterface(A1... args) : expressions{args...} {}
 
     public:
       typedef ExpressionList::iterator ExpressionIterator;
@@ -373,22 +300,19 @@ namespace mirv {
 
       bool expressionEmpty(void) const { return(expressions.empty()); };
     };
+  }
 
-  public:
-    typedef Statement<Base> VisitorBaseType;
-    typedef Interface BaseType;
-  };
+  /// Statement semantics are somehow affected by expressions
+  class Controlled {};
 
-  /// A statement with a single expression child.  It may have one of
-  /// more children of other types.
-  class SingleExpression { 
-  private: 
-    typedef Statement<Controlled> InterfaceBaseType;
+  namespace detail {
+    class SingleExpressionInterface : public Statement<Controlled> {
+    private:
+      typedef Statement<Controlled> InterfaceBaseType;
 
-    class Interface : public InterfaceBaseType {
     public:
       template<typename A1>
-      Interface(A1 a1) : InterfaceBaseType(a1) {}
+      SingleExpressionInterface(A1 a1) : InterfaceBaseType(a1) {}
 
       typedef InterfaceBaseType::ExpressionPtr ExpressionPtr;
       typedef InterfaceBaseType::ConstExpressionPtr
@@ -417,11 +341,11 @@ namespace mirv {
         return(*this->expressionBegin());
       }
     }; 
+  }
 
-  public:
-    typedef Statement<Controlled> VisitorBaseType;
-    typedef Interface BaseType;
-  };
+  /// A statement with a single expression child.  It may have one of
+  /// more children of other types.
+  class SingleExpression {};
 }
 
 #include <mirv/Core/IR/Statement.ipp>

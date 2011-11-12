@@ -18,7 +18,7 @@
 #include <mirv/Core/Utility/Printer.hpp>
 
 namespace mirv {
-  void Binary::Interface::doValidation(void) const {
+  void detail::BinaryInterface::doValidation(void) const {
     if (size() > 1 && *begin()) {
       if (getLeftOperand()->type() != getRightOperand()->type()) {
         std::cerr << "Offending expression:\n";
