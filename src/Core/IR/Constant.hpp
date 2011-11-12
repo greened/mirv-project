@@ -29,16 +29,7 @@ namespace mirv {
 
   /// Define the base class for all constants.
   template<>
-  class Constant<Base> {
-  public:
-    typedef LeafSymbol VisitorBaseType;
-
-  private:
-    typedef detail::BaseConstantInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-  };
+  class Constant<Base> {};
 
   namespace detail {
     template<typename ValueType>
@@ -69,15 +60,9 @@ namespace mirv {
   /// represents a constant value of that type.
   template<typename ValueType>
   class Constant {
-  private:
-    typedef detail::ConstantInterface<ValueType> Interface;
-
   public:
     static void
     initialize(typename ptr<Symbol<Constant<ValueType> > >::type constant) {}
-
-    typedef Interface BaseType;
-    typedef Symbol<Constant<Base>> VisitorBaseType;
   };
 }
 

@@ -30,14 +30,7 @@ namespace mirv {
     };
   }
 
-  struct Integral {
-  private:
-    typedef detail::IntegralInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Type<Simple> > VisitorBaseType;
-  };
+  struct Integral {};
 }
 
 #endif

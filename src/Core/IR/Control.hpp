@@ -40,16 +40,7 @@ namespace mirv {
   }
 
   /// Specify the Interface for block/sequence statements.
-  class Block {
-  private:
-    typedef detail::BlockInterface Interface;
-
-  public:
-    typedef boost::mpl::vector<> Properties;
-    typedef InnerStatement VisitorBaseType;
-
-    typedef Interface BaseType;
-  };
+  class Block {};
 
   namespace detail {
     class SingleBlockInterface : public InnerStatement {
@@ -93,14 +84,7 @@ namespace mirv {
   /// This is a statement with only one child statement.  The child
   /// should be a block statement if more than one statement needs to
   /// be under this control point.
-  class SingleBlock {
-  private:
-    typedef detail::SingleBlockInterface Interface;
-
-  public:
-    typedef InnerStatement VisitorBaseType;
-    typedef Interface BaseType;
-  };
+  class SingleBlock {};
 
   namespace detail {
     class DualBlockInterface : public InnerStatement {
@@ -171,15 +155,7 @@ namespace mirv {
   /// This is a statement with two child statements.  The children
   /// should be block statements if more than one statement needs to
   /// be under this control point.
-  class DualBlock {
-  private:
-    typedef detail::DualBlockInterface Interface;
-
-  public:
-    typedef InnerStatement VisitorBaseType;
-
-    typedef Interface BaseType;
-  };
+  class DualBlock {};
 
   namespace detail {
     class SingleConditionInterface 
@@ -207,14 +183,7 @@ namespace mirv {
   }
 
   /// This is a statement with a single controlling condition
-  class SingleCondition {
-  private:
-    typedef detail::SingleConditionInterface Interface;
-
-  public:
-    typedef Statement<SingleExpression> VisitorBaseType;
-    typedef Interface BaseType;
-  };
+  class SingleCondition {};
 
   namespace detail {
     class IfThenInterface : public Statement<SingleCondition>,
@@ -249,14 +218,7 @@ namespace mirv {
   }
 
   /// Specify the if-then statement Interface.
-  class IfThen {
-  private:
-    typedef detail::IfThenInterface Interface;
-
-  public:
-    typedef StatementBaseGenerator<Interface, IfThen, Conditional>::type BaseType;
-    typedef Statement<SingleBlock> VisitorBaseType;
-  };
+  class IfThen {};
 
   namespace detail {
     class IfElseInterface : public Statement<SingleCondition>,
@@ -291,15 +253,7 @@ namespace mirv {
   }
 
   /// Specify the if-then-else statement Interface.
-  class IfElse {
-  private:
-    typedef detail::IfElseInterface Interface;
-
-
-  public:
-    typedef Statement<DualBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Interface, IfElse, Conditional>::type BaseType;
-  };
+  class IfElse {};
 
   namespace detail {
     class WhileInterface : public Statement<SingleCondition>,
@@ -334,15 +288,7 @@ namespace mirv {
   }
 
   /// Specify the while statement Interface.
-  class While {
-  private:
-    typedef detail::WhileInterface Interface;
-
-  public:
-    typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Interface, While, Conditional, Iterative>::type
-    BaseType;
-  };
+  class While {};
 
   namespace detail {
     class DoWhileInterface : public Statement<SingleCondition>,
@@ -377,14 +323,7 @@ namespace mirv {
   }
 
   /// Specify the do-while statement Interface.
-  class DoWhile {
-  private:
-    typedef detail::DoWhileInterface Interface;
-
-  public:
-    typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Interface, DoWhile, Conditional>::type BaseType;
-  };
+  class DoWhile {};
 
   namespace detail {
     class CaseInterface : public Statement<SingleCondition>,
@@ -419,14 +358,7 @@ namespace mirv {
   }
 
   /// Specify the case statement Interface.
-  class Case {
-  private:
-    typedef detail::CaseInterface Interface;
-
-  public:
-    typedef Statement<SingleBlock> VisitorBaseType;
-    typedef Interface BaseType;
-  };
+  class Case {};
    
   namespace detail {
     class CaseBlockInterface : public virtual Statement<SingleBlock> {
@@ -451,14 +383,7 @@ namespace mirv {
 
   /// This is a list of case statements.  It is the statement type
   /// that appears under a switch statement.
-  class CaseBlock {
-  private:
-    typedef detail::CaseBlockInterface Interface;
-
-  public:
-    typedef Statement<SingleBlock> VisitorBaseType;
-    typedef Interface BaseType;
-  };
+  class CaseBlock {};
 
   namespace detail {
     class SwitchInterface : public Statement<SingleCondition>,
@@ -493,14 +418,7 @@ namespace mirv {
   }
 
   /// Specify the switch statement Interface.
-  class Switch {
-  private:
-    typedef detail::SwitchInterface Interface;
-
-  public:
-    typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Interface, Switch, Conditional>::type BaseType;
-  };
+  class Switch {};
 
   namespace detail {
     class SingleLabelInterface 
@@ -533,14 +451,7 @@ namespace mirv {
   }
 
   /// This is a statement with a single label
-  class SingleLabel {
-  private:
-    typedef detail::SingleLabelInterface Interface;
-
-  public:
-    typedef Statement<SingleExpression> VisitorBaseType;      
-    typedef Interface BaseType;
-  };
+  class SingleLabel {};
 
   namespace detail {
     class BeforeInterface : public Statement<SingleLabel>,
@@ -578,14 +489,7 @@ namespace mirv {
   /// label.  A goto-dest statement may transfer control to this
   /// label.  This provides a structured way to return to the top of a
   /// deeply nested set of loops.
-  class Before {
-  private:
-    typedef detail::BeforeInterface Interface;
-
-  public:
-    typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Interface, Before, Iterative>::type BaseType;
-  };
+  class Before {};
 
   namespace detail {
     class AfterInterface : public Statement<SingleLabel>,
@@ -623,14 +527,7 @@ namespace mirv {
   /// goto-dest statement may transfer control to this label.  This
   /// provides a structured way to implement break- and continue-type
   /// statements.
-  class After {
-  private:
-    typedef detail::AfterInterface Interface;
-
-  public:
-    typedef Statement<SingleBlock> VisitorBaseType;
-    typedef StatementBaseGenerator<Interface, After, Conditional>::type BaseType;
-  };
+  class After {};
 
   namespace detail {
     class GotoInterface : public Statement<SingleLabel>,
@@ -659,14 +556,7 @@ namespace mirv {
   /// normalized IR but is necessary to handle translation from
   /// higher level languages.  A filter will eliminate gotos and
   /// restructure the IR to be fully structured.
-  class Goto {
-  private:
-    typedef detail::GotoInterface Interface;
-
-  public:
-    typedef LeafStatement VisitorBaseType;
-    typedef StatementBaseGenerator<Interface, Goto, Conditional>::type BaseType;
-  };
+  class Goto {};
 
   namespace detail {
     class ReturnInterface : public LeafStatement,
@@ -686,14 +576,7 @@ namespace mirv {
   /// A return does not return an expression.  Instead, assignment to
   /// a special location determines the return value.  This separates
   /// changes in data state from changes in control state.
-  class Return {
-  private:
-    typedef detail::ReturnInterface Interface;
-
-  public:
-    typedef LeafStatement VisitorBaseType;
-    typedef Interface BaseType;
-  };
+  class Return {};
 }
 
 #endif

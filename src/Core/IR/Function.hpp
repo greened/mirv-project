@@ -115,13 +115,7 @@ namespace mirv {
 
   /// This is a symbol tag for function symbols.
   class Function {
-  private:
-    typedef detail::FunctionInterface Interface;
-
   public:
-    typedef Interface BaseType;
-    typedef Symbol<Global> VisitorBaseType;
-
     static void initialize(ptr<Symbol<Function> >::type function) {}
 
     static std::string getName(const std::string &name,

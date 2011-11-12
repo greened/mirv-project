@@ -45,15 +45,9 @@ namespace mirv {
   /// The object must be in a fixed memory location.
   template<>
   class Constant<Address> {
-  private:
-    typedef detail::AddressConstantInterface Interface;
-
   public:
     static void
     initialize(typename ptr<Symbol<Constant<Address> > >::type constant) {}
-
-    typedef Interface BaseType;
-    typedef Symbol<Constant<Base> > VisitorBaseType;
   };    
 }
 

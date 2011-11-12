@@ -3,6 +3,7 @@
 
 #include <mirv/Core/IR/NodeFwd.hpp>
 #include <mirv/Core/IR/Inherit.hpp>
+#include <mirv/Core/IR/Visitable.hpp>
 #include <mirv/Core/Filter/ConstExpressionVisitorFwd.hpp>
 #include <mirv/Core/Filter/ExpressionVisitorFwd.hpp>
 
@@ -54,7 +55,11 @@ namespace mirv {
     /// Define the base type of base expressions.
     template<>
     struct BaseTypeOfExpression<Base> {
-      typedef Node<Base> BaseType;
+      typedef ConstVisitable<
+        Expression<Base>,
+        ConstExpressionVisitor,
+        ExpressionVisitor
+        > BaseType;
     };
 
     class InnerExpressionTraits;

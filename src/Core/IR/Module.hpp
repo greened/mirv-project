@@ -117,13 +117,7 @@ namespace mirv {
   /// collection of types, global variables and functions packaged
   /// together.
   class Module {
-  private:
-    typedef detail::ModuleInterface Interface;
-
   public:
-    typedef Interface BaseType;
-    typedef Symbol<Named> VisitorBaseType;
-
     static void initialize(ptr<Symbol<Module> >::type module);
 
     static std::string getName(const std::string &name) {

@@ -3,6 +3,7 @@
 
 #include <mirv/Core/IR/Inherit.hpp>
 #include <mirv/Core/IR/NodeFwd.hpp>
+#include <mirv/Core/IR/Visitable.hpp>
 #include <mirv/Core/Filter/ConstStatementVisitorFwd.hpp>
 #include <mirv/Core/Filter/StatementVisitorFwd.hpp>
 
@@ -45,7 +46,11 @@ namespace mirv {
     /// Define the base type of base statements.
     template<>
     struct BaseTypeOfStatement<Base> {
-      typedef Node<Base> BaseType;
+      typedef ConstVisitable<
+        Statement<Base>,
+        ConstStatementVisitor,
+        StatementVisitor
+        > BaseType;
     };
 
     class InnerStatementTraits;

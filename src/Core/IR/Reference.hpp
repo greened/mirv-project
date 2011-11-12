@@ -18,11 +18,7 @@
 namespace mirv {
   /// Specify the interface for nodes that reference symbols.
    template<typename SymbolType>
-   class Reference { 
-   public:
-     typedef LeafExpression VisitorBaseType;
-     typedef typename detail::ReferenceBaseGenerator<SymbolType>::type BaseType;
-   };
+   class Reference {};
 
   namespace detail {
     // We need to manually define the interface to override
@@ -57,14 +53,7 @@ namespace mirv {
   }
 
   /// Specify the interface for load expressions.
-  class Load { 
-  private:
-    typedef detail::LoadInterface Interface;
-
-   public:
-    typedef Expression<Unary> VisitorBaseType;
-    typedef Interface BaseType;
-  };
+  class Load {};
 
   namespace detail {
         // TODO: Interface that checks for lvalues.
@@ -124,15 +113,7 @@ namespace mirv {
   }
   
   /// Take the address of a tuple item.
-  class TuplePointer { 
-  public:
-    typedef detail::TuplePointerInterface Interface;
-
-   public:
-     typedef InnerExpression VisitorBaseType;
-     typedef Interface BaseType;
-    // TODO: Override type().
-  };
+  class TuplePointer {};
 }
 
 #endif
