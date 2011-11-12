@@ -73,15 +73,7 @@ namespace mirv {
   }
   /// This is the interface to statements that have two child
   /// expressions.
-  class DualExpression {
-  private:
-    typedef detail::DualExpressionInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef boost::mpl::vector<> Properties;
-    typedef Statement<Controlled> VisitorBaseType;
-  };
+  class DualExpression {};
 
   namespace detail {
     class PhiInterface : public Statement<Controlled>,
@@ -162,14 +154,7 @@ namespace mirv {
   /// program state from general computation.  Expression trees imply
   /// assignmnets to temporary variables at some level of translate,
   /// but we are not concerned about those.
-  class Phi {
-  private:
-    typedef detail::PhiInterface Interface;
-
-  public:
-    typedef StatementBaseGenerator<Interface, Phi, Mutating>::type BaseType;
-    typedef Statement<Controlled> VisitorBaseType;
-  };
+  class Phi {};
 
   namespace detail {
     class StoreInterface : public Statement<DualExpression>,
@@ -234,14 +219,7 @@ namespace mirv {
   /// changes in program state from general computation.  Expression
   /// trees imply assignments to temporary variables at some level of
   /// translation, but we are not concerned about those.
-  class Store {
-  private:
-    typedef detail::StoreInterface Interface;
-
-  public:
-    typedef StatementBaseGenerator<Interface, Store, Mutating>::type BaseType;
-    typedef Statement<DualExpression> VisitorBaseType;
-  };
+  class Store {};
 
   namespace detail {
     /// Define the interface for Call statements.
@@ -375,14 +353,7 @@ namespace mirv {
   }
 
   /// Specify the interface for function call statements.
-  class Call {
-  private:
-    typedef detail::CallInterface Interface;
-
-  public:
-    typedef StatementBaseGenerator<Interface, Call, Mutating>::type BaseType;
-    typedef Statement<Controlled> VisitorBaseType;
-  };
+  class Call {};
 
   namespace detail {
     class AllocateInterface : public Statement<DualExpression>,
@@ -453,14 +424,7 @@ namespace mirv {
 
   /// Specify the interface to alloc statements.
   // TODO: Add alignment information.
-  class Allocate {
-  private:
-    typedef detail::AllocateInterface Interface;
-
-  public:
-    typedef StatementBaseGenerator<Interface, Allocate, Mutating>::type BaseType;
-    typedef Statement<DualExpression> VisitorBaseType;
-  };
+  class Allocate {};
 }
 
 #endif

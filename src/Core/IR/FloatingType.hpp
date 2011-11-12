@@ -30,13 +30,7 @@ namespace mirv {
   }
 
   /// Floating point types.
-  struct Floating {
-    typedef detail::FloatingInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Type<Simple> > VisitorBaseType;
-  };
+  struct Floating {};
 }
 
 #endif

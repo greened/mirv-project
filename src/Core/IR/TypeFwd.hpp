@@ -70,13 +70,13 @@ namespace mirv {
 
     /// Define the visitation base type for inner type symbols.
     template<>
-    struct VisitorBaseTypeOfTypeSymbol<Inner<detail::InnerTypeTraits> > {
+    struct VisitorBaseTypeOfTypeSymbol<Inner<InnerTypeTraits> > {
       typedef Symbol<Type<TypeBase> > VisitorBaseType;
     };
     /// Define the base type of inner type symbols.
     template<>
-    struct BaseTypeOfTypeSymbol<Inner<detail::InnerTypeTraits> > {
-      typedef Symbol<Type<TypeBase> > BaseType;
+    struct BaseTypeOfTypeSymbol<Inner<InnerTypeTraits> > {
+      typedef InnerInterface<InnerTypeTraits>  BaseType;
     };
 
     /// Define the visitation base type for inner type symbols.
@@ -87,7 +87,7 @@ namespace mirv {
     /// Define the base type of inner type symbols.
     template<>
     struct BaseTypeOf<InnerTypeBase> {
-      typedef Symbol<Type<Inner<detail::InnerTypeTraits> > > BaseType;
+      typedef Symbol<Type<Inner<InnerTypeTraits> > > BaseType;
     };
 
     /// Define the visitation base type for inner type symbols.
@@ -101,6 +101,7 @@ namespace mirv {
       typedef InnerImpl<
         const Symbol<Type<TypeBase> >,
         InnerTypeBase,
+        // TODO: Avoid TrackParent use.
         false> BaseType;
     };
 

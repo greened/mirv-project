@@ -29,13 +29,7 @@ namespace mirv {
   /// Placeholder types are used to stand in for another type during
   /// construction of recursive types.
    struct Placeholder {
-   private:
-     typedef detail::PlaceholderInterface Interface;
-
    public:
-     typedef Interface BaseType;
-     typedef Symbol<Type<TypeBase> > VisitorBaseType;
-
      static std::string getName(void) {
        return "placeholder";
      }

@@ -35,15 +35,7 @@ namespace mirv {
   /// This is a symbol tag for variable symbols.  Variables have a
   /// type and a name.
    class Variable {
-   private:
-     typedef detail::VariableInterface Interface;
-
    public:
-     typedef Interface BaseType;
-
-   public:
-     typedef LeafSymbol VisitorBaseType;
-
      static void initialize(ptr<Symbol<Variable> >::type variable) {}
 
      static std::string getName(const std::string &name,

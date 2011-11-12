@@ -1,6 +1,7 @@
 #ifndef mirv_Core_IR_Node_hpp
 #define mirv_Core_IR_Node_hpp
 
+#include <mirv/Core/IR/NodeFwd.hpp>
 #include <mirv/Core/IR/Base.hpp>
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
@@ -136,21 +137,18 @@ namespace mirv {
   /// without introducing initialiation issues and contains no state
   /// so that virtual inheritance can be relatively cheap.
   template<typename Traits>
-  class Inner {
-  public:
-    typedef detail::InnerInterface<Traits> Interface;
-    typedef Interface BaseType;
-    typedef typename Traits::BaseType VisitorBaseType;
-    typedef boost::mpl::vector<> Properties;
- };
+  class Inner {};
 
   /// This provides the implementation for inner IR nodes.  It
   /// contains the sequence state and should never be inherited
   /// virtually.  A class hierarchy instance should inherit this once
   /// throughout the instance.  It may inherit from Inner<> multiply.
   // TODO: TrackParent is a big hack.  Fix with the above TODO.
-  template<typename Child, typename BaseType, bool TrackParent = true>
-  class InnerImpl : public BaseType {
+  template<typename Child, typename BT, bool TrackParent = true>
+  class InnerImpl : public detail::BaseTypeOf<InnerImpl<Child, BT, TrackParent> >::BaseType {
+  private:
+    typedef typename detail::BaseTypeOf<InnerImpl<Child, BT, TrackParent> >::BaseType BaseType;
+
   public:
     typedef Child ChildType;
     typedef typename boost::shared_ptr<Child> ChildPtr;
@@ -279,11 +277,14 @@ namespace mirv {
 
   /// This is the implementation class for IR nodes without children.
    template<typename Tag>
-   class LeafImpl : public Tag {
+   class LeafImpl : public detail::BaseTypeOf<LeafImpl<Tag> >::BaseType {
+   private:
+     typedef typename detail::BaseTypeOf<LeafImpl<Tag> >::BaseType BaseType;
+
    public:
      LeafImpl(void) {}
      template<typename A>
-     LeafImpl(A a) : Tag(a) {}
+     LeafImpl(A a) : BaseType(a) {}
    };
 
   /// This is a safe_cast overload for node types.  We can dump some

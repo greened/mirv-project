@@ -31,13 +31,12 @@ namespace mirv {
   template<typename Tag>
   class Symbol
       : public ConstVisitable<Symbol<Tag>, ConstSymbolVisitor, SymbolVisitor> {
-  public:
+  private:
     typedef ConstVisitable<
     Symbol<Tag>,
     ConstSymbolVisitor,
     SymbolVisitor
     > BaseType;
-    typedef typename detail::VisitorBaseTypeOfSymbol<Tag>::VisitorBaseType VisitorBaseType;
 
   protected:
     Symbol(void) {}
@@ -191,10 +190,7 @@ namespace mirv {
   /// interface from the implementation solves that problem.
   template<>
   class Symbol<Inner<detail::InnerSymbolTraits> >
-      : public virtual Inner<detail::InnerSymbolTraits>::BaseType {
-  public:
-    typedef Symbol<Base> VisitorBaseType;
-  };
+      : public virtual detail::BaseTypeOfSymbol<Inner<detail::InnerSymbolTraits> >::BaseType {};
 
   /// Define the base class for symbols with children.
   class InnerSymbolBase : public Symbol<Inner<detail::InnerSymbolTraits> > {};
@@ -204,18 +200,10 @@ namespace mirv {
   /// This holds the child pointers and other data necessary for inner
   /// symbols.
   // TODO: Fix TrackParent use.
-  class InnerSymbol : public InnerImpl<Symbol<Base>, Virtual<InnerSymbolBase> > {
-  public:
-    typedef InnerImpl<Symbol<Base>, Virtual<InnerSymbolBase> > BaseType;
-    typedef Symbol<Base> VisitorBaseType;
-  };
+  class InnerSymbol : public detail::BaseTypeOf<InnerSymbol>::BaseType {};
 
   /// This is a symbol with no children.
-  class LeafSymbol : public LeafImpl<Virtual<Symbol<Base> > > {
-  public:
-    typedef LeafImpl<Virtual<Symbol<Base> > > BaseType;
-    typedef Symbol<Base> VisitorBaseType;
-  };
+  class LeafSymbol : public detail::BaseTypeOf<LeafSymbol>::BaseType {};
 
   namespace detail {
     class TypedInterface : public virtual Symbol<Base> { 
@@ -235,14 +223,7 @@ namespace mirv {
   }
 
   /// A symbol that has a type associated with it.
-  class Typed {
-  private:
-    typedef detail::TypedInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Base> VisitorBaseType;
-  };
+  class Typed {};
 
   namespace detail {
     class NamedInterface : public virtual Symbol<Base> { 
@@ -259,14 +240,7 @@ namespace mirv {
   }
 
   /// A symbol that has a name associated with it.
-  class Named {
-  private:
-    typedef detail::NamedInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Base> VisitorBaseType;
-  };
+  class Named {};
 
   namespace detail {
     class GlobalInterface : public Symbol<Named>,
@@ -287,14 +261,7 @@ namespace mirv {
   }
 
   /// A global symbol, a function or global variable.
-  class Global {
-  private:
-    typedef detail::GlobalInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Typed> VisitorBaseType;
-  };
+  class Global {};
 }
 
 #include <mirv/Core/IR/Symbol.ipp>

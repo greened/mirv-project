@@ -54,14 +54,7 @@ namespace mirv {
   }
 
   /// A pointer type.
-  struct Pointer {
-  private:
-    typedef detail::PointerInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Type<Derived> > VisitorBaseType;
-  };
+  struct Pointer {};
 }
 
 #endif

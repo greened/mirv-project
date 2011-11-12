@@ -52,17 +52,7 @@ namespace mirv {
   /// This is a symbol tag for variable symbols.  Variables have a
   /// type and a name.
    class GlobalVariable {
-   private:
-     typedef detail::GlobalVariableInterface Interface;
-
    public:
-     typedef Interface BaseType;
-
-   private:
-
-   public:
-     typedef LeafSymbol VisitorBaseType;
-
      static void initialize(ptr<Symbol<GlobalVariable> >::type variable) {}
 
      static std::string

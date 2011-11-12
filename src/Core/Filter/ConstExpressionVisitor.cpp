@@ -14,15 +14,18 @@
 namespace mirv {
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Base> >::const_type e) {}
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<InnerExpression>::const_type e) {
-    ptr<InnerExpression::VisitorBaseType>::const_type p = fast_cast<const InnerExpression::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOf<InnerExpression>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<InnerExpressionBase>::const_type e) {
-    ptr<InnerExpressionBase::VisitorBaseType>::const_type p = fast_cast<const InnerExpressionBase::VisitorBaseType>(e);
-    visit(static_cast<ptr<InnerExpressionBase::VisitorBaseType>::const_type>(e));
+    typedef detail::VisitorBaseTypeOf<InnerExpressionBase>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
+    visit(static_cast<ptr<VisitorBaseType>::const_type>(e));
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<LeafExpression>::const_type e) {
-    ptr<LeafExpression::VisitorBaseType>::const_type p = fast_cast<const LeafExpression::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOf<LeafExpression>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   // Establish an order for properties.  This coresponds to the
@@ -37,7 +40,8 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Arithmetic>::VisitorBaseType>::const_type p = fast_cast<const Expression<Arithmetic>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Arithmetic>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -51,7 +55,8 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Logical>::VisitorBaseType>::const_type p = fast_cast<const Expression<Logical>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Logical>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -65,7 +70,8 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Bitwise>::VisitorBaseType>::const_type p = fast_cast<const Expression<Bitwise>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Bitwise>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -79,7 +85,8 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Relational>::VisitorBaseType>::const_type p = fast_cast<const Expression<Relational>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Relational>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -105,7 +112,8 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Commutative>::VisitorBaseType>::const_type p = fast_cast<const Expression<Commutative>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Commutative>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -135,7 +143,8 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Associative>::VisitorBaseType>::const_type p = fast_cast<const Expression<Associative>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Associative>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -169,7 +178,8 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Transitive>::VisitorBaseType>::const_type p = fast_cast<const Expression<Transitive>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Transitive>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -208,7 +218,8 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Reflexive>::VisitorBaseType>::const_type p = fast_cast<const Expression<Reflexive>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Reflexive>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
@@ -250,134 +261,164 @@ namespace mirv {
       visit(be);
     }
     else {
-      ptr<Expression<Ref>::VisitorBaseType>::const_type p = fast_cast<const Expression<Ref>::VisitorBaseType>(e);
+      typedef detail::VisitorBaseTypeOfExpression<Ref>::VisitorBaseType VisitorBaseType;
+      ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
       visit(p);
     }
   }
 
 ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Unary> >::const_type e) {
-  ptr<Expression<Unary>::VisitorBaseType>::const_type p = fast_cast<const Expression<Unary>::VisitorBaseType>(e);
+  typedef detail::VisitorBaseTypeOfExpression<Unary>::VisitorBaseType VisitorBaseType;
+  ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
   visit(p);
 }
 ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Binary> >::const_type e) {
-  ptr<Expression<Binary>::VisitorBaseType>::const_type p = fast_cast<const Expression<Binary>::VisitorBaseType>(e);
+  typedef detail::VisitorBaseTypeOfExpression<Binary>::VisitorBaseType VisitorBaseType;
+  ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
   visit(p);
 }
 
   // We always prefer to visit the properties because they give us
   // semantic information.
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Add> >::const_type e) {
-    ptr<Expression<Add>::VisitorBaseType>::const_type p = fast_cast<const Expression<Add>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Add>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Subtract> >::const_type e) {
-    ptr<Expression<Subtract>::VisitorBaseType>::const_type p = fast_cast<const Expression<Subtract>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Subtract>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Divide> >::const_type e) {
-    ptr<Expression<Divide>::VisitorBaseType>::const_type p = fast_cast<const Expression<Divide>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Divide>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Multiply> >::const_type e) {
-    ptr<Expression<Multiply>::VisitorBaseType>::const_type p = fast_cast<const Expression<Multiply>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Multiply>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Modulus> >::const_type e) {
-    ptr<Expression<Modulus>::VisitorBaseType>::const_type p = fast_cast<const Expression<Modulus>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Modulus>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Negate> >::const_type e) {
-    ptr<Expression<Negate>::VisitorBaseType>::const_type p = fast_cast<const Expression<Negate>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Negate>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<LogicalAnd> >::const_type e) {
-    ptr<Expression<LogicalAnd>::VisitorBaseType>::const_type p = fast_cast<const Expression<LogicalAnd>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<LogicalAnd>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<LogicalOr> >::const_type e) {
-    ptr<Expression<LogicalOr>::VisitorBaseType>::const_type p = fast_cast<const Expression<LogicalOr>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<LogicalOr>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<LogicalNot> >::const_type e) {
-    ptr<Expression<LogicalNot>::VisitorBaseType>::const_type p = fast_cast<const Expression<LogicalNot>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<LogicalNot>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<BitwiseAnd> >::const_type e) {
-    ptr<Expression<BitwiseAnd>::VisitorBaseType>::const_type p = fast_cast<const Expression<BitwiseAnd>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<BitwiseAnd>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<BitwiseOr> >::const_type e) {
-    ptr<Expression<BitwiseOr>::VisitorBaseType>::const_type p = fast_cast<const Expression<BitwiseOr>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<BitwiseOr>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<BitwiseXor> >::const_type e) {
-    ptr<Expression<BitwiseXor>::VisitorBaseType>::const_type p = fast_cast<const Expression<BitwiseXor>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<BitwiseXor>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<BitwiseComplement> >::const_type e) {
-    ptr<Expression<BitwiseComplement>::VisitorBaseType>::const_type p = fast_cast<const Expression<BitwiseComplement>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<BitwiseComplement>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<ShiftLeft> >::const_type e) {
-    ptr<Expression<ShiftLeft>::VisitorBaseType>::const_type p = fast_cast<const Expression<ShiftLeft>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<ShiftLeft>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<ArithmeticShiftRight> >::const_type e) {
-    ptr<Expression<ArithmeticShiftRight>::VisitorBaseType>::const_type p = fast_cast<const Expression<ArithmeticShiftRight>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<ArithmeticShiftRight>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<LogicalShiftRight> >::const_type e) {
-    ptr<Expression<LogicalShiftRight>::VisitorBaseType>::const_type p = fast_cast<const Expression<LogicalShiftRight>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<LogicalShiftRight>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
 
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<LessThan> >::const_type e) {
-    ptr<Expression<LessThan>::VisitorBaseType>::const_type p = fast_cast<const Expression<LessThan>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<LessThan>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<LessThanOrEqual> >::const_type e) {
-    ptr<Expression<LessThanOrEqual>::VisitorBaseType>::const_type p = fast_cast<const Expression<LessThanOrEqual>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<LessThanOrEqual>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Equal> >::const_type e) {
-    ptr<Expression<Equal>::VisitorBaseType>::const_type p = fast_cast<const Expression<Equal>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Equal>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<NotEqual> >::const_type e) {
-    ptr<Expression<NotEqual>::VisitorBaseType>::const_type p = fast_cast<const Expression<NotEqual>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<NotEqual>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<GreaterThan> >::const_type e) {
-    ptr<Expression<GreaterThan>::VisitorBaseType>::const_type p = fast_cast<const Expression<GreaterThan>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<GreaterThan>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<GreaterThanOrEqual> >::const_type e) {
-    ptr<Expression<GreaterThanOrEqual>::VisitorBaseType>::const_type p = fast_cast<const Expression<GreaterThanOrEqual>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<GreaterThanOrEqual>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
 
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Reference<Variable> > >::const_type e) {
-    ptr<Expression<Reference<Variable> >::VisitorBaseType>::const_type p = fast_cast<const Expression<Reference<Variable> >::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Reference<Variable> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
 
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Reference<Function> > >::const_type e) {
-    ptr<Expression<Reference<Function> >::VisitorBaseType>::const_type p = fast_cast<const Expression<Reference<Function> >::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Reference<Function> >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
 
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Reference<Constant<Base> > > >::const_type e) {
-    ptr<Expression<Reference<Constant<Base> > >::VisitorBaseType>::const_type p = fast_cast<const Expression<Reference<Constant<Base> > >::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Reference<Constant<Base> > >::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
 
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<Load> >::const_type e) {
-    ptr<Expression<Load>::VisitorBaseType>::const_type p = fast_cast<const Expression<Load>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<Load>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
 
   ConstExpressionVisitor::result_type ConstExpressionVisitor::visit(ptr<Expression<TuplePointer> >::const_type e) {
-    ptr<Expression<TuplePointer>::VisitorBaseType>::const_type p = fast_cast<const Expression<TuplePointer>::VisitorBaseType>(e);
+    typedef detail::VisitorBaseTypeOfExpression<TuplePointer>::VisitorBaseType VisitorBaseType;
+    ptr<VisitorBaseType>::const_type p = fast_cast<const VisitorBaseType>(e);
     visit(p);
   }
 }

@@ -116,14 +116,7 @@ namespace mirv {
 
   /// A tuple type.  Multidimensional tuples are represented by tuples
   /// of tuples.
-  struct Tuple {
-  private:
-    typedef detail::TupleInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Type<Derived> > VisitorBaseType;
-  };
+  struct Tuple {};
 }
 
 #endif

@@ -121,14 +121,7 @@ namespace mirv {
   /// will have a pointer to zero as its return type.  A funtion that
   /// does not take any arguments will have an empty argument
   /// sequence.
-  struct FunctionType {
-  private:
-    typedef detail::FunctionTypeInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Type<Derived> > VisitorBaseType;
-  };
+  struct FunctionType {};
 }
 
 #endif

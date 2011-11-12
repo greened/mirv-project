@@ -18,10 +18,10 @@ namespace mirv {
   /// interfaces.
   template<typename Tag>
   class Type {
-  public:
+  private:
     typedef typename detail::BaseTypeOfTypeSymbol<Tag>::BaseType BaseType;
-    typedef typename detail::VisitorBaseTypeOfTypeSymbol<Tag>::VisitorBaseType VisitorBaseType;
 
+  public:
     Type() {}
 
     template<typename Arg>
@@ -55,24 +55,13 @@ namespace mirv {
   }
 
   /// A type tag for the base type of all types.
-  class TypeBase {
-  private:
-    typedef detail::TypeBaseInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef Symbol<Base> VisitorBaseType;
-  };
+  class TypeBase {};
 
   //  template<>
   //class Symbol<Type<TypeBase> > : public Type<TypeBase>::BaseType {};
 
   /// A type with no children.
-  class LeafType : public LeafImpl<Symbol<Type<TypeBase> > > {
-  public:
-    typedef LeafImpl<Symbol<Type<TypeBase> > > BaseType;
-    typedef Symbol<Type<TypeBase> > VisitorBaseType;
-  };
+  class LeafType : public LeafImpl<Symbol<Type<TypeBase> > > {};
 
   namespace detail {
     /// A traits class to define various properties of inner types
@@ -108,34 +97,15 @@ namespace mirv {
   /// that problem.
   template<>
   class Symbol<Type<Inner<detail::InnerTypeTraits> > >
-      : public Inner<detail::InnerTypeTraits>::BaseType {
-  private:
-    typedef Inner<detail::InnerTypeTraits>::BaseType BaseType;
-
-  public:
-    typedef Symbol<Type<TypeBase> > VisitorBaseType;
-  };
+      : public detail::BaseTypeOfTypeSymbol<Inner<detail::InnerTypeTraits> >::BaseType {};
 
   /// Define the base class for types with children.
-  class InnerTypeBase : public Symbol<Type<Inner<detail::InnerTypeTraits> > > {
-  private:
-    typedef Symbol<Type<Inner<detail::InnerTypeTraits> > > BaseType;
-  };
+  class InnerTypeBase : public detail::BaseTypeOf<InnerTypeBase>::BaseType {};
 
   /// This is the implementation of inner types.  It is inherited from
   /// once in the hierarchy for any inner types.  This holds the child
   /// pointers and other data necessary for inner types.
-  class InnerType : public InnerImpl<
-    const Symbol<Type<TypeBase> >,
-    InnerTypeBase,
-    // TODO: Avoid TrackParent use.
-    false> {
-  private:
-    typedef InnerImpl<
-    const Symbol<Type<TypeBase> >,
-    InnerTypeBase,
-    false> BaseType;
-  };
+  class InnerType : public detail::BaseTypeOfSymbol<InnerType>::BaseType  {};
 
   namespace detail {
     class SimpleInterface : public LeafType {
@@ -155,14 +125,7 @@ namespace mirv {
 
   /// A type with no children that has a specific bit size, for
   /// example integer and floating point types.
-  class Simple {
-  private:
-    typedef detail::SimpleInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef LeafType VisitorBaseType;
-  };
+  class Simple {};
 
   namespace detail {
     class DerivedInterface : public InnerType {
@@ -174,14 +137,7 @@ namespace mirv {
 
   /// A type that is built upon other types.  For example structures
   /// and pointers.
-  struct Derived {
-  private:
-    typedef detail::DerivedInterface Interface;
-
-  public:
-    typedef Interface BaseType;
-    typedef InnerType VisitorBaseType;
-  };
+  struct Derived {};
 
   /// This is a safe_cast overload for type nodes.  We can dump some
   /// additional information.
