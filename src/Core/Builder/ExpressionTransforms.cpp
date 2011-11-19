@@ -1,5 +1,6 @@
 #include <mirv/Core/Builder/ExpressionTransforms.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/Builder/SymbolTable.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
@@ -23,7 +24,7 @@ namespace mirv {
     }
 
     ptr<Expression<Base> >::type
-    GlobalVariableRefTransform::operator()(ptr<SymbolTable>::const_type symtab,
+    GlobalVariableRefTransform::operator()(ptr<SymbolTable>::type symtab,
                                            const std::string &name) {
       return ConstructGlobalReference()(
         symtab,
@@ -34,15 +35,15 @@ namespace mirv {
     FunctionRefTransform::operator()(ptr<SymbolTable>::const_type symtab,
                                      const std::string &name) {
       return ConstructUnary<Expression<Reference<Function> > >()(
-        boost::proto::_data,
-        LookupSymbol<Symbol<Function> >(symtab, name));
+        symtab,
+        LookupSymbol<Symbol<Function> >()(symtab, name));
     }
 
-    ptr<Expression<Base> >::type
+    ptr<Expression<Reference<Constant<Base> > > >::type
     ConstantRefTransform::operator()(ptr<SymbolTable>::const_type symtab,
                                      ptr<Symbol<Constant<Base> > >::type constant) {
       return ConstructUnary<Expression<Reference<Constant<Base> > > >()(
-        symtab, constant)
+        symtab, constant);
     }
 
     ptr<Expression<Base> >::type
@@ -52,11 +53,11 @@ namespace mirv {
     }
 
     ptr<Expression<Base> >::type
-    ArrayRefIndexTransform::operator()(ptr<SymbolTable>::const_type symtab,
+    ArrayRefIndexTransform::operator()(ptr<SymbolTable>::type symtab,
                                        ptr<Expression<Base> >::type base,
                                        ptr<Expression<Base> >::type index) {
       return ConstructUnary<Expression<Load> >()(
-        symtab, ConstructAddress(symtab, base, index));
+        symtab, ConstructAddress()(symtab, base, index));
     }
 
     ptr<Expression<Base> >::type
@@ -66,7 +67,7 @@ namespace mirv {
     }
 
     ptr<Expression<Base> >::type
-    ArrayAddressIndexTransform::operator()(ptr<SymbolTable>::const_type symtab,
+    ArrayAddressIndexTransform::operator()(ptr<SymbolTable>::type symtab,
                                            ptr<Expression<Base> >::type base,
                                            ptr<Expression<Base> >::type index) {
       return ConstructAddress()(symtab, base, index);

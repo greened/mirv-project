@@ -86,7 +86,7 @@ namespace mirv {
     struct ConstructUnary : boost::proto::callable {
       typedef typename ptr<NodeType>::type result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(boost::shared_ptr<const SymbolTable> symtab,
                              Child child) {
         return make<NodeType>(child);
       }
@@ -100,7 +100,7 @@ namespace mirv {
     struct ConstructBinary : boost::proto::callable {
       typedef typename ptr<NodeType>::type result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(boost::shared_ptr<const SymbolTable> symtab,
                              Child1 left, Child2 right) {
         return make<NodeType>(left, right);
       }
@@ -115,7 +115,7 @@ namespace mirv {
       boost::proto::callable> : boost::proto::callable {
       typedef ptr<Statement<Block> >::type result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(boost::shared_ptr<const SymbolTable> symtab,
                              Statement<Block>::ChildPtr left,
                              Statement<Block>::ChildPtr right) {
         if (ptr<Statement<Block> >::type lb =
@@ -145,7 +145,7 @@ namespace mirv {
     struct ConstructTernary : boost::proto::callable {
       typedef typename ptr<NodeType>::type result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(boost::shared_ptr<const SymbolTable> symtab,
                              Child1 child1, Child2 child2, Child3 child3) {
         return make<NodeType>(child1, child2, child3);
       }

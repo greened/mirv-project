@@ -51,8 +51,7 @@ namespace mirv {
       std::string translateName(const std::string &name) const;
 
     public:
-      SymbolTable(ModulePointer m, FunctionPointer f)
-          : module(m), function(f), tempNum(0) {}
+      SymbolTable(ModulePointer m, FunctionPointer f);
 
       static ptr<SymbolTable>::type make(ModulePointer m);
 
@@ -60,25 +59,13 @@ namespace mirv {
         return tempNum++;
       }
 
-      void setModule(ModulePointer m) {
-	module = m;
-      }
-      void clearModule(void) {
-	module.reset();
-      }
-      ModulePointer getModule(void) const {
-	return module;
-      }
+      void setModule(ModulePointer m);
+      void clearModule(void);
+      ModulePointer getModule(void) const;
 
-      void setFunction(FunctionPointer f) {
-	function = f;
-      }
-      void clearFunction(void) {
-	function.reset();
-      }
-      FunctionPointer getFunction(void) const {
-	return function;
-      }
+      void setFunction(FunctionPointer f);
+      void clearFunction(void);
+      FunctionPointer getFunction(void) const;
 
       void addPendingStatment(StatementPointer s) {
         pendingStatements.push_back(s);
