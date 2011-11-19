@@ -13,6 +13,33 @@
 
 namespace mirv {
   namespace Builder {
+    SymbolTable::SymbolTable(ModulePointer m, FunctionPointer f)
+        : module(m), function(f), tempNum(0) {}
+
+    void SymbolTable::setModule(ModulePointer m) {
+      module = m;
+    }
+
+    void SymbolTable::clearModule(void) {
+      module.reset();
+    }
+
+    SymbolTable::ModulePointer SymbolTable::getModule(void) const {
+      return module;
+    }
+
+    void SymbolTable::setFunction(FunctionPointer f) {
+      function = f;
+    }
+
+    void SymbolTable::clearFunction(void) {
+      function.reset();
+    }
+
+    SymbolTable::FunctionPointer SymbolTable::getFunction(void) const {
+      return function;
+    }
+
     ptr<SymbolTable>::type
     SymbolTable::make(ModulePointer m) {
       ptr<SymbolTable>::type result(new SymbolTable(m, FunctionPointer()));
@@ -253,6 +280,8 @@ namespace mirv {
 
     void
     SymbolTable::addAtModuleScope(ptr<Symbol<Type<TypeBase> > >::const_type type) {
+      type->setParent(getModule());
+
       std::ostringstream name;
       print(name, type);
       ptr<Symbol<Type<TypeBase> > >::const_type result =

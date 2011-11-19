@@ -316,6 +316,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
       boost::proto::when<
         MultiSubscriptAddressRule,
         ArrayAddressSequenceTransform(
+          boost::proto::_data,
           ConstructAddressFromSequence(
             boost::proto::_data,
             ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),

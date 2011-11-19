@@ -170,12 +170,9 @@ namespace mirv {
             // It's ok to have a type already declared.
             return type;
           }
-          checkInvariant(safe_cast<const Symbol<Type<Placeholder> > >(exists),
-                         "Unexpected type!");          
           symtab->removePlaceholder(name);
 	}
         result_type result = mirv::make<Symbol<Type<Tag> > >(a);
-        result->setParent(symtab->getModule());
         symtab->addAtModuleScope(result);
         return result;
       }
@@ -239,12 +236,9 @@ namespace mirv {
             // It's ok to have a type already declared.
             return type;
           }
-          checkInvariant(safe_cast<const Symbol<Type<Placeholder> > >(exists),
-                         "Unexpected type!");          
           symtab->removePlaceholder(name);
 	}
         result_type result = mirv::make<Symbol<Type<Tag> > >(a1, a2);
-        result->setParent(symtab->getModule());
 	symtab->addAtModuleScope(result);
 	return result;
       }
@@ -313,12 +307,9 @@ namespace mirv {
             // It's ok to have a type already declared.
             return type;
           }
-          checkInvariant(safe_cast<const Symbol<Type<Placeholder> > >(exists),
-                         "Unexpected type!");          
           symtab->removePlaceholder(name);
 	}
         result_type result = mirv::make<Symbol<Type<Tag> > >(a1, a2, a3);
-        result->setParent(symtab->getModule());
 	symtab->addAtModuleScope(result);
 	return result;
       }
