@@ -4,7 +4,7 @@
 #include <mirv/Core/Builder/IfGrammarFwd.hpp>
 
 #include <mirv/Core/Builder/IfRules.hpp>
-#include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/Builder/StatementTransforms.hpp>
 #include <mirv/Core/Builder/ExpressionGrammar.hpp>
 #include <mirv/Core/Builder/StatementGrammarFwd.hpp>
 
@@ -13,14 +13,9 @@ namespace mirv {
     /// This is the grammar for if statements.
     struct IfBuilder : boost::proto::when<
       IfRule,
-      ClearPendingStatements(
-        boost::proto::_data,
-        ConstructBinary<
-          Statement<IfThen>,
-          ptr<Expression<Base> >::type,
-          ptr<Statement<Base> >::type>(boost::proto::_data,
-                                       ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
-                                       ConstructStatementGrammar(boost::proto::_right)))
+      IfTransform(boost::proto::_data,
+                  ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
+                  ConstructStatementGrammar(boost::proto::_right))
       > {};
   }
 }

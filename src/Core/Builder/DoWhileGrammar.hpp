@@ -4,6 +4,7 @@
 #include <mirv/Core/Builder/DoWhileGrammarFwd.hpp>
 
 #include <mirv/Core/Builder/DoWhileRules.hpp>
+#include <mirv/Core/Builder/StatementTransforms.hpp>
 
 namespace mirv {
   namespace Builder {

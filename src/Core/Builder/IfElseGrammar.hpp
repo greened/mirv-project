@@ -4,22 +4,17 @@
 #include <mirv/Core/Builder/IfElseGrammarFwd.hpp>
 
 #include <mirv/Core/Builder/IfElseRules.hpp>
+#include <mirv/Core/Builder/StatementTransforms.hpp>
 
 namespace mirv {
   namespace Builder {
     /// This is the grammar to construct if-else IR statements.
     struct IfElseBuilder : boost::proto::when<
       IfElseRule,
-      ClearPendingStatements(
-        boost::proto::_data,
-        ConstructTernary<
-          Statement<IfElse>,
-          ptr<Expression<Base> >::type,
-          ptr<Statement<Base> >::type,
-          ptr<Statement<Base> >::type>(boost::proto::_data,
-                                       ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
-                                       ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
-                                       ConstructStatementGrammar(boost::proto::_right)))
+      IfElseTransform(boost::proto::_data,
+                      ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
+                      ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
+                      ConstructStatementGrammar(boost::proto::_right))
       > {};
   }
 }
