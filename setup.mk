@@ -24,4 +24,5 @@ opt_CPPFLAGS = -O2 $(IFLAGS) $(DFLAGS) -std=c++0x
 #MDEBUG=1
 
 # Use a custom LLVM for debugging.
-LLVM_PATH=$(HOME)/install
+#LLVM_PATH=$(HOME)/install
+
