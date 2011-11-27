@@ -65,21 +65,7 @@ namespace mirv {
     //public Expression<Ref>,
           public boost::enable_shared_from_this<Expression<TuplePointer> > {
     private:
-      Expression<Base> *cloneImpl(void) {
-        std::vector<ptr<Expression<Base> >::type> children;
-
-        for (auto i = begin(); i != end(); ++i) {
-          children.push_back((*i)->clone());
-        }
-
-        ptr<Expression<TuplePointer> >::type expr(
-          mirv::make<Expression<TuplePointer> >(*children.begin(),
-                                                children.begin() + 1,
-                                                children.end()));
-        Expression<TuplePointer> *result = expr.get();
-        expr.reset();
-        return result;
-      }
+      Expression<Base> *cloneImpl(void);
  
     public:
       TuplePointerInterface(ChildPtr Base, ChildPtr Index)
