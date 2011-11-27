@@ -28,6 +28,23 @@ namespace mirv {
     return pointerType->getBaseType();
   }
 
+  Expression<Base> *
+  detail::TuplePointerInterface::cloneImpl(void) {
+    std::vector<ptr<Expression<Base> >::type> children;
+
+    for (auto i = begin(); i != end(); ++i) {
+      children.push_back((*i)->clone());
+    }
+
+    ptr<Expression<TuplePointer> >::type expr(
+      mirv::make<Expression<TuplePointer> >(*children.begin(),
+                                            children.begin() + 1,
+                                            children.end()));
+    Expression<TuplePointer> *result = expr.get();
+    expr.reset();
+    return result;
+  }
+
   detail::TuplePointerInterface::TypePtr
   detail::TuplePointerInterface::type(void) const 
   {
