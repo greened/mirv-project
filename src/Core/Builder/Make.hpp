@@ -31,6 +31,13 @@ namespace mirv {
   make(A1 a1, A2 a2, A3 a3) {
     return Obj::make(a1, a2, a3);
   }
+
+  /// Construct an object with four constructor arguments.
+  template<typename Obj, typename A1, typename A2, typename A3, typename A4>
+  typename mirv::ptr<Obj>::type
+  make(A1 a1, A2 a2, A3 a3, A4 a4) {
+    return Obj::make(a1, a2, a3, a4);
+  }
 }
 
 #endif
