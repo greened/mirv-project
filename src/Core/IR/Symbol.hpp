@@ -74,6 +74,13 @@ namespace mirv {
       return result;
     }
 
+    template<typename A1, typename A2, typename A3, typename A4>
+    static typename ptr<Symbol<Tag> >::type
+    make(A1 a1, A2 a2, A3 a3, A4 a4) {
+      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2, a3, a4));
+      return result;
+    }
+
      template<typename Arg>
      static std::string getName(Arg &a) {
        return Tag::getName(a);
@@ -87,6 +94,11 @@ namespace mirv {
     template<typename Arg1, typename Arg2, typename Arg3>
     static std::string getName(Arg1 &a1, Arg2 &a2, Arg3 &a3) {
       return Tag::getName(a1, a2, a3);
+     }
+
+    template<typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+    static std::string getName(Arg1 &a1, Arg2 &a2, Arg3 &a3, Arg4 &a4) {
+      return Tag::getName(a1, a2, a3, a4);
      }
   };
 
