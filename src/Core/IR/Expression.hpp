@@ -63,6 +63,8 @@ namespace mirv {
     Expression(A1 a1, A2 a2) : BaseType(a1, a2) {}
     template<typename A1, typename A2, typename A3>
     Expression(A1 a1, A2 a2, A3 a3) : BaseType(a1, a2, a3) {}
+    template<typename A1, typename A2, typename A3, typename A4>
+    Expression(A1 a1, A2 a2, A3 a3, A4 a4) : BaseType(a1, a2, a3, a4) {}
 
   public:
     template<typename A1>
@@ -88,6 +90,16 @@ namespace mirv {
     make(A1 a1, A2 a2, A3 a3) {
       typename ptr<Expression<Op> >::type
         result(new Expression<Op>(a1, a2, a3));
+      result->setParents();
+      result->validate();
+      return result;
+    } 
+
+    template<typename A1, typename A2, typename A3, typename A4>
+    static typename ptr<Expression<Op> >::type
+    make(A1 a1, A2 a2, A3 a3, A4 a4) {
+      typename ptr<Expression<Op> >::type
+        result(new Expression<Op>(a1, a2, a3, a4));
       result->setParents();
       result->validate();
       return result;
