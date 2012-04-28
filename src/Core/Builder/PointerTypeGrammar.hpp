@@ -2,7 +2,7 @@
 #define mirv_Core_Builder_PointerTypeGrammar_hpp
 
 #include <mirv/Core/Builder/PointerTypeRules.hpp>
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
+#include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
 #include <mirv/Core/IR/PointerTypeFwd.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>

@@ -4,6 +4,8 @@
 #include <mirv/Core/Builder/StructTypeGrammarFwd.hpp>
 
 #include <mirv/Core/Builder/StructTypeRules.hpp>
+#include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
+#include <mirv/Core/Builder/Fusion.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
 #include <mirv/Core/IR/TupleTypeFwd.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
@@ -18,57 +20,50 @@ namespace mirv {
     namespace detail {
       /// This is a helper functor to translate a proto list to a list
       /// of IR objects.
-      template<typename ResultType, bool Matches>
+      template<bool Matches>
       class TranslateListImpl {
       public:
-        template<typename List>
-        ResultType operator()(boost::shared_ptr<SymbolTable> symtab,
-                              const List &typeList) {
-          TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
-          return boost::fusion::transform(
-            boost::proto::flatten(typeList), translator);
+        template<typename OutputIterator, typename List>
+        void operator()(boost::shared_ptr<SymbolTable> symtab,
+                        OutputIterator out,
+                        const List &typeList) {
+          FlattenAndTranslateFusionTypeSequence()(symtab, typeList, out);
         }
       };
 
-      /// This is a helper functor to translate a proto expression
-      /// list to a list of type symbols.
-      template<typename ResultType>
-      class TranslateListImpl<ResultType, false> {
+      /// This is a helper functor to translate a single proto expression
+      /// to a type symbol.  It handles the single struct member case.
+      template<>
+      class TranslateListImpl<false> {
       public:
-        template<typename List>
-        ResultType operator()(boost::shared_ptr<SymbolTable> symtab,
-                              const List &typeList) {
-          return TranslateToSymbol<Symbol<Type<TypeBase> > >(symtab)(typeList);
+        template<typename OutputIterator, typename List>
+        void operator()(boost::shared_ptr<SymbolTable> symtab,
+                        OutputIterator out,
+                        const List &typeList) {
+          *out = TranslateToSymbol<Symbol<Type<TypeBase> > >(symtab)(typeList);
         }
       };
-      
+
       /// This is a grammar action to translate the elements of a list
       /// to type symbols.  Various sequence types use it to construct
       /// their member types.
-      template<typename List>
       class TranslateList {
       public:
-        typedef typename boost::mpl::if_<
-        boost::proto::matches<List, StrictTypeList>,
-        typename boost::fusion::result_of::transform<
-          const typename boost::proto::result_of::flatten<const List>::type,
-          TranslateToSymbol<Symbol<Type<TypeBase> > > >::type,
-        ptr<Symbol<Type<TypeBase> > >::const_type
-        >::type result_type;
-
-        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                               const List &theList) {
-          return TranslateListImpl<result_type,
-            boost::proto::matches<List, StrictTypeList>::value>()(symtab, 
-                                                                  theList);
+        template<typename OutputIterator, typename List>
+        void operator()(boost::shared_ptr<SymbolTable> symtab,
+                        OutputIterator out,
+                        const List &theList) {
+          TranslateListImpl<
+            boost::proto::matches<List, StrictTypeList>::value
+            >()(symtab, out, theList);
         }
       };
 
-      template<typename List>
-      typename TranslateList<List>::result_type
-      translateList(boost::shared_ptr<SymbolTable> symtab,
-                    const List &typeList) {
-        return TranslateList<List>()(symtab, typeList);
+      template<typename OutputIterator, typename List>
+      void translateList(boost::shared_ptr<SymbolTable> symtab,
+                         OutputIterator out,
+                         const List &typeList) {
+        TranslateList()(symtab, out, typeList);
       }
     }
 
@@ -86,17 +81,19 @@ namespace mirv {
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              const std::string &name,
                              const List &memberList) {
-        //std::cout << "Building struct:\n";
-        //boost::proto::display_expr(memberList);
-        
+        // std::cout << "Building struct:\n";
+        // boost::proto::display_expr(memberList);
         ptr<Symbol<Type<Placeholder> > >::const_type placeholder =
           symtab->lookupPlaceholder(name);
 
         checkInvariant(placeholder, "Missing placeholder!");
 
-        result_type tuple = UnaryConstructSymbol<Symbol<Type<Tuple> >,
-          ModuleScope>()(
-          symtab, detail::translateList(symtab, memberList));
+        std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> members;
+        detail::translateList(symtab,
+                              std::back_inserter(members),
+                              memberList);
+        result_type tuple = BinaryConstructSymbol<Symbol<Type<Tuple> >,
+          ModuleScope>()(symtab, members.begin(), members.end());
 
         resolve(symtab, name, placeholder, tuple);
 

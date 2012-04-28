@@ -2,7 +2,7 @@
 #include <mirv/Core/IR/Control.hpp>
 #include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/Builder/StatementTransforms.hpp>
-#include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/Builder/ConstructTransform.hpp>
 
 namespace mirv {
   namespace Builder {

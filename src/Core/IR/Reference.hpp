@@ -6,13 +6,6 @@
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Expression.hpp>
 
-#include <boost/bind.hpp>
-#include <boost/fusion/iterator.hpp>
-#include <boost/fusion/include/for_each.hpp>
-#include <boost/fusion/include/front.hpp>
-#include <boost/fusion/include/pop_front.hpp>
-#include <boost/fusion/include/size.hpp>
-
 #include <vector>
 
 namespace mirv {
@@ -71,20 +64,16 @@ namespace mirv {
       TuplePointerInterface(ChildPtr Base, ChildPtr Index)
           : InnerExpression(Base, Index) {}
 
-      template<typename Sequence>
-      TuplePointerInterface(ChildPtr Base, const Sequence &indices)
-          : InnerExpression(Base, indices) {}
-
       TuplePointerInterface(ChildPtr Base, ChildPtr Index1, ChildPtr Index2)
           : InnerExpression(Base, Index1, Index2) {}
-
-      template<typename Sequence>
-      TuplePointerInterface(ChildPtr Base, ChildPtr Index, const Sequence &indices)
-          : InnerExpression(Base, Index, indices) {}
 
       template<typename InputIterator>
       TuplePointerInterface(ChildPtr Base, InputIterator start, InputIterator end)
           : InnerExpression(Base, start, end) {}
+
+      template<typename InputIterator>
+      TuplePointerInterface(ChildPtr Base, ChildPtr Offset, InputIterator start, InputIterator end)
+          : InnerExpression(Base, Offset, start, end) {}
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());

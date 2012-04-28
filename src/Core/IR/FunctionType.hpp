@@ -4,14 +4,6 @@
 #include <mirv/Core/IR/FunctionTypeFwd.hpp>
 #include <mirv/Core/IR/Type.hpp>
 
-#include <boost/bind.hpp>
-
-#include <boost/fusion/iterator.hpp>
-#include <boost/fusion/include/for_each.hpp>
-#include <boost/fusion/include/front.hpp>
-#include <boost/fusion/include/pop_front.hpp>
-#include <boost/fusion/include/size.hpp>
-
 namespace mirv {
   namespace detail {
     class FunctionTypeInterface : public Symbol<Type<Derived> >,
@@ -55,19 +47,6 @@ namespace mirv {
         setReturnType(returnType);
         // Add the parameter types.
         std::copy(start, end, std::back_inserter(*this));
-      }
-
-      template<typename Sequence>
-      FunctionTypeInterface(ChildPtr returnType,
-                            const Sequence &args,
-                            VarargMark v)
-          : BaseType(), vararg(v) {
-        setReturnType(returnType);
-        // Add the parameter types.
-        boost::fusion::for_each(args,
-                                boost::bind(&FunctionTypeInterface::push_back,
-                                            this,
-                                            _1));
       }
 
       BitSizeType bitsize(void) const;

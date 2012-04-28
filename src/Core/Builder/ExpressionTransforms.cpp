@@ -1,7 +1,7 @@
 #include <mirv/Core/Builder/ExpressionTransforms.hpp>
-#include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/Builder/ConstructTransform.hpp>
 #include <mirv/Core/Builder/SymbolTable.hpp>
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
+#include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Module.hpp>

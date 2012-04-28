@@ -4,8 +4,8 @@
 #include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
 
 #include <mirv/Core/Builder/CallExpressionRules.hpp>
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
+#include <mirv/Core/Builder/ConstructTransform.hpp>
 #include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/FunctionTypeFwd.hpp>

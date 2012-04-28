@@ -15,7 +15,7 @@
 #include <mirv/Core/IR/PlaceholderType.hpp>
 #include <mirv/Core/IR/Reference.hpp>
 
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
+#include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
 
 #include <iostream>
 

@@ -27,7 +27,7 @@ namespace mirv {
   {
     push_back(t);
     multiplier =
-      Builder::makeExpression(count, this->parent<Symbol<Module> >());
+      Builder::makeExpression(count, t->parent<Symbol<Module> >());
   }
 
   ptr<Symbol<Type<TypeBase> > >::const_type

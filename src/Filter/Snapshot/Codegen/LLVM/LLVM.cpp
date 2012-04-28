@@ -209,7 +209,8 @@ namespace mirv {
     const llvm::Type *llvmType = getType(type);
     VariableMap::iterator pos;
     bool inserted;
-    std::tie(pos, inserted) = FunctionMap->insert(std::make_pair(name, 0));
+    std::tie(pos, inserted) = FunctionMap->insert(std::make_pair(name,
+                                                                 nullptr));
     checkInvariant(inserted, "Variable already exists");
   }
 
