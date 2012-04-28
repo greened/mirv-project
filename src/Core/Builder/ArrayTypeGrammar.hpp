@@ -4,7 +4,7 @@
 #include <mirv/Core/Builder/ArrayTypeGrammarFwd.hpp>
 
 #include <mirv/Core/Builder/ArrayTypeRules.hpp>
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
+#include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
 

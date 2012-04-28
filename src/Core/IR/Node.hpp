@@ -9,9 +9,6 @@
 #include <mirv/Core/Utility/Printer.hpp>
 
 #include <boost/bind/bind.hpp>
-#include <boost/fusion/iterator.hpp>
-#include <boost/fusion/include/for_each.hpp>
-#include <boost/mpl/vector.hpp>
 
 #include <algorithm>
 #include <iosfwd>
@@ -181,22 +178,17 @@ namespace mirv {
       children.push_back(C3);
       children.push_back(C4);
     }
-    template<typename Sequence>
-    InnerImpl(ChildPtr C1, Sequence Children) {  
-      children.push_back(C1);
-      boost::fusion::for_each(Children,
-                              boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
-    }
-    template<typename Sequence>
-    InnerImpl(ChildPtr C1, ChildPtr C2, Sequence Children) {  
-      children.push_back(C1);
-      children.push_back(C2);
-      boost::fusion::for_each(Children,
-                              boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
-    }
     template<typename InputIterator>
     InnerImpl(ChildPtr C1, InputIterator start, InputIterator end) {  
       children.push_back(C1);
+      std::for_each(start, end,
+                    boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
+    }
+
+    template<typename InputIterator>
+    InnerImpl(ChildPtr C1, ChildPtr C2, InputIterator start, InputIterator end) {  
+      children.push_back(C1);
+      children.push_back(C2);
       std::for_each(start, end,
                     boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
     }

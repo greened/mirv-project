@@ -6,7 +6,8 @@
 #include <mirv/Core/Builder/VoidTypeGrammar.hpp>
 #include <mirv/Core/Builder/TypeGrammar.hpp>
 #include <mirv/Core/Builder/FunctionTypeRules.hpp>
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
+#include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
+#include <mirv/Core/Builder/Fusion.hpp>
 #include <mirv/Core/IR/FunctionTypeFwd.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
 #include <mirv/Core/IR/TypeFwd.hpp>
@@ -28,15 +29,14 @@ namespace mirv {
       template<bool Vararg>
       struct Helper {
         typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
-        template<typename Arg1, typename Arg2>
+        template<typename Arg1, typename FusionSequence>
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                                Arg1 a1,
-                               const Arg2 &a2) {
-        TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
-        return TernaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
-          symtab, a1, boost::fusion::transform(
-            boost::fusion::pop_front(a2), translator),
-          VarargMark::NotVararg);
+                               const FusionSequence &expr) {
+          std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> operands;
+          PopAndTranslateFusionTypeSequence()(symtab, expr, std::back_inserter(operands));
+          return QuaternaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
+            symtab, a1, operands.begin(), operands.end(), VarargMark::NotVararg);
         }
       };
 
@@ -46,23 +46,19 @@ namespace mirv {
       template<>
       struct Helper<true> {
         typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
-        template<typename Arg1, typename Arg2>
+        template<typename Arg1, typename FusionSequence>
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                                Arg1 a1,
-                               const Arg2 &a2) {
-          TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
-          return TernaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
-            symtab,
-            a1,
-            boost::fusion::transform(
-              boost::fusion::pop_front(
-                boost::fusion::pop_back(a2)),
-              translator),
-            VarargMark::Vararg);
+                               const FusionSequence &expr) {
+          std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> operands;
+          PopFrontBackAndTranslateFusionTypeSequence()(symtab, expr, std::back_inserter(operands));
+
+          return QuaternaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
+            symtab, a1, operands.begin(), operands.end(), VarargMark::Vararg);
         }
       };
     }
-    
+
     /// This is a callable transform to construct a function type.
     struct ConstructFunctionTypeSymbol : boost::proto::callable {
       typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;

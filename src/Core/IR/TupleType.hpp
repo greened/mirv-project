@@ -40,7 +40,7 @@ namespace mirv {
         ptr<Symbol<Type<TypeBase> > >::const_type t = *start;
         std::uint64_t count = 0;
         for (auto i = start; i != end; ++i) {
-          if (*i != t) {    
+          if (*i != t) {
             while (start != end) {
               push_back(*start++);
             }
@@ -48,6 +48,11 @@ namespace mirv {
           }
           ++count;
         }
+        if (count == 1) {
+          push_back(*start);
+          return;
+        }
+
         // We can optimize.
         construct_optimized(t, count);
       }
@@ -66,20 +71,6 @@ namespace mirv {
       TupleInterface(InputIterator start, InputIterator end) 
           : BaseType() {
         construct(start, end);
-      }
-
-      template<typename Sequence>
-      TupleInterface(const Sequence &members) : BaseType() {
-        // Add the member types.
-        typedef std::vector<ConstChildPtr> ChildList;
-        ChildList temp;
-        boost::fusion::for_each(members,
-                                boost::bind(
-                                  static_cast<void (ChildList::*)(const ConstChildPtr &)>(
-                                      &ChildList::push_back),
-                                  &temp,
-                                  _1));
-        construct(temp.begin(), temp.end());
       }
 
       /// Construct a tuple type with a single member.

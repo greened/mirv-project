@@ -231,27 +231,6 @@ namespace mirv {
                    boost::const_pointer_cast<ChildType>(Child2),
                    boost::const_pointer_cast<ChildType>(Child3)) {}
 
-    template<typename Sequence>
-    InnerExpression(ChildPtr Child1,
-		    Sequence Children) : BaseType(Child1, Children) {}
-    template<typename Sequence>
-    InnerExpression(ConstChildPtr Child1,
-		    Sequence Children) :
-        BaseType(boost::const_pointer_cast<ChildType>(Child1), Children) {}
-
-
-    template<typename Sequence>
-    InnerExpression(ChildPtr Child1,
-                    ChildPtr Child2,
-		    Sequence Children) : BaseType(Child1, Child2, Children) {}
-    template<typename Sequence>
-    InnerExpression(ConstChildPtr Child1,
-                    ConstChildPtr Child2,
-		    Sequence Children) :
-        BaseType(boost::const_pointer_cast<ChildType>(Child1),
-                 boost::const_pointer_cast<ChildType>(Child2),
-                 Children) {}
-
     template<typename InputIterator>
     InnerExpression(ChildPtr Child1,
 		    InputIterator start,
@@ -261,6 +240,21 @@ namespace mirv {
 		    InputIterator start,
                     InputIterator end)
         : BaseType(boost::const_pointer_cast<ChildType>(Child1), start, end) {}
+
+    template<typename InputIterator>
+    InnerExpression(ChildPtr Child1,
+                    ChildPtr Child2,
+		    InputIterator start,
+                    InputIterator end) : BaseType(Child1, Child2, start, end) {}
+    template<typename InputIterator>
+    InnerExpression(ConstChildPtr Child1,
+                    ConstChildPtr Child2,
+		    InputIterator start,
+                    InputIterator end)
+        : BaseType(boost::const_pointer_cast<ChildType>(Child1),
+                   boost::const_pointer_cast<ChildType>(Child2),
+                   start,
+                   end) {}
   };
 
   /// This is an expression with no children.

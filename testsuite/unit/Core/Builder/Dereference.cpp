@@ -108,7 +108,7 @@ int main(void)
     );
 
   PrintFilter print(std::cout);
-  
+
   print(code);
 
   return(0);

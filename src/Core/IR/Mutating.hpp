@@ -246,27 +246,16 @@ namespace mirv {
       CallInterface(ExpressionPtr function, ExpressionPtr returnValue)
           : Statement<Controlled>(function, returnValue) {}
 
-      template<typename Sequence>
-      CallInterface(ExpressionPtr function, const Sequence &args)
-          : Statement<Controlled>(function) {
-        // Add the parameters.
-        boost::fusion::for_each(args,
-                                boost::bind(&CallInterface::expressionPushBack,
-                                            this,
-                                            _1));
-      }
+      template<typename InputIterator>
+      CallInterface(ExpressionPtr function, InputIterator begin, InputIterator end)
+          : Statement<Controlled>(function, begin, end) {}
 
-      template<typename Sequence>
+      template<typename InputIterator>
       CallInterface(ExpressionPtr function,
                     ExpressionPtr returnValue,
-                    const Sequence &args)
-          : Statement<Controlled>(function, returnValue) {
-        // Add the parameters.
-        boost::fusion::for_each(args,
-                                boost::bind(&CallInterface::expressionPushBack,
-                                            this,
-                                            _1));
-      }
+                    InputIterator begin,
+                    InputIterator end)
+          : Statement<Controlled>(function, returnValue, begin, end) {}
 
       ptr<Node<Base> >::type getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());

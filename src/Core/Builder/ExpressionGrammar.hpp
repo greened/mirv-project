@@ -8,7 +8,7 @@
 #include <mirv/Core/Builder/ConstantGrammar.hpp>
 #include <mirv/Core/Builder/ExpressionRules.hpp>
 #include <mirv/Core/Builder/ExpressionTerminals.hpp>
-#include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/Builder/ConstructTransform.hpp>
 
 #include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Bitwise.hpp>

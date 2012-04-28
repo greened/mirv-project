@@ -8,7 +8,6 @@
 #include <mirv/Core/IR/ModuleFwd.hpp>
 #include <mirv/Core/IR/StatementFwd.hpp>
 #include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/Builder/TransformFwd.hpp>
 #include <mirv/Core/Memory/Heap.hpp>
 
 namespace mirv {

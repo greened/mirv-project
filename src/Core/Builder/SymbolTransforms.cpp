@@ -7,7 +7,7 @@
 #include <mirv/Core/IR/PointerType.hpp>
 #include <mirv/Core/IR/Reference.hpp>
 #include <mirv/Core/IR/AddressConstant.hpp>
-#include <mirv/Core/Builder/SymbolTransforms.hpp>
+#include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
 
 namespace mirv {
   namespace Builder {

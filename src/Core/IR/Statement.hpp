@@ -229,7 +229,23 @@ namespace mirv {
 
     protected:
       template<typename ...A1>
-      ControlledInterface(A1... args) : expressions{args...} {}
+      ControlledInterface(boost::shared_ptr<Expression<A1> >... args) : expressions({args...}) {}
+
+      template<typename InputIterator>
+      ControlledInterface(ptr<Expression<Base> >::type Child1,
+                          InputIterator Start,
+                          InputIterator End) : expressions(Start, End) {
+        expressions.push_front(Child1);
+      }
+
+      template<typename InputIterator>
+      ControlledInterface(ptr<Expression<Base> >::type Child1,
+                          ptr<Expression<Base> >::type Child2,
+                          InputIterator Start,
+                          InputIterator End) : expressions(Start, End) {
+        expressions.push_front(Child2);
+        expressions.push_front(Child1);
+      }
 
     public:
       typedef ExpressionList::iterator ExpressionIterator;
