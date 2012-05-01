@@ -20,10 +20,8 @@ int main(void)
 }
 endef
 
-override LLVM_LIBRARY = libLLVMCore.a libLLVMSupport.a libLLVMSystem.a libpthread.a
-
 ifndef LLVM_PATH
-LLVM_PATH=/usr/lib/llvm-2.8
+LLVM_PATH=/usr/lib/llvm-3.0
 endif
 
 ifndef LLVM_LIBRARY_PATH
@@ -33,6 +31,8 @@ endif
 ifndef LLVM_INCLUDE_PATH
 LLVM_INCLUDE_PATH = $(LLVM_PATH)/include
 endif
+
+override LLVM_LIBRARY = $(shell $(LLVM_PATH)/bin/llvm-config --libnames)
 
 override LLVM_LINK_FLAGS = -L$(LLVM_LIBRARY_PATH) -rdynamic -Xlinker -rpath -Xlinker $(LLVM_LIBRARY_PATH) -lpthread -ldl -lm
 override LLVM_COMPILE_FLAGS = -I$(LLVM_INCLUDE_PATH) -fpermissive -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
