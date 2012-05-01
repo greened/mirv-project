@@ -191,8 +191,8 @@ namespace mirv {
   {
     checkInvariant(TheModule != 0, "No current module");
     checkInvariant(TheFunction == 0, "Function already exists");
-    const llvm::FunctionType *llvmFunctionType =
-      llvm::cast<const llvm::FunctionType>(getType(type));
+    llvm::FunctionType *llvmFunctionType =
+      llvm::cast<llvm::FunctionType>(getType(type));
     TheFunction = llvm::Function::Create(llvmFunctionType,
                                          // FIXME: Handle linkage.
                                          llvm::GlobalValue::ExternalLinkage,
@@ -206,7 +206,7 @@ namespace mirv {
                  ptr<Symbol<Type<TypeBase> > >::const_type type)
   {
     checkInvariant(TheFunction != 0, "No function to hold variable");
-    const llvm::Type *llvmType = getType(type);
+    //llvm::Type *llvmType = getType(type);
     VariableMap::iterator pos;
     bool inserted;
     std::tie(pos, inserted) = FunctionMap->insert(std::make_pair(name,
@@ -220,7 +220,7 @@ namespace mirv {
                ptr<Symbol<Type<TypeBase> > >::const_type type)
   {
     checkInvariant(TheFunction != 0, "No function to hold variable");
-    const llvm::Type *llvmType = getType(type);
+    llvm::Type *llvmType = getType(type);
     llvm::Value *var = builder()->CreateAlloca(llvmType, 0, name);
     VariableMap::iterator pos = FunctionMap->find(name);
     checkInvariant(pos != FunctionMap->end(), "Cannot find variable");
@@ -236,7 +236,7 @@ namespace mirv {
     ptr<Symbol<Type<TypeBase> > >::const_type type(sym->type());
 
     checkInvariant(TheModule, "No module for global variable");
-    const llvm::Type *llvmType = getType(type);
+    llvm::Type *llvmType = getType(type);
 
     if (const llvm::ArrayType *arrayType =
         llvm::dyn_cast<llvm::ArrayType>(llvmType)) {
@@ -315,7 +315,7 @@ namespace mirv {
     return v->second;
   }
 
-  const llvm::Type *LLVMCodegenFilter::
+  llvm::Type *LLVMCodegenFilter::
   FlowAttribute::
   getType(ptr<Symbol<Type<TypeBase> > >::const_type type) const
   {
@@ -357,7 +357,7 @@ namespace mirv {
     // TODO: See about making some of these vector types.
     if (type->isUniform()) {
       (*type->begin())->accept(*this);
-      const llvm::Type *elementType = TheType;
+      llvm::Type *elementType = TheType;
 
       // Size must be an integer constant for LLVM.
       ptr<Expression<Reference<Constant<Base> > > >::const_type cref =
@@ -369,7 +369,7 @@ namespace mirv {
     }
 
     // Create a struct type.
-    std::vector<const llvm::Type *> memberTypes;
+    std::vector<llvm::Type *> memberTypes;
     for (auto m = type->begin();
          m != type->end();
          ++m) {
@@ -384,14 +384,14 @@ namespace mirv {
   TypeCreator::visit(ptr<Symbol<Type<Pointer> > >::const_type type) 
   {
     type->getBaseType()->accept(*this);
-    const llvm::Type *baseType = TheType;
+    llvm::Type *baseType = TheType;
     TheType = llvm::PointerType::getUnqual(baseType);
   }
 
   void LLVMCodegenFilter::FlowAttribute::
   TypeCreator::visit(ptr<Symbol<Type<FunctionType> > >::const_type type) 
   {
-    const llvm::Type *returnType = 0;
+    llvm::Type *returnType = 0;
     if (type->getReturnType()) {
       type->getReturnType()->accept(*this);
       returnType = TheType;
@@ -400,7 +400,7 @@ namespace mirv {
       returnType = llvm::Type::getVoidTy(Context);
     }
 
-    std::vector<const llvm::Type *> parameterTypes;
+    std::vector<llvm::Type *> parameterTypes;
     for (auto p = type->parameterBegin();
          p != type->parameterEnd();
          ++p) {
@@ -543,8 +543,8 @@ namespace mirv {
                 boost::mem_fn(&SynthesizedAttribute::getValue)));
 
     llvm::Value *phi = attributeManager.getInheritedAttribute().builder()->
-      CreatePHI(attributeManager.begin()->getValue()->getType(), "phi");
-    
+      CreatePHI(attributeManager.begin()->getValue()->getType(), 0, "phi");
+
     // TODO: Add incoming values.
 
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
@@ -623,7 +623,7 @@ namespace mirv {
 
     llvm::Value *Call = attributeManager.getInheritedAttribute().builder()->
       CreateCall(attributeManager.begin()->getValue(),
-                arguments.begin(), arguments.end(), name);
+                 llvm::ArrayRef<llvm::Value *>(arguments), name);
 
     syn.setValue(Call);
 
@@ -1135,7 +1135,7 @@ namespace mirv {
 
     llvm::Value *GEP = attributeManager.getInheritedAttribute().builder()->
       CreateGEP(attributeManager.begin()->getValue(),
-                indices.begin(), indices.end(), "tptrgep");
+                llvm::ArrayRef<llvm::Value *>(indices), "tptrgep");
 
     syn.setValue(GEP);
     attributeManager.setSynthesizedAttribute(syn);

@@ -47,7 +47,7 @@ namespace mirv {
       class TypeCreator : public ConstSymbolVisitor {
       private:
         llvm::LLVMContext &Context;
-        const llvm::Type *TheType;
+        llvm::Type *TheType;
 
       public:
         TypeCreator(llvm::LLVMContext &context) 
@@ -59,7 +59,7 @@ namespace mirv {
         virtual void visit(ptr<Symbol<Type<Pointer> > >::const_type);
         virtual void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
 
-        const llvm::Type *type(void) const {
+        llvm::Type *type(void) const {
           return TheType;
         }
       };
@@ -123,7 +123,7 @@ namespace mirv {
         return TheBlock;
       }
 
-      const llvm::Type *
+      llvm::Type *
       getType(ptr<Symbol<Type<TypeBase> > >::const_type) const;
 
       void createModule(const std::string &name) {
@@ -160,7 +160,7 @@ namespace mirv {
       void createIntegerConstant(ptr<Symbol<Type<TypeBase> > >::const_type type,
                                          ValueType value,
                                          bool isSigned) {
-        const llvm::Type *llvmType = getType(type);
+        llvm::Type *llvmType = getType(type);
         llvm::Value *constant = llvm::ConstantInt::get(llvmType, value, isSigned);
         setValue(constant);
       }
@@ -168,7 +168,7 @@ namespace mirv {
       template<typename ValueType>
       void createFloatingPointConstant(ptr<Symbol<Type<TypeBase> > >::const_type type,
                                                ValueType value) {
-        const llvm::Type *llvmType = getType(type);
+        llvm::Type *llvmType = getType(type);
         llvm::Value *constant = llvm::ConstantFP::get(llvmType, value);
         setValue(constant);
       }

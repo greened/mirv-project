@@ -9,7 +9,8 @@
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/JIT.h>
-#include <llvm/Target/TargetSelect.h>
+
+#include <llvm/Support/TargetSelect.h>
 
 namespace mirv {
   namespace {
@@ -25,8 +26,9 @@ namespace mirv {
     doCompile(void * &function, 
               ptr<Symbol<Module> >::type module,
               const std::string &functionName) {
-      llvm::Module *llvmModule = codegen(module);
       llvm::InitializeNativeTarget();
+
+      llvm::Module *llvmModule = codegen(module);
       llvm::EngineBuilder builder(llvmModule);
       std::string JITError;
       llvm::ExecutionEngine *engine =
@@ -48,8 +50,9 @@ namespace mirv {
 
   void compileAndRun(ptr<Symbol<Module> >::type module,
                      const std::string &functionName) {
-    llvm::Module *llvmModule = codegen(module);
     llvm::InitializeNativeTarget();
+
+    llvm::Module *llvmModule = codegen(module);
     llvm::EngineBuilder builder(llvmModule);
     llvm::ExecutionEngine *engine =
       builder.setEngineKind(llvm::EngineKind::JIT).create();
