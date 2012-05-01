@@ -408,8 +408,9 @@ namespace mirv {
       parameterTypes.push_back(TheType);
     }
 
-    // TODO: Handle vararg.
-    TheType = llvm::FunctionType::get(returnType, parameterTypes, false);
+    TheType = llvm::FunctionType::get(returnType,
+                                      parameterTypes,
+                                      type->isVararg());
   }
 
   void LLVMCodegenFilter::
