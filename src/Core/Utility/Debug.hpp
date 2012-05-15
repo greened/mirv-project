@@ -52,7 +52,7 @@ namespace mirv {
     }
   };
 
-  void dump(ptr<Node<Base> >::const_type node);  
+  void dump(ptr<const Node<Base> > node);  
 }
 
 #endif

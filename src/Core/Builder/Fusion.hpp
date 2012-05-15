@@ -17,9 +17,9 @@ namespace mirv {
     namespace detail {
       struct PopAndTranslateFusionExpressionSequence {
         template<typename Expr, typename OutputIterator>
-        void operator()(ptr<SymbolTable>::type symtab, const Expr &expr, OutputIterator out) {
+        void operator()(ptr<SymbolTable> symtab, const Expr &expr, OutputIterator out) {
           TranslateToExpression<Expression<Base>> translator(symtab);
-          typedef std::vector<ptr<Expression<Base> >::type> result_type;
+          typedef std::vector<ptr<Expression<Base> >> result_type;
           result_type results;
           void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
 
@@ -37,9 +37,9 @@ namespace mirv {
 
       struct FlattenAndTranslateFusionExpressionSequence {
         template<typename Expr, typename OutputIterator>
-        void operator()(ptr<SymbolTable>::type symtab, const Expr &expr, OutputIterator out) {
+        void operator()(ptr<SymbolTable> symtab, const Expr &expr, OutputIterator out) {
           TranslateToExpression<Expression<Base>> translator(symtab);
-          typedef std::vector<ptr<Expression<Base> >::type> result_type;
+          typedef std::vector<ptr<Expression<Base> >> result_type;
           result_type results;
           void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
 
@@ -59,7 +59,7 @@ namespace mirv {
         template<typename Expr, typename OutputIterator>
         void operator()(boost::shared_ptr<SymbolTable> symtab,
                         const Expr &expr, OutputIterator out) {
-          typedef std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> result_type;
+          typedef std::vector<ptr<const Symbol<Type<TypeBase> > >> result_type;
           TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
           result_type results;
           void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
@@ -82,7 +82,7 @@ namespace mirv {
         template<typename Expr, typename OutputIterator>
         void operator()(boost::shared_ptr<SymbolTable> symtab,
                         const Expr &expr, OutputIterator out) {
-          typedef std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> result_type;
+          typedef std::vector<ptr<const Symbol<Type<TypeBase> > >> result_type;
           TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
           result_type results;
           void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
@@ -105,7 +105,7 @@ namespace mirv {
         template<typename Expr, typename OutputIterator>
         void operator()(boost::shared_ptr<SymbolTable> symtab,
                         const Expr &expr, OutputIterator out) {
-          typedef std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> result_type;
+          typedef std::vector<ptr<const Symbol<Type<TypeBase> > >> result_type;
           TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
           result_type results;
           void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;

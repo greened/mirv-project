@@ -11,9 +11,9 @@
 
 namespace mirv {
   namespace Builder {
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     ConstructGlobalReference::operator()(boost::shared_ptr<SymbolTable> symtab,
-                                         ptr<Symbol<GlobalVariable> >::type global)
+                                         ptr<Symbol<GlobalVariable> > global)
     {
       auto inttype = LookupAndAddSymbol<Symbol<Type<TypeBase> > >()(
         symtab,

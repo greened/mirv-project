@@ -241,9 +241,9 @@ namespace mirv {
     template<>
     struct constructor<1> {
       template<typename ExprType>
-      static typename ptr<ExprType>::type
+      static ptr<ExprType>
       construct(boost::shared_ptr<ExprType> prototype) {
-        typename ptr<ExprType>::type
+        ptr<ExprType>
           expr(ExprType::make(prototype->getOperand()->clone()));
         return expr;
       }
@@ -253,9 +253,9 @@ namespace mirv {
     template<>
     struct constructor<2> {
       template<typename ExprType>
-      static typename ptr<ExprType>::type
+      static ptr<ExprType>
       construct(boost::shared_ptr<ExprType> prototype) {
-        typename ptr<ExprType>::type
+        ptr<ExprType>
           expr(ExprType::make(prototype->getLeftOperand()->clone(),
                               prototype->getRightOperand()->clone()));
         return expr;
@@ -283,7 +283,7 @@ namespace mirv {
           public boost::enable_shared_from_this<Expression<Tag> > {
     private:
       Expression<Base> *cloneImpl(void) {
-        typename ptr<Expression<Tag> >::type
+        ptr<Expression<Tag> >
           expr(detail::constructor<Expression<Tag>::NumInitializers>::
                construct(this->shared_from_this()));
         Expression<Tag> *result = expr.get();
@@ -310,10 +310,10 @@ namespace mirv {
         error("ExpressionInterface::accept called");
       }
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(this->shared_from_this());
       }
     };

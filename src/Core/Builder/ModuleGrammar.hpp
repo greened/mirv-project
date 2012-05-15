@@ -14,7 +14,7 @@ namespace mirv {
   namespace Builder {
     /// This is a callable transform to get the current module.
     struct GetBuiltModule : boost::proto::callable {
-      typedef ptr<Symbol<Module> >::type result_type;
+      typedef ptr<Symbol<Module> > result_type;
 
       template<typename T>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab, T) {

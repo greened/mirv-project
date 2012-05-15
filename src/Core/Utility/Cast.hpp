@@ -31,9 +31,9 @@ namespace mirv {
 
   // For some reason this doesn't work.
   // template<typename To, typename From>
-  // typename ptr<To>::type dyn_cast(typename ptr<From>::type const &val)
+  // ptr<To>::type dyn_cast(typename ptr<From> const &val)
   // {
-  //   typename ptr<To>::type ret = boost::dynamic_pointer_cast<To>(val);
+  //   ptr<To> ret = boost::dynamic_pointer_cast<To>(val);
   //   return ret;
   // }
 
@@ -42,7 +42,7 @@ namespace mirv {
   template<typename To, typename From>
   typename boost::shared_ptr<To> dyn_cast(typename boost::shared_ptr<From> const &val)
   {
-    typename ptr<To>::type ret = boost::dynamic_pointer_cast<To>(val);
+    ptr<To> ret = boost::dynamic_pointer_cast<To>(val);
     return ret;
   }
 
@@ -71,11 +71,11 @@ namespace mirv {
   {
     if (DebugManager::instance().isActive()
 	&& DebugManager::instance().feature(DebugManager::SafeCast)) {
-      typename ptr<To>::type ret = dyn_cast<To>(val);
+      ptr<To> ret = dyn_cast<To>(val);
       return ret;
     }
     else {
-      typename ptr<To>::type ret = boost::static_pointer_cast<To>(val);
+      ptr<To> ret = boost::static_pointer_cast<To>(val);
       return ret;
     }
   }

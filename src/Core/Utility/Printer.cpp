@@ -24,7 +24,7 @@ namespace mirv {
         /// Do something after printing an expression operator.
         class Operator {
         public:
-          Operator(typename ptr<Expression<Base> >::const_type expr) {}
+          Operator(ptr<const Expression<Base> > expr) {}
           Stream &operator()(Stream &out) const { return out; }
         };
 
@@ -78,7 +78,7 @@ namespace mirv {
         /// Do something after printing an expression operator.
         class Operator {
         public:
-          Operator(typename ptr<Expression<Base> >::const_type expr) {}
+          Operator(ptr<const Expression<Base> > expr) {}
           Stream &operator()(Stream &out) const { return out; }
         };
 
@@ -132,7 +132,7 @@ namespace mirv {
     template<typename Formatter>
     class Operator : public Formatter::Operator {
     public:
-      Operator(typename ptr<Expression<Base> >::const_type expr) 
+      Operator(ptr<const Expression<Base> > expr) 
           : Formatter::Operator(expr) {}
     };
 
@@ -188,10 +188,10 @@ namespace mirv {
 
     namespace {
       template<typename Formatter = Printer::detail::DefaultFormatter>
-      void printImpl(Stream &out, ptr<Node<Base> >::const_type node);
+      void printImpl(Stream &out, ptr<const Node<Base> > node);
     }
 
-    typedef std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> TypeList;
+    typedef std::vector<ptr<const Symbol<Type<TypeBase> > >> TypeList;
 
     /// Define the inherited attibute.
     class TypeNameInheritedAttribute {
@@ -215,7 +215,7 @@ namespace mirv {
         return *ot;
       }
 
-      void typeStackPushBack(ptr<Symbol<Type<TypeBase> > >::const_type type) const {
+      void typeStackPushBack(ptr<const Symbol<Type<TypeBase> > > type) const {
         TypeStack().push_back(type);
       }
       void typeStackPopBack(void) const {
@@ -233,7 +233,7 @@ namespace mirv {
       }
 
       TypeStackIterator
-      typeStackFind(ptr<Symbol<Type<TypeBase> > >::const_type type) const {
+      typeStackFind(ptr<const Symbol<Type<TypeBase> > > type) const {
         return std::find(typeStackBegin(), typeStackEnd(), type);
       }
     };
@@ -263,10 +263,10 @@ namespace mirv {
       EnterTypeNameVisitor(TypeNameFlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Type<Integral> > >::const_type);
-      void visit(ptr<Symbol<Type<Floating> > >::const_type);
-      void visit(ptr<Symbol<Type<Tuple> > >::const_type);
-      void visit(ptr<Symbol<Type<Derived> > >::const_type);
+      void visit(ptr<const Symbol<Type<Integral> > >);
+      void visit(ptr<const Symbol<Type<Floating> > >);
+      void visit(ptr<const Symbol<Type<Tuple> > >);
+      void visit(ptr<const Symbol<Type<Derived> > >);
     };
 
     /// Apply the EnterTypeNameVisitor to type symbols upon entry.
@@ -288,8 +288,8 @@ namespace mirv {
       BeforeTypeNameVisitor(TypeNameFlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Type<TypeBase> > >::const_type);
-      void visit(ptr<Symbol<Type<Derived> > >::const_type);
+      void visit(ptr<const Symbol<Type<TypeBase> > >);
+      void visit(ptr<const Symbol<Type<Derived> > >);
     };
 
     template<typename Formatter>
@@ -317,10 +317,10 @@ namespace mirv {
                       InputIterator node) {}
 
       template<typename InputIterator>
-      void operator()(ptr<InnerType>::const_type parent,
+      void operator()(ptr<const InnerType> parent,
                       InputIterator node) {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        if (ptr<Symbol<Type<FunctionType> > >::const_type function =
+        if (ptr<const Symbol<Type<FunctionType> > > function =
             dyn_cast<const Symbol<Type<FunctionType> > >(parent)) {
           if (node == function->begin()) {
             if (!*node) {
@@ -367,7 +367,7 @@ namespace mirv {
                       InputIterator node,
                       InputIterator next) {
         Stream &out = attributeManager.getInheritedAttribute().out();
-        if (ptr<Symbol<Type<FunctionType> > >::const_type function =
+        if (ptr<const Symbol<Type<FunctionType> > > function =
             dyn_cast<const Symbol<Type<FunctionType> > >(parent)) {
           if (node == function->begin()) {
             return;
@@ -388,10 +388,10 @@ namespace mirv {
       LeaveTypeNameVisitor(TypeNameFlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Type<Pointer> > >::const_type);
-      void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
-      void visit(ptr<Symbol<Type<Tuple> > >::const_type);
-      void visit(ptr<Symbol<Type<Derived> > >::const_type);
+      void visit(ptr<const Symbol<Type<Pointer> > >);
+      void visit(ptr<const Symbol<Type<FunctionType> > >);
+      void visit(ptr<const Symbol<Type<Tuple> > >);
+      void visit(ptr<const Symbol<Type<Derived> > >);
     };
 
     /// Invoke the LeaveTypeNameVisitor upon exiting a type symbol.
@@ -493,18 +493,18 @@ namespace mirv {
       EnterConstantValueVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Constant<std::int8_t> > >::const_type);
-      void visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type);
-      void visit(ptr<Symbol<Constant<std::int16_t> > >::const_type);
-      void visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type);
-      void visit(ptr<Symbol<Constant<std::int32_t> > >::const_type);
-      void visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type);
-      void visit(ptr<Symbol<Constant<std::int64_t> > >::const_type);
-      void visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type);
-      void visit(ptr<Symbol<Constant<float> > >::const_type);
-      void visit(ptr<Symbol<Constant<double> > >::const_type);
-      void visit(ptr<Symbol<Constant<std::string> > >::const_type);
-      void visit(ptr<Symbol<Constant<Address> > >::const_type);
+      void visit(ptr<const Symbol<Constant<std::int8_t> > >);
+      void visit(ptr<const Symbol<Constant<std::uint8_t> > >);
+      void visit(ptr<const Symbol<Constant<std::int16_t> > >);
+      void visit(ptr<const Symbol<Constant<std::uint16_t> > >);
+      void visit(ptr<const Symbol<Constant<std::int32_t> > >);
+      void visit(ptr<const Symbol<Constant<std::uint32_t> > >);
+      void visit(ptr<const Symbol<Constant<std::int64_t> > >);
+      void visit(ptr<const Symbol<Constant<std::uint64_t> > >);
+      void visit(ptr<const Symbol<Constant<float> > >);
+      void visit(ptr<const Symbol<Constant<double> > >);
+      void visit(ptr<const Symbol<Constant<std::string> > >);
+      void visit(ptr<const Symbol<Constant<Address> > >);
     };
 
     /// Invoke the EnterConstantValueVisitor upon entry to a constant
@@ -557,12 +557,12 @@ namespace mirv {
       EnterDeclSymbolVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Module> >::const_type sym);
-      void visit(ptr<Symbol<Function> >::const_type sym);
-      void visit(ptr<Symbol<Variable> >::const_type sym);
-      void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
-      void visit(ptr<Symbol<Type<TypeBase> > >::const_type sym);
-      void visit(ptr<Symbol<Type<Tuple> > >::const_type sym);
+      void visit(ptr<const Symbol<Module> > sym);
+      void visit(ptr<const Symbol<Function> > sym);
+      void visit(ptr<const Symbol<Variable> > sym);
+      void visit(ptr<const Symbol<GlobalVariable> > sym);
+      void visit(ptr<const Symbol<Type<TypeBase> > > sym);
+      void visit(ptr<const Symbol<Type<Tuple> > > sym);
     };
 
     /// Invoke the EnterDeclSymbolVisitor upon entry to a symbol
@@ -585,10 +585,10 @@ namespace mirv {
       EnterDefSymbolVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Module> >::const_type sym);
-      void visit(ptr<Symbol<Function> >::const_type sym);
-      void visit(ptr<Symbol<Variable> >::const_type sym);
-      void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
+      void visit(ptr<const Symbol<Module> > sym);
+      void visit(ptr<const Symbol<Function> > sym);
+      void visit(ptr<const Symbol<Variable> > sym);
+      void visit(ptr<const Symbol<GlobalVariable> > sym);
     };
 
     /// Invoke the EnterDefSymbolVisitor upon entry to a symbol
@@ -611,13 +611,13 @@ namespace mirv {
           : attributeManager(am) {}
 
       /// Print the final newline after each symbol declaration.
-      void visit(ptr<Symbol<Base> >::const_type);
+      void visit(ptr<const Symbol<Base> >);
 
       /// Do nothing for most types.
-      void visit(ptr<Symbol<Type<TypeBase> >  >::const_type);
+      void visit(ptr<const Symbol<Type<TypeBase> >  >);
 
       /// Print the final newline after tuple types.
-      void visit(ptr<Symbol<Type<Tuple> > >::const_type);
+      void visit(ptr<const Symbol<Type<Tuple> > >);
     };
 
     /// Invoke the LeaveDeclSymbolVisitor upon exiting a Symbol.
@@ -639,10 +639,10 @@ namespace mirv {
           : attributeManager(am) {}
 
       /// Print the final newline after each symbol definition.
-      void visit(ptr<Symbol<Variable> >::const_type sym);
-      void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
-      void visit(ptr<Symbol<Module> >::const_type sym);
-      void visit(ptr<Symbol<Function> >::const_type sym);
+      void visit(ptr<const Symbol<Variable> > sym);
+      void visit(ptr<const Symbol<GlobalVariable> > sym);
+      void visit(ptr<const Symbol<Module> > sym);
+      void visit(ptr<const Symbol<Function> > sym);
     };
 
     /// Invoke the LeaveDefSymbolVisitor upon leaving the definition
@@ -664,22 +664,22 @@ namespace mirv {
       EnterStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Statement<Block> >::const_type stmt);
-      void visit(ptr<Statement<IfThen> >::const_type stmt);
-      void visit(ptr<Statement<IfElse> >::const_type stmt);
-      void visit(ptr<Statement<While> >::const_type stmt);
-      void visit(ptr<Statement<DoWhile> >::const_type stmt);
-      void visit(ptr<Statement<Switch> >::const_type stmt);
-      void visit(ptr<Statement<Case> >::const_type stmt);
-      void visit(ptr<Statement<CaseBlock> >::const_type stmt);
-      void visit(ptr<Statement<Before> >::const_type stmt);
-      void visit(ptr<Statement<After> >::const_type stmt);
-      void visit(ptr<Statement<Goto> >::const_type stmt);
-      void visit(ptr<Statement<Return> >::const_type stmt);
-      void visit(ptr<Statement<Phi> >::const_type stmt);
-      void visit(ptr<Statement<Store> >::const_type stmt);
-      void visit(ptr<Statement<Call> >::const_type stmt);
-      void visit(ptr<Statement<Allocate> >::const_type stmt);
+      void visit(ptr<const Statement<Block> > stmt);
+      void visit(ptr<const Statement<IfThen> > stmt);
+      void visit(ptr<const Statement<IfElse> > stmt);
+      void visit(ptr<const Statement<While> > stmt);
+      void visit(ptr<const Statement<DoWhile> > stmt);
+      void visit(ptr<const Statement<Switch> > stmt);
+      void visit(ptr<const Statement<Case> > stmt);
+      void visit(ptr<const Statement<CaseBlock> > stmt);
+      void visit(ptr<const Statement<Before> > stmt);
+      void visit(ptr<const Statement<After> > stmt);
+      void visit(ptr<const Statement<Goto> > stmt);
+      void visit(ptr<const Statement<Return> > stmt);
+      void visit(ptr<const Statement<Phi> > stmt);
+      void visit(ptr<const Statement<Store> > stmt);
+      void visit(ptr<const Statement<Call> > stmt);
+      void visit(ptr<const Statement<Allocate> > stmt);
     };
 
     /// Invoke the EnterStatementVisitor upon entry to a statement.
@@ -700,9 +700,9 @@ namespace mirv {
       LeaveStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Statement<Base> >::const_type stmt);
-      void visit(ptr<Statement<Block> >::const_type stmt);
-      void visit(ptr<Statement<Return> >::const_type stmt);
+      void visit(ptr<const Statement<Base> > stmt);
+      void visit(ptr<const Statement<Block> > stmt);
+      void visit(ptr<const Statement<Return> > stmt);
     };
 
     /// Invoke the LeaveStatementVisitor when exiting statements.
@@ -726,40 +726,40 @@ namespace mirv {
       EnterExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Expression<Add> >::const_type expr);
-      void visit(ptr<Expression<Subtract> >::const_type expr);
-      void visit(ptr<Expression<Multiply> >::const_type expr);
-      void visit(ptr<Expression<Divide> >::const_type expr);
-      void visit(ptr<Expression<Modulus> >::const_type expr);
-      void visit(ptr<Expression<Negate> >::const_type expr);
-      void visit(ptr<Expression<LogicalAnd> >::const_type expr);
-      void visit(ptr<Expression<LogicalOr> >::const_type expr);
-      void visit(ptr<Expression<LogicalNot> >::const_type expr);
-      void visit(ptr<Expression<BitwiseAnd> >::const_type expr);
-      void visit(ptr<Expression<BitwiseOr> >::const_type expr);
-      void visit(ptr<Expression<BitwiseComplement> >::const_type expr);
-      void visit(ptr<Expression<LessThan> >::const_type expr);
-      void visit(ptr<Expression<LessThanOrEqual> >::const_type expr);
-      void visit(ptr<Expression<Equal> >::const_type expr);
-      void visit(ptr<Expression<NotEqual> >::const_type expr);
-      void visit(ptr<Expression<GreaterThan> >::const_type expr);
-      void visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr);
-      void visit(ptr<Expression<TuplePointer> >::const_type expr);
-      void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
-      void visit(ptr<Expression<Reference<Function> > >::const_type expr);
-      void visit(ptr<Expression<Load> >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::uint16_t> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::int32_t> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::uint32_t> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::int64_t> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<float> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<double> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<std::string> > > >::const_type expr);
+      void visit(ptr<const Expression<Add> > expr);
+      void visit(ptr<const Expression<Subtract> > expr);
+      void visit(ptr<const Expression<Multiply> > expr);
+      void visit(ptr<const Expression<Divide> > expr);
+      void visit(ptr<const Expression<Modulus> > expr);
+      void visit(ptr<const Expression<Negate> > expr);
+      void visit(ptr<const Expression<LogicalAnd> > expr);
+      void visit(ptr<const Expression<LogicalOr> > expr);
+      void visit(ptr<const Expression<LogicalNot> > expr);
+      void visit(ptr<const Expression<BitwiseAnd> > expr);
+      void visit(ptr<const Expression<BitwiseOr> > expr);
+      void visit(ptr<const Expression<BitwiseComplement> > expr);
+      void visit(ptr<const Expression<LessThan> > expr);
+      void visit(ptr<const Expression<LessThanOrEqual> > expr);
+      void visit(ptr<const Expression<Equal> > expr);
+      void visit(ptr<const Expression<NotEqual> > expr);
+      void visit(ptr<const Expression<GreaterThan> > expr);
+      void visit(ptr<const Expression<GreaterThanOrEqual> > expr);
+      void visit(ptr<const Expression<TuplePointer> > expr);
+      void visit(ptr<const Expression<Reference<Variable> > > expr);
+      void visit(ptr<const Expression<Reference<Function> > > expr);
+      void visit(ptr<const Expression<Load> > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::int8_t> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::uint8_t> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::int16_t> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::uint16_t> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::int32_t> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::uint32_t> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::int64_t> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::uint64_t> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<float> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<double> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<Base> > > > expr);
+      void visit(ptr<const Expression<Reference<Constant<std::string> > > > expr);
     };
 
     /// Invoke the EnterExpressionVisitor upon entry to an expression.
@@ -780,8 +780,8 @@ namespace mirv {
       LeaveExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Expression<Base> >::const_type expr);
-      void visit(ptr<InnerExpression>::const_type expr);
+      void visit(ptr<const Expression<Base> > expr);
+      void visit(ptr<const InnerExpression> expr);
     };
 
     /// Invoke the LeaveExpressionVisitor upon leaving an expression.
@@ -869,7 +869,7 @@ namespace mirv {
 
       // We need to reverse the order in which we visit the
       // assignment operands.
-      void visit(ptr<Statement<Store> >::const_type stmt) {
+      void visit(ptr<const Statement<Store> > stmt) {
         this->doEnter(stmt);
 
         for (auto i = stmt->expressionBegin();
@@ -884,7 +884,7 @@ namespace mirv {
 
       // We need to reverse the order in which we visit the
       // allocate operands.
-      void visit(ptr<Statement<Allocate> >::const_type stmt) {
+      void visit(ptr<const Statement<Allocate> > stmt) {
         this->doEnter(stmt);
 
         for (auto i = stmt->expressionBegin();
@@ -930,7 +930,7 @@ namespace mirv {
       
       // We just want the function declaration at this point so don't
       // visit children.
-      void visit(ptr<Symbol<Function> >::const_type sym) {
+      void visit(ptr<const Symbol<Function> > sym) {
         this->doEnter(sym);
         this->doLeave(sym);
       }
@@ -970,59 +970,59 @@ namespace mirv {
 
       /// We only want to visit functions here since we already
       /// declared module-level types and variables.
-      void visit(ptr<Symbol<Module> >::const_type sym);
+      void visit(ptr<const Symbol<Module> > sym);
     };
 
     namespace {
       template<typename Formatter = Printer::detail::DefaultFormatter>
-      void printImpl(Printer::Stream &out, ptr<Node<Base> >::const_type node)
+      void printImpl(Printer::Stream &out, ptr<const Node<Base> > node)
       {
-        if (ptr<Symbol<Module> >::const_type s =
+        if (ptr<const Symbol<Module> > s =
             boost::dynamic_pointer_cast<const Symbol<Module> >(node)) {
-          ptr<ConstSymbolVisitor>::type declflow(new Printer::PrintDeclSymbolFlow<Formatter>(out));
+          ptr<ConstSymbolVisitor> declflow(new Printer::PrintDeclSymbolFlow<Formatter>(out));
           s->accept(*declflow);
-          ptr<ConstSymbolVisitor>::type defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
+          ptr<ConstSymbolVisitor> defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
           s->accept(*defflow);
         }
-        else if (ptr<Symbol<Type<TypeBase> > >::const_type t =
+        else if (ptr<const Symbol<Type<TypeBase> > > t =
                  boost::dynamic_pointer_cast<const Symbol<Type<TypeBase> > >(node)) {
-          ptr<ConstSymbolVisitor>::type flow(new Printer::TypeNameFlow<Formatter>(out));
+          ptr<ConstSymbolVisitor> flow(new Printer::TypeNameFlow<Formatter>(out));
           t->accept(*flow);
         }
-        else if (ptr<Symbol<Base> >::const_type s =
+        else if (ptr<const Symbol<Base> > s =
                  boost::dynamic_pointer_cast<const Symbol<Base> >(node)) {
-          ptr<ConstSymbolVisitor>::type defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
+          ptr<ConstSymbolVisitor> defflow(new Printer::PrintDefSymbolFlow<Formatter>(out));
           s->accept(*defflow);
         }
-        else if (ptr<Statement<Base> >::const_type s =
+        else if (ptr<const Statement<Base> > s =
                  boost::dynamic_pointer_cast<const Statement<Base> >(node)) {
-          ptr<ConstStatementVisitor>::type flow(new Printer::PrintFlow<Formatter>(out));
+          ptr<ConstStatementVisitor> flow(new Printer::PrintFlow<Formatter>(out));
           s->accept(*flow);
         }
-        else if (ptr<Expression<Base> >::const_type e =
+        else if (ptr<const Expression<Base> > e =
                  boost::dynamic_pointer_cast<const Expression<Base> >(node)) {
-          ptr<ConstExpressionVisitor>::type flow(new Printer::PrintExpressionFlow<Formatter>(out));
+          ptr<ConstExpressionVisitor> flow(new Printer::PrintExpressionFlow<Formatter>(out));
           e->accept(*flow);
         }
       }
     }
 
     template<typename Formatter>
-    void EnterTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Integral> > >::const_type sym)
+    void EnterTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<Integral> > > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       out << "int" << sym->integerBitSize();
     }
 
     template<typename Formatter>
-    void EnterTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Floating> > >::const_type sym)
+    void EnterTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<Floating> > > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       out << "float" << sym->integerBitSize();
     }
 
     template<typename Formatter>
-    void EnterTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Tuple> > >::const_type sym)
+    void EnterTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<Tuple> > > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       out << "(";
@@ -1034,13 +1034,13 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Derived> > >::const_type sym)
+    void EnterTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<Derived> > > sym)
     {
       attributeManager.getInheritedAttribute().typeStackPushBack(sym);
     }
 
     template<typename Formatter>
-    void BeforeTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<TypeBase> > >::const_type sym)
+    void BeforeTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<TypeBase> > > sym)
     {
       if (!sym) {
         // This is an empty return type.
@@ -1050,7 +1050,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void BeforeTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Derived> > >::const_type sym)
+    void BeforeTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<Derived> > > sym)
     {
       TypeNameInheritedAttribute::TypeStackIterator i =
         attributeManager.getInheritedAttribute().typeStackFind(sym);
@@ -1066,7 +1066,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Pointer> > >::const_type sym)
+    void LeaveTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<Pointer> > > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       out << " *";
@@ -1074,7 +1074,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<FunctionType> > >::const_type sym)
+    void LeaveTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<FunctionType> > > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       if (sym->isVararg()) {
@@ -1085,7 +1085,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Tuple> > >::const_type sym)
+    void LeaveTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<Tuple> > > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       out << ")";
@@ -1093,73 +1093,73 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveTypeNameVisitor<Formatter>::visit(ptr<Symbol<Type<Derived> > >::const_type sym)
+    void LeaveTypeNameVisitor<Formatter>::visit(ptr<const Symbol<Type<Derived> > > sym)
     {
       attributeManager.getInheritedAttribute().typeStackPopBack();
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::int8_t> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::int8_t> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::uint8_t> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::int16_t> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::int16_t> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::uint16_t> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::int32_t> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::int32_t> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::uint32_t> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::int64_t> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::int64_t> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::uint64_t> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<float> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<float> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<double> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<double> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<std::string> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<std::string> > > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       out << '"' << boost::replace_all_copy(sym->value(),
@@ -1167,13 +1167,13 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterConstantValueVisitor<Formatter>::visit(ptr<Symbol<Constant<Address> > >::const_type sym)
+    void EnterConstantValueVisitor<Formatter>::visit(ptr<const Symbol<Constant<Address> > > sym)
     {
       this->visitPrimitiveConstant(sym);
     }
 
     template<typename Formatter>
-    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Module> >::const_type sym)
+    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<Module> > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1185,7 +1185,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Function> >::const_type sym)
+    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<Function> > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1197,7 +1197,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Variable> >::const_type sym)
+    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<Variable> > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1208,7 +1208,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
+    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<GlobalVariable> > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1223,7 +1223,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Type<TypeBase> > >::const_type sym)
+    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<Type<TypeBase> > > sym)
     {
       // This is a type that doesn't need a declaration.  So tell the
       // printer not to print a newline after it.
@@ -1231,7 +1231,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Type<Tuple> > >::const_type sym)
+    void EnterDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<Type<Tuple> > > sym)
     {
       // Stream &out = attributeManager.getInheritedAttribute().out();
       // int ind = attributeManager.getInheritedAttribute().indent();
@@ -1253,7 +1253,7 @@ namespace mirv {
 
     /// Print the final newline after each symbol declaration.
     template<typename Formatter>
-    void LeaveDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Base> >::const_type)
+    void LeaveDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<Base> >)
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -1264,7 +1264,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Type<TypeBase> > >::const_type)
+    void LeaveDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<Type<TypeBase> > >)
     {
       // Don't do anything since we didn't print anything for this
       // type.
@@ -1273,7 +1273,7 @@ namespace mirv {
 
     /// Print the final newline after tuple types.
     template<typename Formatter>
-    void LeaveDeclSymbolVisitor<Formatter>::visit(ptr<Symbol<Type<Tuple> > >::const_type)
+    void LeaveDeclSymbolVisitor<Formatter>::visit(ptr<const Symbol<Type<Tuple> > >)
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -1284,7 +1284,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Module> >::const_type sym)
+    void EnterDefSymbolVisitor<Formatter>::visit(ptr<const Symbol<Module> > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1294,7 +1294,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Function> >::const_type sym)
+    void EnterDefSymbolVisitor<Formatter>::visit(ptr<const Symbol<Function> > sym)
     {
       if (!sym->statementEmpty()) {
         Stream &out = attributeManager.getInheritedAttribute().out();
@@ -1308,7 +1308,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Variable> >::const_type sym)
+    void EnterDefSymbolVisitor<Formatter>::visit(ptr<const Symbol<Variable> > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1319,7 +1319,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterDefSymbolVisitor<Formatter>::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
+    void EnterDefSymbolVisitor<Formatter>::visit(ptr<const Symbol<GlobalVariable> > sym)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1334,7 +1334,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Variable> >::const_type sym)
+    void LeaveDefSymbolVisitor<Formatter>::visit(ptr<const Symbol<Variable> > sym)
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -1345,7 +1345,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveDefSymbolVisitor<Formatter>::visit(ptr<Symbol<GlobalVariable> >::const_type sym)
+    void LeaveDefSymbolVisitor<Formatter>::visit(ptr<const Symbol<GlobalVariable> > sym)
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -1356,7 +1356,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Module> >::const_type sym) {
+    void LeaveDefSymbolVisitor<Formatter>::visit(ptr<const Symbol<Module> > sym) {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
 
@@ -1365,7 +1365,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveDefSymbolVisitor<Formatter>::visit(ptr<Symbol<Function> >::const_type sym) {
+    void LeaveDefSymbolVisitor<Formatter>::visit(ptr<const Symbol<Function> > sym) {
       if (!sym->statementEmpty()) {
         Stream &out = attributeManager.getInheritedAttribute().out();
         int ind = attributeManager.getInheritedAttribute().indent();
@@ -1380,7 +1380,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Block> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Block> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1391,7 +1391,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<IfThen> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<IfThen> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1402,7 +1402,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<IfElse> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<IfElse> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1413,7 +1413,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<While> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<While> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1424,7 +1424,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<DoWhile> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<DoWhile> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1435,7 +1435,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Switch> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Switch> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1446,7 +1446,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Case> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Case> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1455,7 +1455,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<CaseBlock> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<CaseBlock> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1464,7 +1464,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Before> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Before> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1473,7 +1473,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<After> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<After> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1482,7 +1482,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Goto> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Goto> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1491,7 +1491,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Return> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Return> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1500,7 +1500,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Phi> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Phi> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1514,7 +1514,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Store> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Store> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1525,7 +1525,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Call> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Call> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1536,7 +1536,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterStatementVisitor<Formatter>::visit(ptr<Statement<Allocate> >::const_type stmt)
+    void EnterStatementVisitor<Formatter>::visit(ptr<const Statement<Allocate> > stmt)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1550,7 +1550,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveStatementVisitor<Formatter>::visit(ptr<Statement<Base> >::const_type stmt)
+    void LeaveStatementVisitor<Formatter>::visit(ptr<const Statement<Base> > stmt)
     {
       if (   !attributeManager.setLastSynthesizedAttribute()
              || !attributeManager.getLastSynthesizedAttribute().justLeft()) {
@@ -1561,7 +1561,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveStatementVisitor<Formatter>::visit(ptr<Statement<Block> >::const_type stmt) {
+    void LeaveStatementVisitor<Formatter>::visit(ptr<const Statement<Block> > stmt) {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
 
@@ -1574,7 +1574,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveStatementVisitor<Formatter>::visit(ptr<Statement<Return> >::const_type stmt) {
+    void LeaveStatementVisitor<Formatter>::visit(ptr<const Statement<Return> > stmt) {
       Stream &out = attributeManager.getInheritedAttribute().out();
 
       if (   !attributeManager.setLastSynthesizedAttribute()
@@ -1585,7 +1585,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Add> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Add> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1597,7 +1597,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Subtract> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Subtract> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1609,7 +1609,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Multiply> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Multiply> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1621,7 +1621,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Divide> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Divide> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1633,7 +1633,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Modulus> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Modulus> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1645,7 +1645,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Negate> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Negate> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1657,7 +1657,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LogicalAnd> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<LogicalAnd> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1669,7 +1669,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LogicalOr> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<LogicalOr> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1681,7 +1681,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LogicalNot> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<LogicalNot> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1693,7 +1693,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<BitwiseAnd> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<BitwiseAnd> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1705,7 +1705,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<BitwiseOr> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<BitwiseOr> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1717,7 +1717,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<BitwiseComplement> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<BitwiseComplement> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1729,7 +1729,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LessThan> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<LessThan> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1741,7 +1741,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<LessThanOrEqual> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<LessThanOrEqual> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1753,7 +1753,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Equal> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Equal> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1765,7 +1765,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<NotEqual> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<NotEqual> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1777,7 +1777,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<GreaterThan> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<GreaterThan> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1789,7 +1789,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<GreaterThanOrEqual> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1801,7 +1801,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<TuplePointer> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<TuplePointer> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1813,7 +1813,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Variable> > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Variable> > > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1840,73 +1840,73 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<Base> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::int8_t> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::int8_t> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::uint8_t> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::uint8_t> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::int16_t> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::int16_t> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::uint16_t> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::uint16_t> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::int32_t> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::int32_t> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::uint32_t> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::uint32_t> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::int64_t> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::int64_t> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::uint64_t> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::uint64_t> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<float> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<float> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<double> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<double> > > > expr)
     {
       visitConstant(expr);
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Constant<std::string> > > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Constant<std::string> > > > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1922,7 +1922,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Reference<Function> > >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Reference<Function> > > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1932,7 +1932,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void EnterExpressionVisitor<Formatter>::visit(ptr<Expression<Load> >::const_type expr)
+    void EnterExpressionVisitor<Formatter>::visit(ptr<const Expression<Load> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       int ind = attributeManager.getInheritedAttribute().indent();
@@ -1944,7 +1944,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveExpressionVisitor<Formatter>::visit(ptr<Expression<Base> >::const_type expr)
+    void LeaveExpressionVisitor<Formatter>::visit(ptr<const Expression<Base> > expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       if (   !attributeManager.setLastSynthesizedAttribute()
@@ -1955,7 +1955,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void LeaveExpressionVisitor<Formatter>::visit(ptr<InnerExpression>::const_type expr)
+    void LeaveExpressionVisitor<Formatter>::visit(ptr<const InnerExpression> expr)
     {
       Stream &out = attributeManager.getInheritedAttribute().out();
       if (   !attributeManager.setLastSynthesizedAttribute()
@@ -1966,7 +1966,7 @@ namespace mirv {
     }
 
     template<typename Formatter>
-    void PrintDefSymbolFlow<Formatter>::visit(ptr<Symbol<Module>>::const_type sym) {
+    void PrintDefSymbolFlow<Formatter>::visit(ptr<const Symbol<Module>> sym) {
       // We only want to visit functions here since we already
       // declared module-level types and variables.
       this->doEnter(sym);
@@ -2001,10 +2001,10 @@ namespace mirv {
         /// Print the type of expression after its operator.
         class Operator {
         private:
-          typename ptr<Expression<Base> >::const_type expression;
+          ptr<const Expression<Base> > expression;
 
         public:
-          Operator(typename ptr<Expression<Base> >::const_type expr)
+          Operator(ptr<const Expression<Base> > expr)
               : expression(expr) {}
           Stream &operator()(Stream &out) const {
             out << ' ';
@@ -2018,12 +2018,12 @@ namespace mirv {
     }
   }
 
-  void print(Printer::Stream &out, ptr<Node<Base>>::const_type node)
+  void print(Printer::Stream &out, ptr<const Node<Base>> node)
   {
     Printer::printImpl(out, node);
   }
 
-  void printWithTypes(Printer::Stream &out, ptr<Node<Base>>::const_type node)
+  void printWithTypes(Printer::Stream &out, ptr<const Node<Base>> node)
   {
     Printer::printImpl<Printer::detail::TypeFormatter>(out, node);
   }

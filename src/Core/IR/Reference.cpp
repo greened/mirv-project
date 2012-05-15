@@ -19,10 +19,10 @@ namespace mirv {
   detail::LoadInterface::TypePtr
   detail::LoadInterface::type(void) const 
   {
-    ptr<Symbol<Type<TypeBase> > >::const_type ptrType =
+    ptr<const Symbol<Type<TypeBase> > > ptrType =
       (*this->begin())->type();
 
-    ptr<Symbol<Type<Pointer> > >::const_type pointerType =
+    ptr<const Symbol<Type<Pointer> > > pointerType =
       safe_cast<const Symbol<Type<Pointer> > >((*this->begin())->type());
 
     return pointerType->getBaseType();
@@ -30,13 +30,13 @@ namespace mirv {
 
   Expression<Base> *
   detail::TuplePointerInterface::cloneImpl(void) {
-    std::vector<ptr<Expression<Base> >::type> children;
+    std::vector<ptr<Expression<Base> >> children;
 
     for (auto i = begin(); i != end(); ++i) {
       children.push_back((*i)->clone());
     }
 
-    ptr<Expression<TuplePointer> >::type expr(
+    ptr<Expression<TuplePointer> > expr(
       mirv::make<Expression<TuplePointer> >(*children.begin(),
                                             children.begin() + 1,
                                             children.end()));
@@ -52,7 +52,7 @@ namespace mirv {
     // print(std::cerr, this->getSharedHandle());
     // std::cerr << "\n";
 
-    ptr<Symbol<Type<TypeBase> > >::const_type elementType =
+    ptr<const Symbol<Type<TypeBase> > > elementType =
       (*this->begin())->type();
 
     // std::cerr << "TuplePointer::type element:\n";
@@ -66,7 +66,7 @@ namespace mirv {
     // The top-level type could be a pointer.  If there are any
     // pointers down in lower positions there should have been a load
     // to access them.
-    if (ptr<Symbol<Type<Pointer> > >::const_type pointerType =
+    if (ptr<const Symbol<Type<Pointer> > > pointerType =
         dyn_cast<const Symbol<Type<Pointer> > >(elementType)) {
       elementType = pointerType->getBaseType();
       // std::cerr << "TuplePointer::type element:\n";
@@ -78,7 +78,7 @@ namespace mirv {
     }
 
     while (index != end()) {
-      ptr<Symbol<Type<Tuple> > >::const_type tupleType =
+      ptr<const Symbol<Type<Tuple> > > tupleType =
         safe_cast<const Symbol<Type<Tuple> > >(elementType);
 
       elementType = tupleType->elementType(*index);
@@ -90,7 +90,7 @@ namespace mirv {
     }
 
     // Return a pointer to this type.
-    ptr<Symbol<Module> >::type module = elementType->parent<Symbol<Module> >();
+    ptr<Symbol<Module> > module = elementType->parent<Symbol<Module> >();
 
     std::ostringstream pointerName;
     print(pointerName, elementType);
@@ -101,7 +101,7 @@ namespace mirv {
       return *p;
     }
 
-    ptr<Symbol<Type<TypeBase> > >::const_type pointerType =
+    ptr<const Symbol<Type<TypeBase> > > pointerType =
       make<Symbol<Type<Pointer> > >(elementType);
     module->typePushBack(pointerType);
     return pointerType;
@@ -109,7 +109,7 @@ namespace mirv {
 
   void detail::LoadInterface::doValidation(void) const {
     if (!empty() && getOperand()) {
-      ptr<Symbol<Type<Pointer> > >::const_type pointerType
+      ptr<const Symbol<Type<Pointer> > > pointerType
         = safe_cast<const Symbol<Type<Pointer> > >(getOperand()->type());
       if (this->type() != pointerType->getBaseType()) {
         std::cerr << "Offending expression:\n";

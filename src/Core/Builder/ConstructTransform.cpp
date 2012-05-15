@@ -15,10 +15,10 @@ namespace mirv {
       // handles indexing off pointers.  Array index processing uses
       // this routine to construct TuplePointer expressions suitable
       // for a load operation.
-      ptr<Expression<Base> >::type
+      ptr<Expression<Base> >
       extractLoadAddress(boost::shared_ptr<SymbolTable> symtab,
-                         ptr<Expression<Base> >::type value) {
-        ptr<Expression<Load> >::type load = safe_cast<Expression<Load> >(value);
+                         ptr<Expression<Base> > value) {
+        ptr<Expression<Load> > load = safe_cast<Expression<Load> >(value);
 
         // FIXME: If the load result has a pointer type T *, we
         // probably want to use that value.  If we return the load
@@ -28,37 +28,37 @@ namespace mirv {
         // bind because we do want to get the address feeding the
         // load.  So we need some context telling us which value to
         // return.
-        if (ptr<Symbol<Type<Pointer> > >::const_type pointerType =
+        if (ptr<const Symbol<Type<Pointer> > > pointerType =
             dyn_cast<const Symbol<Type<Pointer> > >(load->type())) {
           // Indicate that the value is already what we want.
-          return ptr<Expression<Base> >::type();
+          return ptr<Expression<Base> >();
         }
 
         // Otherwise return the address feeding the load.
-        ptr<Expression<Base> >::type address = load->getOperand();
-        load->setOperand(ptr<Expression<Base> >::type());
+        ptr<Expression<Base> > address = load->getOperand();
+        load->setOperand(ptr<Expression<Base> >());
         return address;
       }
 
       // Return the address of value suitable for a store.  Unlike in
       // the load case, we always want the address of the value
       // becausae we are going to store to it.
-      ptr<Expression<Base> >::type
+      ptr<Expression<Base> >
       extractStoreAddress(boost::shared_ptr<SymbolTable> symtab,
-                          ptr<Expression<Base> >::type value) {
-        ptr<Expression<Load> >::type load = safe_cast<Expression<Load> >(value);
+                          ptr<Expression<Base> > value) {
+        ptr<Expression<Load> > load = safe_cast<Expression<Load> >(value);
 
         // Return the address feeding the load.
-        ptr<Expression<Base> >::type address = load->getOperand();
-        load->setOperand(ptr<Expression<Base> >::type());
+        ptr<Expression<Base> > address = load->getOperand();
+        load->setOperand(ptr<Expression<Base> >());
         return address;
       }
     }
     
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     ConstructAddress::operator()(boost::shared_ptr<SymbolTable> symtab,
-                                 ptr<Expression<Base> >::type base,
-                                 ptr<Expression<Base> >::type index) {
+                                 ptr<Expression<Base> > base,
+                                 ptr<Expression<Base> > index) {
       result_type basePointer = detail::extractLoadAddress(symtab, base);
       if (basePointer) {
         auto offset = Expression<Reference<Constant<Base> > >::make(

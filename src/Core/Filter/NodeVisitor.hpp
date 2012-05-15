@@ -9,7 +9,7 @@ namespace mirv {
     public:
       template<typename VisitorType>
       void operator()(NodeType *This, VisitorType &V) {
-        typename ptr<NodeType>::type p(This->shared_from_this());
+        ptr<NodeType> p(This->shared_from_this());
         V.visit(p);
       }
     };

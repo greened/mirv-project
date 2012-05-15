@@ -10,25 +10,25 @@ namespace llvm {
 }
 
 namespace mirv {
-  typedef ptr<llvm::ExecutionEngine>::type JITContextHandle;
+  typedef ptr<llvm::ExecutionEngine> JITContextHandle;
 
   namespace detail {
     JITContextHandle
     doCompile(void * &function, 
-              ptr<Symbol<Module> >::type module,
+              ptr<Symbol<Module> > module,
               const std::string &functionName);
   }
 
   template<typename Function>
   std::pair<Function *, JITContextHandle>
-  compile(ptr<Symbol<Module> >::type module, const std::string &functionName) 
+  compile(ptr<Symbol<Module> > module, const std::string &functionName) 
   {
     void *function;
     JITContextHandle handle(detail::doCompile(function, module, functionName));
     return std::make_pair(reinterpret_cast<Function *>(function), handle);
   }
 
-  void compileAndRun(ptr<Symbol<Module> >::type module,
+  void compileAndRun(ptr<Symbol<Module> > module,
                      const std::string &functionName);
 }
 

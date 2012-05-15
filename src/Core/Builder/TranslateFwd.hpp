@@ -17,22 +17,22 @@ namespace mirv {
      checkMatch(const Expr &expr);
 
      template<typename Grammar, typename Expr>
-     ptr<Node<Base> >::type
-     translateWithGrammar(ptr<Symbol<Module> >::type module,
-                          ptr<Symbol<Function> >::type function,
+     ptr<Node<Base> >
+     translateWithGrammar(ptr<Symbol<Module> > module,
+                          ptr<Symbol<Function> > function,
                           const Expr &expr);
 
      template<typename Grammar, typename Expr>
-     ptr<Node<Base> >::type
-     translateWithGrammar(ptr<Symbol<Module> >::type module,
+     ptr<Node<Base> >
+     translateWithGrammar(ptr<Symbol<Module> > module,
                           const Expr &expr);
 
      template<typename Grammar, typename Expr>
-     ptr<Node<Base> >::type
-     translateWithGrammar(const Expr &expr, ptr<SymbolTable>::type symtab);
+     ptr<Node<Base> >
+     translateWithGrammar(const Expr &expr, ptr<SymbolTable> symtab);
 
      template<typename Grammar, typename Expr>
-     ptr<Node<Base> >::type
+     ptr<Node<Base> >
      translateWithGrammar(const Expr &expr);
    }
 }

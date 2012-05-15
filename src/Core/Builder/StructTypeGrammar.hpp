@@ -69,13 +69,13 @@ namespace mirv {
 
     /// This is a callable transform to construct a struct type.
     struct ConstructStructTypeSymbol : boost::proto::callable {
-      typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+      typedef ptr<const Symbol<Type<TypeBase> > > result_type;
 
       // Keeping this outlined means we don't need a definition of Tuple.
       void resolve(boost::shared_ptr<SymbolTable> symtab,
                    const std::string &name,
-                   ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
-                   ptr<Symbol<Type<TypeBase> > >::const_type replacement);
+                   ptr<const Symbol<Type<Placeholder> > > placeholder,
+                   ptr<const Symbol<Type<TypeBase> > > replacement);
 
       template<typename List>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -83,12 +83,12 @@ namespace mirv {
                              const List &memberList) {
         // std::cout << "Building struct:\n";
         // boost::proto::display_expr(memberList);
-        ptr<Symbol<Type<Placeholder> > >::const_type placeholder =
+        ptr<const Symbol<Type<Placeholder> > > placeholder =
           symtab->lookupPlaceholder(name);
 
         checkInvariant(placeholder, "Missing placeholder!");
 
-        std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> members;
+        std::vector<ptr<const Symbol<Type<TypeBase> > >> members;
         detail::translateList(symtab,
                               std::back_inserter(members),
                               memberList);
@@ -115,7 +115,7 @@ namespace mirv {
     /// Given the name of a Placeholder type, return the corresponding
     /// Placeholder type Symbol.
     struct LookupPlaceholder : boost::proto::callable {
-      typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+      typedef ptr<const Symbol<Type<TypeBase> > > result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              const std::string &name);

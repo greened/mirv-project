@@ -55,9 +55,9 @@ using Builder::int_;
 
 int main(void)
 {
-  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
 
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::FunctionBuilder>(module,
       func["testfunc"].type[void_()] [
 	var["a"].type[int_(32)],

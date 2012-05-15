@@ -32,7 +32,7 @@ namespace mirv {
     class FlowAttribute {
     private:
       llvm::LLVMContext *Context;
-      ptr<llvm::IRBuilder<> >::type Builder;
+      ptr<llvm::IRBuilder<> > Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
       llvm::Function *ReferencedFunction;
@@ -41,8 +41,8 @@ namespace mirv {
       bool ReturnValue;
 
       typedef Map<std::string, llvm::Value *>::type VariableMap;
-      ptr<VariableMap>::type ModuleMap;
-      ptr<VariableMap>::type FunctionMap;
+      ptr<VariableMap> ModuleMap;
+      ptr<VariableMap> FunctionMap;
       
       class TypeCreator : public ConstSymbolVisitor {
       private:
@@ -53,11 +53,11 @@ namespace mirv {
         TypeCreator(llvm::LLVMContext &context) 
             : Context(context) {}
 
-        virtual void visit(ptr<Symbol<Type<Integral> > >::const_type);
-        virtual void visit(ptr<Symbol<Type<Floating> > >::const_type);
-        virtual void visit(ptr<Symbol<Type<Tuple> > >::const_type);
-        virtual void visit(ptr<Symbol<Type<Pointer> > >::const_type);
-        virtual void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
+        virtual void visit(ptr<const Symbol<Type<Integral> > >);
+        virtual void visit(ptr<const Symbol<Type<Floating> > >);
+        virtual void visit(ptr<const Symbol<Type<Tuple> > >);
+        virtual void visit(ptr<const Symbol<Type<Pointer> > >);
+        virtual void visit(ptr<const Symbol<Type<FunctionType> > >);
 
         llvm::Type *type(void) const {
           return TheType;
@@ -96,7 +96,7 @@ namespace mirv {
         FunctionMap->clear();
       }
 
-      ptr<llvm::IRBuilder<> >::type builder(void) const {
+      ptr<llvm::IRBuilder<> > builder(void) const {
         return Builder;
       }
 
@@ -124,7 +124,7 @@ namespace mirv {
       }
 
       llvm::Type *
-      getType(ptr<Symbol<Type<TypeBase> > >::const_type) const;
+      getType(ptr<const Symbol<Type<TypeBase> > >) const;
 
       void createModule(const std::string &name) {
         checkInvariant(TheModule == 0, "Module already exists");
@@ -137,7 +137,7 @@ namespace mirv {
       }
 
       void createFunction(const std::string &name,
-                          ptr<Symbol<Type<TypeBase> > >::const_type type);
+                          ptr<const Symbol<Type<TypeBase> > > type);
 
       void setReferencedFunction(llvm::Function *function) {
         ReferencedFunction = function;
@@ -148,16 +148,16 @@ namespace mirv {
       }
 
       void createVariable(const std::string &name,
-                          ptr<Symbol<Type<TypeBase> > >::const_type type);
+                          ptr<const Symbol<Type<TypeBase> > > type);
 
       void createAlloca(const std::string &name,
-                        ptr<Symbol<Type<TypeBase> > >::const_type type);
+                        ptr<const Symbol<Type<TypeBase> > > type);
 
-      void createGlobalVariable(ptr<Symbol<GlobalVariable> >::const_type sym,
+      void createGlobalVariable(ptr<const Symbol<GlobalVariable> > sym,
                                 const InheritedAttribute &inh);
 
       template<typename ValueType>
-      void createIntegerConstant(ptr<Symbol<Type<TypeBase> > >::const_type type,
+      void createIntegerConstant(ptr<const Symbol<Type<TypeBase> > > type,
                                          ValueType value,
                                          bool isSigned) {
         llvm::Type *llvmType = getType(type);
@@ -166,14 +166,14 @@ namespace mirv {
       }
 
       template<typename ValueType>
-      void createFloatingPointConstant(ptr<Symbol<Type<TypeBase> > >::const_type type,
+      void createFloatingPointConstant(ptr<const Symbol<Type<TypeBase> > > type,
                                                ValueType value) {
         llvm::Type *llvmType = getType(type);
         llvm::Value *constant = llvm::ConstantFP::get(llvmType, value);
         setValue(constant);
       }
 
-      llvm::Value *getVariable(ptr<Symbol<Variable> >::const_type sym);
+      llvm::Value *getVariable(ptr<const Symbol<Variable> > sym);
       llvm::Value *getGlobalVariable(const std::string &name);
 
       llvm::BasicBlock *createBlock(const std::string &name) {
@@ -244,8 +244,8 @@ namespace mirv {
       EnterSymbolVisitor(FlowAttributeManagerType &am)
 	  : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Module> >::const_type sym);
-      void visit(ptr<Symbol<Function> >::const_type sym);
+      void visit(ptr<const Symbol<Module> > sym);
+      void visit(ptr<const Symbol<Function> > sym);
     };
 
     /// Invoke the EnterSymbolVisitor upon entering a symbol.
@@ -264,10 +264,10 @@ namespace mirv {
       LeaveSymbolVisitor(FlowAttributeManagerType &am)
 	  : attributeManager(am) {}
 
-      void visit(ptr<Symbol<Function> >::const_type sym);
+      void visit(ptr<const Symbol<Function> > sym);
       // We put this here so it can set a synthesized attribute.
-      void visit(ptr<Symbol<Variable> >::const_type sym);
-      void visit(ptr<Symbol<GlobalVariable> >::const_type sym);
+      void visit(ptr<const Symbol<Variable> > sym);
+      void visit(ptr<const Symbol<GlobalVariable> > sym);
     };
 
     /// Invoke the LeaveSymbolVisitor when exiting symbols.
@@ -286,11 +286,11 @@ namespace mirv {
       EnterStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Statement<Block> >::const_type stmt);
-      void visit(ptr<Statement<Before> >::const_type stmt);
-      void visit(ptr<Statement<After> >::const_type stmt);
-      void visit(ptr<Statement<Goto> >::const_type stmt);
-      void visit(ptr<Statement<Allocate> >::const_type stmt);
+      void visit(ptr<const Statement<Block> > stmt);
+      void visit(ptr<const Statement<Before> > stmt);
+      void visit(ptr<const Statement<After> > stmt);
+      void visit(ptr<const Statement<Goto> > stmt);
+      void visit(ptr<const Statement<Allocate> > stmt);
     };
 
     /// Invoke the EnterStatementVisitor upon entry to a statement.
@@ -309,17 +309,17 @@ namespace mirv {
       LeaveStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Statement<Before> >::const_type stmt);
-      void visit(ptr<Statement<After> >::const_type stmt);
-      void visit(ptr<Statement<Goto> >::const_type stmt);
-      void visit(ptr<Statement<Return> >::const_type stmt);
-      void visit(ptr<Statement<Phi> >::const_type stmt);
-      void visit(ptr<Statement<Store> >::const_type stmt);
-      void visit(ptr<Statement<Call> >::const_type stmt);
-      void visit(ptr<Statement<IfElse> >::const_type stmt);
-      void visit(ptr<Statement<IfThen> >::const_type stmt);
-      void visit(ptr<Statement<While> >::const_type stmt);
-      void visit(ptr<Statement<DoWhile> >::const_type stmt);
+      void visit(ptr<const Statement<Before> > stmt);
+      void visit(ptr<const Statement<After> > stmt);
+      void visit(ptr<const Statement<Goto> > stmt);
+      void visit(ptr<const Statement<Return> > stmt);
+      void visit(ptr<const Statement<Phi> > stmt);
+      void visit(ptr<const Statement<Store> > stmt);
+      void visit(ptr<const Statement<Call> > stmt);
+      void visit(ptr<const Statement<IfElse> > stmt);
+      void visit(ptr<const Statement<IfThen> > stmt);
+      void visit(ptr<const Statement<While> > stmt);
+      void visit(ptr<const Statement<DoWhile> > stmt);
     };
 
     /// Invoke the LeaveStatementVisitor upon exiting statements.
@@ -338,7 +338,7 @@ namespace mirv {
       EnterExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Expression<TuplePointer> >::const_type expr);
+      void visit(ptr<const Expression<TuplePointer> > expr);
     };
 
     /// Invoke the EnterExpressionVisitor upon entering an expression.
@@ -357,30 +357,30 @@ namespace mirv {
       LeaveExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<Expression<Add> >::const_type expr);
-      void visit(ptr<Expression<Subtract> >::const_type expr);
-      void visit(ptr<Expression<Multiply> >::const_type expr);
-      void visit(ptr<Expression<Divide> >::const_type expr);
-      void visit(ptr<Expression<Modulus> >::const_type expr);
-      void visit(ptr<Expression<Negate> >::const_type expr);
-      void visit(ptr<Expression<LogicalAnd> >::const_type expr);
-      void visit(ptr<Expression<LogicalOr> >::const_type expr);
-      void visit(ptr<Expression<LogicalNot> >::const_type expr);
-      void visit(ptr<Expression<BitwiseAnd> >::const_type expr);
-      void visit(ptr<Expression<BitwiseOr> >::const_type expr);
-      void visit(ptr<Expression<BitwiseComplement> >::const_type expr);
-      void visit(ptr<Expression<LessThan> >::const_type expr);
-      void visit(ptr<Expression<LessThanOrEqual> >::const_type expr);
-      void visit(ptr<Expression<Equal> >::const_type expr);
-      void visit(ptr<Expression<NotEqual> >::const_type expr);
-      void visit(ptr<Expression<GreaterThan> >::const_type expr);
-      void visit(ptr<Expression<GreaterThanOrEqual> >::const_type expr);
-      void visit(ptr<Expression<Reference<Variable> > >::const_type expr);
-      void visit(ptr<Expression<Reference<GlobalVariable> > >::const_type expr);
-      void visit(ptr<Expression<Load> >::const_type expr);
-      void visit(ptr<Expression<TuplePointer> >::const_type expr);
-      void visit(ptr<Expression<Reference<Function> > >::const_type expr);
-      void visit(ptr<Expression<Reference<Constant<Base> > > >::const_type expr);
+      void visit(ptr<const Expression<Add> > expr);
+      void visit(ptr<const Expression<Subtract> > expr);
+      void visit(ptr<const Expression<Multiply> > expr);
+      void visit(ptr<const Expression<Divide> > expr);
+      void visit(ptr<const Expression<Modulus> > expr);
+      void visit(ptr<const Expression<Negate> > expr);
+      void visit(ptr<const Expression<LogicalAnd> > expr);
+      void visit(ptr<const Expression<LogicalOr> > expr);
+      void visit(ptr<const Expression<LogicalNot> > expr);
+      void visit(ptr<const Expression<BitwiseAnd> > expr);
+      void visit(ptr<const Expression<BitwiseOr> > expr);
+      void visit(ptr<const Expression<BitwiseComplement> > expr);
+      void visit(ptr<const Expression<LessThan> > expr);
+      void visit(ptr<const Expression<LessThanOrEqual> > expr);
+      void visit(ptr<const Expression<Equal> > expr);
+      void visit(ptr<const Expression<NotEqual> > expr);
+      void visit(ptr<const Expression<GreaterThan> > expr);
+      void visit(ptr<const Expression<GreaterThanOrEqual> > expr);
+      void visit(ptr<const Expression<Reference<Variable> > > expr);
+      void visit(ptr<const Expression<Reference<GlobalVariable> > > expr);
+      void visit(ptr<const Expression<Load> > expr);
+      void visit(ptr<const Expression<TuplePointer> > expr);
+      void visit(ptr<const Expression<Reference<Function> > > expr);
+      void visit(ptr<const Expression<Reference<Constant<Base> > > > expr);
     };
 
     /// Invoke the LeaveExpressionVisitor upon leaving an expression.
@@ -502,7 +502,7 @@ namespace mirv {
       // between-expression action when flowing through statements
       // (assignment is the only multiple-expression statement and we
       // don't want to special-case it) we solve the problem this way.
-      void visit(ptr<Statement<Store> >::const_type stmt) {
+      void visit(ptr<const Statement<Store> > stmt) {
         this->doEnter(stmt);
 
         for (auto i = stmt->expressionBegin();
@@ -562,7 +562,7 @@ namespace mirv {
     LLVMCodegenFilter(void) : Filter<Node<Base> >(), TheModule(0) {}
 
     /// Translate an IR tree.
-    void operator()(ptr<Node<Base> >::type node);
+    void operator()(ptr<Node<Base> > node);
 
     llvm::Module *getModule(void) const {
       checkInvariant(TheModule, "Null module");

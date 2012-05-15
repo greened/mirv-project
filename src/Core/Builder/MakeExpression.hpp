@@ -13,46 +13,46 @@
 
 namespace mirv {
   namespace Builder {
-    ptr<Expression<Base> >::type
-    makeExpression(std::int8_t constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(std::int8_t constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(std::uint8_t constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(std::uint8_t constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(std::int16_t constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(std::int16_t constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(std::uint16_t constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(std::uint16_t constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(std::int32_t constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(std::int32_t constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(std::uint32_t constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(std::uint32_t constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(std::int64_t constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(std::int64_t constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(std::uint64_t constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(std::uint64_t constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(float constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(float constant, ptr<Symbol<Module> > module);
 
-    ptr<Expression<Base> >::type
-    makeExpression(double constant, ptr<Symbol<Module> >::type module);
+    ptr<Expression<Base> >
+    makeExpression(double constant, ptr<Symbol<Module> > module);
 
     template<typename Expr>
-    ptr<Expression<Base> >::type
-    makeExpression(const Expr &expr, ptr<Symbol<Module> >::type module) 
+    ptr<Expression<Base> >
+    makeExpression(const Expr &expr, ptr<Symbol<Module> > module) 
     {
       return safe_cast<Expression<Base> >(
         translateWithGrammar<ConstructExpressionGrammar>(module, expr));
     }
 
     template<typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     makeExpression(const Expr &expr) 
     {
       return safe_cast<Expression<Base> >(

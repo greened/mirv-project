@@ -14,11 +14,11 @@
 
 namespace mirv {
   namespace Builder {
-    ptr<Symbol<Type<TypeBase> > >::const_type
+    ptr<const Symbol<Type<TypeBase> > >
     ConstructArrayTypeSymbol::operator()(boost::shared_ptr<SymbolTable> symtab,
                                          detail::TypeSubscriptData subscripts) {
       // Construct a nested tuple type.
-      ptr<Symbol<Type<TypeBase> > >::const_type elementType =
+      ptr<const Symbol<Type<TypeBase> > > elementType =
         subscripts.elementType();
 
       auto s = subscripts.begin();

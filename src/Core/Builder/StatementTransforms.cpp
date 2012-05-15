@@ -6,65 +6,65 @@
 
 namespace mirv {
   namespace Builder {
-    ptr<Statement<Base> >::type
-    IfTransform::operator()(ptr<SymbolTable>::type symtab,
-                            ptr<Expression<Base> >::type condition,
-                            ptr<Statement<Base> >::type body) {
+    ptr<Statement<Base> >
+    IfTransform::operator()(ptr<SymbolTable> symtab,
+                            ptr<Expression<Base> > condition,
+                            ptr<Statement<Base> > body) {
       return ClearPendingStatements()(
         symtab,
         ConstructBinary<
           Statement<IfThen>,
-          ptr<Expression<Base> >::type,
-          ptr<Statement<Base> >::type>()(symtab,
+          ptr<Expression<Base> >,
+          ptr<Statement<Base> >>()(symtab,
                                          condition,
                                          body));
     }
 
-    ptr<Statement<Base> >::type
-    IfElseTransform::operator()(ptr<SymbolTable>::type symtab,
-                                ptr<Expression<Base> >::type condition,
-                                ptr<Statement<Base> >::type thenBody,
-                                ptr<Statement<Base> >::type elseBody) {
+    ptr<Statement<Base> >
+    IfElseTransform::operator()(ptr<SymbolTable> symtab,
+                                ptr<Expression<Base> > condition,
+                                ptr<Statement<Base> > thenBody,
+                                ptr<Statement<Base> > elseBody) {
       return ClearPendingStatements()(
         symtab,
         ConstructTernary<
           Statement<IfElse>,
-          ptr<Expression<Base> >::type,
-          ptr<Statement<Base> >::type,
-          ptr<Statement<Base> >::type>()(symtab,
+          ptr<Expression<Base> >,
+          ptr<Statement<Base> >,
+          ptr<Statement<Base> >>()(symtab,
                                          condition,
                                          thenBody,
                                          elseBody));
     }
 
-    ptr<Statement<Base> >::type
-    WhileTransform::operator()(ptr<SymbolTable>::type symtab,
-                               ptr<Expression<Base> >::type condition,
-                               ptr<Statement<Base> >::type body) {
+    ptr<Statement<Base> >
+    WhileTransform::operator()(ptr<SymbolTable> symtab,
+                               ptr<Expression<Base> > condition,
+                               ptr<Statement<Base> > body) {
       // Since there is not while statement, indicate a while by
       // specializing on the grammar rule.
       return ClearPendingStatementsWhileRule()(
         symtab,
         ConstructBinary<
         Statement<IfThen>,
-        ptr<Expression<Base> >::type,
-        ptr<Statement<Base> >::type>()(symtab,
+        ptr<Expression<Base> >,
+        ptr<Statement<Base> >>()(symtab,
                                        condition,
                                        DoWhileTransform()(symtab,
                                                           condition,
                                                           body)));
     }
 
-    ptr<Statement<Base> >::type
-    DoWhileTransform::operator()(ptr<SymbolTable>::type symtab,
-                                 ptr<Expression<Base> >::type condition,
-                                 ptr<Statement<Base> >::type body) {
+    ptr<Statement<Base> >
+    DoWhileTransform::operator()(ptr<SymbolTable> symtab,
+                                 ptr<Expression<Base> > condition,
+                                 ptr<Statement<Base> > body) {
         return ClearPendingStatementsDoWhile()(
           symtab,
           ConstructBinary<
             Statement<DoWhile>,
-            ptr<Expression<Base> >::type,
-            ptr<Statement<Base> >::type>()(symtab,
+            ptr<Expression<Base> >,
+            ptr<Statement<Base> >>()(symtab,
                                            condition,
                                            body));
     }
@@ -72,21 +72,21 @@ namespace mirv {
     namespace detail {
       /// Given a value, construct a statement to store to it.
       struct ConstructStore : boost::proto::callable {
-        typedef ptr<Statement<Base> >::type result_type;
+        typedef ptr<Statement<Base> > result_type;
         
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                               ptr<Expression<Base> >::type address,
-                               ptr<Expression<Base> >::type value);
+                               ptr<Expression<Base> > address,
+                               ptr<Expression<Base> > value);
       };
 
       /// Given a value, construct a statement to store to it.
-      ptr<Statement<Base> >::type
+      ptr<Statement<Base> >
       ConstructStore::operator()(boost::shared_ptr<SymbolTable> symtab,
-                                 ptr<Expression<Base> >::type address,
-                                 ptr<Expression<Base> >::type value) {
+                                 ptr<Expression<Base> > address,
+                                 ptr<Expression<Base> > value) {
         // The address actually comes across as a value, so extract
         // it.
-        ptr<Expression<Base> >::type newAddress =
+        ptr<Expression<Base> > newAddress =
           detail::extractStoreAddress(symtab, address);
         if (!newAddress) {
           std::cerr << "Offending expression:\n";
@@ -98,10 +98,10 @@ namespace mirv {
       }
     }
 
-    ptr<Statement<Base> >::type
-    AssignTransform::operator()(ptr<SymbolTable>::type symtab,
-                                ptr<Expression<Base> >::type lhs,
-                                ptr<Expression<Base> >::type rhs) {
+    ptr<Statement<Base> >
+    AssignTransform::operator()(ptr<SymbolTable> symtab,
+                                ptr<Expression<Base> > lhs,
+                                ptr<Expression<Base> > rhs) {
       return ClearPendingStatements()(
         symtab,
         detail::ConstructStore()(symtab,

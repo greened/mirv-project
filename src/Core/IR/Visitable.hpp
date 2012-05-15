@@ -20,7 +20,7 @@ namespace mirv {
     template<typename ...Arg>
     Visitable(const Arg &...arg) : BaseType(arg...) {};
 
-    // The visitor classes overloads based on ptr<...>::type.  This
+    // The visitor classes overloads based on ptr<...>.  This
     // requires the smart pointer to determine whether one is
     // convertable to another, which in turn requires full definition
     // of the classes pointed to.  This creates a lot of coupling
@@ -51,7 +51,7 @@ namespace mirv {
 
     using Visitable<NodeType, Visitor>::accept;
 
-    // The visitor classes overloads based on ptr<...>::type.  This
+    // The visitor classes overloads based on ptr<...>.  This
     // requires the smart pointer to determine whether one is
     // convertable to another, which in turn requires full definition
     // of the classes pointed to.  This creates a lot of coupling

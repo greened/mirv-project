@@ -35,7 +35,7 @@ namespace mirv {
     }
 
     static void
-    initialize(typename ptr<Symbol<Type<Tag> > >::const_type type) {}
+    initialize(ptr<const Symbol<Type<Tag> > > type) {}
 
     template<typename Arg1, typename Arg2, typename Arg3>
     static std::string getName(Arg1 &a1, Arg2 &a2, Arg3 &a3) {
@@ -46,11 +46,11 @@ namespace mirv {
   namespace detail {
     class TypeBaseInterface : public Symbol<Base> {
     public:
-      typedef ptr<Expression<Base> >::type BitSizeType;
+      typedef ptr<Expression<Base> > BitSizeType;
       virtual BitSizeType bitsize(void) const = 0;
       virtual void
-      resolve(ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
-              ptr<Symbol<Type<TypeBase> > >::const_type replacement) {}
+      resolve(ptr<const Symbol<Type<Placeholder> > > placeholder,
+              ptr<const Symbol<Type<TypeBase> > > replacement) {}
     };
   }
 
@@ -130,8 +130,8 @@ namespace mirv {
   namespace detail {
     class DerivedInterface : public InnerType {
     public:
-      void resolve(ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
-                   ptr<Symbol<Type<TypeBase> > >::const_type replacement);
+      void resolve(ptr<const Symbol<Type<Placeholder> > > placeholder,
+                   ptr<const Symbol<Type<TypeBase> > > replacement);
     };
   }
 

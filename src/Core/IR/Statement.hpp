@@ -62,40 +62,40 @@ namespace mirv {
     Statement(A1 a1, A2 a2, A3 a3, A4 a4) : BaseType(a1, a2, a3, a4) {}
 
   public:
-    static typename ptr<Statement<Tag> >::type
+    static ptr<Statement<Tag> >
     make(void) {
-      typename ptr<Statement<Tag> >::type p(new Statement<Tag>());
+      ptr<Statement<Tag> > p(new Statement<Tag>());
       return p;
     }
 
     template<typename A1>
-    static typename ptr<Statement<Tag> >::type
+    static ptr<Statement<Tag> >
     make(A1 a1) {
-      typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1));
+      ptr<Statement<Tag> > p(new Statement<Tag>(a1));
       p->setParents();
       return p;
     }
 
     template<typename A1, typename A2>
-    static typename ptr<Statement<Tag> >::type
+    static ptr<Statement<Tag> >
     make(A1 a1, A2 a2) {
-      typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2));
+      ptr<Statement<Tag> > p(new Statement<Tag>(a1, a2));
       p->setParents();
       return p;
     }
 
     template<typename A1, typename A2, typename A3>
-    static typename ptr<Statement<Tag> >::type
+    static ptr<Statement<Tag> >
     make(A1 a1, A2 a2, A3 a3) {
-      typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2, a3));
+      ptr<Statement<Tag> > p(new Statement<Tag>(a1, a2, a3));
       p->setParents();
       return p;
     }
 
     template<typename A1, typename A2, typename A3, typename A4>
-    static typename ptr<Statement<Tag> >::type
+    static ptr<Statement<Tag> >
     make(A1 a1, A2 a2, A3 a3, A4 a4) {
-      typename ptr<Statement<Tag> >::type p(new Statement<Tag>(a1, a2, a3, a4));
+      ptr<Statement<Tag> > p(new Statement<Tag>(a1, a2, a3, a4));
       p->setParents();
       return p;
     }
@@ -130,8 +130,8 @@ namespace mirv {
     virtual Statement<Base> *cloneImpl(void) = 0;
 
   public:
-    ptr<Statement<Base> >::type clone(void) {
-      ptr<Statement<Base> >::type stmt(cloneImpl());
+    ptr<Statement<Base> > clone(void) {
+      ptr<Statement<Base> > stmt(cloneImpl());
       return stmt;
     }
   };
@@ -147,7 +147,7 @@ namespace mirv {
       typedef Virtual<Statement<Base> > BaseType;
 
     private:
-      typedef ptr<Child>::type ChildPtr;
+      typedef ptr<Child> ChildPtr;
       typedef std::list<ChildPtr> ChildList;
 
     public:
@@ -220,8 +220,8 @@ namespace mirv {
   namespace detail {
     class ControlledInterface : public virtual Statement<Base> {
     protected:
-      typedef ptr<Expression<Base> >::type ExpressionPtr;
-      typedef ptr<Expression<Base> >::const_type ConstExpressionPtr;
+      typedef ptr<Expression<Base> > ExpressionPtr;
+      typedef ptr<const Expression<Base> > ConstExpressionPtr;
       typedef std::list<ExpressionPtr> ExpressionList;
 
     private:
@@ -232,15 +232,15 @@ namespace mirv {
       ControlledInterface(boost::shared_ptr<Expression<A1> >... args) : expressions({args...}) {}
 
       template<typename InputIterator>
-      ControlledInterface(ptr<Expression<Base> >::type Child1,
+      ControlledInterface(ptr<Expression<Base> > Child1,
                           InputIterator Start,
                           InputIterator End) : expressions(Start, End) {
         expressions.push_front(Child1);
       }
 
       template<typename InputIterator>
-      ControlledInterface(ptr<Expression<Base> >::type Child1,
-                          ptr<Expression<Base> >::type Child2,
+      ControlledInterface(ptr<Expression<Base> > Child1,
+                          ptr<Expression<Base> > Child2,
                           InputIterator Start,
                           InputIterator End) : expressions(Start, End) {
         expressions.push_front(Child2);

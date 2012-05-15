@@ -68,27 +68,27 @@ namespace mirv {
 
   public:
     template<typename A1>
-    static typename ptr<Expression<Op> >::type
+    static ptr<Expression<Op> >
     make(A1 a1) {
-      typename ptr<Expression<Op> >::type result(new Expression<Op>(a1));
+      ptr<Expression<Op> > result(new Expression<Op>(a1));
       result->setParents();
       result->validate();
       return result;
     }
 
     template<typename A1, typename A2>
-    static typename ptr<Expression<Op> >::type
+    static ptr<Expression<Op> >
     make(A1 a1, A2 a2) {
-      typename ptr<Expression<Op> >::type result(new Expression<Op>(a1, a2));
+      ptr<Expression<Op> > result(new Expression<Op>(a1, a2));
       result->setParents();
       result->validate();
       return result;
     } 
 
     template<typename A1, typename A2, typename A3>
-    static typename ptr<Expression<Op> >::type
+    static ptr<Expression<Op> >
     make(A1 a1, A2 a2, A3 a3) {
-      typename ptr<Expression<Op> >::type
+      ptr<Expression<Op> >
         result(new Expression<Op>(a1, a2, a3));
       result->setParents();
       result->validate();
@@ -96,9 +96,9 @@ namespace mirv {
     } 
 
     template<typename A1, typename A2, typename A3, typename A4>
-    static typename ptr<Expression<Op> >::type
+    static ptr<Expression<Op> >
     make(A1 a1, A2 a2, A3 a3, A4 a4) {
-      typename ptr<Expression<Op> >::type
+      ptr<Expression<Op> >
         result(new Expression<Op>(a1, a2, a3, a4));
       result->setParents();
       result->validate();
@@ -134,11 +134,11 @@ namespace mirv {
     virtual Expression<Base> *cloneImpl(void) = 0;
 
   public:
-    typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
+    typedef ptr<const Symbol<Type<TypeBase> > > TypePtr;
     Expression<Base>(void) {}
 
-    ptr<Expression<Base> >::type clone(void) {
-      ptr<Expression<Base> >::type expr(cloneImpl());
+    ptr<Expression<Base> > clone(void) {
+      ptr<Expression<Base> > expr(cloneImpl());
       return expr;
     }
 
@@ -155,7 +155,7 @@ namespace mirv {
       typedef Expression<Base> BaseType;
 
     private:
-      typedef ptr<Child>::type ChildPtr;
+      typedef ptr<Child> ChildPtr;
       typedef std::list<ChildPtr> ChildList;
 
     public:
@@ -272,8 +272,8 @@ namespace mirv {
       };
 
       typedef Expression<Base> ChildType;
-      typedef ptr<ChildType>::type ChildPtr;
-      typedef ptr<ChildType>::const_type ConstChildPtr;
+      typedef ptr<ChildType> ChildPtr;
+      typedef ptr<const ChildType> ConstChildPtr;
 
       UnaryInterface(ChildPtr Child) : InnerExpression(Child) {}
       // Interface(ConstChildPtr Child) : InterfaceBaseType(Child) {}

@@ -56,7 +56,7 @@ int main(void)
 
   Builder::FunctionTerminal printf_ = {{"printf"}};
 
-  ptr<Symbol<Module> >::type code =
+  ptr<Symbol<Module> > code =
     mirv::safe_cast<Symbol<Module> >(
       Builder::translateWithGrammar<Builder::ModuleBuilder>(
         module["testmodule"] [

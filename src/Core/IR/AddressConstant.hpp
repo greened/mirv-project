@@ -16,11 +16,11 @@ namespace mirv {
           public boost::enable_shared_from_this<Symbol<Constant<Address> > > {
     private:
       typedef Symbol<Constant<Base> > BaseType;
-      typedef ptr<Symbol<Global> >::type SymbolPtr;
+      typedef ptr<Symbol<Global> > SymbolPtr;
       SymbolPtr sym;
 
     public:
-      AddressConstantInterface(ptr<Symbol<Type<TypeBase> > >::const_type type,
+      AddressConstantInterface(ptr<const Symbol<Type<TypeBase> > > type,
                                SymbolPtr s)
           : BaseType(type), sym(s) {}
 
@@ -32,10 +32,10 @@ namespace mirv {
         return "& " + sym->name();
       }
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base>> getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
       };
-      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+      ptr<const Node<Base>> getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(this->shared_from_this());
       };
     };
@@ -47,7 +47,7 @@ namespace mirv {
   class Constant<Address> {
   public:
     static void
-    initialize(typename ptr<Symbol<Constant<Address> > >::type constant) {}
+    initialize(ptr<Symbol<Constant<Address> > > constant) {}
   };    
 }
 

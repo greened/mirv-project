@@ -28,12 +28,12 @@ namespace mirv {
       /// handles the case where we do not have a vararg specifier.
       template<bool Vararg>
       struct Helper {
-        typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
+        typedef ptr<const Symbol<Type<FunctionType> > > result_type;
         template<typename Arg1, typename FusionSequence>
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                                Arg1 a1,
                                const FusionSequence &expr) {
-          std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> operands;
+          std::vector<ptr<const Symbol<Type<TypeBase> > >> operands;
           PopAndTranslateFusionTypeSequence()(symtab, expr, std::back_inserter(operands));
           return QuaternaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
             symtab, a1, operands.begin(), operands.end(), VarargMark::NotVararg);
@@ -45,12 +45,12 @@ namespace mirv {
       /// handles the case where we do have a vararg specifier.
       template<>
       struct Helper<true> {
-        typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
+        typedef ptr<const Symbol<Type<FunctionType> > > result_type;
         template<typename Arg1, typename FusionSequence>
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                                Arg1 a1,
                                const FusionSequence &expr) {
-          std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> operands;
+          std::vector<ptr<const Symbol<Type<TypeBase> > >> operands;
           PopFrontBackAndTranslateFusionTypeSequence()(symtab, expr, std::back_inserter(operands));
 
           return QuaternaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
@@ -61,7 +61,7 @@ namespace mirv {
 
     /// This is a callable transform to construct a function type.
     struct ConstructFunctionTypeSymbol : boost::proto::callable {
-      typedef ptr<Symbol<Type<FunctionType> > >::const_type result_type;
+      typedef ptr<const Symbol<Type<FunctionType> > > result_type;
 
       template<typename Arg1, typename Arg2>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,

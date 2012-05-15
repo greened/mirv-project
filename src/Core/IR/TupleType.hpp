@@ -23,11 +23,11 @@ namespace mirv {
     private:
       typedef Symbol<Type<Derived> > BaseType;
 
-      ptr<Expression<Base> >::type multiplier;
+      ptr<Expression<Base> > multiplier;
 
       // If all the members are the same, remove all but one and add
       // a multiplier.
-      void construct_optimized(ptr<Symbol<Type<TypeBase> > >::const_type t,
+      void construct_optimized(ptr<const Symbol<Type<TypeBase> > > t,
                                std::uint64_t count);
 
       template<typename InputIterator>
@@ -37,7 +37,7 @@ namespace mirv {
           return;
         }
 
-        ptr<Symbol<Type<TypeBase> > >::const_type t = *start;
+        ptr<const Symbol<Type<TypeBase> > > t = *start;
         std::uint64_t count = 0;
         for (auto i = start; i != end; ++i) {
           if (*i != t) {
@@ -59,10 +59,10 @@ namespace mirv {
 
     public:
       typedef Symbol<Type<TypeBase> > ChildType;
-      typedef ptr<ChildType>::const_type ConstChildPtr;
+      typedef ptr<const ChildType> ConstChildPtr;
 
       TupleInterface(ConstChildPtr ElementType,
-                     ptr<Expression<Base> >::type count) :
+                     ptr<Expression<Base> > count) :
           BaseType(), multiplier(count) {
         push_back(ElementType);
       }
@@ -74,7 +74,7 @@ namespace mirv {
       }
 
       /// Construct a tuple type with a single member.
-      TupleInterface(ptr<Symbol<Type<TypeBase> > >::const_type member)
+      TupleInterface(ptr<const Symbol<Type<TypeBase> > > member)
           : BaseType() {
         push_back(member);
       }
@@ -82,8 +82,8 @@ namespace mirv {
       /// Construct a tuple type with no members.
       TupleInterface() : BaseType() {}
 
-      ptr<Symbol<Type<TypeBase> > >::const_type
-      elementType(ptr<Expression<Base> >::const_type) const;
+      ptr<const Symbol<Type<TypeBase> > >
+      elementType(ptr<const Expression<Base> >) const;
 
       BitSizeType bitsize(void) const;
 
@@ -91,15 +91,15 @@ namespace mirv {
         return multiplier;
       }
 
-      ptr<Expression<Base> >::const_type
+      ptr<const Expression<Base> >
       count(void) const {
         return multiplier;
       }
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base>> getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+      ptr<const Node<Base>> getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
     };

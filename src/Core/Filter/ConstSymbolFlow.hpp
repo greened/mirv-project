@@ -32,7 +32,7 @@ namespace mirv {
     /// The flow to invoke on child statements.
     StatementAction stmt;
 
-    typedef std::vector<ptr<Symbol<Type<TypeBase> > >::const_type> TypeList;
+    typedef std::vector<ptr<const Symbol<Type<TypeBase> > >> TypeList;
     TypeList TypeStack;
  
   protected:
@@ -54,11 +54,11 @@ namespace mirv {
     }
 
     TypeStackIterator
-    typeStackFind(ptr<Symbol<Type<TypeBase> > >::const_type type) {
+    typeStackFind(ptr<const Symbol<Type<TypeBase> > > type) {
       return std::find(typeStackBegin(), typeStackEnd(), type);
     }
     ConstTypeStackIterator
-    typeStackFind(ptr<Symbol<Type<TypeBase> > >::const_type type) const {
+    typeStackFind(ptr<const Symbol<Type<TypeBase> > > type) const {
       return std::find(typeStackBegin(), typeStackEnd(), type);
     }
 
@@ -146,7 +146,7 @@ namespace mirv {
     void transfer(Flow &other) {}
 
     /// Visit an inner symbol, visiting all children.
-    void visit(ptr<InnerSymbol>::const_type sym) {
+    void visit(ptr<const InnerSymbol> sym) {
       this->doEnter(sym);
       for(InnerSymbol::const_iterator s = sym->begin(),
             send = sym->end();
@@ -165,7 +165,7 @@ namespace mirv {
 
     /// Visit an inner type, visiting all children.  Track visited
     /// types to avoid infinite recursion.
-    void visit(ptr<InnerType>::const_type sym) {
+    void visit(ptr<const InnerType> sym) {
       TypeStack.push_back(sym);
       this->doEnter(sym);
       for(InnerType::const_iterator s = sym->begin(),
@@ -186,19 +186,19 @@ namespace mirv {
       TypeStack.pop_back();
     }
 
-    void visit(ptr<LeafSymbol>::const_type sym) {
+    void visit(ptr<const LeafSymbol> sym) {
       this->doEnter(sym);
       this->doLeave(sym);
     }
 
-    void visit(ptr<Symbol<Type<TypeBase> > >::const_type sym) {
+    void visit(ptr<const Symbol<Type<TypeBase> > > sym) {
       this->doEnter(sym);
       this->doLeave(sym);
     }
 
     /// Visit a module, visiting contained types, variables and
     /// functions.
-    void visit(ptr<Symbol<Module> >::const_type sym) {
+    void visit(ptr<const Symbol<Module> > sym) {
       this->doEnter(sym);
 
       // Visit types
@@ -248,7 +248,7 @@ namespace mirv {
 
     /// Visit a function, visiting contained variables and
     /// statements.
-    void visit(ptr<Symbol<Function> >::const_type sym) {
+    void visit(ptr<const Symbol<Function> > sym) {
       this->doEnter(sym);
       // Visit variables
       for(Symbol<Function>::ConstVariableIterator v = sym->variableBegin(),

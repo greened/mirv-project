@@ -31,79 +31,79 @@ namespace mirv {
   struct ConstSymbolVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<
-	ptr<Symbol<Base> >::const_type,
-	ptr<InnerSymbol>::const_type,
-	ptr<LeafSymbol>::const_type,
-	ptr<Symbol<Named> >::const_type,
-	ptr<Symbol<Typed> >::const_type,
-	ptr<Symbol<Global> >::const_type,
-	ptr<Symbol<Module> >::const_type,
-	ptr<Symbol<Function> >::const_type,
-	ptr<Symbol<Variable> >::const_type,
-	ptr<Symbol<GlobalVariable> >::const_type,
-	ptr<Symbol<Constant<Base> > >::const_type,
-	ptr<Symbol<Constant<std::int8_t> > >::const_type,
-	ptr<Symbol<Constant<std::uint8_t> > >::const_type,
-	ptr<Symbol<Constant<std::int16_t> > >::const_type,
-	ptr<Symbol<Constant<std::uint16_t> > >::const_type,
-	ptr<Symbol<Constant<std::int32_t> > >::const_type,
-	ptr<Symbol<Constant<std::uint32_t> > >::const_type,
-	ptr<Symbol<Constant<std::int64_t> > >::const_type,
-	ptr<Symbol<Constant<std::uint64_t> > >::const_type,
-	ptr<Symbol<Constant<float> > >::const_type,
-	ptr<Symbol<Constant<double> > >::const_type,
-	ptr<Symbol<Constant<std::string> > >::const_type,
-	ptr<Symbol<Constant<Address> > >::const_type,
-	ptr<Symbol<Type<TypeBase> > >::const_type,
-	ptr<LeafType>::const_type,
-	ptr<InnerType>::const_type,
-	ptr<Symbol<Type<Simple> > >::const_type,
-	ptr<Symbol<Type<Derived> > >::const_type,
-	ptr<Symbol<Type<Integral> > >::const_type,
-	ptr<Symbol<Type<Floating> > >::const_type,
-	ptr<Symbol<Type<Pointer> > >::const_type,
-	ptr<Symbol<Type<FunctionType> > >::const_type,
-	ptr<Symbol<Type<Tuple> > >::const_type
+	ptr<const Symbol<Base> >,
+	ptr<const InnerSymbol>,
+	ptr<const LeafSymbol>,
+	ptr<const Symbol<Named> >,
+	ptr<const Symbol<Typed> >,
+	ptr<const Symbol<Global> >,
+	ptr<const Symbol<Module> >,
+	ptr<const Symbol<Function> >,
+	ptr<const Symbol<Variable> >,
+	ptr<const Symbol<GlobalVariable> >,
+	ptr<const Symbol<Constant<Base> > >,
+	ptr<const Symbol<Constant<std::int8_t> > >,
+	ptr<const Symbol<Constant<std::uint8_t> > >,
+	ptr<const Symbol<Constant<std::int16_t> > >,
+	ptr<const Symbol<Constant<std::uint16_t> > >,
+	ptr<const Symbol<Constant<std::int32_t> > >,
+	ptr<const Symbol<Constant<std::uint32_t> > >,
+	ptr<const Symbol<Constant<std::int64_t> > >,
+	ptr<const Symbol<Constant<std::uint64_t> > >,
+	ptr<const Symbol<Constant<float> > >,
+	ptr<const Symbol<Constant<double> > >,
+	ptr<const Symbol<Constant<std::string> > >,
+	ptr<const Symbol<Constant<Address> > >,
+	ptr<const Symbol<Type<TypeBase> > >,
+	ptr<const LeafType>,
+	ptr<const InnerType>,
+	ptr<const Symbol<Type<Simple> > >,
+	ptr<const Symbol<Type<Derived> > >,
+	ptr<const Symbol<Type<Integral> > >,
+	ptr<const Symbol<Type<Floating> > >,
+	ptr<const Symbol<Type<Pointer> > >,
+	ptr<const Symbol<Type<FunctionType> > >,
+	ptr<const Symbol<Type<Tuple> > >
 	> > {
   public:
-    virtual void visit(ptr<Symbol<Base> >::const_type);
-    virtual void visit(ptr<LeafSymbol>::const_type);
-    virtual void visit(ptr<InnerSymbol>::const_type);
-    virtual void visit(ptr<Symbol<Typed> >::const_type);
-    virtual void visit(ptr<Symbol<Named> >::const_type);
-    virtual void visit(ptr<Symbol<Global> >::const_type);
-    virtual void visit(ptr<Symbol<Module> >::const_type);
-    virtual void visit(ptr<Symbol<Function> >::const_type);
-    virtual void visit(ptr<Symbol<Variable> >::const_type);
-    virtual void visit(ptr<Symbol<GlobalVariable> >::const_type);
-    virtual void visit(ptr<Symbol<Constant<Base> > >::const_type);
-    virtual void visit(ptr<Symbol<Constant<std::int8_t> > >::const_type);
+    virtual void visit(ptr<const Symbol<Base> >);
+    virtual void visit(ptr<const LeafSymbol>);
+    virtual void visit(ptr<const InnerSymbol>);
+    virtual void visit(ptr<const Symbol<Typed> >);
+    virtual void visit(ptr<const Symbol<Named> >);
+    virtual void visit(ptr<const Symbol<Global> >);
+    virtual void visit(ptr<const Symbol<Module> >);
+    virtual void visit(ptr<const Symbol<Function> >);
+    virtual void visit(ptr<const Symbol<Variable> >);
+    virtual void visit(ptr<const Symbol<GlobalVariable> >);
+    virtual void visit(ptr<const Symbol<Constant<Base> > >);
+    virtual void visit(ptr<const Symbol<Constant<std::int8_t> > >);
     
-    virtual void visit(ptr<Symbol<Constant<std::uint8_t> > >::const_type);
+    virtual void visit(ptr<const Symbol<Constant<std::uint8_t> > >);
     
-    virtual void visit(ptr<Symbol<Constant<std::int16_t> > >::const_type);
+    virtual void visit(ptr<const Symbol<Constant<std::int16_t> > >);
     
-    virtual void visit(ptr<Symbol<Constant<std::uint16_t> > >::const_type);
-    virtual void visit(ptr<Symbol<Constant<std::int32_t> > >::const_type);
+    virtual void visit(ptr<const Symbol<Constant<std::uint16_t> > >);
+    virtual void visit(ptr<const Symbol<Constant<std::int32_t> > >);
     
-    virtual void visit(ptr<Symbol<Constant<std::uint32_t> > >::const_type);
-    virtual void visit(ptr<Symbol<Constant<std::int64_t> > >::const_type);   
-    virtual void visit(ptr<Symbol<Constant<std::uint64_t> > >::const_type);
-    virtual void visit(ptr<Symbol<Constant<float> > >::const_type);
-    virtual void visit(ptr<Symbol<Constant<double> > >::const_type);
-    virtual void visit(ptr<Symbol<Constant<std::string> > >::const_type);
-    virtual void visit(ptr<Symbol<Constant<Address> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<TypeBase> > >::const_type);
-    virtual void visit(ptr<LeafType>::const_type);
-    virtual void visit(ptr<InnerType>::const_type);
-    virtual void visit(ptr<Symbol<Type<Simple> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<Derived> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<Integral> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<Floating> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<Pointer> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<FunctionType> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<Tuple> > >::const_type);
-    virtual void visit(ptr<Symbol<Type<Placeholder> > >::const_type);
+    virtual void visit(ptr<const Symbol<Constant<std::uint32_t> > >);
+    virtual void visit(ptr<const Symbol<Constant<std::int64_t> > >);   
+    virtual void visit(ptr<const Symbol<Constant<std::uint64_t> > >);
+    virtual void visit(ptr<const Symbol<Constant<float> > >);
+    virtual void visit(ptr<const Symbol<Constant<double> > >);
+    virtual void visit(ptr<const Symbol<Constant<std::string> > >);
+    virtual void visit(ptr<const Symbol<Constant<Address> > >);
+    virtual void visit(ptr<const Symbol<Type<TypeBase> > >);
+    virtual void visit(ptr<const LeafType>);
+    virtual void visit(ptr<const InnerType>);
+    virtual void visit(ptr<const Symbol<Type<Simple> > >);
+    virtual void visit(ptr<const Symbol<Type<Derived> > >);
+    virtual void visit(ptr<const Symbol<Type<Integral> > >);
+    virtual void visit(ptr<const Symbol<Type<Floating> > >);
+    virtual void visit(ptr<const Symbol<Type<Pointer> > >);
+    virtual void visit(ptr<const Symbol<Type<FunctionType> > >);
+    virtual void visit(ptr<const Symbol<Type<Tuple> > >);
+    virtual void visit(ptr<const Symbol<Type<Placeholder> > >);
   };
 }
 

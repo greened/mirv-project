@@ -29,7 +29,7 @@ namespace mirv {
      ExprAction,
      AfterExprAction
      > {
-     typedef Map<ptr<Expression<Base>>::const_type, bool>::type LabelIterateMapType;
+     typedef Map<ptr<const Expression<Base>>, bool> LabelIterateMapType;
      LabelIterateMapType iterateMap;
 
    public:
@@ -49,7 +49,7 @@ namespace mirv {
     ConstBackwardStatementFlow(Args &...args) : BaseType(args...) {}
 
      /// Visit block statements from the last statement to the first.
-      void visit(ptr<Statement<Block> >::const_type stmt) {
+      void visit(ptr<const Statement<Block> > stmt) {
          enter(stmt);
          for(Statement<Block>::reverse_iterator s = stmt->rbegin(),
                 send = stmt->rend();
@@ -68,7 +68,7 @@ namespace mirv {
 
      /// Visit IfThen statements, visiting the then-statement, then
      /// the controlling expression.
-      void visit(ptr<Statement<IfThen> >::const_type stmt) {
+      void visit(ptr<const Statement<IfThen> > stmt) {
          enter(stmt);
 
          beforeStatement(stmt, stmt->begin());
@@ -86,7 +86,7 @@ namespace mirv {
 
      /// Visit IfElse statements, visiting the then-statement, then
      /// the else-statement, then the controlling expression.
-      void visit(ptr<Statement<IfElse> >::const_type stmt) {
+      void visit(ptr<const Statement<IfElse> > stmt) {
          enter(stmt);
 
          Dataflow denter(dataflow());
@@ -116,7 +116,7 @@ namespace mirv {
 
      /// Visit While statements, visiting the body, then the
      /// controlling expression.
-      void visit(ptr<Statement<While> >::const_type stmt) {
+      void visit(ptr<const Statement<While> > stmt) {
          enter(stmt);
 
          beforeExpression(stmt, stmt->expressionBegin());
@@ -140,7 +140,7 @@ namespace mirv {
 
      /// Visit DoWhile statements, visiting the controlling
      /// expression, then the body.
-      void visit(ptr<Statement<DoWhile> >::const_type stmt) {
+      void visit(ptr<const Statement<DoWhile> > stmt) {
          enter(stmt);
 
          do {
@@ -160,7 +160,7 @@ namespace mirv {
 
      /// Visit Switch statements, visiting the cases in reverse order,
      /// then the controlling expression.
-      void visit(ptr<Statement<Switch> >::const_type stmt) {
+      void visit(ptr<const Statement<Switch> > stmt) {
          enter(stmt);
 
          for(Statement<Switch>::reverse_iterator s = stmt->rbegin(),
@@ -189,7 +189,7 @@ namespace mirv {
 
      /// Visit Case statements, visiting the body, then the
      /// controlling expression.
-      void visit(ptr<Statement<Case> >::const_type stmt) {
+      void visit(ptr<const Statement<Case> > stmt) {
          enter(stmt);
 
          beforeStatement(stmt, stmt->begin());
@@ -203,10 +203,10 @@ namespace mirv {
          leave(stmt);
       }
 
-      void visit(ptr<Statement<CaseBlock> >::const_type stmt);
+      void visit(ptr<const Statement<CaseBlock> > stmt);
 
      /// Visit Before statements.
-      void visit(ptr<Statement<Before> >::const_type stmt) {
+      void visit(ptr<const Statement<Before> > stmt) {
          enter(stmt);
 
          LabelIterateMapType::iterator i;
@@ -230,7 +230,7 @@ namespace mirv {
       }
 
      /// Visit After statements.
-      void visit(ptr<Statement<After> >::const_type stmt) {
+      void visit(ptr<const Statement<After> > stmt) {
          enter(stmt);
 
          // Join point: Statement and jump.  Hanled at jump.
@@ -243,7 +243,7 @@ namespace mirv {
       }
 
      /// Visit Goto statements.
-      void visit(ptr<Statement<Goto> >::const_type stmt) {
+      void visit(ptr<const Statement<Goto> > stmt) {
          enter(stmt);
 
          LabelIterateMapType::iterator i =
@@ -260,13 +260,13 @@ namespace mirv {
       }
 
      /// Visit Return statements.
-      void visit(ptr<Statement<Return> >::const_type stmt) {
+      void visit(ptr<const Statement<Return> > stmt) {
          enter(stmt);
          leave(stmt);
       }
 
      /// Visit Phi statements.
-      void visit(ptr<Statement<Phi> >::const_type stmt) {
+      void visit(ptr<const Statement<Phi> > stmt) {
          this->doEnter(stmt);
 
          for (auto i = stmt->expressionRBegin();
@@ -282,7 +282,7 @@ namespace mirv {
 
      /// Visit Store statements, visiting the left-hand side,
      /// then the right-hand side.
-      void visit(ptr<Statement<Store> >::const_type stmt) {
+      void visit(ptr<const Statement<Store> > stmt) {
          this->doEnter(stmt);
 
          for (auto i = stmt->expressionBegin();
@@ -297,7 +297,7 @@ namespace mirv {
       }
 
      /// Visit Call statements.
-      void visit(ptr<Statement<Call> >::const_type stmt) {
+      void visit(ptr<const Statement<Call> > stmt) {
          this->doEnter(stmt);
 
          for (auto i = stmt->expressionRBegin();
@@ -313,7 +313,7 @@ namespace mirv {
 
      /// Visit Allocate statements, visiting the left-hand side,
      /// then the right-hand side.
-      void visit(ptr<Statement<Allocate> >::const_type stmt) {
+      void visit(ptr<const Statement<Allocate> > stmt) {
          this->doEnter(stmt);
 
          for (auto i = stmt->expressionBegin();

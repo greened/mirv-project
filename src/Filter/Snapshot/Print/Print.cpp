@@ -5,7 +5,7 @@
 #include <mirv/Core/Utility/Printer.hpp>
 
 namespace mirv {
-  void PrintFilter::operator()(ptr<Node<Base> >::const_type node)
+  void PrintFilter::operator()(ptr<const Node<Base> > node)
   {
     print(out, node);
   }

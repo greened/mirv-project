@@ -117,26 +117,26 @@ using mirv::make;
 
 int main(void)
 {
-  ptr<Symbol<Type<Integral> > >::const_type type =
+  ptr<const Symbol<Type<Integral> > > type =
     make<Symbol<Type<Integral> > >(32);
-  ptr<Symbol<Type<Pointer> > >::const_type ptrtype =
+  ptr<const Symbol<Type<Pointer> > > ptrtype =
     make<Symbol<Type<Pointer> > >(type);
-  ptr<Symbol<Type<TypeBase> > >::type ftype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >::type());
+  ptr<Symbol<Type<TypeBase> > > ftype =
+    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >());
 
-  ptr<Symbol<Module> >::type m =
+  ptr<Symbol<Module> > m =
     Symbol<Module>::make("Test");
 
   m->typePushBack(type);
   m->typePushBack(ptrtype);
   m->typePushBack(ftype);
 
-  ptr<Symbol<Variable> >::type a = Symbol<Variable>::make("a", ptrtype);
-  ptr<Symbol<Variable> >::type b = Symbol<Variable>::make("b", ptrtype);
-  ptr<Symbol<GlobalVariable> >::type c =
+  ptr<Symbol<Variable> > a = Symbol<Variable>::make("a", ptrtype);
+  ptr<Symbol<Variable> > b = Symbol<Variable>::make("b", ptrtype);
+  ptr<Symbol<GlobalVariable> > c =
     Symbol<GlobalVariable>::make("c", type);
 
-  ptr<Statement<Base> >::type dowhile =
+  ptr<Statement<Base> > dowhile =
     Statement<Block>::make(
       Statement<Allocate>::make(
         Expression<Reference<Variable> >::make(a),
@@ -208,7 +208,7 @@ int main(void)
                           Symbol<Constant<std::uint64_t> >::make(
                             type, 0))))))))))));
 
-  ptr<Symbol<Function> >::type f =
+  ptr<Symbol<Function> > f =
     make<Symbol<Function> >("foo", ftype, dowhile);
 
   f->variablePushBack(a);

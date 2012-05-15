@@ -14,10 +14,10 @@ namespace mirv {
       VariableInterface(const std::string &n, TypePtr t)
           : Symbol<Typed>(t), Symbol<Named>(n){}
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base>> getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+      ptr<const Node<Base>> getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
 
@@ -36,10 +36,10 @@ namespace mirv {
   /// type and a name.
    class Variable {
    public:
-     static void initialize(ptr<Symbol<Variable> >::type variable) {}
+     static void initialize(ptr<Symbol<Variable> > variable) {}
 
      static std::string getName(const std::string &name,
-                                ptr<Symbol<Type<TypeBase> > >::const_type type) {
+                                ptr<const Symbol<Type<TypeBase> > > type) {
        return name;
      }
    };

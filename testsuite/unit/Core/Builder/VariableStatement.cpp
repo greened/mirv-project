@@ -106,13 +106,13 @@ using Builder::if_;
 
 int main(void)
 {
-  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
 
   Builder::VariableTerminal a = {{"a"}};
   Builder::VariableTerminal b = {{"b"}};
   Builder::VariableTerminal c = {{"c"}};
 
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::FunctionBuilder>(module,
       func["testfunc"].type[void_()] [
 	var["a"].type[int_(32)],

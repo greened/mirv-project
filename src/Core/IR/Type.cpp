@@ -14,9 +14,9 @@ namespace mirv {
     }
 
     void
-    DerivedInterface::resolve(ptr<Symbol<Type<Placeholder> > >::const_type
+    DerivedInterface::resolve(ptr<const Symbol<Type<Placeholder> > >
                               placeholder,
-                              ptr<Symbol<Type<TypeBase> > >::const_type
+                              ptr<const Symbol<Type<TypeBase> > >
                               replacement) 
     {  
       for (auto member = begin(); member != end(); ++member) {

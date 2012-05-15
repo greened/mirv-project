@@ -111,7 +111,7 @@ int main(void)
   Builder::VariableTerminal c = {{"c"}};
   Builder::VariableTerminal d = {{"d"}};
 
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
 	var[a].type[int_(32)],

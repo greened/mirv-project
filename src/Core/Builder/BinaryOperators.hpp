@@ -8,38 +8,38 @@
 namespace mirv {
   namespace {
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs,
-                   ptr<Expression<Base> >::type rhs) 
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs,
+                   ptr<Expression<Base> > rhs) 
     {
       return make<Expression<Op> >(lhs, rhs);
     }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs,
-    //                ptr<Expression<Base> >::const_type rhs) 
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs,
+    //                ptr<const Expression<Base> > rhs) 
     // {
     //   return make<Expression<Op> >(lhs, rhs);
     // }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
-    binaryOperator(const Expr &lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(const Expr &lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(Builder::makeExpression(lhs), rhs);
     }
 
     // template<typename Op, typename Expr>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(const Expr &lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(const Expr &lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(Builder::makeExpression(lhs), rhs);
     // }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(std::int8_t lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(std::int8_t lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -47,8 +47,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(std::uint8_t lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(std::uint8_t lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -56,8 +56,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(std::int16_t lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(std::int16_t lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -65,8 +65,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(std::uint16_t lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(std::uint16_t lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -74,8 +74,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(std::int32_t lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(std::int32_t lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -83,8 +83,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(std::uint32_t lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(std::uint32_t lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -92,8 +92,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(std::int64_t lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(std::int64_t lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -101,8 +101,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(std::uint64_t lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(std::uint64_t lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -110,8 +110,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(float lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(float lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -119,8 +119,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(double lhs, ptr<Expression<Base> >::type rhs)
+    ptr<Expression<Base> >
+    binaryOperator(double lhs, ptr<Expression<Base> > rhs)
     {
       return make<Expression<Op> >(
         Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -128,8 +128,8 @@ namespace mirv {
     }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(std::int8_t lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(std::int8_t lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -137,8 +137,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(std::uint8_t lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(std::uint8_t lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -146,8 +146,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(std::int16_t lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(std::int16_t lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -155,8 +155,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(std::uint16_t lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(std::uint16_t lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -164,8 +164,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(std::int32_t lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(std::int32_t lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -173,8 +173,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(std::uint32_t lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(std::uint32_t lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -182,8 +182,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(std::int64_t lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(std::int64_t lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -191,8 +191,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(std::uint64_t lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(std::uint64_t lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -200,8 +200,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(float lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(float lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -209,8 +209,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(double lhs, ptr<Expression<Base> >::const_type rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(double lhs, ptr<const Expression<Base> > rhs)
     // {
     //   return make<Expression<Op> >(
     //     Builder::makeExpression(lhs, rhs->parent<Symbol<Module> >()),
@@ -218,7 +218,7 @@ namespace mirv {
     // }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, std::int8_t rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -228,7 +228,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, std::uint8_t rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -238,7 +238,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, std::int16_t rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -248,7 +248,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, std::uint16_t rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -258,7 +258,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, std::int32_t rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -268,7 +268,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, std::uint32_t rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -278,7 +278,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, std::int64_t rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -288,7 +288,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, std::uint64_t rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -298,7 +298,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, float rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -308,7 +308,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(const Expr &lhs, double rhs)
     {
       auto lhsExpression = Builder::makeExpression(lhs);
@@ -318,15 +318,15 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, const Expr &rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(lhs, Builder::makeExpression(rhs));
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, std::int8_t rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, std::int8_t rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -334,8 +334,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, std::uint8_t rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, std::uint8_t rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -343,8 +343,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, std::int16_t rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, std::int16_t rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -352,8 +352,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, std::uint16_t rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, std::uint16_t rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -361,8 +361,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, std::int32_t rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, std::int32_t rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -370,8 +370,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, std::uint32_t rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, std::uint32_t rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -379,8 +379,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, std::int64_t rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, std::int64_t rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -388,8 +388,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, std::uint64_t rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, std::uint64_t rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -397,8 +397,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, float rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, float rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -406,8 +406,8 @@ namespace mirv {
     }
 
     template<typename Op>
-    ptr<Expression<Base> >::type
-    binaryOperator(ptr<Expression<Base> >::type lhs, double rhs)
+    ptr<Expression<Base> >
+    binaryOperator(ptr<Expression<Base> > lhs, double rhs)
     {
       return make<Expression<Op> >(
         lhs,  
@@ -415,15 +415,15 @@ namespace mirv {
     }
 
     // template<typename Op, typename Expr>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, const Expr &rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, const Expr &rhs)
     // {
     //   return make<Expression<Op> >(lhs, Builder::makeExpression(rhs));
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, std::int8_t rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, std::int8_t rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -431,8 +431,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, std::uint8_t rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, std::uint8_t rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -440,8 +440,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, std::int16_t rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, std::int16_t rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -449,8 +449,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, std::uint16_t rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, std::uint16_t rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -458,8 +458,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, std::int32_t rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, std::int32_t rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -467,8 +467,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, std::uint32_t rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, std::uint32_t rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -476,8 +476,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, std::int64_t rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, std::int64_t rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -485,8 +485,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, std::uint64_t rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, std::uint64_t rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -494,8 +494,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, float rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, float rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -503,8 +503,8 @@ namespace mirv {
     // }
 
     // template<typename Op>
-    // ptr<Expression<Base> >::const_type
-    // binaryOperator(ptr<Expression<Base> >::const_type lhs, double rhs)
+    // ptr<const Expression<Base> >
+    // binaryOperator(ptr<const Expression<Base> > lhs, double rhs)
     // {
     //   return make<Expression<Op> >(
     //     lhs,  
@@ -512,7 +512,7 @@ namespace mirv {
     // }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(std::int8_t lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -521,7 +521,7 @@ namespace mirv {
     }
  
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(std::uint8_t lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -530,7 +530,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(std::int16_t lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -539,7 +539,7 @@ namespace mirv {
     }
  
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(std::uint16_t lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -548,7 +548,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(std::int32_t lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -557,7 +557,7 @@ namespace mirv {
     }
  
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(std::uint32_t lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -566,7 +566,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(std::int64_t lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -575,7 +575,7 @@ namespace mirv {
     }
  
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(std::uint64_t lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -584,7 +584,7 @@ namespace mirv {
     }
 
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(float lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(
@@ -593,7 +593,7 @@ namespace mirv {
     }
  
     template<typename Op, typename Expr>
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     binaryOperator(double lhs, const Expr &rhs)
     {
       return make<Expression<Op> >(

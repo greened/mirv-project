@@ -16,7 +16,7 @@ namespace mirv {
   namespace Builder {
     /// This is a callable transform to get the current function.
     struct GetFunction : boost::proto::callable {
-      typedef ptr<Symbol<Function> >::type result_type;
+      typedef ptr<Symbol<Function> > result_type;
 
       template<typename T>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab, T) {
@@ -27,7 +27,7 @@ namespace mirv {
 
     /// This is a callable transform to add a statement to a function.
     struct AddFunctionStatement : boost::proto::callable {
-      typedef ptr<Symbol<Function> >::type result_type;
+      typedef ptr<Symbol<Function> > result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
 			     boost::shared_ptr<Statement<Base> > body) {
@@ -40,7 +40,7 @@ namespace mirv {
     /// This is a callable transform to add a block statement to a
     /// function.
     struct AddFunctionBodyForVariable : boost::proto::callable {
-      typedef ptr<Symbol<Function> >::type result_type;
+      typedef ptr<Symbol<Function> > result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              boost::shared_ptr<Symbol<Variable>>) {

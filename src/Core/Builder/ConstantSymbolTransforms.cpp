@@ -22,8 +22,8 @@
 namespace mirv {
   namespace Builder {
     namespace detail {
-      ptr<Symbol<Type<TypeBase> > >::const_type
-      IntegralTypeGen::operator()(ptr<SymbolTable>::type symtab,
+      ptr<const Symbol<Type<TypeBase> > >
+      IntegralTypeGen::operator()(ptr<SymbolTable> symtab,
                                   size_t bitsize)
       {
         return UnaryConstructSymbol<Symbol<Type<Integral> >, ModuleScope>()(
@@ -31,8 +31,8 @@ namespace mirv {
           bitsize);
       }
 
-      ptr<Symbol<Type<TypeBase> > >::const_type
-      FloatingTypeGen::operator()(ptr<SymbolTable>::type symtab,
+      ptr<const Symbol<Type<TypeBase> > >
+      FloatingTypeGen::operator()(ptr<SymbolTable> symtab,
                                   size_t bitsize)
       {
         return UnaryConstructSymbol<Symbol<Type<Floating> >, ModuleScope>()(
@@ -40,31 +40,31 @@ namespace mirv {
           bitsize);
       }
 
-      ptr<Symbol<Type<TypeBase> > >::const_type
-      StringTypeGen::operator()(ptr<SymbolTable>::type symtab,
+      ptr<const Symbol<Type<TypeBase> > >
+      StringTypeGen::operator()(ptr<SymbolTable> symtab,
                                 const std::string &value)
       {
-        ptr<Symbol<Module> >::type module = symtab->getModule();
+        ptr<Symbol<Module> > module = symtab->getModule();
         Symbol<Module>::TypeIterator intType = module->typeFind("int64");
 
         if (intType == module->typeEnd()) {
-          ptr<Symbol<Type<TypeBase> > >::const_type type =
+          ptr<const Symbol<Type<TypeBase> > > type =
             make<Symbol<Type<Integral> > >(64);
           module->typePushBack(type);
           intType = module->typeFind("int64");
           checkInvariant(intType != module->typeEnd(),
                          "Could not create int64 type!");
         }
-        ptr<Symbol<Constant<std::uint64_t> > >::type size =
+        ptr<Symbol<Constant<std::uint64_t> > > size =
           mirv::make<Symbol<Constant<std::uint64_t> > >(*intType, value.size());
 
-        ptr<Expression<Base> >::type sizeReference =
+        ptr<Expression<Base> > sizeReference =
           mirv::make<Expression<Reference<Constant<Base> > > >(size);
 
         intType = module->typeFind("int8");
 
         if (intType == module->typeEnd()) {
-          ptr<Symbol<Type<TypeBase> > >::const_type type =
+          ptr<const Symbol<Type<TypeBase> > > type =
             make<Symbol<Type<Integral> > >(8);
           module->typePushBack(type);
           intType = module->typeFind("int8");
@@ -76,33 +76,33 @@ namespace mirv {
           symtab, *intType, sizeReference);
       }
 
-      ptr<Expression<Base> >::type
+      ptr<Expression<Base> >
       GetCStringReference::operator()(boost::shared_ptr<SymbolTable> symtab,
-                                      ptr<Expression<Base> >::type str)
+                                      ptr<Expression<Base> > str)
       {
-        ptr<Symbol<Module> >::type module = symtab->getModule();
+        ptr<Symbol<Module> > module = symtab->getModule();
         Symbol<Module>::TypeIterator intType = module->typeFind("int32");
 
         if (intType == module->typeEnd()) {
-          ptr<Symbol<Type<TypeBase> > >::const_type type =
+          ptr<const Symbol<Type<TypeBase> > > type =
             make<Symbol<Type<Integral> > >(32);
           module->typePushBack(type);
           intType = module->typeFind("int32");
           checkInvariant(intType != module->typeEnd(),
                          "Could not create int32 type!");
         }
-        ptr<Symbol<Constant<std::uint64_t> > >::type zero =
+        ptr<Symbol<Constant<std::uint64_t> > > zero =
           mirv::make<Symbol<Constant<std::uint64_t> > >(*intType, 0);
 
-        ptr<Expression<Base> >::type zeroReference =
+        ptr<Expression<Base> > zeroReference =
           mirv::make<Expression<Reference<Constant<Base> > > >(zero);
 
-        ptr<Expression<Base> >::type zeroReference2 =
+        ptr<Expression<Base> > zeroReference2 =
           mirv::make<Expression<Reference<Constant<Base> > > >(zero);
 
-        ptr<Expression<Load> >::type load = safe_cast<Expression<Load> >(str);
+        ptr<Expression<Load> > load = safe_cast<Expression<Load> >(str);
 
-        ptr<Expression<Base> >::type address =
+        ptr<Expression<Base> > address =
           mirv::make<Expression<TuplePointer> >(load->getOperand(),
                                                 zeroReference,
                                                 zeroReference2);
@@ -111,11 +111,11 @@ namespace mirv {
       }
     }
   
-    ptr<Expression<Base> >::type
+    ptr<Expression<Base> >
     AddStringConstant::operator()(boost::shared_ptr<SymbolTable> symtab,
-                                  ptr<Symbol<Constant<Base> > >::type str)
+                                  ptr<Symbol<Constant<Base> > > str)
     {
-      ptr<Symbol<GlobalVariable> >::type temp =
+      ptr<Symbol<GlobalVariable> > temp =
         TernaryConstructSymbol<Symbol<GlobalVariable>, ModuleScope>()(
           symtab,
           "__str"
@@ -124,17 +124,17 @@ namespace mirv {
           str->type(),
           make<Expression<Reference<Constant<Base> > > >(str));
 
-      ptr<Expression<Base> >::type reference =
+      ptr<Expression<Base> > reference =
         ConstructGlobalReference()(symtab, temp);
 
       return reference;
     } 
 
-    ptr<Symbol<Constant<Base> > >::type
-    ConstructAddressConstantSymbol::operator()(ptr<SymbolTable>::type symtab,
-                                               ptr<Symbol<Global> >::type symbol)
+    ptr<Symbol<Constant<Base> > >
+    ConstructAddressConstantSymbol::operator()(ptr<SymbolTable> symtab,
+                                               ptr<Symbol<Global> > symbol)
     {
-      ptr<Symbol<Type<TypeBase> > >::const_type constantType = 
+      ptr<const Symbol<Type<TypeBase> > > constantType = 
         LookupAndAddSymbol<Symbol<Type<TypeBase> > >()(
           symtab,
           mirv::make<Symbol<Type<Pointer> > >(symbol->type()));

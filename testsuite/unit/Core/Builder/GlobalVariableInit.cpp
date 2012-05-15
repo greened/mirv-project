@@ -53,7 +53,7 @@ using Builder::int_;
 
 int main(void)
 {
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
         var["a"].type[int_(32)],

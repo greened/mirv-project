@@ -148,7 +148,7 @@ namespace mirv {
 
      /// Visit inner expressions from leftmost operand to rightmost
      /// operand.
-      void visit(ptr<InnerExpression>::type expr) {
+      void visit(ptr<InnerExpression> expr) {
          this->doEnter(expr);
 
          for(InnerExpression::iterator i = expr->begin(),
@@ -167,7 +167,7 @@ namespace mirv {
          this->doLeave(expr);
       }
      /// Visit all other expressions.
-      void visit(ptr<LeafExpression>::type expr) {
+      void visit(ptr<LeafExpression> expr) {
          this->doEnter(expr);
          this->doLeave(expr);
       }
@@ -235,7 +235,7 @@ namespace mirv {
 
      /// Walk inner expressions from rightmost operand to leftmost
      /// operand.
-      void visit(ptr<InnerExpression>::type expr) {
+      void visit(ptr<InnerExpression> expr) {
          this->doEnter(expr);
 
          for(InnerExpression::reverse_iterator i = expr->rbegin(),
@@ -255,7 +255,7 @@ namespace mirv {
       }
 
      /// Walk all other expressions.
-      void visit(ptr<LeafExpression>::type expr) {
+      void visit(ptr<LeafExpression> expr) {
          this->doEnter(expr);
          this->doLeave(expr);
       }

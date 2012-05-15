@@ -104,10 +104,10 @@ namespace mirv {
 
       TypeIterator typeFind(const std::string &name);
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base>> getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+      ptr<const Node<Base>> getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
     };
@@ -118,7 +118,7 @@ namespace mirv {
   /// together.
   class Module {
   public:
-    static void initialize(ptr<Symbol<Module> >::type module);
+    static void initialize(ptr<Symbol<Module> > module);
 
     static std::string getName(const std::string &name) {
       return name;

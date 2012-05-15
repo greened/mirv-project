@@ -26,7 +26,7 @@ namespace mirv {
       newStmt->setParent(this->getSharedHandle());
     }
     else {
-      ptr<Statement<Block> >::type block =
+      ptr<Statement<Block> > block =
         safe_cast<Statement<Block> >(StatementBaseType::front());
       block->push_back(stmt);
       block->setParent(this->getSharedHandle());

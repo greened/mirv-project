@@ -15,8 +15,8 @@ namespace mirv {
         boost::proto::_data,
         ConstructBinary<
           Statement<DoWhile>,
-          ptr<Expression<Base> >::type,
-        ptr<Statement<Base> >::type>(boost::proto::_data,
+          ptr<Expression<Base> >,
+        ptr<Statement<Base> >>(boost::proto::_data,
                                      ConstructExpressionGrammar(boost::proto::_right),
                                      ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left)))))
       > {};

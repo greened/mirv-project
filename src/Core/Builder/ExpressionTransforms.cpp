@@ -11,8 +11,8 @@
 
 namespace mirv {
   namespace Builder {
-    ptr<Expression<Base> >::type
-    VariableRefTransform::operator()(ptr<SymbolTable>::const_type symtab,
+    ptr<Expression<Base> >
+    VariableRefTransform::operator()(ptr<const SymbolTable> symtab,
                                      const std::string &name) {
       // Pointer
       return ConstructUnary<Expression<Load> >()(
@@ -23,53 +23,53 @@ namespace mirv {
               LookupSymbol<Symbol<Variable> >()(symtab, name)));
     }
 
-    ptr<Expression<Base> >::type
-    GlobalVariableRefTransform::operator()(ptr<SymbolTable>::type symtab,
+    ptr<Expression<Base> >
+    GlobalVariableRefTransform::operator()(ptr<SymbolTable> symtab,
                                            const std::string &name) {
       return ConstructGlobalReference()(
         symtab,
         LookupSymbol<Symbol<GlobalVariable> >()(symtab, name));
     }
 
-    ptr<Expression<Base> >::type
-    FunctionRefTransform::operator()(ptr<SymbolTable>::const_type symtab,
+    ptr<Expression<Base> >
+    FunctionRefTransform::operator()(ptr<const SymbolTable> symtab,
                                      const std::string &name) {
       return ConstructUnary<Expression<Reference<Function> > >()(
         symtab,
         LookupSymbol<Symbol<Function> >()(symtab, name));
     }
 
-    ptr<Expression<Reference<Constant<Base> > > >::type
-    ConstantRefTransform::operator()(ptr<SymbolTable>::const_type symtab,
-                                     ptr<Symbol<Constant<Base> > >::type constant) {
+    ptr<Expression<Reference<Constant<Base> > > >
+    ConstantRefTransform::operator()(ptr<const SymbolTable> symtab,
+                                     ptr<Symbol<Constant<Base> > > constant) {
       return ConstructUnary<Expression<Reference<Constant<Base> > > >()(
         symtab, constant);
     }
 
-    ptr<Expression<Base> >::type
-    ArrayRefSequenceTransform::operator()(ptr<SymbolTable>::const_type symtab,
-                                          ptr<Expression<Base> >::type address) {
+    ptr<Expression<Base> >
+    ArrayRefSequenceTransform::operator()(ptr<const SymbolTable> symtab,
+                                          ptr<Expression<Base> > address) {
       return ConstructUnary<Expression<Load> >()(symtab, address);
     }
 
-    ptr<Expression<Base> >::type
-    ArrayRefIndexTransform::operator()(ptr<SymbolTable>::type symtab,
-                                       ptr<Expression<Base> >::type base,
-                                       ptr<Expression<Base> >::type index) {
+    ptr<Expression<Base> >
+    ArrayRefIndexTransform::operator()(ptr<SymbolTable> symtab,
+                                       ptr<Expression<Base> > base,
+                                       ptr<Expression<Base> > index) {
       return ConstructUnary<Expression<Load> >()(
         symtab, ConstructAddress()(symtab, base, index));
     }
 
-    ptr<Expression<Base> >::type
-    ArrayAddressSequenceTransform::operator()(ptr<SymbolTable>::const_type symtab,
-                                              ptr<Expression<Base> >::type address) {
+    ptr<Expression<Base> >
+    ArrayAddressSequenceTransform::operator()(ptr<const SymbolTable> symtab,
+                                              ptr<Expression<Base> > address) {
       return address;
     }
 
-    ptr<Expression<Base> >::type
-    ArrayAddressIndexTransform::operator()(ptr<SymbolTable>::type symtab,
-                                           ptr<Expression<Base> >::type base,
-                                           ptr<Expression<Base> >::type index) {
+    ptr<Expression<Base> >
+    ArrayAddressIndexTransform::operator()(ptr<SymbolTable> symtab,
+                                           ptr<Expression<Base> > base,
+                                           ptr<Expression<Base> > index) {
       return ConstructAddress()(symtab, base, index);
     }
   }

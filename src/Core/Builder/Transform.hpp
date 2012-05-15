@@ -27,7 +27,7 @@ namespace mirv {
   namespace Builder {
     /// This is a callable transform to add a statement to a function.
     struct AddAllocateStatement : boost::proto::callable {
-      typedef ptr<Statement<Base> >::type result_type;
+      typedef ptr<Statement<Base> > result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              boost::shared_ptr<Statement<Base> > stmt);
@@ -35,17 +35,17 @@ namespace mirv {
     
     /// Get a variable symbol given a statement.
     struct ExtractVariable : boost::proto::callable {
-      typedef ptr<Symbol<Variable> >::type VariablePointer;
+      typedef ptr<Symbol<Variable> > VariablePointer;
       typedef VariablePointer result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             ptr<Statement<Base> >::type stmt);
+                             ptr<Statement<Base> > stmt);
     };
 
     /// Bundle any pending statements created from child expressions
     /// with the statement just processed.
     struct ClearPendingStatements : boost::proto::callable {
-      typedef ptr<Statement<Base> >::type StatementPointer;
+      typedef ptr<Statement<Base> > StatementPointer;
       typedef StatementPointer result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -57,7 +57,7 @@ namespace mirv {
     /// These statements need to be placed in the loop body
     /// immediately before the condition.
     struct ClearPendingStatementsDoWhile : boost::proto::callable {
-      typedef ptr<Statement<DoWhile> >::type StatementPointer;
+      typedef ptr<Statement<DoWhile> > StatementPointer;
       typedef StatementPointer result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -72,7 +72,7 @@ namespace mirv {
     /// statement with the current statement.  This handles things
     /// like function calls in the condition expression.
     struct ClearPendingStatementsWhileRule : boost::proto::callable {
-      typedef ptr<Statement<IfThen> >::type StatementPointer;
+      typedef ptr<Statement<IfThen> > StatementPointer;
       typedef StatementPointer result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -90,7 +90,7 @@ namespace mirv {
       TranslateToExpression<ExpressionType>(boost::shared_ptr<SymbolTable> s)
       : symtab(s) {}
 
-      typedef typename ptr<ExpressionType>::type result_type;
+      typedef ptr<ExpressionType> result_type;
 
       template<typename Expr>
       result_type operator()(const Expr &e) const {

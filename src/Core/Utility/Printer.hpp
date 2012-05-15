@@ -10,8 +10,8 @@ namespace mirv {
   namespace Printer {
     typedef std::ostream Stream;
   }
-  void print(Printer::Stream &out, ptr<Node<Base> >::const_type node);
-  void printWithTypes(Printer::Stream &out, ptr<Node<Base> >::const_type node);
+  void print(Printer::Stream &out, ptr<const Node<Base> > node);
+  void printWithTypes(Printer::Stream &out, ptr<const Node<Base> > node);
 }
 
 #endif
