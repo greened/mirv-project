@@ -54,7 +54,7 @@ using Builder::float_;
 
 int main(void)
 {
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
         func["foo"].type[void_(int_(32))],

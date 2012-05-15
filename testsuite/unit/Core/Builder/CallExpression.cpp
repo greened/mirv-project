@@ -84,7 +84,7 @@ int main(void)
 
   Builder::FunctionTerminal foo = {{"foo"}};
 
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
 	var[a].type[int_(32)],

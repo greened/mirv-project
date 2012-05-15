@@ -21,7 +21,7 @@ namespace mirv {
                         public boost::enable_shared_from_this<Expression<Reference<SymbolType> > > {
       private:
         Expression<Base> *cloneImpl(void) {
-          typename ptr<Expression<Reference<SymbolType> > >::type expr(
+          ptr<Expression<Reference<SymbolType> > > expr(
             make<Expression<Reference<SymbolType> > >(this->getSymbol()));
           Expression<Reference<SymbolType> > *result = expr.get();
           expr.reset();
@@ -34,15 +34,15 @@ namespace mirv {
       public:
         typedef Symbol<SymbolType> ChildType;
         typedef typename ChildType::TypePtr TypePtr;
-        typedef typename ptr<ChildType>::type ChildPtr;
-        typedef typename ptr<ChildType>::const_type ConstChildPtr;
+        typedef ptr<ChildType> ChildPtr;
+        typedef ptr<const ChildType> ConstChildPtr;
 
         Interface(ChildPtr Var) : InterfaceBaseType(Var) {}
 
-        ptr<Node<Base> >::type getSharedHandle(void) {
+        ptr<Node<Base> > getSharedHandle(void) {
           return fast_cast<Node<Base>>(this->shared_from_this());
         }
-        ptr<Node<Base> >::const_type getSharedHandle(void) const {
+        ptr<const Node<Base> > getSharedHandle(void) const {
           return fast_cast<const Node<Base>>(this->shared_from_this());
         }
 

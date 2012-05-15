@@ -18,7 +18,7 @@ namespace mirv {
   public:
     PrintFilter(Stream &o) : out(o) {}
 
-    void operator()(ptr<Node<Base> >::const_type node);
+    void operator()(ptr<const Node<Base> > node);
   };
 }
 

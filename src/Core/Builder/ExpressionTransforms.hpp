@@ -12,50 +12,50 @@
 namespace mirv {
   namespace Builder {
     struct ExpressionTransform : boost::proto::callable {
-      typedef ptr<Expression<Base> >::type result_type;
+      typedef ptr<Expression<Base> > result_type;
     };
 
     struct VariableRefTransform : ExpressionTransform {
-      result_type operator()(ptr<SymbolTable>::const_type symtab,
+      result_type operator()(ptr<const SymbolTable> symtab,
 			     const std::string &name);
     };
 
     struct GlobalVariableRefTransform : ExpressionTransform {
-      result_type operator()(ptr<SymbolTable>::type symtab,
+      result_type operator()(ptr<SymbolTable> symtab,
 			     const std::string &name);
     };
 
     struct FunctionRefTransform : ExpressionTransform {
-      result_type operator()(ptr<SymbolTable>::const_type symtab,
+      result_type operator()(ptr<const SymbolTable> symtab,
 			     const std::string &name);
     };
 
     struct ConstantRefTransform : ExpressionTransform {
-      typedef ptr<Expression<Reference<Constant<Base> > > >::type result_type;
-      result_type operator()(ptr<SymbolTable>::const_type symtab,
-			     ptr<Symbol<Constant<Base> > >::type constant);
+      typedef ptr<Expression<Reference<Constant<Base> > > > result_type;
+      result_type operator()(ptr<const SymbolTable> symtab,
+			     ptr<Symbol<Constant<Base> > > constant);
     };
 
     struct ArrayRefSequenceTransform : ExpressionTransform {
-      result_type operator()(ptr<SymbolTable>::const_type symtab,
-			     ptr<Expression<Base> >::type address);
+      result_type operator()(ptr<const SymbolTable> symtab,
+			     ptr<Expression<Base> > address);
     };
 
     struct ArrayRefIndexTransform : ExpressionTransform {
-      result_type operator()(ptr<SymbolTable>::type symtab,
-			     ptr<Expression<Base> >::type base,
-                             ptr<Expression<Base> >::type index);
+      result_type operator()(ptr<SymbolTable> symtab,
+			     ptr<Expression<Base> > base,
+                             ptr<Expression<Base> > index);
     };
 
     struct ArrayAddressSequenceTransform : ExpressionTransform {
-      result_type operator()(ptr<SymbolTable>::const_type symtab,
-			     ptr<Expression<Base> >::type address);
+      result_type operator()(ptr<const SymbolTable> symtab,
+			     ptr<Expression<Base> > address);
     };
 
     struct ArrayAddressIndexTransform : ExpressionTransform {
-      result_type operator()(ptr<SymbolTable>::type symtab,
-			     ptr<Expression<Base> >::type base,
-                             ptr<Expression<Base> >::type index);
+      result_type operator()(ptr<SymbolTable> symtab,
+			     ptr<Expression<Base> > base,
+                             ptr<Expression<Base> > index);
     };
   }
 }

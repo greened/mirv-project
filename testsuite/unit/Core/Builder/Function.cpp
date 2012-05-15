@@ -49,28 +49,28 @@ using Builder::func;
 
 int main(void)
 {
-  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
 
-  ptr<Symbol<Type<TypeBase> > >::type functype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >::type());
+  ptr<Symbol<Type<TypeBase> > > functype =
+    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >());
   module->typePushBack(functype);
 
-  ptr<Symbol<Type<TypeBase> > >::type inttype =
+  ptr<Symbol<Type<TypeBase> > > inttype =
     make<Symbol<Type<Integral> > >(32);
   module->typePushBack(inttype);
 
-  ptr<Symbol<GlobalVariable> >::type asym =
+  ptr<Symbol<GlobalVariable> > asym =
     make<Symbol<GlobalVariable> >("a", inttype);
   module->globalVariablePushBack(asym);
 
-  ptr<Symbol<GlobalVariable> >::type bsym =
+  ptr<Symbol<GlobalVariable> > bsym =
     make<Symbol<GlobalVariable> >("b", inttype);
   module->globalVariablePushBack(bsym);
 
   Builder::GlobalVariableTerminal a = {{"a"}};
   Builder::GlobalVariableTerminal b = {{"b"}};
 
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::FunctionBuilder>(module,
       func["testfunc"].type["void ()"] [
        	a = a + b

@@ -12,7 +12,7 @@ namespace mirv {
   namespace Builder {
     /// This is a callable transform to construct a void type.
     struct ConstructVoidType : boost::proto::callable {
-      typedef ptr<Symbol<Type<TypeBase> > >::type result_type;
+      typedef ptr<Symbol<Type<TypeBase> > > result_type;
       result_type operator()(void) {
 	return result_type();
       }

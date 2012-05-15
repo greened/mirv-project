@@ -20,7 +20,7 @@ namespace mirv {
           public LeafSymbol,
           public boost::enable_shared_from_this<Symbol<GlobalVariable> > {
     private:
-      typedef ptr<Expression<Reference<Constant<Base> > > >::type ConstantPtr;
+      typedef ptr<Expression<Reference<Constant<Base> > > > ConstantPtr;
       ConstantPtr init;
 
     public:
@@ -31,10 +31,10 @@ namespace mirv {
         return init;
       }
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base>> getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+      ptr<const Node<Base>> getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
 
@@ -53,17 +53,17 @@ namespace mirv {
   /// type and a name.
    class GlobalVariable {
    public:
-     static void initialize(ptr<Symbol<GlobalVariable> >::type variable) {}
+     static void initialize(ptr<Symbol<GlobalVariable> > variable) {}
 
      static std::string
      getName(const std::string &name,
-             ptr<Symbol<Type<TypeBase> > >::const_type type) {
+             ptr<const Symbol<Type<TypeBase> > > type) {
        return name;
      }
      template<typename Init>
      static std::string
      getName(const std::string &name,
-             ptr<Symbol<Type<TypeBase> > >::const_type type,
+             ptr<const Symbol<Type<TypeBase> > > type,
              const Init &) {
        return name;
      }

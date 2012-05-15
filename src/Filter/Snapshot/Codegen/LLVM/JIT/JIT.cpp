@@ -14,7 +14,7 @@
 
 namespace mirv {
   namespace {
-    llvm::Module *codegen(ptr<Symbol<Module> >::type module) {
+    llvm::Module *codegen(ptr<Symbol<Module> > module) {
       LLVMCodegenFilter codegen;
       codegen(module);
       return codegen.getModule();
@@ -24,7 +24,7 @@ namespace mirv {
   namespace detail {
     JITContextHandle
     doCompile(void * &function, 
-              ptr<Symbol<Module> >::type module,
+              ptr<Symbol<Module> > module,
               const std::string &functionName) {
       llvm::InitializeNativeTarget();
 
@@ -48,7 +48,7 @@ namespace mirv {
     }
   }
 
-  void compileAndRun(ptr<Symbol<Module> >::type module,
+  void compileAndRun(ptr<Symbol<Module> > module,
                      const std::string &functionName) {
     llvm::InitializeNativeTarget();
 

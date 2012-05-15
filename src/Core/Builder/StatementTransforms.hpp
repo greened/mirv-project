@@ -10,38 +10,38 @@
 namespace mirv {
   namespace Builder {
     struct StatementTransform : boost::proto::callable {
-      typedef ptr<Statement<Base> >::type result_type;
+      typedef ptr<Statement<Base> > result_type;
     };
 
     struct IfTransform : public StatementTransform {
-      result_type operator()(ptr<SymbolTable>::type symtab,
-                             ptr<Expression<Base> >::type condition,
-                             ptr<Statement<Base> >::type body);
+      result_type operator()(ptr<SymbolTable> symtab,
+                             ptr<Expression<Base> > condition,
+                             ptr<Statement<Base> > body);
     };
 
     struct IfElseTransform : public StatementTransform {
-      result_type operator()(ptr<SymbolTable>::type symtab,
-                             ptr<Expression<Base> >::type condition,
-                             ptr<Statement<Base> >::type thenBody,
-                             ptr<Statement<Base> >::type elseBody);
+      result_type operator()(ptr<SymbolTable> symtab,
+                             ptr<Expression<Base> > condition,
+                             ptr<Statement<Base> > thenBody,
+                             ptr<Statement<Base> > elseBody);
     };
 
     struct WhileTransform : public StatementTransform {
-      result_type operator()(ptr<SymbolTable>::type symtab,
-                             ptr<Expression<Base> >::type condition,
-                             ptr<Statement<Base> >::type body);
+      result_type operator()(ptr<SymbolTable> symtab,
+                             ptr<Expression<Base> > condition,
+                             ptr<Statement<Base> > body);
     };
 
     struct DoWhileTransform : public StatementTransform {
-      result_type operator()(ptr<SymbolTable>::type symtab,
-                             ptr<Expression<Base> >::type condition,
-                             ptr<Statement<Base> >::type body);
+      result_type operator()(ptr<SymbolTable> symtab,
+                             ptr<Expression<Base> > condition,
+                             ptr<Statement<Base> > body);
     };
 
     struct AssignTransform : public StatementTransform {
-      result_type operator()(ptr<SymbolTable>::type symtab,
-                             ptr<Expression<Base> >::type lhs,
-                             ptr<Expression<Base> >::type rhs);
+      result_type operator()(ptr<SymbolTable> symtab,
+                             ptr<Expression<Base> > lhs,
+                             ptr<Expression<Base> > rhs);
     };
   }
 }

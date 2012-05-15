@@ -46,7 +46,7 @@ namespace mirv {
       AfterExprAction
       > BaseType;
 
-    typedef Map<ptr<Expression<Base>>::type, bool>::type LabelIterateMapType;
+    typedef Map<ptr<Expression<Base>>::type, bool> LabelIterateMapType;
     LabelIterateMapType iterateMap;
 
   public:
@@ -66,7 +66,7 @@ namespace mirv {
     ForwardFlow(Args &...args) : BaseType(args...) {}
 
     /// Visit Block statements from the first child to the last.
-    void visit(ptr<Statement<Block> >::type stmt) {
+    void visit(ptr<Statement<Block> > stmt) {
       this->doEnter(stmt);
       for(Statement<Block>::iterator s = stmt->begin(),
             send = stmt->end();
@@ -85,7 +85,7 @@ namespace mirv {
 
     /// Visit IfThen statements, starting with the controlling
     /// expression, followed by the then body.
-    void visit(ptr<Statement<IfThen> >::type stmt) {
+    void visit(ptr<Statement<IfThen> > stmt) {
       this->doEnter(stmt);
 
       this->doBeforeExpression(stmt, stmt->expressionBegin());
@@ -103,7 +103,7 @@ namespace mirv {
 
     /// Visit IfElse statements, starting with the controllingiled
     /// expression, followed by the then body, then the else body.
-    void visit(ptr<Statement<IfElse> >::type stmt) {
+    void visit(ptr<Statement<IfElse> > stmt) {
       this->doEnter(stmt);
 
       this->doBeforeExpression(stmt, stmt->expressionBegin());
@@ -131,7 +131,7 @@ namespace mirv {
 
     /// Visit While statements, starting with the controlling
     /// expression, followed by the body.
-    void visit(ptr<Statement<While> >::type stmt) {
+    void visit(ptr<Statement<While> > stmt) {
       this->doEnter(stmt);
 
       this->doBeforeExpression(stmt, stmt->expressionBegin());
@@ -160,7 +160,7 @@ namespace mirv {
 
     /// Visit DoWhile statements, starting with the body, followed by
     /// the controlling expression.
-    void visit(ptr<Statement<DoWhile> >::type stmt) {
+    void visit(ptr<Statement<DoWhile> > stmt) {
       this->doEnter(stmt);
 
       do {
@@ -179,7 +179,7 @@ namespace mirv {
 
     /// Visit Switch statements, starting with the controlling
     /// expression, followed by the cast statements.
-    void visit(ptr<Statement<Switch> >::type stmt) {
+    void visit(ptr<Statement<Switch> > stmt) {
       this->doEnter(stmt);
 
       this->doBeforeExpression(stmt, stmt->expressionBegin());
@@ -206,7 +206,7 @@ namespace mirv {
 
     /// Visit Case statements, starting with the controlling
     /// expression, followed by the body.
-    void visit(ptr<Statement<Case> >::type stmt) {
+    void visit(ptr<Statement<Case> > stmt) {
       this->doEnter(stmt);
 
       this->doBeforeExpression(stmt, stmt->expressionBegin());
@@ -220,11 +220,11 @@ namespace mirv {
       this->doLeave(stmt);
     }
 
-    void visit(ptr<Statement<CaseBlock> >::type stmt) {
+    void visit(ptr<Statement<CaseBlock> > stmt) {
     }
 
     /// Visit Before statements.
-    void visit(ptr<Statement<Before> >::type stmt) {
+    void visit(ptr<Statement<Before> > stmt) {
       this->doEnter(stmt);
 
       LabelIterateMapType::iterator i;
@@ -248,7 +248,7 @@ namespace mirv {
     }
 
     /// Visit After statements.
-    void visit(ptr<Statement<After> >::type stmt) {
+    void visit(ptr<Statement<After> > stmt) {
       this->doEnter(stmt);
 
       this->doBeforeStatement(stmt, stmt->begin());
@@ -260,7 +260,7 @@ namespace mirv {
     }
 
     /// Visit Goto statements.
-    void visit(ptr<Statement<Goto> >::type stmt) {
+    void visit(ptr<Statement<Goto> > stmt) {
       this->doEnter(stmt);
 
       LabelIterateMapType::iterator i =
@@ -276,13 +276,13 @@ namespace mirv {
     }
 
     /// Visit Return statements.
-    void visit(ptr<Statement<Return> >::type stmt) {
+    void visit(ptr<Statement<Return> > stmt) {
       this->doEnter(stmt);
       this->doLeave(stmt);
     }
 
     /// Visit Phi statements.
-    void visit(ptr<Statement<Phi> >::type stmt) {
+    void visit(ptr<Statement<Phi> > stmt) {
       this->doEnter(stmt);
 
       for (auto i = stmt->expressionBegin();
@@ -298,7 +298,7 @@ namespace mirv {
 
     /// Visit Store statements, starting with the right-hand
     /// side, followed by the left-hand side.
-    void visit(ptr<Statement<Store> >::type stmt) {
+    void visit(ptr<Statement<Store> > stmt) {
       this->doEnter(stmt);
 
       for (auto i = stmt->expressionRBegin();
@@ -313,7 +313,7 @@ namespace mirv {
     }
 
     /// Visit Call statements.
-    void visit(ptr<Statement<Call> >::type stmt) {
+    void visit(ptr<Statement<Call> > stmt) {
       this->doEnter(stmt);
 
       for (auto e = stmt->expressionBegin(); e != stmt->expressionEnd(); ++e) {
@@ -327,7 +327,7 @@ namespace mirv {
 
     /// Visit Allocate statements, starting with the right-hand
     /// side, followed by the left-hand side.
-    void visit(ptr<Statement<Allocate> >::type stmt) {
+    void visit(ptr<Statement<Allocate> > stmt) {
       this->doEnter(stmt);
 
       for (auto e = stmt->expressionRBegin();

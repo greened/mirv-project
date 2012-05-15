@@ -26,56 +26,56 @@ namespace mirv {
   struct ConstStatementVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<
-	ptr<Statement<Base> >::const_type,
-	ptr<LeafStatement>::const_type,
-	ptr<InnerStatement>::const_type,
-	ptr<Statement<Conditional> >::const_type,
-	ptr<Statement<Iterative> >::const_type,
-	ptr<Statement<Mutating> >::const_type,
-	ptr<Statement<Block> >::const_type,
-	ptr<Statement<SingleBlock> >::const_type,
-	ptr<Statement<DualBlock> >::const_type,
-	ptr<Statement<IfThen> >::const_type,
-	ptr<Statement<IfElse> >::const_type,
-	ptr<Statement<While> >::const_type,
-	ptr<Statement<DoWhile> >::const_type,
-	ptr<Statement<Switch> >::const_type,
-	ptr<Statement<Case> >::const_type,
-	ptr<Statement<CaseBlock> >::const_type,
-	ptr<Statement<Before> >::const_type,
-	ptr<Statement<After> >::const_type,
-	ptr<Statement<Goto> >::const_type,
-	ptr<Statement<Return> >::const_type,
-	ptr<Statement<Phi> >::const_type,
-	ptr<Statement<Store> >::const_type,
-	ptr<Statement<Call> >::const_type,
-	ptr<Statement<Allocate> >::const_type
+	ptr<const Statement<Base> >,
+	ptr<const LeafStatement>,
+	ptr<const InnerStatement>,
+	ptr<const Statement<Conditional> >,
+	ptr<const Statement<Iterative> >,
+	ptr<const Statement<Mutating> >,
+	ptr<const Statement<Block> >,
+	ptr<const Statement<SingleBlock> >,
+	ptr<const Statement<DualBlock> >,
+	ptr<const Statement<IfThen> >,
+	ptr<const Statement<IfElse> >,
+	ptr<const Statement<While> >,
+	ptr<const Statement<DoWhile> >,
+	ptr<const Statement<Switch> >,
+	ptr<const Statement<Case> >,
+	ptr<const Statement<CaseBlock> >,
+	ptr<const Statement<Before> >,
+	ptr<const Statement<After> >,
+	ptr<const Statement<Goto> >,
+	ptr<const Statement<Return> >,
+	ptr<const Statement<Phi> >,
+	ptr<const Statement<Store> >,
+	ptr<const Statement<Call> >,
+	ptr<const Statement<Allocate> >
 	> > {
   public:
-    virtual result_type visit(ptr<Statement<Base> >::const_type);
-    virtual result_type visit(ptr<LeafStatement>::const_type);
-    virtual result_type visit(ptr<InnerStatement>::const_type);
-    virtual result_type visit(ptr<Statement<Conditional> >::const_type);
-    virtual result_type visit(ptr<Statement<Iterative> >::const_type);
-    virtual result_type visit(ptr<Statement<Mutating> >::const_type);
-    virtual result_type visit(ptr<Statement<Block> >::const_type);
-    virtual result_type visit(ptr<Statement<SingleBlock> >::const_type);
-    virtual result_type visit(ptr<Statement<DualBlock> >::const_type);
-    virtual result_type visit(ptr<Statement<IfThen> >::const_type);
-    virtual result_type visit(ptr<Statement<IfElse> >::const_type);
-    virtual result_type visit(ptr<Statement<While> >::const_type);
-    virtual result_type visit(ptr<Statement<DoWhile> >::const_type);
-    virtual result_type visit(ptr<Statement<Switch> >::const_type);
-    virtual result_type visit(ptr<Statement<Case> >::const_type);
-    virtual result_type visit(ptr<Statement<CaseBlock> >::const_type);
-    virtual result_type visit(ptr<Statement<Before> >::const_type);
-    virtual result_type visit(ptr<Statement<After> >::const_type);
-    virtual result_type visit(ptr<Statement<Goto> >::const_type);
-    virtual result_type visit(ptr<Statement<Return> >::const_type);
-    virtual result_type visit(ptr<Statement<Phi> >::const_type);
-    virtual result_type visit(ptr<Statement<Store> >::const_type);
-    virtual result_type visit(ptr<Statement<Call> >::const_type);
-    virtual result_type visit(ptr<Statement<Allocate> >::const_type);
+    virtual result_type visit(ptr<const Statement<Base> >);
+    virtual result_type visit(ptr<const LeafStatement>);
+    virtual result_type visit(ptr<const InnerStatement>);
+    virtual result_type visit(ptr<const Statement<Conditional> >);
+    virtual result_type visit(ptr<const Statement<Iterative> >);
+    virtual result_type visit(ptr<const Statement<Mutating> >);
+    virtual result_type visit(ptr<const Statement<Block> >);
+    virtual result_type visit(ptr<const Statement<SingleBlock> >);
+    virtual result_type visit(ptr<const Statement<DualBlock> >);
+    virtual result_type visit(ptr<const Statement<IfThen> >);
+    virtual result_type visit(ptr<const Statement<IfElse> >);
+    virtual result_type visit(ptr<const Statement<While> >);
+    virtual result_type visit(ptr<const Statement<DoWhile> >);
+    virtual result_type visit(ptr<const Statement<Switch> >);
+    virtual result_type visit(ptr<const Statement<Case> >);
+    virtual result_type visit(ptr<const Statement<CaseBlock> >);
+    virtual result_type visit(ptr<const Statement<Before> >);
+    virtual result_type visit(ptr<const Statement<After> >);
+    virtual result_type visit(ptr<const Statement<Goto> >);
+    virtual result_type visit(ptr<const Statement<Return> >);
+    virtual result_type visit(ptr<const Statement<Phi> >);
+    virtual result_type visit(ptr<const Statement<Store> >);
+    virtual result_type visit(ptr<const Statement<Call> >);
+    virtual result_type visit(ptr<const Statement<Allocate> >);
   };
 }
 

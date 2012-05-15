@@ -47,15 +47,15 @@ using Builder::int_;
 
 int main(void)
 {
-  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
 
-  ptr<Symbol<Type<TypeBase> > >::type inttype =
+  ptr<Symbol<Type<TypeBase> > > inttype =
     make<Symbol<Type<Integral> > >(32);
   module->typePushBack(inttype);
 
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::FunctionBuilder>(
-      module, ptr<Symbol<Function> >::type(),
+      module, ptr<Symbol<Function> >(),
       func["testfunc"].type[void_()] [
         var["a"].type[int_(32)]
       ]

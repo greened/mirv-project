@@ -16,13 +16,13 @@ namespace mirv {
       typedef Symbol<Type<Derived> > BaseType;
 
     public:
-      PointerInterface(ptr<Symbol<Type<TypeBase> > >::const_type base)
+      PointerInterface(ptr<const Symbol<Type<TypeBase> > > base)
           : BaseType() {
         setBaseType(base);
       }
       typedef const Symbol<Type<TypeBase> > ChildType;
-      typedef ptr<ChildType>::type ChildPtr;
-      typedef ptr<ChildType>::const_type ConstChildPtr;
+      typedef ptr<ChildType> ChildPtr;
+      typedef ptr<const ChildType> ConstChildPtr;
 
       void setBaseType(ChildPtr c) {
         if (empty()) {
@@ -41,10 +41,10 @@ namespace mirv {
         return(front());
       }
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base>> getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+      ptr<const Node<Base>> getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
 

@@ -29,7 +29,7 @@ namespace mirv {
      // as the type's parent.  We really ought to pass the module to
      // the type during construction because that's the only place it
      // will ever live.
-     mutable ptr<Node<Base>>::weak_type theParent;
+     mutable weak_ptr<Node<Base>> theParent;
 
      // Do internal consistency checks.
      virtual void doValidation(void) const;
@@ -37,23 +37,23 @@ namespace mirv {
    public:
      virtual ~Node<Base>(void);
 
-     virtual ptr<Node<Base>>::type getSharedHandle(void) = 0;
-     virtual ptr<Node<Base>>::const_type getSharedHandle(void) const = 0;
+     virtual ptr<Node<Base>> getSharedHandle(void) = 0;
+     virtual ptr<const Node<Base>> getSharedHandle(void) const = 0;
 
      template<typename NodeType>
-     typename ptr<NodeType>::type parent(void) const {
-       ptr<Node<Base> >::type result(theParent.lock());
+     ptr<NodeType> parent(void) const {
+       ptr<Node<Base> > result(theParent.lock());
        if (!result) {
-         return typename ptr<NodeType>::type();
+         return ptr<NodeType>();
        }
-       typename ptr<NodeType>::type casted = dyn_cast<NodeType>(result);
+       ptr<NodeType> casted = dyn_cast<NodeType>(result);
        if (casted) {
          return casted;
        }
        return result->template parent<NodeType>();
      }
 
-     void setParent(ptr<Node<Base>>::weak_type parent) const {
+     void setParent(weak_ptr<Node<Base>> parent) const {
        theParent = parent;
      }
      

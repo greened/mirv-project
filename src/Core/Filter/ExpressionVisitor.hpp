@@ -29,98 +29,98 @@ namespace mirv {
   struct ExpressionVisitor :
     public lib::cyclic_visitor<void,
       boost::mpl::vector<
-	ptr<Expression<Base> >::type,
-	ptr<InnerExpression>::type,
-	ptr<InnerExpressionBase>::type,
-	ptr<LeafExpression>::type,
-	ptr<Expression<Arithmetic> >::type,
-	ptr<Expression<Logical> >::type,
-	ptr<Expression<Bitwise> >::type,
-	ptr<Expression<Ref> >::type,
-	ptr<Expression<Commutative> >::type,
-	ptr<Expression<Associative> >::type,
-	ptr<Expression<Transitive> >::type,
-	ptr<Expression<Reflexive> >::type,
+	ptr<Expression<Base> >,
+	ptr<InnerExpression>,
+	ptr<InnerExpressionBase>,
+	ptr<LeafExpression>,
+	ptr<Expression<Arithmetic> >,
+	ptr<Expression<Logical> >,
+	ptr<Expression<Bitwise> >,
+	ptr<Expression<Ref> >,
+	ptr<Expression<Commutative> >,
+	ptr<Expression<Associative> >,
+	ptr<Expression<Transitive> >,
+	ptr<Expression<Reflexive> >,
 
-	ptr<Expression<Unary> >::type,
-	ptr<Expression<Binary> >::type,
+	ptr<Expression<Unary> >,
+	ptr<Expression<Binary> >,
 
-	ptr<Expression<Add> >::type,
-	ptr<Expression<Subtract> >::type,
-	ptr<Expression<Divide> >::type,
-	ptr<Expression<Modulus> >::type,
-	ptr<Expression<Multiply> >::type,
-	ptr<Expression<Negate> >::type,
+	ptr<Expression<Add> >,
+	ptr<Expression<Subtract> >,
+	ptr<Expression<Divide> >,
+	ptr<Expression<Modulus> >,
+	ptr<Expression<Multiply> >,
+	ptr<Expression<Negate> >,
 
-	ptr<Expression<LogicalAnd> >::type,
-	ptr<Expression<LogicalOr> >::type,
-	ptr<Expression<LogicalNot> >::type,
+	ptr<Expression<LogicalAnd> >,
+	ptr<Expression<LogicalOr> >,
+	ptr<Expression<LogicalNot> >,
 
-	ptr<Expression<BitwiseAnd> >::type,
-	ptr<Expression<BitwiseOr> >::type,
-	ptr<Expression<BitwiseXor> >::type,
-	ptr<Expression<BitwiseComplement> >::type,
-	ptr<Expression<ShiftLeft> >::type,
-	ptr<Expression<ArithmeticShiftRight> >::type,
-	ptr<Expression<LogicalShiftRight> >::type,
+	ptr<Expression<BitwiseAnd> >,
+	ptr<Expression<BitwiseOr> >,
+	ptr<Expression<BitwiseXor> >,
+	ptr<Expression<BitwiseComplement> >,
+	ptr<Expression<ShiftLeft> >,
+	ptr<Expression<ArithmeticShiftRight> >,
+	ptr<Expression<LogicalShiftRight> >,
 
-	ptr<Expression<LessThan> >::type,
-	ptr<Expression<LessThanOrEqual> >::type,
-	ptr<Expression<Equal> >::type,
-	ptr<Expression<NotEqual> >::type,
-	ptr<Expression<GreaterThanOrEqual> >::type,
-	ptr<Expression<GreaterThan> >::type,
+	ptr<Expression<LessThan> >,
+	ptr<Expression<LessThanOrEqual> >,
+	ptr<Expression<Equal> >,
+	ptr<Expression<NotEqual> >,
+	ptr<Expression<GreaterThanOrEqual> >,
+	ptr<Expression<GreaterThan> >,
 
-	ptr<Expression<Reference<Variable> > >::type,
-	ptr<Expression<Reference<Function> > >::type,
-	ptr<Expression<Reference<Constant<Base> > > >::type,
-	ptr<Expression<Load> >::type,
+	ptr<Expression<Reference<Variable> > >,
+	ptr<Expression<Reference<Function> > >,
+	ptr<Expression<Reference<Constant<Base> > > >,
+	ptr<Expression<Load> >,
 
-	ptr<Expression<TuplePointer> >::type
+	ptr<Expression<TuplePointer> >
 	> > {
   public:
-    virtual result_type visit(ptr<Expression<Base> >::type);
-    virtual result_type visit(ptr<InnerExpression>::type);
-    virtual result_type visit(ptr<InnerExpressionBase>::type);
-    virtual result_type visit(ptr<LeafExpression>::type);
-    virtual result_type visit(ptr<Expression<Arithmetic> >::type);
-    virtual result_type visit(ptr<Expression<Logical> >::type);
-    virtual result_type visit(ptr<Expression<Bitwise> >::type);
-    virtual result_type visit(ptr<Expression<Relational> >::type);
-    virtual result_type visit(ptr<Expression<Ref> >::type);
-    virtual result_type visit(ptr<Expression<Commutative> >::type);
-    virtual result_type visit(ptr<Expression<Associative> >::type);
-    virtual result_type visit(ptr<Expression<Transitive> >::type);
-    virtual result_type visit(ptr<Expression<Reflexive> >::type);
-    virtual result_type visit(ptr<Expression<Unary> >::type);
-    virtual result_type visit(ptr<Expression<Binary> >::type);
-    virtual result_type visit(ptr<Expression<Add> >::type);
-    virtual result_type visit(ptr<Expression<Subtract> >::type);
-    virtual result_type visit(ptr<Expression<Divide> >::type);
-    virtual result_type visit(ptr<Expression<Multiply> >::type);
-    virtual result_type visit(ptr<Expression<Modulus> >::type);
-    virtual result_type visit(ptr<Expression<Negate> >::type);
-    virtual result_type visit(ptr<Expression<LogicalAnd> >::type);
-    virtual result_type visit(ptr<Expression<LogicalOr> >::type);
-    virtual result_type visit(ptr<Expression<LogicalNot> >::type);
-    virtual result_type visit(ptr<Expression<BitwiseAnd> >::type);
-    virtual result_type visit(ptr<Expression<BitwiseOr> >::type);
-    virtual result_type visit(ptr<Expression<BitwiseXor> >::type);
-    virtual result_type visit(ptr<Expression<BitwiseComplement> >::type);
-    virtual result_type visit(ptr<Expression<ShiftLeft> >::type);
-    virtual result_type visit(ptr<Expression<ArithmeticShiftRight> >::type);
-    virtual result_type visit(ptr<Expression<LogicalShiftRight> >::type);
-    virtual result_type visit(ptr<Expression<LessThan> >::type);
-    virtual result_type visit(ptr<Expression<LessThanOrEqual> >::type);
-    virtual result_type visit(ptr<Expression<Equal> >::type);
-    virtual result_type visit(ptr<Expression<NotEqual> >::type);
-    virtual result_type visit(ptr<Expression<GreaterThanOrEqual> >::type);
-    virtual result_type visit(ptr<Expression<GreaterThan> >::type);
-    virtual result_type visit(ptr<Expression<Reference<Variable> > >::type);
-    virtual result_type visit(ptr<Expression<Reference<Function> > >::type);
-    virtual result_type visit(ptr<Expression<Reference<Constant<Base> > > >::type);
-    virtual result_type visit(ptr<Expression<Load> >::type);
-    virtual result_type visit(ptr<Expression<TuplePointer> >::type);
+    virtual result_type visit(ptr<Expression<Base> >);
+    virtual result_type visit(ptr<InnerExpression>);
+    virtual result_type visit(ptr<InnerExpressionBase>);
+    virtual result_type visit(ptr<LeafExpression>);
+    virtual result_type visit(ptr<Expression<Arithmetic> >);
+    virtual result_type visit(ptr<Expression<Logical> >);
+    virtual result_type visit(ptr<Expression<Bitwise> >);
+    virtual result_type visit(ptr<Expression<Relational> >);
+    virtual result_type visit(ptr<Expression<Ref> >);
+    virtual result_type visit(ptr<Expression<Commutative> >);
+    virtual result_type visit(ptr<Expression<Associative> >);
+    virtual result_type visit(ptr<Expression<Transitive> >);
+    virtual result_type visit(ptr<Expression<Reflexive> >);
+    virtual result_type visit(ptr<Expression<Unary> >);
+    virtual result_type visit(ptr<Expression<Binary> >);
+    virtual result_type visit(ptr<Expression<Add> >);
+    virtual result_type visit(ptr<Expression<Subtract> >);
+    virtual result_type visit(ptr<Expression<Divide> >);
+    virtual result_type visit(ptr<Expression<Multiply> >);
+    virtual result_type visit(ptr<Expression<Modulus> >);
+    virtual result_type visit(ptr<Expression<Negate> >);
+    virtual result_type visit(ptr<Expression<LogicalAnd> >);
+    virtual result_type visit(ptr<Expression<LogicalOr> >);
+    virtual result_type visit(ptr<Expression<LogicalNot> >);
+    virtual result_type visit(ptr<Expression<BitwiseAnd> >);
+    virtual result_type visit(ptr<Expression<BitwiseOr> >);
+    virtual result_type visit(ptr<Expression<BitwiseXor> >);
+    virtual result_type visit(ptr<Expression<BitwiseComplement> >);
+    virtual result_type visit(ptr<Expression<ShiftLeft> >);
+    virtual result_type visit(ptr<Expression<ArithmeticShiftRight> >);
+    virtual result_type visit(ptr<Expression<LogicalShiftRight> >);
+    virtual result_type visit(ptr<Expression<LessThan> >);
+    virtual result_type visit(ptr<Expression<LessThanOrEqual> >);
+    virtual result_type visit(ptr<Expression<Equal> >);
+    virtual result_type visit(ptr<Expression<NotEqual> >);
+    virtual result_type visit(ptr<Expression<GreaterThanOrEqual> >);
+    virtual result_type visit(ptr<Expression<GreaterThan> >);
+    virtual result_type visit(ptr<Expression<Reference<Variable> > >);
+    virtual result_type visit(ptr<Expression<Reference<Function> > >);
+    virtual result_type visit(ptr<Expression<Reference<Constant<Base> > > >);
+    virtual result_type visit(ptr<Expression<Load> >);
+    virtual result_type visit(ptr<Expression<TuplePointer> >);
   };
 }
 

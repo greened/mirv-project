@@ -119,7 +119,7 @@ namespace mirv {
     void transfer(Flow &other) {}
 
     /// Visit an inner symbol, visiting all children.
-    void visit(ptr<InnerSymbol>::type sym) {
+    void visit(ptr<InnerSymbol> sym) {
       this->doEnter(sym);
       for(InnerSymbol::iterator s = sym->begin(),
             send = sym->end();
@@ -136,7 +136,7 @@ namespace mirv {
       this->doLeave(sym);
     }
 
-    void visit(ptr<LeafSymbol>::type sym) {
+    void visit(ptr<LeafSymbol> sym) {
       this->doEnter(sym);
       this->doLeave(sym);
     }
@@ -144,7 +144,7 @@ namespace mirv {
     /// Visit a module, visiting contained variables and functions.
     /// We do not visit types as they are immutable.  See
     /// ConstSymbolFlow.
-    void visit(ptr<Symbol<Module> >::type sym) {
+    void visit(ptr<Symbol<Module> > sym) {
       this->doEnter(sym);
 
       // Visit variables
@@ -179,7 +179,7 @@ namespace mirv {
 
     /// Visit a function, visiting contained variables and
     /// statements.
-    void visit(ptr<Symbol<Function> >::type sym) {
+    void visit(ptr<Symbol<Function> > sym) {
       this->doEnter(sym);
       // Visit variables
       for(Symbol<Function>::VariableIterator v = sym->variableBegin(),

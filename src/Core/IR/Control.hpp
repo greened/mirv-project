@@ -30,10 +30,10 @@ namespace mirv {
       template<typename A1, typename A2, typename A3, typename A4>
       BlockInterface(A1 a1, A2 a2, A3 a3, A4 a4) : InnerStatement(a1, a2, a3, a4)  {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
     };
@@ -199,10 +199,10 @@ namespace mirv {
       IfThenInterface(E e, S s) : Statement<SingleCondition>(e),
                                     Statement<SingleBlock>(s) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
 
@@ -234,10 +234,10 @@ namespace mirv {
       IfElseInterface(E e, S1 s1, S2 s2) : Statement<SingleCondition>(e),
                                              Statement<DualBlock>(s1, s2) {}
       
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -269,10 +269,10 @@ namespace mirv {
       WhileInterface(E e, S1 s1) : Statement<SingleCondition>(e),
                                      Statement<SingleBlock>(s1) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -304,10 +304,10 @@ namespace mirv {
       DoWhileInterface(E e, S1 s1) : Statement<SingleCondition>(e),
                                        Statement<SingleBlock>(s1) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -339,10 +339,10 @@ namespace mirv {
       CaseInterface(E e, S1 s1) : Statement<SingleCondition>(e),
                                     Statement<SingleBlock>(s1) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -399,10 +399,10 @@ namespace mirv {
       SwitchInterface(E e, S1 s1) : Statement<SingleCondition>(e),
                                       Statement<SingleBlock>(s1) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -467,10 +467,10 @@ namespace mirv {
       BeforeInterface(E e, S1 s1) : Statement<SingleLabel>(e),
                                       Statement<SingleBlock>(s1) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -505,10 +505,10 @@ namespace mirv {
       AfterInterface(E e, S1 s1) : Statement<SingleLabel>(e),
                                      Statement<SingleBlock>(s1) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -543,10 +543,10 @@ namespace mirv {
       GotoInterface(E e) : Statement<SingleLabel>(e),
                              LeafStatement() {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
     };
@@ -564,10 +564,10 @@ namespace mirv {
       Statement<Base> *cloneImpl(void);
 
     public:
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
     };

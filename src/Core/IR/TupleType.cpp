@@ -22,7 +22,7 @@
 
 namespace mirv {
   void
-  detail::TupleInterface::construct_optimized(ptr<Symbol<Type<TypeBase> > >::const_type t,
+  detail::TupleInterface::construct_optimized(ptr<const Symbol<Type<TypeBase> > > t,
                                               std::uint64_t count) 
   {
     push_back(t);
@@ -30,17 +30,17 @@ namespace mirv {
       Builder::makeExpression(count, t->parent<Symbol<Module> >());
   }
 
-  ptr<Symbol<Type<TypeBase> > >::const_type
-  detail::TupleInterface::elementType(ptr<Expression<Base> >::const_type index) const
+  ptr<const Symbol<Type<TypeBase> > >
+  detail::TupleInterface::elementType(ptr<const Expression<Base> > index) const
   {
     if (multiplier) {
       // Types are uniform.
       return *begin();
     }
     // index must be an integer constant.
-    ptr<Expression<Reference<Constant<Base> > > >::const_type cref =
+    ptr<const Expression<Reference<Constant<Base> > > > cref =
       safe_cast<const Expression<Reference<Constant<Base> > > >(index);
-    ptr<Symbol<Constant<std::uint64_t> > >::const_type constant =
+    ptr<const Symbol<Constant<std::uint64_t> > > constant =
       safe_cast<const Symbol<Constant<std::uint64_t> > >(cref->getSymbol());
     auto type = begin();
     std::advance(type, constant->value());

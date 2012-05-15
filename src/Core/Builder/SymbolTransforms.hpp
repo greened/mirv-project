@@ -31,7 +31,7 @@ namespace mirv {
       TranslateToSymbol<SymbolType>(boost::shared_ptr<SymbolTable> s)
       : symtab(s) {}
 
-     typedef typename ptr<SymbolType>::type result_type;
+     typedef ptr<SymbolType> result_type;
 
       template<typename Expr>
       result_type operator()(const Expr &e) const {
@@ -54,7 +54,7 @@ namespace mirv {
       TranslateToSymbol<Symbol<Type<Tag> > >(boost::shared_ptr<SymbolTable> s)
       : symtab(s) {}
 
-      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+      typedef ptr<const Symbol<Type<Tag> > > result_type;
 
       template<typename Expr>
       result_type operator()(const Expr &e) const {

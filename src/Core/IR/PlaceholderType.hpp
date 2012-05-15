@@ -17,10 +17,10 @@ namespace mirv {
     public:
       BitSizeType bitsize(void) const;
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base>> getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       };
-      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+      ptr<const Node<Base>> getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       };
     };
@@ -33,7 +33,7 @@ namespace mirv {
      static std::string getName(void) {
        return "placeholder";
      }
-     static std::string getName(ptr<Symbol<Module> >::type) {
+     static std::string getName(ptr<Symbol<Module> >) {
        return getName();
      }
   };

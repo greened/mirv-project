@@ -26,17 +26,17 @@ namespace mirv {
     /// query for various symbols as needed.
     class SymbolTable {
     private:
-      typedef ptr<Symbol<Module> >::type ModulePointer;
+      typedef ptr<Symbol<Module> > ModulePointer;
       ModulePointer module;
-      typedef ptr<Symbol<Function> >::type FunctionPointer;
+      typedef ptr<Symbol<Function> > FunctionPointer;
       FunctionPointer function;
-      typedef ptr<Statement<Base> >::type StatementPointer;
+      typedef ptr<Statement<Base> > StatementPointer;
       typedef std::list<StatementPointer> StatementList;
       StatementList pendingStatements;
 
       typedef std::map<
         std::string,
-        ptr<Symbol<Type<Placeholder> > >::const_type
+        ptr<const Symbol<Type<Placeholder> > >
         > PlaceholderMap;
       PlaceholderMap placeholders;
 
@@ -53,7 +53,7 @@ namespace mirv {
     public:
       SymbolTable(ModulePointer m, FunctionPointer f);
 
-      static ptr<SymbolTable>::type make(ModulePointer m);
+      static ptr<SymbolTable> make(ModulePointer m);
 
       unsigned int getNextTempNum(void) {
         return tempNum++;
@@ -86,80 +86,80 @@ namespace mirv {
         return pendingStatements.empty();
       }
 
-      ptr<Symbol<Type<TypeBase> > >::const_type
+      ptr<const Symbol<Type<TypeBase> > >
       addPlaceholder(const std::string &name);
 
-      ptr<Symbol<Type<Placeholder> > >::const_type
+      ptr<const Symbol<Type<Placeholder> > >
       lookupPlaceholder(const std::string &name) const;
 
-      ptr<Symbol<Type<Placeholder> > >::const_type
+      ptr<const Symbol<Type<Placeholder> > >
       removePlaceholder(const std::string &name);
 
       void resolve(const std::string &oldName,
-                   ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
-                   ptr<Symbol<Type<TypeBase> > >::const_type replacement);
+                   ptr<const Symbol<Type<Placeholder> > > placeholder,
+                   ptr<const Symbol<Type<TypeBase> > > replacement);
 
       /// Get the variable symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
-      ptr<Symbol<Variable> >::type
+      ptr<Symbol<Variable> >
       lookupAtCurrentScope(const std::string &name,
 			   Symbol<Variable> *) const;
 
       /// Get the global variable symbol at the current scope only.
       /// Return a null pointer if the symbol does not exist.
-      ptr<Symbol<GlobalVariable> >::type
+      ptr<Symbol<GlobalVariable> >
       lookupAtCurrentScope(const std::string &name,
 			   Symbol<GlobalVariable> *) const;
 
       /// Get the function symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
-      ptr<Symbol<Function> >::type
+      ptr<Symbol<Function> >
       lookupAtModuleScope(const std::string &name,
                           Symbol<Function> *) const;
-      ptr<Symbol<Function> >::type
+      ptr<Symbol<Function> >
       lookupAtCurrentScope(const std::string &name,
                            Symbol<Function> *) const;
 
       /// Get the global variable symbol at module scope only.  Return
       /// a null pointer if the symbol does not exist.
-      ptr<Symbol<GlobalVariable> >::type
+      ptr<Symbol<GlobalVariable> >
       lookupAtModuleScope(const std::string &name,
                           Symbol<GlobalVariable> *) const;
 
       /// Get the type symbol at the current scope only.  Return a
       /// null pointer if the symbol does not exist.
-      ptr<Symbol<Type<TypeBase> > >::const_type
+      ptr<const Symbol<Type<TypeBase> > >
       lookupAtModuleScope(const std::string &name,
                           const Symbol<Type<TypeBase> > *) const;
 
-      ptr<Symbol<Variable> >::type
+      ptr<Symbol<Variable> >
       lookupAtAllScopes(const std::string &name,
 			Symbol<Variable> *) const;
-      ptr<Symbol<GlobalVariable> >::type
+      ptr<Symbol<GlobalVariable> >
       lookupAtAllScopes(const std::string &name,
 			Symbol<GlobalVariable> *) const;
-      ptr<Symbol<Function> >::type
+      ptr<Symbol<Function> >
       lookupAtAllScopes(const std::string &name,
 			Symbol<Function> *) const;
-      ptr<Symbol<Type<TypeBase> > >::const_type
+      ptr<const Symbol<Type<TypeBase> > >
       lookupAtAllScopes(const std::string &name,
 			const Symbol<Type<TypeBase> > *) const;
-      void addAtCurrentScope(ptr<Symbol<Variable> >::type var);
-      void addAtCurrentScope(ptr<Symbol<GlobalVariable> >::type var);
-      void addAtCurrentScope(ptr<Symbol<Function> >::type func);
-      void addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::const_type type);
-      void addAtModuleScope(ptr<Symbol<Function> >::type func);
-      void addAtModuleScope(ptr<Symbol<Type<TypeBase> > >::const_type type);
-      void addAtModuleScope(ptr<Symbol<GlobalVariable> >::type var);
+      void addAtCurrentScope(ptr<Symbol<Variable> > var);
+      void addAtCurrentScope(ptr<Symbol<GlobalVariable> > var);
+      void addAtCurrentScope(ptr<Symbol<Function> > func);
+      void addAtCurrentScope(ptr<const Symbol<Type<TypeBase> > > type);
+      void addAtModuleScope(ptr<Symbol<Function> > func);
+      void addAtModuleScope(ptr<const Symbol<Type<TypeBase> > > type);
+      void addAtModuleScope(ptr<Symbol<GlobalVariable> > var);
     };
 
     /// This is a callable transform to set the module scope in a
     /// symbol table.
     struct SetModule : boost::proto::callable {
-      typedef ptr<SymbolTable>::type result_type;
+      typedef ptr<SymbolTable> result_type;
 
-      result_type operator()(ptr<SymbolTable>::type symtab,
-			     ptr<Symbol<Module> >::type module) {
+      result_type operator()(ptr<SymbolTable> symtab,
+			     ptr<Symbol<Module> > module) {
 	symtab->setModule(module);
         return symtab;
       }
@@ -168,9 +168,9 @@ namespace mirv {
     /// This is a callable transform to get the module scope from a
     /// symbol table.
     struct GetModule : boost::proto::callable {
-      typedef ptr<Symbol<Module> >::type result_type;
+      typedef ptr<Symbol<Module> > result_type;
 
-      result_type operator()(ptr<SymbolTable>::type symtab) {
+      result_type operator()(ptr<SymbolTable> symtab) {
         return symtab->getModule();
       }
     };
@@ -178,10 +178,10 @@ namespace mirv {
     /// This is a callable transform to set the function scope in a
     /// symbol table.
     struct SetFunction : boost::proto::callable {
-      typedef ptr<SymbolTable>::type result_type;
+      typedef ptr<SymbolTable> result_type;
 
-      result_type operator()(ptr<SymbolTable>::type symtab,
-			     ptr<Symbol<Function> >::type function) {
+      result_type operator()(ptr<SymbolTable> symtab,
+			     ptr<Symbol<Function> > function) {
 	symtab->setFunction(function);
         return symtab;
       }
@@ -191,9 +191,9 @@ namespace mirv {
     template<typename SymbolType,
       typename Dummy = boost::proto::callable>
     struct LookupSymbol : boost::proto::callable {
-      typedef typename ptr<SymbolType>::type result_type;
+      typedef ptr<SymbolType> result_type;
 
-      result_type operator()(ptr<SymbolTable>::const_type symtab,
+      result_type operator()(ptr<const SymbolTable> symtab,
 			     const std::string &name) {
 	result_type result =
           symtab->lookupAtAllScopes(name, reinterpret_cast<SymbolType *>(0));
@@ -209,9 +209,9 @@ namespace mirv {
     template<typename Tag>
     struct LookupSymbol<Symbol<Type<Tag> >, boost::proto::callable>
         : boost::proto::callable {
-      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+      typedef ptr<const Symbol<Type<Tag> > > result_type;
 
-      result_type operator()(ptr<SymbolTable>::const_type symtab,
+      result_type operator()(ptr<const SymbolTable> symtab,
 			     const std::string &name) {
 	result_type result =
           symtab->lookupAtAllScopes(name,
@@ -228,9 +228,9 @@ namespace mirv {
     template<typename SymbolType,
       typename Dummy = boost::proto::callable>
     struct LookupAndAddSymbol : boost::proto::callable {
-      typedef typename ptr<SymbolType>::type result_type;
+      typedef ptr<SymbolType> result_type;
 
-      result_type operator()(ptr<SymbolTable>::type symtab,
+      result_type operator()(ptr<SymbolTable> symtab,
 			     result_type symbol) {
 	result_type result =
           symtab->lookupAtAllScopes(symbol->name(), 
@@ -251,9 +251,9 @@ namespace mirv {
     template<typename Tag>
     struct LookupAndAddSymbol<Symbol<Type<Tag> >, boost::proto::callable> 
         : boost::proto::callable {
-      typedef typename ptr<Symbol<Type<Tag> > >::const_type result_type;
+      typedef ptr<const Symbol<Type<Tag> > > result_type;
 
-      result_type operator()(ptr<SymbolTable>::type symtab,
+      result_type operator()(ptr<SymbolTable> symtab,
 			     result_type symbol) {
         std::ostringstream name;
         print(name, symbol);

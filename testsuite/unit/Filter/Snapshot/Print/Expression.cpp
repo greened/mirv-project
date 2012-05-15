@@ -42,19 +42,19 @@ int main(void)
 {
   auto type = make<Symbol<Type<Integral> > >(32);
 
-  ptr<Symbol<Variable> >::type a =
+  ptr<Symbol<Variable> > a =
     Symbol<Variable>::make("a", type);
-  ptr<Symbol<Variable> >::type b =
+  ptr<Symbol<Variable> > b =
     Symbol<Variable>::make("b", type);
-  ptr<Symbol<Variable> >::type c =
+  ptr<Symbol<Variable> > c =
     Symbol<Variable>::make("c", type);
-  ptr<Symbol<Variable> >::type d =
+  ptr<Symbol<Variable> > d =
     Symbol<Variable>::make("d", type);
-  ptr<Symbol<Variable> >::type e =
+  ptr<Symbol<Variable> > e =
     Symbol<Variable>::make("e", type);
 
    // a + (b - c) * d / -e)
-   ptr<Expression<Base> >::type expr =
+   ptr<Expression<Base> > expr =
      Expression<Add>::make(
        Expression<Reference<Variable> >::make(a),
        Expression<Divide>::make(

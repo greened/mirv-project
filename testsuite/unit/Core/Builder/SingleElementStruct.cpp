@@ -36,7 +36,7 @@ using Builder::var;
 
 int main(void)
 {
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
         struct_["teststruct"] [

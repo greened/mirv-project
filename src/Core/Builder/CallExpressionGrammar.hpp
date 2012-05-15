@@ -20,13 +20,13 @@ namespace mirv {
     /// This is a callable transform to add an expression-level call
     /// to a function.
     struct AddCallAsExpression : boost::proto::callable {
-      typedef ptr<Expression<Base> >::type result_type;
+      typedef ptr<Expression<Base> > result_type;
 
       template<typename Arg, typename Expr>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
                              Arg functionExpr,
                              const Expr &expr) {
-        ptr<Symbol<Variable> >::type temp =
+        ptr<Symbol<Variable> > temp =
           BinaryConstructSymbol<Symbol<Variable>, CurrentScope>()(
             symtab, "__ct"
             + boost::lexical_cast<std::string>(symtab->getNextTempNum())
@@ -34,16 +34,16 @@ namespace mirv {
             safe_cast<const Symbol<Type<FunctionType> > >(functionExpr->type())->
             getReturnType());
 
-      ptr<Expression<Reference<Variable> > >::type returnValue =
+      ptr<Expression<Reference<Variable> > > returnValue =
         make<Expression<Reference<Variable> > >(temp);
 
-      ptr<Statement<Call> >::type call =
+      ptr<Statement<Call> > call =
         ConstructNary<Statement<Call> >()(symtab,
                                           functionExpr,
                                           returnValue,
                                           expr);
 
-      ptr<Symbol<Function> >::type function = symtab->getFunction();
+      ptr<Symbol<Function> > function = symtab->getFunction();
 	function->statementPushBack(call);
 	return make<Expression<Reference<Variable> > >(temp);
       }

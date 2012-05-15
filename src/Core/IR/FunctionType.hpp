@@ -13,8 +13,8 @@ namespace mirv {
 
     public:
       typedef Symbol<Type<TypeBase> > ChildType;
-      typedef ptr<ChildType>::const_type ChildPtr;
-      typedef ptr<ChildType>::const_type ConstChildPtr;
+      typedef ptr<const ChildType> ChildPtr;
+      typedef ptr<const ChildType> ConstChildPtr;
 
     private:
       /// Mark whether this function is vararg.
@@ -86,10 +86,10 @@ namespace mirv {
         return vararg == VarargMark::Vararg;
       }
 
-      ptr<Node<Base>>::type getSharedHandle(void) {
+      ptr<Node<Base>> getSharedHandle(void) {
         return fast_cast<Node<Base>>(shared_from_this());
       }
-      ptr<Node<Base>>::const_type getSharedHandle(void) const {
+      ptr<const Node<Base>> getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(shared_from_this());
       }
     };

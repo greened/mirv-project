@@ -26,7 +26,7 @@ namespace mirv {
       }
 
       void operator()(const Symbol<Type<Tag> > *This, ConstSymbolVisitor &V) {
-        typename ptr<Symbol<Type<Tag> > >::const_type p(This->shared_from_this());
+        ptr<const Symbol<Type<Tag> > > p(This->shared_from_this());
         V.visit(p);
       }
     };

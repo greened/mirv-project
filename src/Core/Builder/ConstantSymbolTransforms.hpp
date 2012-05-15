@@ -14,29 +14,29 @@ namespace mirv {
   namespace Builder {
     namespace detail {
       struct IntegralTypeGen {
-        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+        typedef ptr<const Symbol<Type<TypeBase> > > result_type;
         typedef std::uint64_t value_type;
 
-        result_type operator()(ptr<SymbolTable>::type symtab,
+        result_type operator()(ptr<SymbolTable> symtab,
                                size_t bitsize);
       };
  
       /// This is a functor to generate a floating point type of some
       /// bitsize.
       struct FloatingTypeGen {
-        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+        typedef ptr<const Symbol<Type<TypeBase> > > result_type;
         typedef double value_type;
 
-        result_type operator()(ptr<SymbolTable>::type symtab,
+        result_type operator()(ptr<SymbolTable> symtab,
                                size_t bitsize);
       };
 
       /// This is a grammar action to generate the type for a C-style
       /// string.
       struct StringTypeGen {
-        typedef ptr<Symbol<Type<TypeBase> > >::const_type result_type;
+        typedef ptr<const Symbol<Type<TypeBase> > > result_type;
 
-        result_type operator()(ptr<SymbolTable>::type symtab,
+        result_type operator()(ptr<SymbolTable> symtab,
                                const std::string &value);
       };
 
@@ -44,20 +44,20 @@ namespace mirv {
       /// reference and return the address of the first element, to
       /// give C semantics.
       struct GetCStringReference : boost::proto::callable {
-        typedef ptr<Expression<Base> >::type result_type;
+        typedef ptr<Expression<Base> > result_type;
 
         result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                               ptr<Expression<Base> >::type str);
+                               ptr<Expression<Base> > str);
       };
     }
 
     /// This is a callable transform to add a string constant to a
     /// module.
     struct AddStringConstant : boost::proto::callable {
-      typedef ptr<Expression<Base> >::type result_type;
+      typedef ptr<Expression<Base> > result_type;
 
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             ptr<Symbol<Constant<Base> > >::type str);
+                             ptr<Symbol<Constant<Base> > > str);
     };
 
     /// This is a callable transform to construct a constant symbol.
@@ -65,7 +65,7 @@ namespace mirv {
       typename ConstantTypeGenerator,
       typename Dummy = boost::proto::callable>
     struct ConstructConstantSymbol : boost::proto::callable {
-      typedef typename ptr<Symbol<Constant<Base>>>::type result_type;
+      typedef ptr<Symbol<Constant<Base>>> result_type;
 
       template<typename Expr>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -73,7 +73,7 @@ namespace mirv {
         ConstantTypeGenerator typeGen;
 
         // Constant type
-        ptr<Symbol<Type<TypeBase> > >::const_type constantType = 
+        ptr<const Symbol<Type<TypeBase> > > constantType = 
           LookupAndAddSymbol<Symbol<Type<TypeBase> > >()(
             symtab,
             typeGen(symtab,
@@ -98,7 +98,7 @@ namespace mirv {
     struct ConstructConstantSymbol<detail::StringTypeGen,
       boost::proto::callable>
         : boost::proto::callable {
-      typedef ptr<Symbol<Constant<Base>>>::type result_type;
+      typedef ptr<Symbol<Constant<Base>>> result_type;
 
       template<typename Expr>
       result_type operator()(boost::shared_ptr<SymbolTable> symtab,
@@ -106,7 +106,7 @@ namespace mirv {
         detail::StringTypeGen typeGen;
 
         // Constant type
-        ptr<Symbol<Type<TypeBase> > >::const_type constantType = 
+        ptr<const Symbol<Type<TypeBase> > > constantType = 
           LookupAndAddSymbol<Symbol<Type<TypeBase> > >()(
             symtab, typeGen(symtab, boost::proto::value(expr)));
 
@@ -123,10 +123,10 @@ namespace mirv {
     /// This is a callable transform to construct an address constant
     /// symbol.
     struct ConstructAddressConstantSymbol : boost::proto::callable {
-      typedef typename ptr<Symbol<Constant<Base>>>::type result_type;
+      typedef ptr<Symbol<Constant<Base>>> result_type;
 
-      result_type operator()(ptr<SymbolTable>::type symtab,
-			     ptr<Symbol<Global> >::type symbol);
+      result_type operator()(ptr<SymbolTable> symtab,
+			     ptr<Symbol<Global> > symbol);
     };
 
     /// This is a callable transform to construct an integer constant
@@ -135,12 +135,12 @@ namespace mirv {
       std::int64_t Value,
       typename Dummy = boost::proto::callable>
     struct ConstructIntegerConstantSymbol : boost::proto::callable {
-      typedef typename ptr<Symbol<Constant<Base>>>::type result_type;
+      typedef ptr<Symbol<Constant<Base>>> result_type;
 
-      result_type operator()(ptr<SymbolTable>::type symtab) {
+      result_type operator()(ptr<SymbolTable> symtab) {
         // Constant type
         detail::IntegralTypeGen typeGen;
-        ptr<Symbol<Type<TypeBase> > >::const_type constantType = 
+        ptr<const Symbol<Type<TypeBase> > > constantType = 
           LookupAndAddSymbol<Symbol<Type<TypeBase> > >()(
             symtab,
             typeGen(symtab, 64));

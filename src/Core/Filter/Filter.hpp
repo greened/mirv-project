@@ -13,7 +13,7 @@ namespace mirv {
     typedef Result result_type;
   
     /// Examine and/or operate on the given IR tree.
-    virtual result_type operator()(typename ptr<Visited>::type node) = 0;
+    virtual result_type operator()(ptr<Visited> node) = 0;
   };
 
   /// This is the base class for all IR filters that do not mutate the
@@ -25,7 +25,7 @@ namespace mirv {
     typedef Result result_type;
   
     /// Examine and/or operate on the given IR tree.
-    virtual result_type operator()(typename ptr<Visited>::const_type node) = 0;
+    virtual result_type operator()(ptr<const Visited> node) = 0;
   };
 }
 

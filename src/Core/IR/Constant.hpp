@@ -14,7 +14,7 @@ namespace mirv {
         : public Symbol<Typed>,
           public LeafSymbol {
     public:
-      BaseConstantInterface(ptr<Symbol<Type<TypeBase> > >::const_type type)
+      BaseConstantInterface(ptr<const Symbol<Type<TypeBase> > > type)
           : Symbol<Typed>(type) {}
     };
   }
@@ -40,17 +40,17 @@ namespace mirv {
       ValueType val;
 
     public:
-      ConstantInterface(typename ptr<Symbol<Type<TypeBase> > >::const_type type,
+      ConstantInterface(ptr<const Symbol<Type<TypeBase> > > type,
                         ValueType v) : Symbol<Constant<Base>>(type), val(v) {}
 
       ValueType value(void) const {
         return val;
       }
 
-       ptr<Node<Base>>::type getSharedHandle(void) {
+       ptr<Node<Base>> getSharedHandle(void) {
          return fast_cast<Node<Base>>(this->shared_from_this());
        };
-       ptr<Node<Base>>::const_type getSharedHandle(void) const {
+       ptr<const Node<Base>> getSharedHandle(void) const {
          return fast_cast<const Node<Base>>(this->shared_from_this());
        };
     };
@@ -62,7 +62,7 @@ namespace mirv {
   class Constant {
   public:
     static void
-    initialize(typename ptr<Symbol<Constant<ValueType> > >::type constant) {}
+    initialize(ptr<Symbol<Constant<ValueType> > > constant) {}
   };
 }
 

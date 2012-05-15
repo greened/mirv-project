@@ -18,8 +18,8 @@ namespace mirv {
     ConstructStructTypeSymbol::
     resolve(boost::shared_ptr<SymbolTable> symtab,
             const std::string &oldName,
-            ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
-            ptr<Symbol<Type<TypeBase> > >::const_type replacement) {
+            ptr<const Symbol<Type<Placeholder> > > placeholder,
+            ptr<const Symbol<Type<TypeBase> > > replacement) {
       // This isn't in the symbol table yet, so add it now.  This
       // avoids the need for a definition for Tuple to do
       // placeholder resolution on it.
@@ -30,7 +30,7 @@ namespace mirv {
       symtab->resolve(oldName, placeholder, replacement);
     }
 
-    ptr<Symbol<Type<TypeBase> > >::const_type
+    ptr<const Symbol<Type<TypeBase> > >
     LookupPlaceholder::operator()(boost::shared_ptr<SymbolTable> symtab,
                                   const std::string &name)
     {

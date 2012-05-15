@@ -5,7 +5,7 @@
 namespace mirv {
   Statement<Base> *detail::BlockInterface::cloneImpl(void)
   {
-    ptr<Statement<Block> >::type block(Statement<Block>::make());
+    ptr<Statement<Block> > block(Statement<Block>::make());
     for (Statement<Block>::iterator i = begin();
          i != end();
          ++i) {
@@ -27,7 +27,7 @@ namespace mirv {
 
   Statement<Base> *detail::IfThenInterface::cloneImpl(void)
   {
-    ptr<Statement<IfThen> >::type stmt(Statement<IfThen>::make(
+    ptr<Statement<IfThen> > stmt(Statement<IfThen>::make(
                                          getCondition()->clone(),
                                          getChildStatement()->clone()));
     Statement<IfThen> *result = stmt.get();
@@ -43,7 +43,7 @@ namespace mirv {
 
   Statement<Base> *detail::IfElseInterface::cloneImpl(void)
   {
-    ptr<Statement<IfElse> >::type stmt(Statement<IfElse>::make(
+    ptr<Statement<IfElse> > stmt(Statement<IfElse>::make(
                                          getCondition()->clone(),
                                          getLeftChildStatement()->clone(),
                                          getRightChildStatement()->clone()));
@@ -61,7 +61,7 @@ namespace mirv {
 
   Statement<Base> *detail::DoWhileInterface::cloneImpl(void)
   {
-    ptr<Statement<DoWhile> >::type stmt(Statement<DoWhile>::make(
+    ptr<Statement<DoWhile> > stmt(Statement<DoWhile>::make(
                                           getCondition()->clone(),
                                           getChildStatement()->clone()));
     Statement<DoWhile> *result = stmt.get();
@@ -77,7 +77,7 @@ namespace mirv {
 
   Statement<Base> *detail::WhileInterface::cloneImpl(void)
   {
-    ptr<Statement<While> >::type stmt(Statement<While>::make(
+    ptr<Statement<While> > stmt(Statement<While>::make(
                                         getCondition()->clone(),
                                         getChildStatement()->clone()));
     Statement<While> *result = stmt.get();
@@ -93,7 +93,7 @@ namespace mirv {
 
   Statement<Base> *detail::CaseInterface::cloneImpl(void)
   {
-    ptr<Statement<Case> >::type stmt(Statement<Case>::make(
+    ptr<Statement<Case> > stmt(Statement<Case>::make(
                                        getCondition()->clone(),
                                            getChildStatement()->clone()));
     Statement<Case> *result = stmt.get();
@@ -114,7 +114,7 @@ namespace mirv {
 
   Statement<Base> *detail::SwitchInterface::cloneImpl(void)
   {
-    ptr<Statement<Switch> >::type stmt(Statement<Switch>::make(
+    ptr<Statement<Switch> > stmt(Statement<Switch>::make(
                                          getCondition()->clone(),
                                          getChildStatement()->clone()));
     Statement<Switch> *result = stmt.get();
@@ -130,7 +130,7 @@ namespace mirv {
 
   Statement<Base> *detail::BeforeInterface::cloneImpl(void)
   {
-    ptr<Statement<Before> >::type stmt(Statement<Before>::make(
+    ptr<Statement<Before> > stmt(Statement<Before>::make(
                                          getLabel()->clone(),
                                          getChildStatement()->clone()));
     Statement<Before> *result = stmt.get();
@@ -146,7 +146,7 @@ namespace mirv {
 
   Statement<Base> *detail::AfterInterface::cloneImpl(void)
   {
-    ptr<Statement<After> >::type stmt(Statement<After>::make(
+    ptr<Statement<After> > stmt(Statement<After>::make(
                                         getLabel()->clone(),
                                         getChildStatement()->clone()));
     Statement<After> *result = stmt.get();
@@ -162,7 +162,7 @@ namespace mirv {
 
   Statement<Base> *detail::GotoInterface::cloneImpl(void)
   {
-    ptr<Statement<Goto> >::type stmt(Statement<Goto>::make(
+    ptr<Statement<Goto> > stmt(Statement<Goto>::make(
                                        getLabel()->clone()));
     Statement<Goto> *result = stmt.get();
     stmt.reset();
@@ -176,7 +176,7 @@ namespace mirv {
 
   Statement<Base> *detail::ReturnInterface::cloneImpl(void)
   {
-    ptr<Statement<Return> >::type stmt(Statement<Return>::make());
+    ptr<Statement<Return> > stmt(Statement<Return>::make());
     Statement<Return> *result = stmt.get();
     stmt.reset();
     return result;

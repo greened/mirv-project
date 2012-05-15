@@ -6,7 +6,7 @@
 namespace mirv {
   Statement<Base> *detail::PhiInterface::cloneImpl(void) 
   {
-    ptr<Statement<Phi> >::type stmt(Statement<Phi>::make(this->target()));
+    ptr<Statement<Phi> > stmt(Statement<Phi>::make(this->target()));
     Statement<Phi>::iterator i = this->begin();
     while (++i != this->end()) {
       stmt->expressionPushBack((*i)->clone());
@@ -27,7 +27,7 @@ namespace mirv {
 
   Statement<Base> *detail::StoreInterface::cloneImpl(void) 
   {
-    ptr<Statement<Store> >::type stmt(Statement<Store>::make(
+    ptr<Statement<Store> > stmt(Statement<Store>::make(
                                              getLeftExpression()->clone(),
                                              getRightExpression()->clone()));
     Statement<Store> *result = stmt.get();
@@ -35,8 +35,8 @@ namespace mirv {
     return result;
   }
 
-  detail::StoreInterface::StoreInterface(ptr<Expression<Base> >::type e1,
-                                         ptr<Expression<Base> >::type e2)
+  detail::StoreInterface::StoreInterface(ptr<Expression<Base> > e1,
+                                         ptr<Expression<Base> > e2)
       : Statement<DualExpression>(e1, e2), LeafStatement() {
     doValidation();
   }
@@ -59,7 +59,7 @@ namespace mirv {
 
   Statement<Base> *detail::CallInterface::cloneImpl(void) 
   {
-    ptr<Statement<Call> >::type stmt(Statement<Call>::make(this->function()->clone()));
+    ptr<Statement<Call> > stmt(Statement<Call>::make(this->function()->clone()));
     Statement<Call>::iterator i = this->begin();
     while (++i != this->end()) {
       stmt->expressionPushBack((*i)->clone());
@@ -80,7 +80,7 @@ namespace mirv {
 
   Statement<Base> *detail::AllocateInterface::cloneImpl(void) 
   {
-    ptr<Statement<Allocate> >::type stmt(Statement<Allocate>::make(
+    ptr<Statement<Allocate> > stmt(Statement<Allocate>::make(
                                            getLeftExpression()->clone(),
                                            getRightExpression()->clone(),
                                            type()));

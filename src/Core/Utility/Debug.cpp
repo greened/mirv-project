@@ -5,7 +5,7 @@
 namespace mirv {
   DebugManager * DebugManager::inst = 0;
 
-  void dump(ptr<Node<Base> >::const_type node) 
+  void dump(ptr<const Node<Base> > node) 
   {
     print(std::cerr, node);
   }

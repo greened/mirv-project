@@ -80,7 +80,7 @@ namespace mirv {
                          public LeafStatement,
                          public boost::enable_shared_from_this<Statement<Phi> > {
     private:
-      ptr<Symbol<Variable> >::type theTarget;
+      ptr<Symbol<Variable> > theTarget;
 
       Statement<Base> *cloneImpl(void);
 
@@ -93,24 +93,24 @@ namespace mirv {
       typedef ReverseExpressionIterator reverse_iterator;
       typedef ConstReverseExpressionIterator const_reverse_iterator;
 
-      PhiInterface(ptr<Symbol<Variable> >::type target) :
+      PhiInterface(ptr<Symbol<Variable> > target) :
           Statement<Controlled>(), LeafStatement(), theTarget(target) {}
 
       template<typename ...E>
-      PhiInterface(ptr<Symbol<Variable> >::type target,
+      PhiInterface(ptr<Symbol<Variable> > target,
                 E ...exprs) :
           Statement<Controlled>(exprs...), LeafStatement(), theTarget(target) {}
 
-      typedef ptr<Symbol<Variable> >::type TargetPtr;
-      typedef ptr<Symbol<Variable> >::const_type ConstTargetPtr;
+      typedef ptr<Symbol<Variable> > TargetPtr;
+      typedef ptr<const Symbol<Variable> > ConstTargetPtr;
 
       typedef ExpressionPtr ChildPtr;
       typedef ConstExpressionPtr ConstChildPtr;
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -173,16 +173,16 @@ namespace mirv {
       typedef ReverseExpressionIterator reverse_iterator;
       typedef ConstReverseExpressionIterator const_reverse_iterator;
 
-      StoreInterface(ptr<Expression<Base> >::type e1,
-                     ptr<Expression<Base> >::type e2);
+      StoreInterface(ptr<Expression<Base> > e1,
+                     ptr<Expression<Base> > e2);
 
       typedef ExpressionPtr ChildPtr;
       typedef ConstExpressionPtr ConstChildPtr;
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -257,10 +257,10 @@ namespace mirv {
                     InputIterator end)
           : Statement<Controlled>(function, returnValue, begin, end) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 
@@ -349,7 +349,7 @@ namespace mirv {
                               public LeafStatement,
                               public boost::enable_shared_from_this<Statement<Allocate> > {
     public:
-      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
+      typedef ptr<const Symbol<Type<TypeBase> > > TypePtr;
 
     private:
       TypePtr theType;
@@ -372,10 +372,10 @@ namespace mirv {
       typedef ExpressionPtr ChildPtr;
       typedef ConstExpressionPtr ConstChildPtr;
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base> >(shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base> >(shared_from_this());
       }
 

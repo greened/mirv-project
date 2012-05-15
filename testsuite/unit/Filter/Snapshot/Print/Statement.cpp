@@ -90,19 +90,19 @@ using mirv::make;
 
 int main(void)
 {
-  ptr<Symbol<Type<Integral> > >::type int32type =
+  ptr<Symbol<Type<Integral> > > int32type =
     make<Symbol<Type<Integral> > >(32);
-  ptr<Symbol<Type<Pointer> > >::const_type ptrtype =
+  ptr<const Symbol<Type<Pointer> > > ptrtype =
     make<Symbol<Type<Pointer> > >(int32type);
 
-  ptr<Symbol<Variable> >::type a =
+  ptr<Symbol<Variable> > a =
     Symbol<Variable>::make("a", ptrtype);
-  ptr<Symbol<Variable> >::type b =
+  ptr<Symbol<Variable> > b =
     Symbol<Variable>::make("b", ptrtype);
-  ptr<Symbol<Variable> >::type c =
+  ptr<Symbol<Variable> > c =
     Symbol<Variable>::make("c", ptrtype);
 
-  ptr<Statement<Base> >::type dowhile =
+  ptr<Statement<Base> > dowhile =
     Statement<Block>::make(
       Statement<Allocate>::make(
         Expression<Reference<Variable> >::make(a),

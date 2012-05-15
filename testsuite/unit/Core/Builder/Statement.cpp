@@ -83,40 +83,40 @@ using Builder::do_;
 
 int main(void)
 {
-  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
 
-  ptr<Symbol<Type<TypeBase> > >::type functype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >::type());
+  ptr<Symbol<Type<TypeBase> > > functype =
+    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >());
   module->typePushBack(functype);
 
-  ptr<Symbol<Type<TypeBase> > >::type inttype =
+  ptr<Symbol<Type<TypeBase> > > inttype =
     make<Symbol<Type<Integral> > >(32);
   module->typePushBack(inttype);
 
-  ptr<Symbol<Type<TypeBase> > >::type ptrtype =
+  ptr<Symbol<Type<TypeBase> > > ptrtype =
     make<Symbol<Type<Pointer> > >(inttype);
   module->typePushBack(ptrtype);
 
-  ptr<Symbol<Function> >::type function =
+  ptr<Symbol<Function> > function =
     make<Symbol<Function> >("testfunc", functype);
 
   module->functionPushBack(function);
 
-  ptr<Symbol<Variable> >::type asym = make<Symbol<Variable> >("a", ptrtype);
+  ptr<Symbol<Variable> > asym = make<Symbol<Variable> >("a", ptrtype);
   function->variablePushBack(asym);
 
-  ptr<Symbol<GlobalVariable> >::type bsym =
+  ptr<Symbol<GlobalVariable> > bsym =
     make<Symbol<GlobalVariable> >("b", inttype);
   module->globalVariablePushBack(bsym);
 
-  ptr<Symbol<Variable> >::type csym = make<Symbol<Variable> >("c", ptrtype);
+  ptr<Symbol<Variable> > csym = make<Symbol<Variable> >("c", ptrtype);
   function->variablePushBack(csym);
 
   Builder::VariableTerminal a = {{"a"}};
   Builder::GlobalVariableTerminal b = {{"b"}};
   Builder::VariableTerminal c = {{"c"}};
 
-  ptr<Node<Base> >::type stmt =
+  ptr<Node<Base> > stmt =
     Builder::translateWithGrammar<Builder::ConstructStatementGrammar>(
       module, function,
       do_[

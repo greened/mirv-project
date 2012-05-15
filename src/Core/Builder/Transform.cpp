@@ -8,7 +8,7 @@
 
 namespace mirv {
   namespace Builder {
-    ptr<Statement<Base> >::type
+    ptr<Statement<Base> >
     AddAllocateStatement::operator()(boost::shared_ptr<SymbolTable> symtab,
                                      boost::shared_ptr<Statement<Base> > stmt)
     {
@@ -17,14 +17,14 @@ namespace mirv {
       return stmt;
     }
 
-    ptr<Symbol<Variable> >::type
+    ptr<Symbol<Variable> >
     ExtractVariable::operator()(boost::shared_ptr<SymbolTable> symtab,
-                                ptr<Statement<Base> >::type stmt)
+                                ptr<Statement<Base> > stmt)
     {
-      ptr<Statement<Allocate > >::type allocate =
+      ptr<Statement<Allocate > > allocate =
         safe_cast<Statement<Allocate> >(stmt);
 
-      ptr<Expression<Reference<Variable> > >::type vref =
+      ptr<Expression<Reference<Variable> > > vref =
         safe_cast<Expression<Reference<Variable> > >(
           allocate->getLeftExpression());
 

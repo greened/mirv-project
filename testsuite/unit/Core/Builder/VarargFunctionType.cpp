@@ -53,7 +53,7 @@ using Builder::vararg;
 
 int main(void)
 {
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
         func["testfunc"].type[void_(int_(32), int_(16), vararg)] [

@@ -58,12 +58,12 @@ namespace mirv {
                                   std::placeholders::_1, name));
   }
 
-  void Module::initialize(ptr<Symbol<Module> >::type module)
+  void Module::initialize(ptr<Symbol<Module> > module)
   {
     // Every module must have at least a 64-bit integer type.  This
     // allows bootstraping of the IR since we need this type to create
     // integer constants.
-    ptr<Symbol<Type<TypeBase> > >::const_type type =
+    ptr<const Symbol<Type<TypeBase> > > type =
       make<Symbol<Type<Integral> > >(64);
     type->setParent(module);
     module->typePushBack(type);

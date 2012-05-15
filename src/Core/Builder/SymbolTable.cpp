@@ -40,9 +40,9 @@ namespace mirv {
       return function;
     }
 
-    ptr<SymbolTable>::type
+    ptr<SymbolTable>
     SymbolTable::make(ModulePointer m) {
-      ptr<SymbolTable>::type result(new SymbolTable(m, FunctionPointer()));
+      ptr<SymbolTable> result(new SymbolTable(m, FunctionPointer()));
       return result;
     }
 
@@ -56,7 +56,7 @@ namespace mirv {
       return name;
     }
 
-    ptr<Symbol<Type<TypeBase> > >::const_type
+    ptr<const Symbol<Type<TypeBase> > >
     SymbolTable::addPlaceholder(const std::string &name) 
     {
       // It's ok if this already exists.
@@ -65,34 +65,34 @@ namespace mirv {
         first->second;
     }
 
-    ptr<Symbol<Type<Placeholder> > >::const_type
+    ptr<const Symbol<Type<Placeholder> > >
     SymbolTable::lookupPlaceholder(const std::string &name) const
     {
       auto p = placeholders.find(name);
       if (p != placeholders.end()) {
-        ptr<Symbol<Type<Placeholder> > >::const_type result = p->second;
+        ptr<const Symbol<Type<Placeholder> > > result = p->second;
         return result;
       }
-      return ptr<Symbol<Type<Placeholder> > >::const_type();
+      return ptr<const Symbol<Type<Placeholder> > >();
     }
 
-    ptr<Symbol<Type<Placeholder> > >::const_type
+    ptr<const Symbol<Type<Placeholder> > >
     SymbolTable::removePlaceholder(const std::string &name)
     {
       auto p = placeholders.find(name);
       if (p != placeholders.end()) {
-        ptr<Symbol<Type<Placeholder> > >::const_type result = p->second;
+        ptr<const Symbol<Type<Placeholder> > > result = p->second;
         placeholders.erase(p);
         return result;
       }
       error("Missing placeholder!");
-      return ptr<Symbol<Type<Placeholder> > >::const_type();
+      return ptr<const Symbol<Type<Placeholder> > >();
     }
 
     void
     SymbolTable::resolve(const std::string &oldName,
-                         ptr<Symbol<Type<Placeholder> > >::const_type placeholder,
-                         ptr<Symbol<Type<TypeBase> > >::const_type replacement)
+                         ptr<const Symbol<Type<Placeholder> > > placeholder,
+                         ptr<const Symbol<Type<TypeBase> > > replacement)
     {
       for (auto type = module->typeBegin();
            type != module->typeEnd();
@@ -107,7 +107,7 @@ namespace mirv {
 
     /// Get the variable symbol at the current scope only.  Return a
     /// null pointer if the symbol does not exist.
-    ptr<Symbol<Variable> >::type
+    ptr<Symbol<Variable> >
     SymbolTable::lookupAtCurrentScope(const std::string &name,
                                       Symbol<Variable> *) const {
       if (function) {
@@ -116,24 +116,24 @@ namespace mirv {
           return *i;
         }
       }
-      return ptr<Symbol<Variable> >::type();
+      return ptr<Symbol<Variable> >();
     } 
 
     /// Get the global variable symbol at the current scope only.
     /// Return a null pointer if the symbol does not exist.
-    ptr<Symbol<GlobalVariable> >::type
+    ptr<Symbol<GlobalVariable> >
     SymbolTable::lookupAtCurrentScope(const std::string &name,
                                       Symbol<GlobalVariable> *) const {
       Symbol<Module>::GlobalVariableIterator i = module->globalVariableFind(name);
       if (i != module->globalVariableEnd()) {
         return *i;
       }
-      return ptr<Symbol<GlobalVariable> >::type();
+      return ptr<Symbol<GlobalVariable> >();
     } 
 
     /// Get the globalvariable symbol at module scope only.  Return a
     /// null pointer if the symbol does not exist.
-    ptr<Symbol<GlobalVariable> >::type
+    ptr<Symbol<GlobalVariable> >
     SymbolTable::lookupAtModuleScope(const std::string &name,
                                      Symbol<GlobalVariable> *) const {
       Symbol<Module>::GlobalVariableIterator i =
@@ -141,22 +141,22 @@ namespace mirv {
       if (i != module->globalVariableEnd()) {
         return *i;
       }
-      return ptr<Symbol<GlobalVariable> >::type();
+      return ptr<Symbol<GlobalVariable> >();
     } 
      
     /// Get the function symbol at the module scope only.  Return a
     /// null pointer if the symbol does not exist.
-    ptr<Symbol<Function> >::type
+    ptr<Symbol<Function> >
     SymbolTable::lookupAtModuleScope(const std::string &name,
                                      Symbol<Function> *) const {
       Symbol<Module>::FunctionIterator i = module->functionFind(name);
       if (i != module->functionEnd()) {
         return *i;
       }
-      return ptr<Symbol<Function> >::type();
+      return ptr<Symbol<Function> >();
     }
 
-    ptr<Symbol<Function> >::type
+    ptr<Symbol<Function> >
     SymbolTable::lookupAtCurrentScope(const std::string &name,
                                       Symbol<Function> *dummy) const {
       return lookupAtModuleScope(name, dummy);
@@ -164,7 +164,7 @@ namespace mirv {
 
     /// Get the type symbol at the current scope only.  Return a
     /// null pointer if the symbol does not exist.
-    ptr<Symbol<Type<TypeBase> > >::const_type
+    ptr<const Symbol<Type<TypeBase> > >
     SymbolTable::lookupAtModuleScope(const std::string &name,
                                      const Symbol<Type<TypeBase> > *) const {
       Symbol<Module>::ConstTypeIterator i = module->typeFind(name);
@@ -178,13 +178,13 @@ namespace mirv {
         return placeholder;
       }
 
-      return ptr<Symbol<Type<TypeBase> > >::const_type();
+      return ptr<const Symbol<Type<TypeBase> > >();
     }
 
-    ptr<Symbol<Variable> >::type
+    ptr<Symbol<Variable> >
     SymbolTable::lookupAtAllScopes(const std::string &name,
                                    Symbol<Variable> *) const {
-      ptr<Symbol<Variable> >::type var =
+      ptr<Symbol<Variable> > var =
         lookupAtCurrentScope(name, reinterpret_cast<Symbol<Variable> *>(0));
       if (!var) {
         error("Could not find variable");
@@ -192,12 +192,12 @@ namespace mirv {
       return var;
     } 
 
-    ptr<Symbol<GlobalVariable> >::type
+    ptr<Symbol<GlobalVariable> >
     SymbolTable::lookupAtAllScopes(const std::string &name,
                                    Symbol<GlobalVariable> *) const {
       // Look up at module scope
-      SymbolTable ModuleScope(module, ptr<Symbol<Function> >::type());
-      ptr<Symbol<GlobalVariable> >::type var = ModuleScope.lookupAtCurrentScope(
+      SymbolTable ModuleScope(module, ptr<Symbol<Function> >());
+      ptr<Symbol<GlobalVariable> > var = ModuleScope.lookupAtCurrentScope(
         name,
         reinterpret_cast<Symbol<GlobalVariable> *>(0));
       if (!var) {
@@ -206,10 +206,10 @@ namespace mirv {
       return var;
     }
      
-    ptr<Symbol<Function> >::type
+    ptr<Symbol<Function> >
     SymbolTable::lookupAtAllScopes(const std::string &name,
                                    Symbol<Function> *) const {
-      ptr<Symbol<Function> >::type function =
+      ptr<Symbol<Function> > function =
         lookupAtModuleScope(name, reinterpret_cast<Symbol<Function> *>(0));
       if (!function) {
         error("Could not find function");
@@ -217,12 +217,12 @@ namespace mirv {
       return function;
     }
 
-    ptr<Symbol<Type<TypeBase> > >::const_type
+    ptr<const Symbol<Type<TypeBase> > >
     SymbolTable::lookupAtAllScopes(const std::string &name,
                                    const Symbol<Type<TypeBase> > *) const {
       std::string realName = translateName(name);
 
-      ptr<Symbol<Type<TypeBase> > >::const_type type =
+      ptr<const Symbol<Type<TypeBase> > > type =
         lookupAtModuleScope(realName,
                             reinterpret_cast<const Symbol<Type<TypeBase> > *>(0));
       if (!type) {
@@ -232,8 +232,8 @@ namespace mirv {
     }
 
     void
-    SymbolTable::addAtCurrentScope(ptr<Symbol<Variable> >::type var) {
-      ptr<Symbol<Variable> >::type result =
+    SymbolTable::addAtCurrentScope(ptr<Symbol<Variable> > var) {
+      ptr<Symbol<Variable> > result =
         lookupAtCurrentScope(var->name(),
                              reinterpret_cast<Symbol<Variable> *>(0));
       if (result) {
@@ -247,8 +247,8 @@ namespace mirv {
     }
 
     void
-    SymbolTable::addAtCurrentScope(ptr<Symbol<GlobalVariable> >::type var) {
-      ptr<Symbol<GlobalVariable> >::type result =
+    SymbolTable::addAtCurrentScope(ptr<Symbol<GlobalVariable> > var) {
+      ptr<Symbol<GlobalVariable> > result =
         lookupAtCurrentScope(var->name(),
                              reinterpret_cast<Symbol<GlobalVariable> *>(0));
       if (result) {
@@ -258,13 +258,13 @@ namespace mirv {
     }
 
     void
-    SymbolTable::addAtCurrentScope(ptr<Symbol<Function> >::type func) {
+    SymbolTable::addAtCurrentScope(ptr<Symbol<Function> > func) {
       addAtModuleScope(func);
     }
 
     void
-    SymbolTable::addAtModuleScope(ptr<Symbol<Function> >::type func) {
-      ptr<Symbol<Function> >::type result =
+    SymbolTable::addAtModuleScope(ptr<Symbol<Function> > func) {
+      ptr<Symbol<Function> > result =
         lookupAtModuleScope(func->name(),
                              reinterpret_cast<Symbol<Function> *>(0));
       if (result) {
@@ -274,21 +274,21 @@ namespace mirv {
     }
 
     void
-    SymbolTable::addAtCurrentScope(ptr<Symbol<Type<TypeBase> > >::const_type type) {
+    SymbolTable::addAtCurrentScope(ptr<const Symbol<Type<TypeBase> > > type) {
       addAtModuleScope(type);
     }
 
     void
-    SymbolTable::addAtModuleScope(ptr<Symbol<Type<TypeBase> > >::const_type type) {
+    SymbolTable::addAtModuleScope(ptr<const Symbol<Type<TypeBase> > > type) {
       type->setParent(getModule());
 
       std::ostringstream name;
       print(name, type);
-      ptr<Symbol<Type<TypeBase> > >::const_type result =
+      ptr<const Symbol<Type<TypeBase> > > result =
         lookupAtModuleScope(name.str(),
                             reinterpret_cast<const Symbol<Type<TypeBase> > *>(0));
       if (result) {
-        ptr<Symbol<Type<Placeholder> > >::const_type placeholder =
+        ptr<const Symbol<Type<Placeholder> > > placeholder =
           dyn_cast<const Symbol<Type<Placeholder> > >(result);
         if (!placeholder) {
           error("Type already exists");
@@ -298,9 +298,9 @@ namespace mirv {
     }
 
     void
-    SymbolTable::addAtModuleScope(ptr<Symbol<GlobalVariable> >::type var)
+    SymbolTable::addAtModuleScope(ptr<Symbol<GlobalVariable> > var)
     {
-      ptr<Symbol<GlobalVariable> >::type result =
+      ptr<Symbol<GlobalVariable> > result =
         lookupAtModuleScope(var->name(),
                             reinterpret_cast<Symbol<GlobalVariable> *>(0));
       if (result) {

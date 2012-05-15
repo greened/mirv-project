@@ -43,19 +43,19 @@ using Builder::func;
 
 int main(void)
 {
-  ptr<Symbol<Module> >::type module = make<Symbol<Module> >("testmodule");
+  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
 
-  ptr<Symbol<Type<TypeBase> > >::type functype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >::type());
+  ptr<Symbol<Type<TypeBase> > > functype =
+    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >());
   module->typePushBack(functype);
 
-  ptr<Symbol<Type<TypeBase> > >::type inttype =
+  ptr<Symbol<Type<TypeBase> > > inttype =
     make<Symbol<Type<Integral> > >(32);
   module->typePushBack(inttype);
 
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::FunctionBuilder>(
-      module, ptr<Symbol<Function> >::type(),
+      module, ptr<Symbol<Function> >(),
       func["testfunc"].type["void ()"] [
 	var["a"].type["int32"]
       ]

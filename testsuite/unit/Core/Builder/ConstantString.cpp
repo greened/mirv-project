@@ -79,7 +79,7 @@ int main(void)
   Builder::VariableTerminal i = {{"i"}};
   Builder::FunctionTerminal printf_ = {{"printf"}};
 
-  ptr<Node<Base> >::type code =
+  ptr<Node<Base> > code =
     Builder::translateWithGrammar<Builder::ModuleBuilder>(
       module["testmodule"] [
         func["printf"].type[int_(32)(*int_(8), vararg)],

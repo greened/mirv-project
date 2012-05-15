@@ -21,7 +21,7 @@ namespace mirv {
           public boost::enable_shared_from_this<Expression<Load> > {
     private:
       Expression<Base> *cloneImpl(void) {
-        ptr<Expression<Load> >::type expr(
+        ptr<Expression<Load> > expr(
           mirv::make<Expression<Load> >(getOperand()->clone()));
         Expression<Load> *result = expr.get();
         expr.reset();
@@ -33,14 +33,14 @@ namespace mirv {
     public:
       LoadInterface(ChildPtr address);
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(this->shared_from_this());
       }
 
-      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
+      typedef ptr<const Symbol<Type<TypeBase> > > TypePtr;
       TypePtr type(void) const;
     };
   }
@@ -75,14 +75,14 @@ namespace mirv {
       TuplePointerInterface(ChildPtr Base, ChildPtr Offset, InputIterator start, InputIterator end)
           : InnerExpression(Base, Offset, start, end) {}
 
-      ptr<Node<Base> >::type getSharedHandle(void) {
+      ptr<Node<Base> > getSharedHandle(void) {
         return fast_cast<Node<Base>>(this->shared_from_this());
       }
-      ptr<Node<Base> >::const_type getSharedHandle(void) const {
+      ptr<const Node<Base> > getSharedHandle(void) const {
         return fast_cast<const Node<Base>>(this->shared_from_this());
       }
 
-      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
+      typedef ptr<const Symbol<Type<TypeBase> > > TypePtr;
       TypePtr type(void) const;
     };
   }

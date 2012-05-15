@@ -44,40 +44,40 @@ namespace mirv {
     Symbol(Args ...args) : BaseType(args...) {}
 
   public:
-    static typename ptr<Symbol<Tag> >::type
+    static ptr<Symbol<Tag> >
     make(void) {
-      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>());
+      ptr<Symbol<Tag> > result(new Symbol<Tag>());
       Tag::initialize(result);
       return result;
     }
 
     template<typename A1>
-    static typename ptr<Symbol<Tag> >::type
+    static ptr<Symbol<Tag> >
     make(A1 a1) {
-      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1));
+      ptr<Symbol<Tag> > result(new Symbol<Tag>(a1));
       Tag::initialize(result);
       return result;
     }
 
     template<typename A1, typename A2>
-    static typename ptr<Symbol<Tag> >::type
+    static ptr<Symbol<Tag> >
     make(A1 a1, A2 a2) {
-      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2));
+      ptr<Symbol<Tag> > result(new Symbol<Tag>(a1, a2));
       Tag::initialize(result);
       return result;
     }
 
     template<typename A1, typename A2, typename A3>
-    static typename ptr<Symbol<Tag> >::type
+    static ptr<Symbol<Tag> >
     make(A1 a1, A2 a2, A3 a3) {
-      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2, a3));
+      ptr<Symbol<Tag> > result(new Symbol<Tag>(a1, a2, a3));
       return result;
     }
 
     template<typename A1, typename A2, typename A3, typename A4>
-    static typename ptr<Symbol<Tag> >::type
+    static ptr<Symbol<Tag> >
     make(A1 a1, A2 a2, A3 a3, A4 a4) {
-      typename ptr<Symbol<Tag> >::type result(new Symbol<Tag>(a1, a2, a3, a4));
+      ptr<Symbol<Tag> > result(new Symbol<Tag>(a1, a2, a3, a4));
       return result;
     }
 
@@ -138,11 +138,11 @@ namespace mirv {
 				const std::string &,
 				bool> {
   private:
-    typedef std::binary_function<typename ptr<Symbol<SymbolTag> >::const_type,
+    typedef std::binary_function<ptr<const Symbol<SymbolTag> >,
 				 const std::string &,
 				 bool> BaseType;
   public:
-    bool operator()(typename ptr<Symbol<SymbolTag> >::const_type symbol,
+    bool operator()(ptr<const Symbol<SymbolTag> > symbol,
 		    const std::string &name) const {
       return symbol->name() == name;
     }
@@ -155,11 +155,11 @@ namespace mirv {
 				const std::string &,
 				bool> {
   private:
-    typedef std::binary_function<typename ptr<Symbol<Type<TypeTag> > >::const_type,
+    typedef std::binary_function<ptr<const Symbol<Type<TypeTag> > >,
 				 const std::string &,
 				 bool> BaseType;
   public:
-    bool operator()(typename ptr<Symbol<Type<TypeTag> > >::const_type symbol,
+    bool operator()(ptr<const Symbol<Type<TypeTag> > > symbol,
 		    const std::string &name) const {
       std::ostringstream typeName;
       print(typeName, symbol);
@@ -177,7 +177,7 @@ namespace mirv {
        typedef Symbol<Base> BaseType;
 
      private:
-       typedef ptr<Child>::type ChildPtr;
+       typedef ptr<Child> ChildPtr;
        typedef std::list<ChildPtr> ChildList;
 
      public:
@@ -220,7 +220,7 @@ namespace mirv {
   namespace detail {
     class TypedInterface : public virtual Symbol<Base> { 
     public:
-      typedef ptr<Symbol<Type<TypeBase> > >::const_type TypePtr;
+      typedef ptr<const Symbol<Type<TypeBase> > > TypePtr;
 
     private:
       TypePtr theType;
