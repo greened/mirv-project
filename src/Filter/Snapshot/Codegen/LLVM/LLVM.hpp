@@ -21,7 +21,7 @@
 
 namespace mirv {
   /// This is a filter to translate from MIRV IR to LLVM IR.
-  class LLVMCodegenFilter : public Filter<Node<Base> > {
+  class LLVMCodegenFilter : public ConstFilter<Node<Base> > {
   public:
     class InheritedAttribute;
 
@@ -559,10 +559,14 @@ namespace mirv {
     llvm::Module *TheModule;
 
   public:
-    LLVMCodegenFilter(void) : Filter<Node<Base> >(), TheModule(0) {}
+    LLVMCodegenFilter(void)
+    : ConstFilter<Node<Base> >(NullDependence::begin(), NullDependence::end(),
+                               NullDependence::begin(), NullDependence::end(),
+                               NullDependence::begin(), NullDependence::end()),
+        TheModule(0) {}
 
     /// Translate an IR tree.
-    void operator()(ptr<Node<Base> > node);
+    void operator()(ptr<const Node<Base> > node);
 
     llvm::Module *getModule(void) const {
       checkInvariant(TheModule, "Null module");
