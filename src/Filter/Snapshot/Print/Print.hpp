@@ -16,7 +16,11 @@ namespace mirv {
     Stream &out;
 
   public:
-    PrintFilter(Stream &o) : out(o) {}
+    PrintFilter(Stream &o)
+    : ConstFilter<Node<Base> >(NullDependence::begin(), NullDependence::end(),
+                               NullDependence::begin(), NullDependence::end(),
+                               NullDependence::begin(), NullDependence::end()),
+        out(o) {}
 
     void operator()(ptr<const Node<Base> > node);
   };

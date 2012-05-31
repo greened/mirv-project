@@ -1158,10 +1158,10 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::operator()(ptr<Node<Base> > node)
+  void LLVMCodegenFilter::operator()(ptr<const Node<Base> > node)
   {
-    if (ptr<Symbol<Module> > s =
-        boost::dynamic_pointer_cast<Symbol<Module> >(node)) {
+    if (ptr<const Symbol<Module> > s =
+        boost::dynamic_pointer_cast<const Symbol<Module> >(node)) {
       ptr<LLVMCodegenSymbolFlow> flow(new LLVMCodegenSymbolFlow());
       s->accept(*flow);
       TheModule =
@@ -1172,11 +1172,13 @@ namespace mirv {
     }
 
     //if (ptr<const Statement<Base> > s = dyn_cast<Statement<Base> >(node)) {
-    if (ptr<Statement<Base> > s = boost::dynamic_pointer_cast<Statement<Base> >(node)) {
+    if (ptr<const Statement<Base> > s =
+        boost::dynamic_pointer_cast<const Statement<Base> >(node)) {
       ptr<LLVMCodegenFlow> flow(new LLVMCodegenFlow());
       s->accept(*flow);
     }
-    else if (ptr<Expression<Base> > e = boost::dynamic_pointer_cast<Expression<Base> >(node)) {
+    else if (ptr<const Expression<Base> > e =
+             boost::dynamic_pointer_cast<const Expression<Base> >(node)) {
       ptr<LLVMCodegenExpressionFlow> flow(new LLVMCodegenExpressionFlow());
       e->accept(*flow);
     }
