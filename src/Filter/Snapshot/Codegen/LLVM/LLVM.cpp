@@ -1158,7 +1158,12 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::operator()(ptr<const Node<Base> > node)
+  void LLVMCodegenFilter::run(ptr<Node<Base> > node)
+  {
+    run(boost::const_pointer_cast<const Node<Base> >(node));
+  }
+
+  void LLVMCodegenFilter::run(ptr<const Node<Base> > node)
   {
     if (ptr<const Symbol<Module> > s =
         boost::dynamic_pointer_cast<const Symbol<Module> >(node)) {

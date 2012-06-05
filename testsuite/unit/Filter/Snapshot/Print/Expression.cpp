@@ -22,6 +22,7 @@
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
+using mirv::Node;
 using mirv::Symbol;
 using mirv::Variable;
 using mirv::Type;
@@ -64,10 +65,10 @@ int main(void)
 	     Expression<Reference<Variable> >::make(c)),
 	   Expression<Reference<Variable> >::make(d)),
 	 Expression<Negate>::make(Expression<Reference<Variable> >::make(e))));
-   
+
    PrintFilter print(std::cout);
 
-   print(expr);
+   print(boost::static_pointer_cast<Node<Base> >(expr));
 
    return(0);
 }

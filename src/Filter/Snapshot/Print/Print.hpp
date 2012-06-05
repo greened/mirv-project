@@ -8,21 +8,22 @@
 
 namespace mirv {
   /// This is a filter to print MIRV IR in textual form.
-  class PrintFilter : public ConstFilter<Node<Base> > {
+  class PrintFilter : public Filter<Node<Base> > {
   private:
     typedef Printer::Stream Stream;
 
     /// A handle to the output stream.
     Stream &out;
 
+    void run(ptr<Node<Base> > node);
+    void run(ptr<const Node<Base> > node);
+
   public:
     PrintFilter(Stream &o)
-    : ConstFilter<Node<Base> >(NullDependence::begin(), NullDependence::end(),
-                               NullDependence::begin(), NullDependence::end(),
-                               NullDependence::begin(), NullDependence::end()),
+    : Filter<Node<Base> >(NullDependence::begin(), NullDependence::end(),
+                          NullDependence::begin(), NullDependence::end(),
+                          NullDependence::begin(), NullDependence::end()),
         out(o) {}
-
-    void operator()(ptr<const Node<Base> > node);
   };
 }
 

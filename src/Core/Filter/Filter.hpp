@@ -6,6 +6,9 @@
 #include <mirv/Core/Containers/Vector.hpp>
 
 namespace mirv {
+  /// This is the base class for all IR filters.  A filter is
+  /// essenetially a pass that examines and/or modifies the IR in some
+  /// way.
   class FilterBase {
   private:
     typedef Vector<std::string>::type DependenceVector;
@@ -33,6 +36,7 @@ namespace mirv {
       }
     };
 
+    virtual void run(ptr<Node<Base> > node) = 0;
     virtual void run(ptr<const Node<Base> > node) = 0;
 
   public:
@@ -55,20 +59,19 @@ namespace mirv {
       return Dependencies(killsVector.begin(), killsVector.end());
     }
 
+    void operator()(ptr<Node<Base> > node) {
+      run(node);
+    }
     void operator()(ptr<const Node<Base> > node) {
       run(node);
     }
   };
 
-  /// This is the base class for all IR filters that mutate the IR.  A
-  /// filter is essenetially a pass that examines and/or modifies the
-  /// IR in some way.
   template<typename Visited, typename Result = void>
   class Filter : public FilterBase {
   private:
-    virtual void run(ptr<const Node<Base> > node) {
-      this->operator()(node);
-    }
+    virtual void run(ptr<Node<Base> > node) {}
+    virtual void run(ptr<const Node<Base> > node) {}
 
   public:
     template<typename InputIterator>
@@ -80,34 +83,6 @@ namespace mirv {
                      killsBegin, killsEnd) {}
 
     typedef Result result_type;
-
-    /// Examine and/or operate on the given IR tree.
-    virtual result_type operator()(ptr<Visited> node) = 0;
-  };
-
-  /// This is the base class for all IR filters that do not mutate the
-  /// IR.  A filter is essenetially a pass that examines and/or
-  /// modifies the IR in some way.
-  template<typename Visited, typename Result = void>
-  class ConstFilter : public FilterBase {
-  private:
-    virtual void run(ptr<const Node<Base> > node) {
-      this->operator()(node);
-    }
-
-  public:
-    template<typename InputIterator>
-    ConstFilter(InputIterator requiresBegin, InputIterator requiresEnd,
-                InputIterator providesBegin, InputIterator providesEnd,
-                InputIterator killsBegin, InputIterator killsEnd)
-        : FilterBase(requiresBegin, requiresEnd,
-                     providesBegin, providesEnd,
-                     killsBegin, killsEnd) {}
-
-    typedef Result result_type;
-
-    /// Examine and/or operate on the given IR tree.
-    virtual result_type operator()(ptr<const Visited> node) = 0;
   };
 
   class NullDependence {

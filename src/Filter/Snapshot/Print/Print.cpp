@@ -5,7 +5,12 @@
 #include <mirv/Core/Utility/Printer.hpp>
 
 namespace mirv {
-  void PrintFilter::operator()(ptr<const Node<Base> > node)
+  void PrintFilter::run(ptr<Node<Base> > node)
+  {
+    run(boost::const_pointer_cast<const Node<Base> >(node));
+  }
+
+  void PrintFilter::run(ptr<const Node<Base> > node)
   {
     print(out, node);
   }

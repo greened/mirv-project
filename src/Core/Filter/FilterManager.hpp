@@ -78,9 +78,8 @@ namespace mirv {
       }
     }
 
-    void run(ptr<Symbol<Module> > module);
-    void run(ptr<Symbol<Function> > function);
     void run(ptr<Node<Base> > node);
+    void run(ptr<const Node<Base> > node);
   };
 }
 
