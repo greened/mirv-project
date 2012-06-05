@@ -21,7 +21,7 @@
 
 namespace mirv {
   /// This is a filter to translate from MIRV IR to LLVM IR.
-  class LLVMCodegenFilter : public ConstFilter<Node<Base> > {
+  class LLVMCodegenFilter : public Filter<Node<Base> > {
   public:
     class InheritedAttribute;
 
@@ -43,14 +43,14 @@ namespace mirv {
       typedef Map<std::string, llvm::Value *>::type VariableMap;
       ptr<VariableMap> ModuleMap;
       ptr<VariableMap> FunctionMap;
-      
+
       class TypeCreator : public ConstSymbolVisitor {
       private:
         llvm::LLVMContext &Context;
         llvm::Type *TheType;
 
       public:
-        TypeCreator(llvm::LLVMContext &context) 
+        TypeCreator(llvm::LLVMContext &context)
             : Context(context) {}
 
         virtual void visit(ptr<const Symbol<Type<Integral> > >);
@@ -70,7 +70,7 @@ namespace mirv {
       }
 
     public:
-      FlowAttribute(void) 
+      FlowAttribute(void)
           : Context(&llvm::getGlobalContext()),
               Builder(new llvm::IRBuilder<>(*Context)),
               TheModule(0),
@@ -558,15 +558,16 @@ namespace mirv {
 
     llvm::Module *TheModule;
 
+    /// Translate an IR tree.
+    void run(ptr<Node<Base> > node);
+    void run(ptr<const Node<Base> > node);
+
   public:
     LLVMCodegenFilter(void)
-    : ConstFilter<Node<Base> >(NullDependence::begin(), NullDependence::end(),
-                               NullDependence::begin(), NullDependence::end(),
-                               NullDependence::begin(), NullDependence::end()),
+    : Filter<Node<Base> >(NullDependence::begin(), NullDependence::end(),
+                          NullDependence::begin(), NullDependence::end(),
+                          NullDependence::begin(), NullDependence::end()),
         TheModule(0) {}
-
-    /// Translate an IR tree.
-    void operator()(ptr<const Node<Base> > node);
 
     llvm::Module *getModule(void) const {
       checkInvariant(TheModule, "Null module");

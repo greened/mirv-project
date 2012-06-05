@@ -16,7 +16,7 @@ namespace mirv {
   namespace {
     llvm::Module *codegen(ptr<Symbol<Module> > module) {
       LLVMCodegenFilter codegen;
-      codegen(module);
+      codegen(boost::static_pointer_cast<Node<Base> >(module));
       return codegen.getModule();
     }
   }

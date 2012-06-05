@@ -84,6 +84,7 @@
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
+using mirv::Node;
 using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
@@ -219,7 +220,7 @@ int main(void)
 
   PrintFilter print(std::cout);
 
-  print(m);
+  print(boost::static_pointer_cast<Node<Base> >(m));
 
   return(0);
 }

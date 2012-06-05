@@ -29,17 +29,12 @@ namespace mirv {
     }
   }
 
-  void FilterManager::run(ptr<Symbol<Module> > module) {
-    for (auto f : filters) {
-      (*f)(module);
-    }
-  }
-  void FilterManager::run(ptr<Symbol<Function> > function) {
-    for (auto f : filters) {
-      (*f)(function);
-    }
-  }
   void FilterManager::run(ptr<Node<Base> > node) {
+    for (auto f : filters) {
+      (*f)(node);
+    }
+  }
+  void FilterManager::run(ptr<const Node<Base> > node) {
     for (auto f : filters) {
       (*f)(node);
     }

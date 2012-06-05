@@ -71,7 +71,7 @@ int main(void)
       ));
 
   mirv::LLVMCodegenFilter codegen;
-  codegen(code);
+  codegen(boost::static_pointer_cast<Node<Base> >(code));
 
   std::function<void(void)> testfunc;
   mirv::JITContextHandle JITContext;

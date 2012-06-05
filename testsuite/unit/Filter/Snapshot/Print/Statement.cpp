@@ -65,6 +65,7 @@
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
+using mirv::Node;
 using mirv::Symbol;
 using mirv::Variable;
 using mirv::Constant;
@@ -161,7 +162,7 @@ int main(void)
 
   PrintFilter print(std::cout);
 
-  print(dowhile);
+  print(boost::static_pointer_cast<Node<Base> >(dowhile));
 
   return(0);
 }
