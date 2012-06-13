@@ -9,6 +9,7 @@
 #include <mirv/Core/IR/FunctionFwd.hpp>
 #include <mirv/Library/Singleton.hpp>
 
+#include <boost/range/iterator_range.hpp>
 #include <functional>
 
 namespace mirv {
@@ -32,18 +33,17 @@ namespace mirv {
   public:
     static void registerFilter(FilterConstructor factory,
                                const std::string &data);
-    template<typename InputIterator>
+    template<typename ForwardRange>
     static void registerFilter(FilterConstructor factory,
-                               InputIterator dataBegin,
-                               InputIterator dataEnd) {
-      for (auto i = dataBegin; i != dataEnd; ++i) {
+                               ForwardRange data) {
+      for (auto i : data) {
         registerFilter(factory, *i);
       }
     }
 
-    typedef ProvidesMap::const_iterator const_iterator;
-    std::pair<const_iterator, const_iterator>
-    providers(const std::string &dependence) {
+    typedef boost::iterator_range<ProvidesMap::const_iterator> range;
+
+    range providers(const std::string &dependence) {
       return provides.equal_range(dependence);
     }
   };

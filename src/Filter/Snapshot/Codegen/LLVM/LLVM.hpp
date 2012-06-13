@@ -564,10 +564,7 @@ namespace mirv {
 
   public:
     LLVMCodegenFilter(void)
-    : Filter<Node<Base> >(NullDependence::begin(), NullDependence::end(),
-                          NullDependence::begin(), NullDependence::end(),
-                          NullDependence::begin(), NullDependence::end()),
-        TheModule(0) {}
+    : Filter<Node<Base> >(range(), range(), range()), TheModule(0) {}
 
     llvm::Module *getModule(void) const {
       checkInvariant(TheModule, "Null module");

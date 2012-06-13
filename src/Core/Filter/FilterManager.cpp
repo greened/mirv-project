@@ -18,13 +18,12 @@ namespace mirv {
   void FilterManager::addRequired(const std::string &dependence) {
     LiveSet addedFilters;
     if (liveFilters.find(dependence) == liveFilters.end()) {
-      FilterDependenceManager::const_iterator begin, end;
-      std::tie(begin, end) =
+      FilterDependenceManager::range providers =
         FilterDependenceManager::instance().providers(dependence);
-      checkInvariant(begin != end, "No providers for " + dependence);
+      checkInvariant(!providers.empty(), "No providers for " + dependence);
 
-      // Just pick the frist one.
-      add(begin->second());
+      // Just pick the first one.
+      add(providers.begin()->second());
       liveFilters.insert(dependence);
     }
   }

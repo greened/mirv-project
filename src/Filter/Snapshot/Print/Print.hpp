@@ -20,10 +20,7 @@ namespace mirv {
 
   public:
     PrintFilter(Stream &o)
-    : Filter<Node<Base> >(NullDependence::begin(), NullDependence::end(),
-                          NullDependence::begin(), NullDependence::end(),
-                          NullDependence::begin(), NullDependence::end()),
-        out(o) {}
+    : Filter<Node<Base> >(range(), range(), range()), out(o) {}
   };
 }
 

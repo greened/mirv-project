@@ -5,6 +5,8 @@
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Containers/Vector.hpp>
 
+#include <boost/range/iterator_range.hpp>
+
 namespace mirv {
   /// This is the base class for all IR filters.  A filter is
   /// essenetially a pass that examines and/or modifies the IR in some
@@ -16,47 +18,29 @@ namespace mirv {
     DependenceVector providesVector;
     DependenceVector killsVector;
 
-    class Dependencies {
-    private:
-      DependenceVector::const_iterator first;
-      DependenceVector::const_iterator last;
-    public:
-      Dependencies(DependenceVector::const_iterator begin,
-                   DependenceVector::const_iterator end)
-          : first(begin), last(end) {}
-
-      typedef DependenceVector::const_iterator iterator;
-      typedef DependenceVector::const_iterator const_iterator;
-
-      const_iterator begin(void) const {
-        return first;
-      }
-      const_iterator end(void) const {
-        return last;
-      }
-    };
-
     virtual void run(ptr<Node<Base> > node) = 0;
     virtual void run(ptr<const Node<Base> > node) = 0;
 
   public:
-    template<typename InputIterator>
-    FilterBase(InputIterator requiresBegin, InputIterator requiresEnd,
-               InputIterator providesBegin, InputIterator providesEnd,
-               InputIterator killsBegin, InputIterator killsEnd)
-        : requiresVector(requiresBegin, requiresEnd),
-            providesVector(providesBegin, providesEnd),
-            killsVector(killsBegin, killsEnd) {}
+    template<typename ForwardRange>
+    FilterBase(ForwardRange require,
+               ForwardRange provide,
+               ForwardRange kill)
+        : requiresVector(require.begin(), require.end()),
+            providesVector(provide.begin(), provide.end()),
+            killsVector(kill.begin(), kill.end()) {}
     virtual ~FilterBase(void);
 
-    Dependencies requires(void) const {
-      return Dependencies(requiresVector.begin(), requiresVector.end());
+    typedef boost::iterator_range<DependenceVector::const_iterator> range;
+
+    range requires(void) const {
+      return range(requiresVector.begin(), requiresVector.end());
     }
-    Dependencies provides(void) const {
-      return Dependencies(providesVector.begin(), providesVector.end());
+    range provides(void) const {
+      return range(providesVector.begin(), providesVector.end());
     }
-    Dependencies kills(void) const {
-      return Dependencies(killsVector.begin(), killsVector.end());
+    range kills(void) const {
+      return range(killsVector.begin(), killsVector.end());
     }
 
     void operator()(ptr<Node<Base> > node) {
@@ -74,30 +58,13 @@ namespace mirv {
     virtual void run(ptr<const Node<Base> > node) {}
 
   public:
-    template<typename InputIterator>
-    Filter(InputIterator requiresBegin, InputIterator requiresEnd,
-           InputIterator providesBegin, InputIterator providesEnd,
-           InputIterator killsBegin, InputIterator killsEnd)
-        : FilterBase(requiresBegin, requiresEnd,
-                     providesBegin, providesEnd,
-                     killsBegin, killsEnd) {}
+    template<typename ForwardRange>
+    Filter(ForwardRange requires,
+           ForwardRange provides,
+           ForwardRange kills)
+        : FilterBase(requires, provides, kills) {}
 
     typedef Result result_type;
-  };
-
-  class NullDependence {
-  public:
-    typedef const std::vector<std::string> StringVector;
-
-    static StringVector::const_iterator begin() {
-      return nullVector.begin();
-    }
-    static StringVector::const_iterator end() {
-      return nullVector.end();
-    }
-
-  private:
-    static StringVector nullVector;
   };
 }
 
