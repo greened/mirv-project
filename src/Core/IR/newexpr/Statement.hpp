@@ -29,9 +29,6 @@ namespace mirv {
       Call,
       Allocate
     };
-
-  private:
-    Index<Type> theType;
   };
 }
 
