@@ -3,28 +3,18 @@
 
 #include <Core/Containers/Vector.hpp>
 #include <Core/IR/Index.hpp>
+#include <Core/IR/Node.hpp>
 
 #include <boost/range/iterator_range.hpp>
 
 namespace mirv {
-  class Expression {
+  class Type : public Node<Type> {
   public:
     enum Kind {
       Null,
       Integer,
       Floating,
     };
-
-
-  private:
-    Kind kind;
-
-    typedef Vector<Index<Type>> IndexVector;
-    IndexVector fields;
-
-  public:
-    typedef boost::iterator_range<IndexVector::iterator> range;
-    typedef boost::iterator_range<VectorType::const_iterator> const_range;
   };
 }
 
