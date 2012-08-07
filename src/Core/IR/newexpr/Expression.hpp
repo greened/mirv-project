@@ -2,6 +2,7 @@
 #define mirv_Core_IR_Expression_hpp
 
 #include <Core/IR/Node.hpp>
+#include <Core/IR/Type.hpp>
 
 namespace mirv {
   class Expression : public Node<Expression> {
@@ -44,6 +45,9 @@ namespace mirv {
       Load,
       TuplePointer
     };
+
+  private:
+    Index<Type> theType;
   };
 }
 
