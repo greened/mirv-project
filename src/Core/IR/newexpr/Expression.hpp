@@ -1,11 +1,7 @@
 #ifndef mirv_Core_IR_Expression_hpp
 #define mirv_Core_IR_Expression_hpp
 
-#include <Core/Containers/Vector.hpp>
-#include <Core/IR/Index.hpp>
 #include <Core/IR/Node.hpp>
-
-#include <boost/range/iterator_range.hpp>
 
 namespace mirv {
   class Expression : public Node<Expression> {
