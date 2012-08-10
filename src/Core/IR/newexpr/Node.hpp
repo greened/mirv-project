@@ -7,6 +7,13 @@
 #include <boost/range/iterator_range.hpp>
 
 namespace mirv {
+  /// This is a collection of node kinds.  We use it to categorize
+  /// various kinds of nodes.  In particular, the visitor patterns use
+  /// this to dispatch to the correct visitation routine.
+  template<typename T, T::Kind ...K>
+  class KindTuple {};
+
+  /// This is the common interface for all IR node types.
   template<typename T>
   class Node {
   private:
