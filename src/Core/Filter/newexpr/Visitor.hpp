@@ -5,14 +5,51 @@
 
 namespace mirv {
   /// This is the default implementation for all visitors.
-  template<typename T>
+  template<typename V>
   class Visitor {
+  private:
+    template<typename T>
+    class VisitFallback {};
+
+    template<V::VisitKind::K, V::VisitKind::Kind ...Rest>
+    class VisitFallback<KindTuple<K, Rest...>> {
+    public:
+      template<typename N>
+      static void dispatch(V visitor, N node) {
+        visitor.visit<K>(N);
+        VisitFallback<KindTuple<Rest...>>::dispatch(visitor, node);
+      }
+    };
+
   public:
-    template<T::Kind K>
-    void visit(T Node) { }
+    template<V::VisitKind::Kind K>
+      void visit(V visitor, T Node) {
+      // Visit using the default fallback visit routines.
+      VisitFallback<typename VisitKind::VisitKinds<K>::type>::
+        dispatch(visitor, node);
+   }
   };
 
-  /// This is the visitor dispatch routine.
+  template<typename V>
+  template<V::VisitKind K>
+  class Visitor<V>::VisitFallback<KindTuple<K>> {
+  public:
+    template<typename N>
+    static void dispatch(V visitor, N node) {
+      visitor.visit<K>(N);
+    }
+  };
+
+  template<typename V>
+  template<>
+  class Visitor<V>::VisitFallback<KindTuple<>> {
+  public:
+    template<typename N>
+    static void dispatch(V visitor, N node) {}
+  };
+
+  /// This is the visitor dispatch mechanism.  It statically generates
+  /// a lookup table of visit routines, one for each node Kind.
   template<typename V, typename K>
   class VisitorDispatch {};
 

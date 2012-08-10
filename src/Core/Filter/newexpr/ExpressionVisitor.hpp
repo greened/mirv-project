@@ -7,6 +7,8 @@
 namespace mirv {
   class ExpressionVisitor : public Visitor<Expression> {
   public:
+    typedef Expresion VisitKind;
+
     /// This is the default implementation for visiting Expressions.
     template<Expression::Kind Kind>
     void visit(void) {

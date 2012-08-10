@@ -13,6 +13,9 @@ namespace mirv {
   template<typename T, T::Kind ...K>
   class KindTuple {};
 
+  template<typename T>
+  class KindTuple<T> {};
+
   /// This is the common interface for all IR node types.
   template<typename T>
   class Node {
