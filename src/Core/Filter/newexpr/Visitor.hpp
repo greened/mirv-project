@@ -20,12 +20,12 @@ namespace mirv {
   template<typename V, typename ...K>
   class VisitorDispatch<V, KindTuple<K...>> {
   private:
-    
     template<typename N, typename Kind>
       static void dispatch(V visitor, N node) {
       visitor.visit<Kind>(N);
     }
-    public:
+
+  public:
     template<typename N>
       void operator()(V visitor, N node) {
       using F = void(V, N);
