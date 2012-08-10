@@ -43,7 +43,13 @@ namespace mirv {
       // Reference
       Reference,
       Load,
-      TuplePointer
+      TuplePointer,
+
+      // Categories
+      Associative,
+      Commutative,
+      Reflexive,
+      Transitive
     };
 
     typedef KindTuple<Kind,
@@ -70,10 +76,130 @@ namespace mirv {
     Index<Type> theType;
   };
 
+  // Add categories
   template<>
   class Expression::VisitKind<Add> {
   public:
-    typedef KindTuple<> type;
+    typedef KindTuple<Associative, Commutative> type;p
+  };
+
+  // Subtrace categories
+  template<>
+  class Expression::VisitKind<Subtract> {
+  public:
+    typedef KindTuple<Associative> type;p
+  };
+
+  // Multiply categories
+  template<>
+  class Expression::VisitKind<Multiply> {
+  public:
+    typedef KindTuple<Associative, Commutative> type;p
+  };
+
+  // Divide categories
+  template<>
+  class Expression::VisitKind<Divide> {
+  public:
+    typedef KindTuple<Associative> type;p
+  };
+
+  // LogicalAnd categories
+  template<>
+  class Expression::VisitKind<LogicalAnd> {
+  public:
+    typedef KindTuple<Associative, Commutative> type;
+  };
+
+  // LogicalOr categories
+  template<>
+  class Expression::VisitKind<LogicalOr> {
+  public:
+    typedef KindTuple<Associative, Commutative> type;
+  };
+
+  // BitwiseAnd categories
+  template<>
+  class Expression::VisitKind<BitwiseAnd> {
+  public:
+    typedef KindTuple<Associative, Commutative> type;
+  };
+
+  // BitwiseOr categories
+  template<>
+  class Expression::VisitKind<BitwiseOr> {
+  public:
+    typedef KindTuple<Associative, Commutative> type;
+  };
+
+  // BitwiseXor categories
+  template<>
+  class Expression::VisitKind<BitwiseXor> {
+  public:
+    typedef KindTuple<Associative, Commutative> type;
+  };
+
+  // ShiftLeft categories
+  template<>
+  class Expression::VisitKind<ShiftLeft> {
+  public:
+    typedef KindTuple<Associative, Commutative> type;
+  };
+
+  // ArithmeticShiftRight categories
+  template<>
+  class Expression::VisitKind<ArithmeticShiftRight> {
+  public:
+    typedef KindTuple<Associative> type;
+  };
+
+  // LogicalShiftRight categories
+  template<>
+  class Expression::VisitKind<LogicalShiftRight> {
+  public:
+    typedef KindTuple<Associative> type;
+  };
+
+  // LessThan categories
+  template<>
+  class Expression::VisitKind<LessThan> {
+  public:
+    typedef KindTuple<Transitive> type;
+  };
+
+  // LessThanOrEqual categories
+  template<>
+  class Expression::VisitKind<LessThanOrEqual> {
+  public:
+    typedef KindTuple<Transitive> type;
+  };
+
+  // Equal categories
+  template<>
+  class Expression::VisitKind<Equal> {
+  public:
+    typedef KindTuple<Commutative, Transitive> type;
+  };
+
+  // NotEqual categories
+  template<>
+  class Expression::VisitKind<NotEqual> {
+  public:
+    typedef KindTuple<Commutative> type;
+  };
+
+  // GreaterThanOrEqual categories
+  template<>
+  class Expression::VisitKind<GreaterThanOrEqual> {
+  public:
+    typedef KindTuple<Transitive> type;
+  };
+
+  // GreaterThan categories
+  template<>
+  class Expression::VisitKind<GreaterThan> {
+  public:
+    typedef KindTuple<Transitive> type;
   };
 }
 
