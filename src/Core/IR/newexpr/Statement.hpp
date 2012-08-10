@@ -29,6 +29,17 @@ namespace mirv {
       Call,
       Allocate
     };
+
+    typedef KindTuple<Kind,
+                      Block, IfThen, IfElse, DoWhile, Case, CaseBlock, Switch,
+                      Before, After, Goto, Return,
+                      Phi, Store, Call, Allocate> Kinds;
+
+    template<Kind K>
+    class VisitKinds {
+    public:
+      typedef KindTuple<> type;
+    }:
   };
 }
 
