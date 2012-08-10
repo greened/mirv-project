@@ -46,7 +46,21 @@ namespace mirv {
       TuplePointer
     };
 
+    typedef KindTuple<Kind,
+                      Add, Subtract, Multiply, Divide, Modulus, Negate,
+                      LogicalAnd, LogicalOr,
+                      BitwiseAnd, BitwiseOr, BitwiseXor, ShiftLeft,
+                      ArithmeticShiftRight, LogicalShiftRight,
+                      LessThan, LessThanOrEqual, Equal, NotEqual,
+                      GreaterThanOrEqual, GreaterThan,
+                      Reference, Load, TuplePointer> Kinds;
+
+    Kind kind(void) const {
+      return theKind;
+    }
+
   private:
+    Kind theKind;
     Index<Type> theType;
   };
 }
