@@ -55,6 +55,12 @@ namespace mirv {
                       GreaterThanOrEqual, GreaterThan,
                       Reference, Load, TuplePointer> Kinds;
 
+    template<Kind K>
+    class VisitKinds {
+    public:
+      typedef KindTuple<> type;
+    }:
+
     Kind kind(void) const {
       return theKind;
     }
@@ -62,6 +68,12 @@ namespace mirv {
   private:
     Kind theKind;
     Index<Type> theType;
+  };
+
+  template<>
+  class Expression::VisitKind<Add> {
+  public:
+    typedef KindTuple<> type;
   };
 }
 
