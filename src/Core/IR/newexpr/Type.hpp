@@ -10,6 +10,17 @@ namespace mirv {
       Null,
       Integer,
       Floating,
+      Tuple,
+      Pointer
+
+      typedef KindTuple<kind,
+                        Integer, Floating, Tuple, Pointer> Kinds;
+
+      template<Kind K>
+      class VisitKinds {
+      public:
+        typedef KindTuple<> type;
+      }:
     };
   };
 }
