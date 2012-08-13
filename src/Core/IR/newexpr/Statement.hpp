@@ -5,6 +5,8 @@
 #include <Core/IR/Type.hpp>
 
 namespace mirv {
+  class Function;
+
   class Statement : public Node<Statement> {
   public:
     enum Kind {
@@ -40,6 +42,9 @@ namespace mirv {
     public:
       typedef KindTuple<> type;
     }:
+
+    private:
+    Index<Function> parentFunction;
   };
 }
 
