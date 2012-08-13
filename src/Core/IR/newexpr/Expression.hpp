@@ -74,6 +74,7 @@ namespace mirv {
   private:
     Kind theKind;
     Index<Type> theType;
+    Index<Function> parentFunction;
   };
 
   // Add categories
