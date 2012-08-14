@@ -12,7 +12,7 @@ namespace mirv {
   class Statement : public Node<Statement> {
   public:
     enum {
-      IRKind = detail::IRNode::Module;
+      IRKind = detail::IRNode::Statement;
     };
 
     enum Kind {
@@ -51,6 +51,7 @@ namespace mirv {
 
     private:
     Index<Function> parentFunction;
+    Index<IRNode> theParent;
   };
 }
 
