@@ -20,8 +20,6 @@ namespace mirv {
   template<typename T>
   class Node {
   private:
-    typename T::Kind kind;
-
     typedef Vector<Index<T>> IndexVector;
     IndexVector children;
 
