@@ -81,6 +81,7 @@ namespace mirv {
     Kind theKind;
     Index<Type> theType;
     Index<Function> parentFunction;
+    Index<Module> theParent;
   };
 
   // Add categories

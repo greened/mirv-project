@@ -12,6 +12,9 @@ namespace mirv {
     enum {
       IRKind = detail::IRNode::Function;
     };
+
+  private:
+    Index<Module> theParent;
   };
 }
 
