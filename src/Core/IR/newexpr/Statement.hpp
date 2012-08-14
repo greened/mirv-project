@@ -49,7 +49,12 @@ namespace mirv {
       typedef KindTuple<> type;
     }:
 
+    Kind kind(void) const {
+      return theKind;
+    }
+
     private:
+    Kind theKind;
     Index<Function> parentFunction;
     Index<IRNode> theParent;
   };
