@@ -4,9 +4,15 @@
 #include <Core/IR/Node.hpp>
 #include <Core/IR/Type.hpp>
 
+#include <Core/IR/detail/IRNode.hpp>
+
 namespace mirv {
   class Expression : public Node<Expression> {
   public:
+    enum {
+      IRKind = detail::IRNode::Expression;
+    };
+
     enum Kind {
       Null,
 

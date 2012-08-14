@@ -4,11 +4,17 @@
 #include <Core/IR/Node.hpp>
 #include <Core/IR/Type.hpp>
 
+#include <Core/IR/detail/IRNode.hpp>
+
 namespace mirv {
   class Function;
 
   class Statement : public Node<Statement> {
   public:
+    enum {
+      IRKind = detail::IRNode::Module;
+    };
+
     enum Kind {
       Null,
 
