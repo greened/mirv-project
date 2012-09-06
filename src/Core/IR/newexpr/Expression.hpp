@@ -3,11 +3,30 @@
 
 #include <Core/IR/Node.hpp>
 #include <Core/IR/Type.hpp>
+#include <Core/Support/Debug.hpp>
+
+#include <Library/Dispatch.hpp>
 
 #include <Core/IR/detail/IRNode.hpp>
 
 namespace mirv {
   class Expression : public Node<Expression> {
+  private:
+    template<typename T>
+    class ChildrenDispatcher {
+    public:
+      static Range dispatch(Expression node) {
+        return node.childrenImpl<T>();
+      }
+    };
+
+    friend class ChiildrenDispatcher;
+
+    template<typename K>
+    Range childrenImpl(void) {
+      return Node<Expression>::children();
+    }
+
   public:
     enum {
       IRKind = detail::IRNode::Expression;
@@ -77,18 +96,28 @@ namespace mirv {
       return theKind;
     }
 
+    template<typename T = Expression>
+    Range children(void) {
+      Dispatch<Range, ChildrenDispatcher<T>, Kinds>::
+        dispatch(*this, this->theKind);
+    }
+
+    template<typename T = Expression>
+    ConstRange children(void) const {
+      return Node<Expression>::begin<T>();
+    }
+
   private:
     Kind theKind;
     Index<Type> theType;
     Index<Function> parentFunction;
-    Index<Module> theParent;
   };
 
   // Add categories
   template<>
   class Expression::VisitKind<Add> {
   public:
-    typedef KindTuple<Associative, Commutative> type;p
+    typedef KindTuple<Associative, Commutative> type;
   };
 
   // Subtrace categories
@@ -102,7 +131,7 @@ namespace mirv {
   template<>
   class Expression::VisitKind<Multiply> {
   public:
-    typedef KindTuple<Associative, Commutative> type;p
+    typedef KindTuple<Associative, Commutative> type;
   };
 
   // Divide categories
