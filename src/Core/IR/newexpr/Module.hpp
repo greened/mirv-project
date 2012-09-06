@@ -1,9 +1,9 @@
-#ifndef mirv_Core_IR_Module_hpp
+#ifndef mirv_Core_IR_Module_hpp 
 #define mirv_Core_IR_Module_hpp
 
 #include <Core/IR/Function.hpp>
 
-#include <Core/IR/detail/IRNode.hpp>
+include <Core/IR/detail/IRNode.hpp>
 
 namespace mirv {
   class Module : public Node<Function> {
