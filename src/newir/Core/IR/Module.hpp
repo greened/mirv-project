@@ -1,4 +1,4 @@
-#ifndef mirv_Core_IR_Module_hpp 
+#ifndef mirv_Core_IR_Module_hpp
 #define mirv_Core_IR_Module_hpp
 
 #include <Core/IR/Function.hpp>
