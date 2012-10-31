@@ -15,16 +15,22 @@ namespace mirv {
     template<typename T>
     class ChildrenDispatcher {
     public:
+      template<typename K>
       static Range dispatch(Expression node) {
-        return node.childrenImpl<T>();
+        return node.childrenImpl<T, K>();
       }
     };
 
     friend class ChiildrenDispatcher;
 
-    template<typename K>
+    template<typename T, typename K>
     Range childrenImpl(void) {
-      return Node<Expression>::children();
+      return Node<T>::children();
+    }
+
+    template<typename T, typename K>
+    ConstRange childrenImpl(void) const {
+      return Node<T>::children();
     }
 
   public:
@@ -104,7 +110,8 @@ namespace mirv {
 
     template<typename T = Expression>
     ConstRange children(void) const {
-      return Node<Expression>::begin<T>();
+      Dispatch<Range, ChildrenDispatcher<T>, Kinds>::
+        dispatch(*this, this->theKind);
     }
 
   private:
