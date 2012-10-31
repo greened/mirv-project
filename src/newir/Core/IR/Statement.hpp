@@ -14,16 +14,17 @@ namespace mirv {
     template<typename T>
     class ChildrenDispatcher {
     public:
+      template<typename K>
       static Range dispatch(Statement node) {
-        return node.childrenImpl<T>();
+        return node.childrenImpl<T, K>();
       }
     };
 
     friend class ChiildrenDispatcher;
 
-    template<typename K>
+    template<typename T, typename K>
     Range childrenImpl(void) {
-      return Node<Statement>::children();
+      return Node<T>::children();
     }
 
   public:
