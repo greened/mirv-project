@@ -22,6 +22,10 @@ namespace mirv {
     public:
       typedef KindTuple<> type;
     }:
+
+    Kind kind(void) const {
+      return theKind;
+    }
   };
 }
 
