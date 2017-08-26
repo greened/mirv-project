@@ -8,9 +8,9 @@ include $(BUILDTOOLS)/configure/library.mk
 # See if the LLVM libraries are available.
 
 define LLVM_SOURCE
-#include <llvm/Constants.h>
-#include <llvm/LLVMContext.h>
-#include <llvm/Type.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Type.h>
 
 int main(void)
 {
@@ -21,7 +21,7 @@ int main(void)
 endef
 
 ifndef LLVM_PATH
-LLVM_PATH=/usr/lib/llvm-3.0
+LLVM_PATH=/usr/lib/llvm-3.8
 endif
 
 ifndef LLVM_LIBRARY_PATH
@@ -34,7 +34,7 @@ endif
 
 override LLVM_LIBRARY = $(shell $(LLVM_PATH)/bin/llvm-config --libnames)
 
-override LLVM_LINK_FLAGS = -L$(LLVM_LIBRARY_PATH) -rdynamic -Xlinker -rpath -Xlinker $(LLVM_LIBRARY_PATH) -lpthread -ldl -lm
+override LLVM_LINK_FLAGS = -L$(LLVM_LIBRARY_PATH) -rdynamic -Xlinker -rpath -Xlinker $(LLVM_LIBRARY_PATH) -lpthread -ldl -lm -lcurses
 override LLVM_COMPILE_FLAGS = -I$(LLVM_INCLUDE_PATH) -fpermissive -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 override LLVM_COMPILE_ERROR = $(call mc_error,Cannot find LLVM libraries)
 override LLVM_LINK_ERROR = $(call mc_error,Cannot link to LLVM libraries)
