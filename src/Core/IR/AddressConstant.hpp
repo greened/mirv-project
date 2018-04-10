@@ -48,7 +48,7 @@ namespace mirv {
   public:
     static void
     initialize(ptr<Symbol<Constant<Address> > > constant) {}
-  };    
+  };
 }
 
 #endif

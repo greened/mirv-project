@@ -46,13 +46,9 @@ namespace mirv {
             : baseType(e) {
           boost::fusion::for_each(
             dims,
-            boost::bind(static_cast<void(dimensionList::*)(const std::uint64_t &)>(
-                          // Dimensions are listed most significant to
-                          // least.  TupleType wants them least
-                          // significant to most.
-                          &dimensionList::push_front),
-                        boost::ref(dimensions),
-                        _1));
+            [this] (auto V) {
+              dimensions.push_front(V);
+            });
         }
 
         ptr<const Symbol<Type<TypeBase> > > elementType(void) const {

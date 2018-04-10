@@ -461,7 +461,7 @@ namespace mirv {
     syn.createGlobalVariable(sym, attributeManager.getInheritedAttribute());
     attributeManager.setSynthesizedAttribute(syn);
   }
-  
+
   void LLVMCodegenFilter::
   EnterStatementVisitor::visit(ptr<const Statement<Block> > stmt)
   {
@@ -478,7 +478,7 @@ namespace mirv {
       inh.builder()->CreateBr(thisBlock);
       inh.builder()->SetInsertPoint(thisBlock);
     }
-              
+
     attributeManager.setInheritedAttribute(inh);
   }
 

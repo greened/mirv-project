@@ -139,7 +139,7 @@ int main(void)
     );
 
   PrintFilter print(std::cout);
-  
+
   print(stmt);
 
   return(0);

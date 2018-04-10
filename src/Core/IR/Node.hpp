@@ -181,16 +181,20 @@ namespace mirv {
     template<typename InputIterator>
     InnerImpl(ChildPtr C1, InputIterator start, InputIterator end) {  
       children.push_back(C1);
-      std::for_each(start, end,
-                    boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
+      std::for_each(start, end, [this](typename InputIterator::value_type V) {
+          children.push_back(V);
+        });
+        //                    boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
     }
 
     template<typename InputIterator>
     InnerImpl(ChildPtr C1, ChildPtr C2, InputIterator start, InputIterator end) {  
       children.push_back(C1);
       children.push_back(C2);
-      std::for_each(start, end,
-                    boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
+      std::for_each(start, end, [this](typename InputIterator::value_type V) {
+          children.push_back(V);
+        });
+      //                    boost::bind(static_cast<void (ChildList::*)(const ChildPtr &)>(&ChildList::push_back), &children, _1));
     }
        
     typedef typename ChildList::iterator iterator;
