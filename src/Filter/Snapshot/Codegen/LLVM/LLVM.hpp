@@ -12,12 +12,12 @@
 #include <mirv/Core/Filter/SymbolFlow.hpp>
 #include <mirv/Core/IR/Node.hpp>
 
-#include <llvm/Module.h>
-#include <llvm/Function.h>
-#include <llvm/BasicBlock.h>
-#include <llvm/Instruction.h>
-#include <llvm/LLVMContext.h>
-#include <llvm/Support/IRBuilder.h>
+#include <llvm/IR/Module.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Instruction.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/IRBuilder.h>
 
 namespace mirv {
   /// This is a filter to translate from MIRV IR to LLVM IR.

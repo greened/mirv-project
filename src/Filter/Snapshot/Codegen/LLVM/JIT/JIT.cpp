@@ -8,7 +8,8 @@
 #include <mirv/Filter/Snapshot/Codegen/LLVM/LLVM.hpp>
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/ExecutionEngine/JIT.h>
+#include <llvm/ExecutionEngine/GenericValue.h>
+#include <llvm/ExecutionEngine/MCJIT.h>
 
 #include <llvm/Support/TargetSelect.h>
 
@@ -23,13 +24,18 @@ namespace mirv {
 
   namespace detail {
     JITContextHandle
-    doCompile(void * &function, 
+    doCompile(void * &function,
               ptr<Symbol<Module> > module,
               const std::string &functionName) {
       llvm::InitializeNativeTarget();
+      llvm::InitializeNativeTargetAsmPrinter();
+      llvm::InitializeNativeTargetAsmParser();
 
-      llvm::Module *llvmModule = codegen(module);
-      llvm::EngineBuilder builder(llvmModule);
+      std::unique_ptr<llvm::Module> llvmModule(codegen(module));
+      llvm::Function *LLVMfunction = llvmModule->getFunction(functionName);
+      checkInvariant(LLVMfunction != 0, "Could not find function to jit");
+
+      llvm::EngineBuilder builder(std::move(llvmModule));
       std::string JITError;
       llvm::ExecutionEngine *engine =
         builder.
@@ -40,8 +46,6 @@ namespace mirv {
         error(JITError);
       }
       checkInvariant(engine != 0, "Could not create JIT");
-      llvm::Function *LLVMfunction = llvmModule->getFunction(functionName);
-      checkInvariant(LLVMfunction != 0, "Could not find function to jit");
       void *result = engine->getPointerToFunction(LLVMfunction);
       function = result;
       return JITContextHandle(engine);
@@ -51,14 +55,19 @@ namespace mirv {
   void compileAndRun(ptr<Symbol<Module> > module,
                      const std::string &functionName) {
     llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
 
-    llvm::Module *llvmModule = codegen(module);
-    llvm::EngineBuilder builder(llvmModule);
-    llvm::ExecutionEngine *engine =
-      builder.setEngineKind(llvm::EngineKind::JIT).create();
+    std::unique_ptr<llvm::Module> llvmModule(codegen(module));
     llvm::Function *function = llvmModule->getFunction(functionName);
     checkInvariant(function != 0, "Could not find function to jit");
-    engine->runJITOnFunction(function);
+
+    llvm::EngineBuilder builder(std::move(llvmModule));
+    llvm::ExecutionEngine *engine =
+      builder.setEngineKind(llvm::EngineKind::JIT).create();
+    engine->finalizeObject();
+    std::vector<llvm::GenericValue> args;
+    engine->runFunction(function, args);
     delete engine;
   }
 }
