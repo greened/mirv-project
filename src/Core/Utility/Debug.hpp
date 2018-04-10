@@ -32,11 +32,13 @@ namespace mirv {
     /// Is debugging active?
     bool active;
 
+  public:
     enum Flags {
       /// Check all casts for correctness.
       SafeCast = 0x1
     };
 
+  private:
     /// What should be debugged?
     unsigned flags;
 
