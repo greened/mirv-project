@@ -88,7 +88,7 @@ namespace mirv {
       BitSizeType bitsize(void) const;
 
       bool isUniform(void) const {
-        return multiplier;
+        return multiplier != nullptr;
       }
 
       ptr<const Expression<Base> >
