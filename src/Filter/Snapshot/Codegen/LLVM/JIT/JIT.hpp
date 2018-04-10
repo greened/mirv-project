@@ -14,7 +14,7 @@ namespace mirv {
 
   namespace detail {
     JITContextHandle
-    doCompile(void * &function, 
+    doCompile(void * &function,
               ptr<Symbol<Module> > module,
               const std::string &functionName);
   }

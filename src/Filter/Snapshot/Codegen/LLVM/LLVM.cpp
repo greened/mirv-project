@@ -5,7 +5,7 @@
 #include <boost/mem_fn.hpp>
 
 #include <llvm/Support/raw_ostream.h>
-#include <llvm/Support/CFG.h>
+#include <llvm/IR/CFG.h>
 
 #include "LLVM.hpp"
 
@@ -251,17 +251,18 @@ namespace mirv {
           // requires a basic block to exist here.  The code below
           // does the equivalent.
 
-          // llvm::Value *pointer =
-          //   inh.builder()->CreateGlobalString(str->value().c_str(), name);
+          //llvm::Value *pointer =
+          //  inh.builder()->CreateGlobalString(str->value().c_str(), name);
 
           llvm::Constant *StrConstant =
-            llvm::ConstantArray::get(inh.builder()->getContext(),
-                                     str->value().c_str(), true);
+            llvm::ConstantDataArray::getString(inh.builder()->getContext(),
+                                               llvm::StringRef(str->value()),
+                                               true);
           llvm::Module &M = *inh.getModule();
           llvm::GlobalVariable *GV =
             new llvm::GlobalVariable(M, StrConstant->getType(),
                                      true, llvm::GlobalValue::InternalLinkage,
-                                     StrConstant, "", 0, false);
+                                     StrConstant, "");
           GV->setName(name);
           llvm::Value *pointer = GV;
 
@@ -516,7 +517,7 @@ namespace mirv {
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
-    llvm::Value *inst = 
+    llvm::Value *inst =
       attributeManager.getInheritedAttribute().hasReturnValue() ?
       syn.builder()->
       CreateRet(attributeManager.getInheritedAttribute().getValue()) :
