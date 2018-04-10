@@ -21,14 +21,13 @@ namespace mirv {
           TranslateToExpression<Expression<Base>> translator(symtab);
           typedef std::vector<ptr<Expression<Base> >> result_type;
           result_type results;
-          void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
 
           boost::fusion::for_each(boost::fusion::transform(
                                     boost::fusion::pop_front(expr),
                                     translator),
-                                  boost::bind(push_back,
-                                              &results,
-                                              _1));
+                                  [&results] (auto V) {
+                                    results.push_back(V);
+                                  });
           // TODO: This is inefficient.  Find a way to assign to the
           // output iterator directly.
           std::copy(results.begin(), results.end(), out);
@@ -41,14 +40,13 @@ namespace mirv {
           TranslateToExpression<Expression<Base>> translator(symtab);
           typedef std::vector<ptr<Expression<Base> >> result_type;
           result_type results;
-          void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
 
           boost::fusion::for_each(boost::fusion::transform(
                                     boost::proto::flatten(expr),
                                     translator),
-                                  boost::bind(push_back,
-                                              &results,
-                                              _1));
+                                  [&results] (auto V) {
+                                    results.push_back(V);
+                                  });
           // TODO: This is inefficient.  Find a way to assign to the
           // output iterator directly.
           std::copy(results.begin(), results.end(), out);
@@ -62,16 +60,15 @@ namespace mirv {
           typedef std::vector<ptr<const Symbol<Type<TypeBase> > >> result_type;
           TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
           result_type results;
-          void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
 
           // std::cout << "Flattening and translating type:\n";
           // boost::proto::display_expr(expr);
 
           boost::fusion::for_each(boost::fusion::transform(
                                     boost::proto::flatten(expr), translator),
-                                  boost::bind(push_back,
-                                              &results,
-                                              _1));
+                                  [&results] (auto V) {
+                                    results.push_back(V);
+                                  });
           // TODO: This is inefficient.  Find a way to assign to the
           // output iterator directly.
           std::copy(results.begin(), results.end(), out);
@@ -85,16 +82,15 @@ namespace mirv {
           typedef std::vector<ptr<const Symbol<Type<TypeBase> > >> result_type;
           TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
           result_type results;
-          void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
 
           // std::cout << "Popping and translating type:\n";
           // boost::proto::display_expr(expr);
 
           boost::fusion::for_each(boost::fusion::transform(
                                     boost::fusion::pop_front(expr), translator),
-                                  boost::bind(push_back,
-                                              &results,
-                                              _1));
+                                  [&results] (auto V) {
+                                    results.push_back(V);
+                                  });
           // TODO: This is inefficient.  Find a way to assign to the
           // output iterator directly.
           std::copy(results.begin(), results.end(), out);
@@ -108,7 +104,6 @@ namespace mirv {
           typedef std::vector<ptr<const Symbol<Type<TypeBase> > >> result_type;
           TranslateToSymbol<Symbol<Type<TypeBase> > > translator(symtab);
           result_type results;
-          void (result_type::*push_back)(const result_type::value_type &) = &result_type::push_back;
 
           // std::cout << "Popping front back and translating type:\n";
           // boost::proto::display_expr(expr);
@@ -117,9 +112,9 @@ namespace mirv {
                                     boost::fusion::pop_front(
                                       boost::fusion::pop_back(expr)),
                                     translator),
-                                  boost::bind(push_back,
-                                              &results,
-                                              _1));
+                                  [&results] (auto V) {
+                                    results.push_back(V);
+                                  });
           // TODO: This is inefficient.  Find a way to assign to the
           // output iterator directly.
           std::copy(results.begin(), results.end(), out);
