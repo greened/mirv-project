@@ -34,7 +34,7 @@ endif
 
 override LLVM_LIBRARY = $(shell $(LLVM_PATH)/bin/llvm-config --libnames)
 
-override LLVM_LINK_FLAGS = -L$(LLVM_LIBRARY_PATH) -rdynamic -Xlinker -rpath -Xlinker $(LLVM_LIBRARY_PATH) -lpthread -ldl -lm -lcurses
+override LLVM_LINK_FLAGS = -L$(LLVM_LIBRARY_PATH) -rdynamic -Xlinker -rpath -Xlinker $(LLVM_LIBRARY_PATH) -lpthread -ldl -lm -lcurses -lz
 override LLVM_COMPILE_FLAGS = -I$(LLVM_INCLUDE_PATH) -fpermissive -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 override LLVM_COMPILE_ERROR = $(call mc_error,Cannot find LLVM libraries)
 override LLVM_LINK_ERROR = $(call mc_error,Cannot link to LLVM libraries)
