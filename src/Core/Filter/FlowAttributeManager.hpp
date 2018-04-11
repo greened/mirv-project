@@ -34,11 +34,15 @@ namespace mirv {
     private:
       friend class FlowAttributeManager<Inherited, Synthesized>;
 
-      Inherited inherited;
+      Inherited inheritedPrototype;
+      Synthesized synthesizedPrototype;
       typedef std::pair<Synthesized, bool> AttributePair;
       typedef typename Vector<AttributePair>::type
       SynthesizedVector;
+
+      Inherited inherited;
       SynthesizedVector synthesized;
+
       unsigned int childNum;
       bool hasChild;
 
@@ -80,14 +84,13 @@ namespace mirv {
       typedef boost::transform_iterator<select1st<AttributePair>,
         const_filter_iterator> const_iterator;
 
-      AttributeRecord(void)
-          : synthesized(1, std::make_pair(Synthesized(), false)), childNum(0),
-              hasChild(false) {}
-      AttributeRecord(const Inherited &inh)
-          : inherited(inh),
-              synthesized(1, std::make_pair(Synthesized(), false)),
-              childNum(0),
-              hasChild(false) {}
+      AttributeRecord(const Inherited &inh, const Synthesized &syn)
+          : inheritedPrototype(inh),
+            synthesizedPrototype(syn),
+            inherited(inh),
+            synthesized(1, std::make_pair(synthesizedPrototype, false)),
+            childNum(0),
+            hasChild(false) {}
 
       void enterChild(void) {
         // Reuse slot 0, which is where we put the default synthesized
@@ -96,7 +99,7 @@ namespace mirv {
           ++childNum;
           checkInvariant(synthesized.size() == childNum,
                          "Unexpected attribute slot");
-          synthesized.push_back(std::make_pair(Synthesized(), false));
+          synthesized.push_back(std::make_pair(synthesizedPrototype, false));
         }
         hasChild = true;
       }
@@ -114,7 +117,7 @@ namespace mirv {
       void setSynthesizedAttribute(const Synthesized &syn) {
         if (synthesized.size() <= childNumber()) {
           synthesized.resize(childNumber(),
-                             std::make_pair(Synthesized(), false));
+                             std::make_pair(synthesizedPrototype, false));
         }
 
         synthesized[childNumber()].first = syn;
@@ -140,7 +143,7 @@ namespace mirv {
 
       iterator begin(void) {
         return boost::make_transform_iterator(
-          boost::make_filter_iterator(select2nd<AttributePair>(),            
+          boost::make_filter_iterator(select2nd<AttributePair>(),
                                       synthesized.begin(),
                                       synthesized.end()),
           select1st<AttributePair>());
@@ -156,7 +159,7 @@ namespace mirv {
 
       iterator end(void) {
         return boost::make_transform_iterator(
-          boost::make_filter_iterator(select2nd<AttributePair>(),            
+          boost::make_filter_iterator(select2nd<AttributePair>(),
                                       synthesized.end(),
                                       synthesized.end()),
           select1st<AttributePair>());
@@ -174,6 +177,9 @@ namespace mirv {
     typedef typename Vector<AttributeRecord>::type AttributeStackType;
     AttributeStackType attributeStack;
 
+    Inherited inheritedPrototype;
+    Synthesized synthesizedPrototype;
+
     void setSynthesizedBit(unsigned int index) {
       checkInvariant(attributeStack.size() > 1, "Attribute stack underflow");
       (attributeStack.end() - 2)->setSynthesizedBit(index);
@@ -183,13 +189,24 @@ namespace mirv {
     typedef typename AttributeRecord::iterator iterator;
     typedef typename AttributeRecord::const_iterator const_iterator;
 
-    FlowAttributeManager(const Inherited &inherited) {
-      attributeStack.push_back(AttributeRecord(inherited));
+    FlowAttributeManager(const Inherited &inherited,
+                         const Synthesized &synthesized)
+      : inheritedPrototype(inherited), synthesizedPrototype(synthesized) {
+      attributeStack.push_back(AttributeRecord(inherited,
+                                               synthesized));
     }
 
     template<typename Manager>
     void swap(Manager &other) {
       attributeStack.swap(other.attributeStack);
+    }
+
+    const Inherited &getInheritedAttributePrototype(void) const {
+      return inheritedPrototype;
+    }
+
+    const Synthesized &getSynthesizedAttributePrototype(void) const {
+      return synthesizedPrototype;
     }
 
     void pushContext(void) {
@@ -205,10 +222,12 @@ namespace mirv {
         // our getInheritedAttribute here because the new context
         // hasn't been pushed yet.
         attributeStack.push_back(AttributeRecord(attributeStack.back().
-                                                 getInheritedAttribute()));
+                                                 getInheritedAttribute(),
+                                                 synthesizedPrototype));
       }
       else {
-        attributeStack.push_back(AttributeRecord());
+        attributeStack.push_back(AttributeRecord(inheritedPrototype,
+                                                 synthesizedPrototype));
       }
     }
 
