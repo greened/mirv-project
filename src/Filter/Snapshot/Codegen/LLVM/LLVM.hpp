@@ -19,11 +19,14 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include <utility>
+
 namespace mirv {
   /// This is a filter to translate from MIRV IR to LLVM IR.
   class LLVMCodegenFilter : public Filter<Node<Base> > {
   public:
     class InheritedAttribute;
+    class SynthesizedAttribute;
 
     /// This is the base of codegen inherited and synthesized
     /// attributes.  It contains all of the necessary context for
@@ -31,7 +34,7 @@ namespace mirv {
     /// results for parent nodes to examine.
     class FlowAttribute {
     private:
-      llvm::LLVMContext *Context;
+      llvm::LLVMContext &Context;
       ptr<llvm::IRBuilder<> > Builder;
       llvm::Module *TheModule;
       llvm::Function *TheFunction;
@@ -70,18 +73,29 @@ namespace mirv {
       }
 
     public:
-      FlowAttribute(void)
-          : Context(&llvm::getGlobalContext()),
-              Builder(new llvm::IRBuilder<>(*Context)),
-              TheModule(0),
-              TheFunction(0),
-              TheBlock(0),
-              TheValue(0),
+      FlowAttribute(llvm::LLVMContext &C)
+          : Context(C),
+              Builder(new llvm::IRBuilder<>(Context)),
+              TheModule(nullptr),
+              TheFunction(nullptr),
+              TheBlock(nullptr),
+              TheValue(nullptr),
               ReturnValue(false),
               ModuleMap(new VariableMap),
               FunctionMap(new VariableMap) {}
 
-      FlowAttribute(const FlowAttribute &other) 
+      FlowAttribute(const FlowAttribute &other)
+          : Context(other.Context),
+              Builder(other.Builder),
+              TheModule(other.TheModule),
+              TheFunction(other.TheFunction),
+              TheBlock(other.TheBlock),
+              TheValue(other.TheValue),
+              ReturnValue(other.ReturnValue),
+              ModuleMap(other.ModuleMap),
+              FunctionMap(other.FunctionMap) {}
+
+      FlowAttribute(const FlowAttribute &&other)
           : Context(other.Context),
               Builder(other.Builder),
               TheModule(other.TheModule),
@@ -128,7 +142,7 @@ namespace mirv {
 
       void createModule(const std::string &name) {
         checkInvariant(TheModule == 0, "Module already exists");
-        TheModule = new llvm::Module(name, *Context);
+        TheModule = new llvm::Module(name, Context);
       }
 
       llvm::Module *getModule(void) const {
@@ -142,7 +156,7 @@ namespace mirv {
       void setReferencedFunction(llvm::Function *function) {
         ReferencedFunction = function;
       }
-      
+
       llvm::Function *referencedFunction(void) const {
         return ReferencedFunction;
       }
@@ -154,7 +168,8 @@ namespace mirv {
                         ptr<const Symbol<Type<TypeBase> > > type);
 
       void createGlobalVariable(ptr<const Symbol<GlobalVariable> > sym,
-                                const InheritedAttribute &inh);
+                                const InheritedAttribute &inh,
+                                const SynthesizedAttribute &syn);
 
       template<typename ValueType>
       void createIntegerConstant(ptr<const Symbol<Type<TypeBase> > > type,
@@ -178,7 +193,7 @@ namespace mirv {
 
       llvm::BasicBlock *createBlock(const std::string &name) {
         checkInvariant(TheFunction, "No function for block");
-        llvm::BasicBlock *block = llvm::BasicBlock::Create(*Context,
+        llvm::BasicBlock *block = llvm::BasicBlock::Create(Context,
                                                            name,
                                                            TheFunction);
         builder()->SetInsertPoint(block);
@@ -192,18 +207,33 @@ namespace mirv {
     /// This is the inherited attribute for code generation.  It
     /// carries the necessary context and utility functions to create
     /// IR constructs.
-    class InheritedAttribute 
+    class InheritedAttribute
         : public FlowAttribute {
     public:
-      InheritedAttribute(void) = default;
+      InheritedAttribute(llvm::LLVMContext &C) : FlowAttribute(C) {};
 
       InheritedAttribute(const InheritedAttribute &inherited)
           : FlowAttribute(inherited) {}
 
-      InheritedAttribute(const SynthesizedAttribute &synthesized) 
+      InheritedAttribute(const InheritedAttribute &&inherited)
+          : FlowAttribute(inherited) {}
+
+      InheritedAttribute(const SynthesizedAttribute &synthesized)
           : FlowAttribute(synthesized) {
         // Do not inherited this property.
         setValueUnchecked(0);
+      }
+
+      InheritedAttribute &operator=(const InheritedAttribute &other) {
+        InheritedAttribute temp(other);
+        std::swap(temp, *this);
+        return *this;
+      }
+
+      InheritedAttribute &operator=(const InheritedAttribute &&other) {
+        InheritedAttribute temp(other);
+        std::swap(temp, *this);
+        return *this;
       }
 
       InheritedAttribute &operator=(const SynthesizedAttribute &synthesized) {
@@ -213,15 +243,33 @@ namespace mirv {
       }
     };
 
-    /// This is the symthesized attribute for the code generator.  It
+    /// This is the synthesized attribute for the code generator.  It
     /// carrries result Values, Symbols, etc. to parent nodes.
-    class SynthesizedAttribute 
+    class SynthesizedAttribute
         : public FlowAttribute {
     public:
-      SynthesizedAttribute(void) = default;
+      SynthesizedAttribute(llvm::LLVMContext &C) : FlowAttribute(C) {}
 
-      SynthesizedAttribute(const InheritedAttribute &inherited) 
+      SynthesizedAttribute(const SynthesizedAttribute &other)
+          : FlowAttribute(other) {}
+
+      SynthesizedAttribute(const SynthesizedAttribute &&other)
+          : FlowAttribute(other) {}
+
+      SynthesizedAttribute(const InheritedAttribute &inherited)
           : FlowAttribute(inherited) {}
+
+      SynthesizedAttribute &operator=(const SynthesizedAttribute &other) {
+        SynthesizedAttribute temp(other);
+        std::swap(temp, *this);
+        return *this;
+      }
+
+      SynthesizedAttribute &operator=(const SynthesizedAttribute &&other) {
+        SynthesizedAttribute temp(other);
+        std::swap(temp, *this);
+        return *this;
+      }
 
       SynthesizedAttribute &operator=(const InheritedAttribute &inherited) {
         SynthesizedAttribute temp(inherited);
@@ -251,7 +299,7 @@ namespace mirv {
     /// Invoke the EnterSymbolVisitor upon entering a symbol.
     class EnterSymbolAction : public VisitAction<EnterSymbolVisitor> {
     public:
-      EnterSymbolAction(FlowAttributeManagerType &attributeManager) 
+      EnterSymbolAction(FlowAttributeManagerType &attributeManager)
           : VisitAction<EnterSymbolVisitor>(attributeManager) {}
     };
 
@@ -273,7 +321,7 @@ namespace mirv {
     /// Invoke the LeaveSymbolVisitor when exiting symbols.
     class LeaveSymbolAction : public VisitAction<LeaveSymbolVisitor> {
     public:
-      LeaveSymbolAction(FlowAttributeManagerType &attributeManager) 
+      LeaveSymbolAction(FlowAttributeManagerType &attributeManager)
           : VisitAction<LeaveSymbolVisitor>(attributeManager) {}
     };
 
@@ -296,7 +344,7 @@ namespace mirv {
     /// Invoke the EnterStatementVisitor upon entry to a statement.
     class EnterStatementAction : public VisitAction<EnterStatementVisitor> {
     public:
-      EnterStatementAction(FlowAttributeManagerType &attributeManager) 
+      EnterStatementAction(FlowAttributeManagerType &attributeManager)
           : VisitAction<EnterStatementVisitor>(attributeManager) {}
     };
 
@@ -325,7 +373,7 @@ namespace mirv {
     /// Invoke the LeaveStatementVisitor upon exiting statements.
     class LeaveStatementAction : public VisitAction<LeaveStatementVisitor> {
     public:
-      LeaveStatementAction(FlowAttributeManagerType &attributeManager) 
+      LeaveStatementAction(FlowAttributeManagerType &attributeManager)
           : VisitAction<LeaveStatementVisitor>(attributeManager) {}
     };
 
@@ -344,7 +392,7 @@ namespace mirv {
     /// Invoke the EnterExpressionVisitor upon entering an expression.
     class EnterExpressionAction : public VisitAction<EnterExpressionVisitor> {
     public:
-      EnterExpressionAction(FlowAttributeManagerType &attributeManager) 
+      EnterExpressionAction(FlowAttributeManagerType &attributeManager)
           : VisitAction<EnterExpressionVisitor>(attributeManager) {}
     };
 
@@ -386,7 +434,7 @@ namespace mirv {
     /// Invoke the LeaveExpressionVisitor upon leaving an expression.
     class LeaveExpressionAction : public VisitAction<LeaveExpressionVisitor> {
     public:
-      LeaveExpressionAction(FlowAttributeManagerType &attributeManager) 
+      LeaveExpressionAction(FlowAttributeManagerType &attributeManager)
           : VisitAction<LeaveExpressionVisitor>(attributeManager) {}
     };
 
@@ -426,11 +474,13 @@ namespace mirv {
       > BaseType;
 
     public:
-      LLVMCodegenExpressionFlow()
-          : BaseType(InheritedAttribute()) {}
+      LLVMCodegenExpressionFlow(llvm::LLVMContext &C)
+          : BaseType(InheritedAttribute(C),
+                     SynthesizedAttribute(C)) {}
 
-      LLVMCodegenExpressionFlow(FlowAttributeManagerType &)
-          : BaseType(InheritedAttribute()) {}
+      LLVMCodegenExpressionFlow(FlowAttributeManagerType &am)
+          : BaseType(am.getInheritedAttributePrototype(),
+                     am.getSynthesizedAttributePrototype()) {}
     };
 
     /// This is the flow for translating statements.
@@ -483,13 +533,15 @@ namespace mirv {
 	NullAction> BaseType;
 
     public:
-      LLVMCodegenFlow()
-          : BaseType(InheritedAttribute()) {
+      LLVMCodegenFlow(llvm::LLVMContext &C)
+          : BaseType(InheritedAttribute(C),
+                     SynthesizedAttribute(C)) {
         expression().setParentFlow(this);
       }
 
-      LLVMCodegenFlow(const FlowAttributeManagerType &)
-          : BaseType(InheritedAttribute()) {
+      LLVMCodegenFlow(const FlowAttributeManagerType &am)
+          : BaseType(am.getInheritedAttributePrototype(),
+                     am.getSynthesizedAttributePrototype()) {
         expression().setParentFlow(this);
       }
 
@@ -550,8 +602,9 @@ namespace mirv {
       > BaseType;
 
     public:
-      LLVMCodegenSymbolFlow(void)
-          : BaseType(InheritedAttribute()) {
+      LLVMCodegenSymbolFlow(llvm::LLVMContext &C)
+          : BaseType(InheritedAttribute(C),
+                     SynthesizedAttribute(C)) {
         statement().setParentFlow(this);
       }
     };

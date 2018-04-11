@@ -195,9 +195,10 @@ namespace mirv {
     //AttributeFlow &operator=(AttributeFlow &&) = delete;
 
   public:
-    AttributeFlow(const Inherited &inherited)
+    AttributeFlow(const Inherited &inherited,
+                  const Synthesized &synthesized)
         : BaseType(attributeManager),
-            attributeManager(inherited) {}
+          attributeManager(inherited, synthesized) {}
     // FIXME: We'd really rather not allow this.  This is forced by
     // the gcc error noted above.
     FlowAttributeManagerType &getAttributeManager(void) {

@@ -206,7 +206,8 @@ namespace mirv {
       }
 
     public:
-      TypeNameInheritedAttribute(void) : ot(0), ts(0) {}
+      TypeNameInheritedAttribute(void) = default;
+
       TypeNameInheritedAttribute(Stream &o, TypeList &t)
           : ot(&o), ts(&t) {}
 
@@ -244,7 +245,8 @@ namespace mirv {
       TypeList *ts;
 
     public:
-      TypeNameSynthesizedAttribute(void) : ts(0) {}
+      TypeNameSynthesizedAttribute(void) = default;
+
       TypeNameSynthesizedAttribute(TypeList &t) : ts(&t) {}
     };
 
@@ -432,7 +434,8 @@ namespace mirv {
 
     public:
       TypeNameFlow(std::ostream &out)
-          : BaseType(TypeNameInheritedAttribute(out, typeStack)) {}
+          : BaseType(TypeNameInheritedAttribute(out, typeStack),
+                     TypeNameSynthesizedAttribute()) {}
     };
 
     /// Define the inherited attibute.
@@ -444,7 +447,8 @@ namespace mirv {
       Stream *ot;
 
     public:
-      InheritedAttribute(void) : ind(0), ot(0) {}
+      InheritedAttribute(void) = default;
+
       InheritedAttribute(int i, Stream &o) : ind(i), ot(&o) {}
 
       int indent(void) const {
@@ -544,9 +548,10 @@ namespace mirv {
 
     public:
       ConstantValueFlow(std::ostream &out)
-          : BaseType(InheritedAttribute(0, out)) {}
+        : BaseType(InheritedAttribute(0, out),
+                   SynthesizedAttribute()) {}
     };
- 
+
     /// Entering each symbol
     template<typename Formatter>
     class EnterDeclSymbolVisitor : public ConstSymbolVisitor {
@@ -818,10 +823,12 @@ namespace mirv {
 
     public:
       PrintExpressionFlow(Stream &out)
-          : BaseType(InheritedAttribute(0, out)) {}
+          : BaseType(InheritedAttribute(0, out),
+                     SynthesizedAttribute()) {}
 
       PrintExpressionFlow(FlowAttributeManagerType &)
-          : BaseType(InheritedAttribute()) {}        
+          : BaseType(InheritedAttribute(),
+                     SynthesizedAttribute()) {}
 
     };
 
@@ -858,12 +865,14 @@ namespace mirv {
         > BaseType;
 
     public:
-      PrintFlow(Stream &out) : BaseType(InheritedAttribute(0, out)) {
+      PrintFlow(Stream &out) : BaseType(InheritedAttribute(0, out),
+                                        SynthesizedAttribute()) {
         this->expression().setParentFlow(this);
       }
 
       PrintFlow(FlowAttributeManagerType &)
-          : BaseType(InheritedAttribute()) {
+          : BaseType(InheritedAttribute(),
+                     SynthesizedAttribute()) {
         this->expression().setParentFlow(this);
       }
 
@@ -926,8 +935,9 @@ namespace mirv {
 
     public:
       PrintDeclSymbolFlow(Stream &out)
-          : BaseType(InheritedAttribute(0, out)) {}
-      
+          : BaseType(InheritedAttribute(0, out),
+                     SynthesizedAttribute()) {}
+
       // We just want the function declaration at this point so don't
       // visit children.
       void visit(ptr<const Symbol<Function> > sym) {
@@ -964,7 +974,8 @@ namespace mirv {
 
     public:
       PrintDefSymbolFlow(Stream &out, int i = 0)
-          : BaseType(InheritedAttribute(i, out)) {
+          : BaseType(InheritedAttribute(i, out),
+                     SynthesizedAttribute()) {
         this->statement().setParentFlow(this);
       }
 
