@@ -5,9 +5,7 @@
 #include <mirv/Core/Builder/SymbolTable.hpp>
 #include <mirv/Core/Builder/SymbolGrammarFwd.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
-#include <mirv/Core/IR/Base.hpp>
-#include <mirv/Core/IR/FloatingTypeFwd.hpp>
-#include <mirv/Core/IR/IntegralTypeFwd.hpp>
+#include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Core/Utility/Printer.hpp>
 
@@ -25,10 +23,10 @@ namespace mirv {
     template<typename SymbolType>
     class TranslateToSymbol : boost::proto::callable {
     private:
-      boost::shared_ptr<SymbolTable> symtab;
+      ptr<SymbolTable> symtab;
 
     public:
-      TranslateToSymbol<SymbolType>(boost::shared_ptr<SymbolTable> s)
+      TranslateToSymbol<SymbolType>(ptr<SymbolTable> s)
       : symtab(s) {}
 
      typedef ptr<SymbolType> result_type;
@@ -45,23 +43,22 @@ namespace mirv {
     /// This is a grammar action to translate a proto expression to an
     /// IR symbol.  This is a specialization for types, which must be
     /// const.
-    template<typename Tag>
-    class TranslateToSymbol<Symbol<Type<Tag> > > : boost::proto::callable {
+    template<typename T>
+    class TranslateToSymbol<const T> : boost::proto::callable {
     private:
-      boost::shared_ptr<SymbolTable> symtab;
+      ptr<SymbolTable> symtab;
 
     public:
-      TranslateToSymbol<Symbol<Type<Tag> > >(boost::shared_ptr<SymbolTable> s)
-      : symtab(s) {}
+      TranslateToSymbol<const T>(ptr<SymbolTable> s) :
+        symtab(s) {}
 
-      typedef ptr<const Symbol<Type<Tag> > > result_type;
+      typedef ptr<T> result_type;
 
       template<typename Expr>
-      result_type operator()(const Expr &e) const {
+      auto operator()(const Expr &e) const {
         //std::cout << "Translating:\n";
         //boost::proto::display_expr(e);
-        return safe_cast<const Symbol<Type<Tag> > >(
-          constTranslateWithGrammar<ConstructSymbolGrammar>(e, symtab));
+        return translateWithGrammar<ConstructSymbolGrammar>(e, symtab);
       }
     };
   }

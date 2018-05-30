@@ -2,8 +2,6 @@
 #define mirv_Core_Utility_Debug_hpp
 
 #include <mirv/Core/Memory/Heap.hpp>
-#include <mirv/Core/IR/Base.hpp>
-#include <mirv/Core/IR/NodeFwd.hpp>
 
 #include <iostream>
 #include <cstdlib>
@@ -19,6 +17,12 @@ namespace mirv {
   /// Abort with a message.
   inline void error(const std::string &msg) {
     std::cerr << "ERROR: " << msg << "\n";
+    abort();
+  }
+
+  /// Abort with a message.
+  inline void unreachable(const std::string &msg) {
+    std::cerr << "UNREACHABLE: " << msg << "\n";
     abort();
   }
 
@@ -54,7 +58,13 @@ namespace mirv {
     }
   };
 
-  void dump(ptr<const Node<Base> > node);  
+  class Type;
+  class Control;
+  class ValueProducer;
+
+  void dump(ptr<const Type> sym);
+  void dump(ptr<Control> statement);
+  void dump(ptr<ValueProducer> expression);
 }
 
 #endif

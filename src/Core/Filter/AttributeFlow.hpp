@@ -18,7 +18,7 @@ namespace mirv {
       AttributeFlowEnterAction(FlowAttributeManager &am)
           : enter(am), attributeManager(am) {}
       template<typename Arg>
-      void operator()(const Arg &a) {
+      void operator()(Arg &a) {
         attributeManager.pushContext();
         enter(a);
       }
@@ -37,7 +37,7 @@ namespace mirv {
       AttributeFlowLeaveAction(FlowAttributeManager &am)
           : leave(am), attributeManager(am) {}
       template<typename Arg>
-      void operator()(const Arg &a) {
+      void operator()(Arg &a) {
         leave(a);
         // Do the pop last as we may still need our inherited
         // attribute.
@@ -63,7 +63,7 @@ namespace mirv {
     AttributeFlowSynthesizedToInheritedAction(FlowAttributeManager &am)
         : action(am), attributeManager(am) {}
     template<typename Arg>
-    void operator()(const Arg &a) {
+    void operator()(Arg &a) {
       action(a);
       if (attributeManager.setLastSynthesizedAttribute()) {
         attributeManager.setInheritedAttribute(attributeManager.
@@ -72,14 +72,23 @@ namespace mirv {
     }
 
     template<typename Arg1, typename Arg2>
-    void operator()(const Arg1 &a1, const Arg2 &a2) {
+    void operator()(Arg1 &a1, Arg2 &a2) {
       action(a1, a2);
       if (attributeManager.setLastSynthesizedAttribute()) {
         attributeManager.setInheritedAttribute(attributeManager.
                                                getLastSynthesizedAttribute());
       }
     }
-  };
+
+    template<typename Arg1, typename Arg2, typename Arg3>
+    void operator()(Arg1 &a1, Arg2 &a2, Arg3 &a3) {
+      action(a1, a2, a3);
+      if (attributeManager.setLastSynthesizedAttribute()) {
+        attributeManager.setInheritedAttribute(attributeManager.
+                                               getLastSynthesizedAttribute());
+      }
+    }
+};
 
   /// This action transfers an inherited attribute to a synthesized
   /// attribute.  It is useful for leaf nodes and other constructs
@@ -97,7 +106,7 @@ namespace mirv {
     AttributeFlowInheritedToSynthesizedAction(FlowAttributeManager &am)
         : action(am), attributeManager(am) {}
     template<typename Arg>
-    void operator()(const Arg &a) {
+    void operator()(Arg &a) {
       action(a);
       // If we didn't set a synthesized attribute and we didn't get
       // one from a child, then propagate the inherited attribute as
@@ -110,7 +119,7 @@ namespace mirv {
     }
 
     template<typename Arg1, typename Arg2>
-    void operator()(const Arg1 &a1, const Arg2 &a2) {
+    void operator()(Arg1 &a1, Arg2 &a2) {
       action(a1, a2);
       if (!attributeManager.setSynthesized()) {
         attributeManager.setSynthesizedAttribute(attributeManager.

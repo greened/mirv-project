@@ -2,6 +2,7 @@
 #define mirv_Core_Builder_SequenceGrammar_hpp
 
 #include <mirv/Core/Builder/SequenceRules.hpp>
+#include <mirv/Core/Builder/StatementTransforms.hpp>
 
 namespace mirv {
   namespace Builder {
@@ -9,9 +10,9 @@ namespace mirv {
     /// role of the semicolon in C-like languages.
     struct SequenceBuilder : boost::proto::when<
       CommaRule,
-      ConstructBinary<Statement<Block> >(boost::proto::_data,
-                                         ConstructStatementGrammar(boost::proto::_left),
-                                         ConstructStatementGrammar(boost::proto::_right))> {};
+      BlockTransform(boost::proto::_data,
+                             ConstructStatementGrammar(boost::proto::_left),
+                             ConstructStatementGrammar(boost::proto::_right))> {};
   }
 }
 

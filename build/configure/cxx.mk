@@ -8,7 +8,7 @@ include $(BUILDTOOLS)/configure/configure.mk
 include $(BUILDTOOLS)/configure/executable.mk
 include $(BUILDTOOLS)/configure/execute.mk
 
-$(call mc_target_tool,CXX,g++ c++,Could not find C++ compiler)
+$(call mc_target_tool,CXX,clang++ g++ c++,Could not find C++ compiler)
 
 #ifeq ($(CXX),)
 #  $(call mc_target_tool,CXX,g++ c++,Could not find C++ compiler)
@@ -36,8 +36,26 @@ CXX_EXECUTE_TRUE = $(call mc_define_append_nomsg,CONFIG_HAVE_GXX,yes,$@); $(call
 CXX_EXECUTE_FALSE = $(call mc_define_append_nomsg,CONFIG_HAVE_GXX,,$@)
 CXX_EXECUTE_DEP_MK = $(FINAL_BUILDDIR)/configure/CXX.mk
 
-$(call mc_try_execute,GXX_EXECUTE,CXX_EXECUTE_RUN,CXX_EXECUTE_TRUE,CXX_EXECUTE_FALSE,$(CXX_EXECUTE_DEP_MK))
+ifeq ($(CONFIG_HAVE_GXX),yes)
+  include $(BUILDTOOLS)/configure/gxx.mk
+endif
+
+# See if this is clang++
+CXX_EXECUTE_RUN = $(CXX) --version | grep "clang"
+CXX_EXECUTE_TRUE = $(call mc_define_append_nomsg,CONFIG_HAVE_CLANGXX,yes,$@); $(call mc_info_append,Using clang++,$@)
+CXX_EXECUTE_FALSE = $(call mc_define_append_nomsg,CONFIG_HAVE_CLANGXX,,$@)
+CXX_EXECUTE_DEP_MK = $(FINAL_BUILDDIR)/configure/CXX.mk
+
+$(call mc_try_execute,CXX_EXECUTE,CXX_EXECUTE_RUN,CXX_EXECUTE_TRUE,CXX_EXECUTE_FALSE,$(CXX_EXECUTE_DEP_MK))
 
 #CONFIGURE_INCLUDES += $(FINAL_BUILDDIR)/configure/GXX_TRY.mk
+
+ifeq ($(CONFIG_HAVE_CLANGXX),yes)
+  include $(BUILDTOOLS)/configure/clangxx.mk
+endif
+
+LXX := $(CXX)
+CXXDEPFLAGS := -MM
+CXXPICFLAGS := -fPIC
 
 endif

@@ -7,10 +7,10 @@
 
 namespace mirv {
    namespace Builder {
-      // Nary expressions
+     // Nary expressions
      /// This is a rule to match a call expression.
      /// Call -> Expression '(' Expression? (, Expression)* ')'
-     struct CallRule : boost::proto::function<ConstructExpressionGrammar, 
+     struct FunctionCallRule : boost::proto::function<ConstructExpressionGrammar, 
        boost::proto::vararg<ConstructExpressionGrammar>
        > {};
    }

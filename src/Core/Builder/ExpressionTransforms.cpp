@@ -5,72 +5,76 @@
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/Reference.hpp>
+#include <mirv/Core/IR/Producers.hpp>
 #include <mirv/Core/IR/Type.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 
 namespace mirv {
   namespace Builder {
-    ptr<Expression<Base> >
+    ptr<ValueProducer>
     VariableRefTransform::operator()(ptr<const SymbolTable> symtab,
                                      const std::string &name) {
+      std::cerr << "VariableRefTransform\n";
       // Pointer
-      return ConstructUnary<Expression<Load> >()(
-        symtab,
-        ConstructUnary<
-          Expression<Reference<Variable> >
-          >()(symtab,
-              LookupSymbol<Symbol<Variable> >()(symtab, name)));
+      auto Alloc = IRBuilder::FindAllocate(name);
+      checkInvariant(Alloc != nullptr, "Did not find expected allocate");
+      return IRBuilder::get<Load>(IRBuilder::getTempName(),
+                                  Alloc);
     }
 
-    ptr<Expression<Base> >
+    ptr<ValueProducer>
     GlobalVariableRefTransform::operator()(ptr<SymbolTable> symtab,
                                            const std::string &name) {
-      return ConstructGlobalReference()(
-        symtab,
-        LookupSymbol<Symbol<GlobalVariable> >()(symtab, name));
+      std::cerr << "GlobalVariableRefTransform\n";
+      auto Global = IRBuilder::FindGlobalVariable(name);
+      checkInvariant(Global != nullptr, "Did not find expected global");
+      auto Address = Global;
+      return IRBuilder::get<Load>(IRBuilder::getTempName(),
+                                  Address);
     }
 
-    ptr<Expression<Base> >
+    ptr<Function>
     FunctionRefTransform::operator()(ptr<const SymbolTable> symtab,
                                      const std::string &name) {
-      return ConstructUnary<Expression<Reference<Function> > >()(
-        symtab,
-        LookupSymbol<Symbol<Function> >()(symtab, name));
+      return IRBuilder::FindFunction(name);
     }
 
-    ptr<Expression<Reference<Constant<Base> > > >
+    ptr<Constant>
     ConstantRefTransform::operator()(ptr<const SymbolTable> symtab,
-                                     ptr<Symbol<Constant<Base> > > constant) {
-      return ConstructUnary<Expression<Reference<Constant<Base> > > >()(
-        symtab, constant);
+                                     ptr<Constant> constant) {
+      std::cerr << "ConstantRefTransform\n";
+      return constant;
     }
 
-    ptr<Expression<Base> >
+    ptr<ValueProducer>
     ArrayRefSequenceTransform::operator()(ptr<const SymbolTable> symtab,
-                                          ptr<Expression<Base> > address) {
-      return ConstructUnary<Expression<Load> >()(symtab, address);
-    }
-
-    ptr<Expression<Base> >
-    ArrayRefIndexTransform::operator()(ptr<SymbolTable> symtab,
-                                       ptr<Expression<Base> > base,
-                                       ptr<Expression<Base> > index) {
-      return ConstructUnary<Expression<Load> >()(
-        symtab, ConstructAddress()(symtab, base, index));
-    }
-
-    ptr<Expression<Base> >
-    ArrayAddressSequenceTransform::operator()(ptr<const SymbolTable> symtab,
-                                              ptr<Expression<Base> > address) {
+                                          ptr<ValueProducer> address) {
       return address;
     }
 
-    ptr<Expression<Base> >
+    ptr<ValueProducer>
+    ArrayRefIndexTransform::operator()(ptr<SymbolTable> symtab,
+                                       ptr<ValueProducer> base,
+                                       ptr<ValueProducer> index) {
+      auto Pointer = IRBuilder::get<TuplePointer>(IRBuilder::getTempName(),
+                                                  base,
+                                                  index);
+      return IRBuilder::get<Load>(IRBuilder::getTempName(),
+                                  Pointer);
+    }
+
+    ptr<ValueProducer>
+    ArrayAddressSequenceTransform::operator()(ptr<const SymbolTable> symtab,
+                                              ptr<ValueProducer> address) {
+      return address;
+    }
+
+    ptr<ValueProducer>
     ArrayAddressIndexTransform::operator()(ptr<SymbolTable> symtab,
-                                           ptr<Expression<Base> > base,
-                                           ptr<Expression<Base> > index) {
-      return ConstructAddress()(symtab, base, index);
+                                           ptr<ValueProducer> base,
+                                           ptr<ValueProducer> index) {
+      return IRBuilder::get<TuplePointer>(IRBuilder::getTempName(),
+                                          base,
+                                          index);
     }
   }
 }

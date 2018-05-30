@@ -1,19 +1,10 @@
 #ifndef mirv_Core_Builder_MakeExpression_hpp
 #define mirv_Core_Builder_MakeExpression_hpp
 
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Bitwise.hpp>
-#include <mirv/Core/IR/Logical.hpp>
-#include <mirv/Core/IR/ModuleFwd.hpp>
-#include <mirv/Core/IR/Reference.hpp>
-#include <mirv/Core/IR/Relational.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
+#include <mirv/Core/IR/Producers.hpp>
+#include <mirv/Core/IR/Module.hpp>
+#include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/IR/Function.hpp>
-//#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/PlaceholderType.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Module.hpp>
 
@@ -24,80 +15,67 @@
 namespace mirv {
   namespace Builder {
     namespace {
-      ptr<Expression<Base> >
+      ptr<ValueProducer>
       makeIntegralConstant(std::uint64_t constant,
-                           ptr<Symbol<Module> > module)
-      {
+                           ptr<Module> module) {
         checkInvariant(module, "No module available!");
-        Symbol<Module>::TypeIterator type =
-          module->typeFind("int64");
-        checkInvariant(type != module->typeEnd(), "No integer type available!");
-        ptr<Symbol<Constant<Base> > > symbol =
-          mirv::make<Symbol<Constant<std::uint64_t> > >(*type, constant);
-        return mirv::make<Expression<Reference<Constant<Base> > > >(symbol);
+        auto IntType = IRBuilder::getIntegerType(64);
+        ptr<Constant> symbol =
+          IRBuilder::getIntegerConstant(IntType, constant);
+        return symbol;
       }
     }
 
-    ptr<Expression<Base> >
-    makeExpression(std::int8_t constant, ptr<Symbol<Module> > module) 
-    {
+    ptr<ValueProducer>
+    makeExpression(std::int8_t constant, ptr<Module> module) {
       return makeIntegralConstant(constant, module);
     }
 
-    ptr<Expression<Base> >
-    makeExpression(std::uint8_t constant, ptr<Symbol<Module> > module) 
-    {
+    ptr<ValueProducer>
+    makeExpression(std::uint8_t constant, ptr<Module> module) {
       return makeIntegralConstant(constant, module);
     }
 
-    ptr<Expression<Base> >
-    makeExpression(std::int16_t constant, ptr<Symbol<Module> > module) 
-    {
+    ptr<ValueProducer>
+    makeExpression(std::int16_t constant, ptr<Module> module) {
       return makeIntegralConstant(constant, module);
     }
 
-    ptr<Expression<Base> >
-    makeExpression(std::uint16_t constant, ptr<Symbol<Module> > module) 
-    {
+    ptr<ValueProducer>
+    makeExpression(std::uint16_t constant, ptr<Module> module) {
       return makeIntegralConstant(constant, module);
     }
 
-    ptr<Expression<Base> >
-    makeExpression(std::int32_t constant, ptr<Symbol<Module> > module) 
-    {
+    ptr<ValueProducer>
+    makeExpression(std::int32_t constant, ptr<Module> module) {
       return makeIntegralConstant(constant, module);
     }
 
-    ptr<Expression<Base> >
-    makeExpression(std::uint32_t constant, ptr<Symbol<Module> > module) 
-    {
+    ptr<ValueProducer>
+    makeExpression(std::uint32_t constant, ptr<Module> module) {
       return makeIntegralConstant(constant, module);
     }
 
-    ptr<Expression<Base> >
-    makeExpression(std::int64_t constant, ptr<Symbol<Module> > module) 
-    {
+    ptr<ValueProducer>
+    makeExpression(std::int64_t constant, ptr<Module> module) {
       return makeIntegralConstant(constant, module);
     }
 
-    ptr<Expression<Base> >
-    makeExpression(std::uint64_t constant, ptr<Symbol<Module> > module) 
-    {
+    ptr<ValueProducer>
+    makeExpression(std::uint64_t constant, ptr<Module> module) {
       return makeIntegralConstant(constant, module);
     }
 
-    ptr<Expression<Base> >
-    makeExpression(float constant, ptr<Symbol<Module> > module) 
-    {
-      return safe_cast<Expression<Base> >(
+    ptr<ValueProducer>
+    makeExpression(float constant, ptr<Module> module) {
+      return safe_cast<ValueProducer>(
         translateWithGrammar<ConstructExpressionGrammar>(
           module, boost::proto::lit(constant)));
     }
 
-    ptr<Expression<Base> >
-    makeExpression(double constant, ptr<Symbol<Module> > module) 
-    {
-      return safe_cast<Expression<Base> >(
+    ptr<ValueProducer>
+    makeExpression(double constant, ptr<Module> module) {
+      return safe_cast<ValueProducer>(
         translateWithGrammar<ConstructExpressionGrammar>(
           module, boost::proto::lit(constant)));
     }

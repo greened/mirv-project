@@ -2,8 +2,6 @@
 #define mirv_Core_Builder_VoidTypeGrammar_hpp
 
 #include <mirv/Core/Builder/VoidTypeRules.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/fusion/include/transform.hpp>
@@ -12,9 +10,9 @@ namespace mirv {
   namespace Builder {
     /// This is a callable transform to construct a void type.
     struct ConstructVoidType : boost::proto::callable {
-      typedef ptr<Symbol<Type<TypeBase> > > result_type;
+      typedef ptr<const Type> result_type;
       result_type operator()(void) {
-	return result_type();
+	return IRBuilder::getVoidType();
       }
     };
 

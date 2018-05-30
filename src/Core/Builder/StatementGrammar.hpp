@@ -21,7 +21,7 @@ namespace mirv {
       IfElseBuilder,
       WhileBuilder,
       DoWhileBuilder,
-      CallStatementBuilder
+      SubroutineCallStatementBuilder
       > {};
   }
 }

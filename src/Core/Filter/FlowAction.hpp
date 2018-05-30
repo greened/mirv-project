@@ -20,16 +20,16 @@ namespace mirv {
 
     // FIXME: Maybe move transfers to before/after actions.
     template<typename Expr>
-    void operator()(boost::shared_ptr<Expr> child) {
+    void operator()(Expr & child) {
       this->visitor().transfer(*parentFlow);
       VisitAction<Flow>::operator()(child);
       parentFlow->transfer(this->visitor());
     }
 
     // FIXME: Maybe move transfers to before/after actions.
-    template<typename Stmt, typename InputIterator>
-    void operator()(boost::shared_ptr<Stmt> parent,
-                    InputIterator child) {
+    template<typename Stmt, typename Child>
+    void operator()(Stmt & parent,
+                    ptr<Child> child) {
       this->visitor().transfer(*parentFlow);
       VisitAction<Flow>::operator()(parent, child);
       parentFlow->transfer(this->visitor());

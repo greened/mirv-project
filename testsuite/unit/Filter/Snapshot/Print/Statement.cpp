@@ -51,118 +51,65 @@
 // STDOUT:             vref c
 // STDOUT: }
 
-#include <mirv/Core/IR/Control.hpp>
-#include <mirv/Core/IR/Mutating.hpp>
-#include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Constant.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Reference.hpp>
-#include <mirv/Core/IR/Relational.hpp>
-#include <mirv/Core/Builder/Make.hpp>
+#include <mirv/Core/IR/ControlStructure.hpp>
+#include <mirv/Core/IR/Producers.hpp>
+#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
-using mirv::Node;
-using mirv::Symbol;
-using mirv::Variable;
-using mirv::Constant;
-using mirv::Type;
-using mirv::Integral;
-using mirv::Pointer;
-using mirv::Expression;
-using mirv::Base;
-using mirv::Add;
+using mirv::Allocate;
+using mirv::DoWhile;
 using mirv::LessThan;
 using mirv::GreaterThan;
-using mirv::Statement;
-using mirv::Allocate;
 using mirv::Block;
-using mirv::IfElse;
-using mirv::DoWhile;
-using mirv::Load;
 using mirv::Store;
-using mirv::Reference;
-using mirv::ptr;
+using mirv::IfElse;
+using mirv::Sequence;
+using mirv::Add;
+using mirv::Load;
+using mirv::IRBuilder;
 using mirv::PrintFilter;
-using mirv::make;
 
 int main(void)
 {
-  ptr<Symbol<Type<Integral> > > int32type =
-    make<Symbol<Type<Integral> > >(32);
-  ptr<const Symbol<Type<Pointer> > > ptrtype =
-    make<Symbol<Type<Pointer> > >(int32type);
+  auto int32type = IRBuilder::getIntegerType(32);
+  auto ptrtype = IRBuilder::getPointerType(int32type);
 
-  ptr<Symbol<Variable> > a =
-    Symbol<Variable>::make("a", ptrtype);
-  ptr<Symbol<Variable> > b =
-    Symbol<Variable>::make("b", ptrtype);
-  ptr<Symbol<Variable> > c =
-    Symbol<Variable>::make("c", ptrtype);
+  auto a = IRBuilder::get<Allocate>("a", ptrtype);
+  auto b = IRBuilder::get<Allocate>("b", ptrtype);
+  auto c = IRBuilder::get<Allocate>("c", ptrtype);
 
-  ptr<Statement<Base> > dowhile =
-    Statement<Block>::make(
-      Statement<Allocate>::make(
-        Expression<Reference<Variable> >::make(a),
-        Expression<Reference<Constant<Base> > >::make(
-          Symbol<Constant<std::uint64_t> >::make(
-            int32type, 1)),
-        int32type),
-      Statement<Allocate>::make(
-        Expression<Reference<Variable> >::make(b),
-        Expression<Reference<Constant<Base> > >::make(
-          Symbol<Constant<std::uint64_t> >::make(
-            int32type, 1)),
-        int32type),
-      Statement<Allocate>::make(
-        Expression<Reference<Variable> >::make(c),
-        Expression<Reference<Constant<Base> > >::make(
-          Symbol<Constant<std::uint64_t> >::make(
-            int32type, 1)),
-        int32type),
-      Statement<DoWhile>::make(
-        Expression<LessThan>::make(
-          Expression<Load>::make(
-            Expression<Reference<Variable> >::make(a)),
-          Expression<Load>::make(
-            Expression<Reference<Variable> >::make(c))),
-        Statement<Block>::make(
-          Statement<Store>::make(
-            Expression<Reference<Variable> >::make(a),
-            Expression<Add>::make(
-              Expression<Load>::make(
-                Expression<Reference<Variable> >::make(a)),
-              Expression<Load>::make(
-                Expression<Reference<Variable> >::make(b)))),
-          Statement<IfElse>::make(
-            Expression<GreaterThan>::make(
-              Expression<Load>::make(
-                Expression<Reference<Variable> >::make(b)),
-              Expression<Load>::make(
-                Expression<Reference<Variable> >::make(c))),
-            Statement<Block>::make(
-              Statement<Store>::make(
-                Expression<Reference<Variable> >::make(a),
-                Expression<Add>::make(
-                  Expression<Load>::make(
-                    Expression<Reference<Variable> >::make(a)),
-                  Expression<Load>::make(
-                    Expression<Reference<Variable> >::make(b))))),
-            Statement<Block>::make(
-              Statement<Store>::make(
-                Expression<Reference<Variable> >::make(a),
-                Expression<Add>::make(
-                  Expression<Load>::make(
-                    Expression<Reference<Variable> >::make(a)),
-                  Expression<Load>::make(
-                    Expression<Reference<Variable> >::make(c)))))))));
+  auto dowhile =
+    IRBuilder::get<DoWhile>(
+      IRBuilder::get<LessThan>(a, c),
+        IRBuilder::get<Block>(
+          IRBuilder::get<Sequence>(
+            IRBuilder::get<Store>(
+              a,
+              IRBuilder::get<Add>(IRBuilder::get<Load>(a),
+                                  IRBuilder::get<Load>(b)))),
+          IRBuilder::get<IfElse>(
+            IRBuilder::get<GreaterThan>(
+              IRBuilder::get<Load>(b),
+              IRBuilder::get<Load>(c)),
+            IRBuilder::get<Block>(
+              IRBuilder::get<Sequence>(
+                IRBuilder::get<Store>(
+                  a,
+                  IRBuilder::get<Add>(
+                    IRBuilder::get<Load>(a),
+                    IRBuilder::get<Load>(b))))),
+            IRBuilder::get<Block>(
+              IRBuilder::get<Sequence>(
+                IRBuilder::get<Store>(
+                  a,
+                  IRBuilder::get<Add>(
+                    IRBuilder::get<Load>(a),
+                    IRBuilder::get<Load>(c))))))));
 
   PrintFilter print(std::cout);
 
-  print(boost::static_pointer_cast<Node<Base> >(dowhile));
+  print.run(dowhile);
 
   return(0);
 }

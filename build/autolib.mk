@@ -14,7 +14,8 @@ $$(foreach srcdir,$(3),$$(call make_objects,$(1)_$$(subst /,_,$$(srcdir)),$$(src
 $$(foreach srcdir,$(3),$$(eval $(1)_SRCS += $$($(1)_$$(subst /,_,$$(srcdir))_SRCS)))
 $$(foreach srcdir,$(3),$$(eval $(1)_OBJS += $$($(1)_$$(subst /,_,$$(srcdir))_OBJS)))
 
-$(1)_LIBRARIES := $$($(1)_OBJDIR)/$(1).a $$($(1)_OBJDIR)/$(1).so
+#$(1)_LIBRARIES := $$($(1)_OBJDIR)/$(1).a $$($(1)_OBJDIR)/$(1).so
+$(1)_LIBRARIES := $$($(1)_OBJDIR)/$(1).a
 
 $$($(1)_OBJDIR)/$(1).a: $$($(1)_OBJS)
 	+$$(QUIET)[ -d $$(@D) ] || $$(MKDIR) -p $$(@D)

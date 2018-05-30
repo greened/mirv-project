@@ -4,8 +4,8 @@
 #include <mirv/Core/Builder/DoWhileRulesFwd.hpp>
 
 #include <mirv/Core/Builder/LoopTerminals.hpp>
-#include <mirv/Core/Builder/ExpressionGrammar.hpp>
-#include <mirv/Core/Builder/StatementGrammar.hpp>
+#include <mirv/Core/Builder/ExpressionRules.hpp>
+#include <mirv/Core/Builder/StatementRules.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
 
@@ -19,11 +19,11 @@ namespace mirv {
        boost::proto::member<
 	 boost::proto::subscript<
 	   DoTerminal,
-	   ConstructStatementGrammar
+	   StatementRule
 	   >,
 	 WhileTerminal
 	 >,
-       ConstructExpressionGrammar
+       ExpressionRule
        > {};
    }
 }

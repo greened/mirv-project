@@ -19,37 +19,23 @@
 
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/PlaceholderType.hpp>
-#include <mirv/Core/IR/Relational.hpp>
-#include <mirv/Core/IR/Arithmetic.hpp>
 #include <mirv/Core/IR/Control.hpp>
-#include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/ModuleGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
+using mirv::IRBuilder;
 using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
-using mirv::Variable;
+using mirv::FunctionType;
 using mirv::GlobalVariable;
 using mirv::Type;
-using mirv::TypeBase;
-using mirv::Integral;
-using mirv::FunctionType;
-using mirv::Node;
-using mirv::Base;
 using mirv::ptr;
 using mirv::PrintFilter;
-using mirv::make;
 
 namespace Builder = mirv::Builder;
 
@@ -63,32 +49,18 @@ using Builder::if_;
 
 int main(void)
 {
-  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
+  ptr<Module> module = IRBuilder::GetOrCreateModule("testmodule");
 
-  
-  ptr<Symbol<Type<TypeBase> > > inttype =
-    make<Symbol<Type<Integral> > >(32);
-  module->typePushBack(inttype);
+  ptr<const Type> inttype = IRBuilder::getIntegerType(32);
 
-  std::vector<ptr<Symbol<Type<TypeBase> > >> argTypes;
-  argTypes.push_back(inttype);
+  ptr<const Type> functype = IRBuilder::getFunctionType(FunctionType::NotVararg,
+                                                        IRBuilder::getVoidType(),
+                                                        inttype);
 
-  ptr<Symbol<Type<TypeBase> > > functype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >(),
-                                       argTypes.begin(),
-                                       argTypes.end());
-  module->typePushBack(functype);
+  IRBuilder::GetOrCreateGlobalVariable("a", inttype);
+  IRBuilder::GetOrCreateGlobalVariable("b", inttype);
 
-  ptr<Symbol<GlobalVariable> > asym =
-    make<Symbol<GlobalVariable> >("a", inttype);
-  module->globalVariablePushBack(asym);
-
-  ptr<Symbol<GlobalVariable> > bsym =
-    make<Symbol<GlobalVariable> >("b", inttype);
-  module->globalVariablePushBack(bsym);
-
-  ptr<Symbol<Function> > fsym = make<Symbol<Function> >("foo", functype);
-  module->functionPushBack(fsym);
+  IRBuilder::GetOrCreateFunction("foo", functype);
 
   Builder::GlobalVariableTerminal a = {{"a"}};
   Builder::GlobalVariableTerminal b = {{"b"}};
@@ -96,7 +68,7 @@ int main(void)
 
   Builder::FunctionTerminal foo = {{"foo"}};
 
-  ptr<Node<Base> > code =
+  auto code =
     Builder::translateWithGrammar<Builder::FunctionBuilder>(module,
       func["testfunc"].type[void_()] [
         var[c].type[int_(32)],
@@ -105,9 +77,9 @@ int main(void)
       ]
     );
 
-  PrintFilter print(std::cout);
-  
-  print(code);
+  mirv::PrintFilter print(std::cout);
+
+  print.run(code);
 
   return(0);
 }

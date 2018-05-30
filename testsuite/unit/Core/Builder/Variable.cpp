@@ -11,13 +11,8 @@
 
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/PlaceholderType.hpp>
+#include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
@@ -25,45 +20,39 @@
 using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
-using mirv::Variable;
+using mirv::IRBuilder;
 using mirv::Type;
-using mirv::TypeBase;
-using mirv::Integral;
 using mirv::FunctionType;
-using mirv::Node;
-using mirv::Base;
 using mirv::ptr;
 using mirv::PrintFilter;
-using mirv::make;
 
 namespace Builder = mirv::Builder;
 
 using Builder::var;
 using Builder::func;
+using Builder::int_;
+using Builder::void_;
 
 int main(void)
 {
-  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
+  auto module = IRBuilder::GetOrCreateModule("module");
 
-  ptr<Symbol<Type<TypeBase> > > functype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >());
-  module->typePushBack(functype);
+  IRBuilder::getFunctionType(FunctionType::NotVararg,
+                             IRBuilder::getVoidType());
 
-  ptr<Symbol<Type<TypeBase> > > inttype =
-    make<Symbol<Type<Integral> > >(32);
-  module->typePushBack(inttype);
+  IRBuilder::getIntegerType(32);
 
-  ptr<Node<Base> > code =
+  auto code =
     Builder::translateWithGrammar<Builder::FunctionBuilder>(
-      module, ptr<Symbol<Function> >(),
-      func["testfunc"].type["void ()"] [
-	var["a"].type["int32"]
+      module, ptr<Function>(),
+      func["testfunc"].type[void_()] [
+        var["a"].type[int_(32)]
       ]
     );
 
   PrintFilter print(std::cout);
-  
-  print(code);
+
+  print.run(code);
 
   return(0);
 }

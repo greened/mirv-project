@@ -1,37 +1,39 @@
 #ifndef mirv_Core_Filter_Filter_hpp
 #define mirv_Core_Filter_Filter_hpp
 
-#include <mirv/Core/IR/NodeFwd.hpp>
 #include <mirv/Core/Memory/Heap.hpp>
-#include <mirv/Core/Containers/Vector.hpp>
+#include <mirv/Library/Range.hpp>
+#include <mirv/Library/Vector.hpp>
 
 #include <boost/range/iterator_range.hpp>
 
 namespace mirv {
+  class Control;
+  class Function;
+  class Module;
+  class Producer;
+
   /// This is the base class for all IR filters.  A filter is
   /// essenetially a pass that examines and/or modifies the IR in some
   /// way.
   class FilterBase {
   private:
-    typedef Vector<std::string>::type DependenceVector;
+    typedef Vector<std::string> DependenceVector;
     DependenceVector requiresVector;
     DependenceVector providesVector;
     DependenceVector killsVector;
-
-    virtual void run(ptr<Node<Base> > node) = 0;
-    virtual void run(ptr<const Node<Base> > node) = 0;
 
   public:
     template<typename ForwardRange>
     FilterBase(ForwardRange require,
                ForwardRange provide,
                ForwardRange kill)
-        : requiresVector(require.begin(), require.end()),
-            providesVector(provide.begin(), provide.end()),
-            killsVector(kill.begin(), kill.end()) {}
+      : requiresVector(require.begin(), require.end()),
+        providesVector(provide.begin(), provide.end()),
+        killsVector(kill.begin(), kill.end()) {}
     virtual ~FilterBase(void);
 
-    typedef boost::iterator_range<DependenceVector::const_iterator> range;
+    typedef Range<DependenceVector::const_iterator> range;
 
     range requires(void) const {
       return range(requiresVector.begin(), requiresVector.end());
@@ -42,29 +44,38 @@ namespace mirv {
     range kills(void) const {
       return range(killsVector.begin(), killsVector.end());
     }
-
-    void operator()(ptr<Node<Base> > node) {
-      run(node);
-    }
-    void operator()(ptr<const Node<Base> > node) {
-      run(node);
-    }
   };
 
-  template<typename Visited, typename Result = void>
   class Filter : public FilterBase {
   private:
-    virtual void run(ptr<Node<Base> > node) {}
-    virtual void run(ptr<const Node<Base> > node) {}
+    virtual void runImpl(ptr<Module> M);
+    virtual void runImpl(ptr<Function> F) = 0;
+    // virtual void runImpl(ptr<Symbol> F) = 0;
+    virtual void runImpl(ptr<Producer> F) = 0;
+    virtual void runImpl(ptr<Control> F) = 0;
 
   public:
     template<typename ForwardRange>
     Filter(ForwardRange requires,
            ForwardRange provides,
-           ForwardRange kills)
-        : FilterBase(requires, provides, kills) {}
+           ForwardRange kills) :
+      FilterBase(requires, provides, kills) {}
 
-    typedef Result result_type;
+    void run(ptr<Module> M) {
+      runImpl(M);
+    }
+    void run(ptr<Function> F) {
+      runImpl(F);
+    }
+    // void run(ptr<Symbol> F) {
+    //   runImpl(F);
+    // }
+    void run(ptr<Producer> F) {
+      runImpl(F);
+    }
+    void run(ptr<Control> F) {
+      runImpl(F);
+    }
   };
 }
 

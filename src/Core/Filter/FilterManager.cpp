@@ -1,15 +1,8 @@
 #include <mirv/Core/Filter/FilterManager.hpp>
-#include <mirv/Core/IR/Module.hpp>
-#include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Node.hpp>
+#include <mirv/Core/Utility/Cast.hpp>
+#include <mirv/Core/Utility/Debug.hpp>
 
 namespace mirv {
-  namespace lib {
-    template<> std::shared_ptr<FilterDependenceManager>
-    Singleton<FilterDependenceManager>::inst = 0;
-  }
-
   void FilterDependenceManager::registerFilter(FilterConstructor factory,
                                                const std::string &data) {
     instance().provides.insert(std::make_pair(data, factory));
@@ -28,14 +21,24 @@ namespace mirv {
     }
   }
 
-  void FilterManager::run(ptr<Node<Base> > node) {
+  void FilterManager::run(ptr<Module> M) {
     for (auto f : filters) {
-      (*f)(node);
+      f->run(M);
     }
   }
-  void FilterManager::run(ptr<const Node<Base> > node) {
+  void FilterManager::run(ptr<Function> Func) {
     for (auto f : filters) {
-      (*f)(node);
+      f->run(Func);
+    }
+  }
+  void FilterManager::run(ptr<Control> C) {
+    for (auto f : filters) {
+      f->run(C);
+    }
+  }
+  void FilterManager::run(ptr<Producer> P) {
+    for (auto f : filters) {
+      f->run(P);
     }
   }
 }

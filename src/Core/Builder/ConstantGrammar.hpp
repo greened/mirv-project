@@ -14,14 +14,14 @@ namespace mirv {
     struct ConstantBuilder : boost::proto::or_<
       boost::proto::when<
         IntegralConstantRule,
-        ConstructConstantSymbol<detail::IntegralTypeGen>(
+        ConstructConstantSymbol<detail::IntegerConstantGen>(
             boost::proto::_data,
             // Constant expression
             boost::proto::_expr)
             >,
       boost::proto::when<
         FloatingConstantRule,
-        ConstructConstantSymbol<detail::FloatingTypeGen>(
+        ConstructConstantSymbol<detail::FloatingPointConstantGen>(
             boost::proto::_data,
             // Constant expression
             boost::proto::_expr)
@@ -36,7 +36,7 @@ namespace mirv {
         boost::proto::_data,
         AddStringConstant(
           boost::proto::_data,
-          ConstructConstantSymbol<detail::StringTypeGen>(
+          ConstructConstantSymbol<detail::StringConstantGen>(
             boost::proto::_data,
             // Constant expression
             boost::proto::_expr)))

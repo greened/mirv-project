@@ -7,97 +7,149 @@
 #include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
 #include <mirv/Core/Builder/Fusion.hpp>
 #include <mirv/Core/Builder/SymbolTransforms.hpp>
-#include <mirv/Core/IR/TupleTypeFwd.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/proto/proto.hpp>
+#include <boost/proto/fusion.hpp>
+#include <boost/fusion/functional/invocation/invoke.hpp>
 #include <boost/fusion/iterator.hpp>
 #include <boost/fusion/include/transform.hpp>
 
 namespace mirv {
   namespace Builder {
-    namespace detail {
-      /// This is a helper functor to translate a proto list to a list
-      /// of IR objects.
-      template<bool Matches>
-      class TranslateListImpl {
-      public:
-        template<typename OutputIterator, typename List>
-        void operator()(boost::shared_ptr<SymbolTable> symtab,
-                        OutputIterator out,
-                        const List &typeList) {
-          FlattenAndTranslateFusionTypeSequence()(symtab, typeList, out);
-        }
-      };
+    // namespace detail {
+    //   /// This is a helper functor to translate a proto list to a list
+    //   /// of IR objects.
+    //   template<bool Matches>
+    //   class TranslateListImpl {
+    //   public:
+    //     template<typename OutputIterator, typename List>
+    //     void operator()(ptr<SymbolTable> symtab,
+    //                     OutputIterator out,
+    //                     const List &typeList) {
+    //       auto Build = [] (auto ...args) -> ptr<const FunctionType> {
+    //         return IRBuilder::get<FunctionType>(std::move(args)...);
+    //       };
 
-      /// This is a helper functor to translate a single proto expression
-      /// to a type symbol.  It handles the single struct member case.
-      template<>
-      class TranslateListImpl<false> {
-      public:
-        template<typename OutputIterator, typename List>
-        void operator()(boost::shared_ptr<SymbolTable> symtab,
-                        OutputIterator out,
-                        const List &typeList) {
-          *out = TranslateToSymbol<Symbol<Type<TypeBase> > >(symtab)(typeList);
-        }
-      };
+    //       using boost::fusion::invoke;
+    //       using boost::fusion::transform;
+    //       using boost::fusion::pop_front;
 
-      /// This is a grammar action to translate the elements of a list
-      /// to type symbols.  Various sequence types use it to construct
-      /// their member types.
-      class TranslateList {
-      public:
-        template<typename OutputIterator, typename List>
-        void operator()(boost::shared_ptr<SymbolTable> symtab,
-                        OutputIterator out,
-                        const List &theList) {
-          TranslateListImpl<
-            boost::proto::matches<List, StrictTypeList>::value
-            >()(symtab, out, theList);
-        }
-      };
+    //       TranslateToSymbol<const Type> translator(symtab);
+    //       return invoke(Build,
+    //                     transform(pop_front(expr),
+    //                               translator));
+    //       // FlattenAndTranslateFusionTypeSequence()(symtab, typeList, out);
+    //     }
+    //   };
 
-      template<typename OutputIterator, typename List>
-      void translateList(boost::shared_ptr<SymbolTable> symtab,
-                         OutputIterator out,
-                         const List &typeList) {
-        TranslateList()(symtab, out, typeList);
-      }
-    }
+    //   /// This is a helper functor to translate a single proto expression
+    //   /// to a type symbol.  It handles the single struct member case.
+    //   template<>
+    //   class TranslateListImpl<false> {
+    //   public:
+    //     template<typename OutputIterator, typename List>
+    //     void operator()(ptr<SymbolTable> symtab,
+    //                     OutputIterator out,
+    //                     const List &typeList) {
+    //       *out = TranslateToSymbol<Type>(symtab)(typeList);
+    //     }
+    //   };
+
+    //   /// This is a grammar action to translate the elements of a list
+    //   /// to type symbols.  Various sequence types use it to construct
+    //   /// their member types.
+    //   class TranslateList {
+    //   public:
+    //     template<typename OutputIterator, typename List>
+    //     void operator()(ptr<SymbolTable> symtab,
+    //                     OutputIterator out,
+    //                     const List &theList) {
+    //       TranslateListImpl<
+    //         boost::proto::matches<List, StrictTypeList>::value
+    //         >()(symtab, out, theList);
+    //     }
+    //   };
+
+    //   template<typename OutputIterator, typename List>
+    //   void translateList(ptr<SymbolTable> symtab,
+    //                      OutputIterator out,
+    //                      const List &typeList) {
+    //     TranslateList()(symtab, out, typeList);
+    //   }
+    // }
 
     /// This is a callable transform to construct a struct type.
-    struct ConstructStructTypeSymbol : boost::proto::callable {
-      typedef ptr<const Symbol<Type<TypeBase> > > result_type;
+    struct ConstructStructMultiTypeSymbol : boost::proto::callable {
+      typedef ptr<const Type> result_type;
 
       // Keeping this outlined means we don't need a definition of Tuple.
-      void resolve(boost::shared_ptr<SymbolTable> symtab,
-                   const std::string &name,
-                   ptr<const Symbol<Type<Placeholder> > > placeholder,
-                   ptr<const Symbol<Type<TypeBase> > > replacement);
+      // void resolve(ptr<SymbolTable> symtab,
+      //              const std::string &name,
+      //              ptr<const PlaceholderType> placeholder,
+      //              ptr<const Type> replacement);
 
       template<typename List>
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(ptr<SymbolTable> symtab,
                              const std::string &name,
                              const List &memberList) {
         // std::cout << "Building struct:\n";
         // boost::proto::display_expr(memberList);
-        ptr<const Symbol<Type<Placeholder> > > placeholder =
-          symtab->lookupPlaceholder(name);
+        auto Build = [&name] (auto ...args) -> ptr<const TupleType> {
+          return IRBuilder::getTupleType(name, args...);
+        };
 
-        checkInvariant(placeholder, "Missing placeholder!");
+        using boost::fusion::invoke;
+        using boost::fusion::transform;
+        using boost::proto::flatten;
 
-        std::vector<ptr<const Symbol<Type<TypeBase> > >> members;
-        detail::translateList(symtab,
-                              std::back_inserter(members),
-                              memberList);
-        result_type tuple = BinaryConstructSymbol<Symbol<Type<Tuple> >,
-          ModuleScope>()(symtab, members.begin(), members.end());
+        TranslateToSymbol<const Type> translator(symtab);
+        auto Tuple = invoke(Build,
+                            transform(flatten(memberList),
+                                      translator));
+        // std::vector<ptr<const Type>> members;
+        // detail::translateList(symtab,
+        //                       std::back_inserter(members),
+        //                       memberList);
+        // result_type tuple = IRBuilder::getTupleType(name,
+        //                                             members.begin(),
+        //                                             members.end());
 
-        resolve(symtab, name, placeholder, tuple);
+        auto Placeholder = IRBuilder::findPlaceholderType(name);
 
-        return tuple;
+        checkInvariant(Placeholder, "Missing placeholder!");
+
+        IRBuilder::ResolveTypes(Placeholder, Tuple);
+
+        return Tuple;
+      }
+    };
+
+        /// This is a callable transform to construct a struct type.
+    struct ConstructStructSingleTypeSymbol : boost::proto::callable {
+      typedef ptr<const Type> result_type;
+
+      // Keeping this outlined means we don't need a definition of Tuple.
+      // void resolve(ptr<SymbolTable> symtab,
+      //              const std::string &name,
+      //              ptr<const PlaceholderType> placeholder,
+      //              ptr<const Type> replacement);
+
+      template<typename Member>
+      result_type operator()(ptr<SymbolTable> symtab,
+                             const std::string &name,
+                             const Member &member) {
+        // std::cout << "Building struct:\n";
+        // boost::proto::display_expr(member);
+
+        TranslateToSymbol<const Type> translator(symtab);
+        auto Tuple = IRBuilder::getTupleType(name, translator(member));
+
+        auto Placeholder = IRBuilder::findPlaceholderType(name);
+        checkInvariant(Placeholder, "Missing placeholder!");
+
+        IRBuilder::ResolveTypes(Placeholder, Tuple);
+
+        return Tuple;
       }
     };
 
@@ -105,9 +157,9 @@ namespace mirv {
     struct AddPlaceholder : boost::proto::callable {
       typedef std::string result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(ptr<SymbolTable> symtab,
                              const std::string &name) {
-        symtab->addPlaceholder(name);
+        IRBuilder::getPlaceholderType(name);
         return name;
       }
     };
@@ -115,25 +167,41 @@ namespace mirv {
     /// Given the name of a Placeholder type, return the corresponding
     /// Placeholder type Symbol.
     struct LookupPlaceholder : boost::proto::callable {
-      typedef ptr<const Symbol<Type<TypeBase> > > result_type;
+      typedef ptr<const Type> result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(ptr<SymbolTable> symtab,
                              const std::string &name);
     };
 
     /// This is the grammar for struct types.
-    struct StructTypeDefBuilder : boost::proto::when<
-      StructTypeDefRule,
-       LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
-        boost::proto::_data,
-        ConstructStructTypeSymbol(
+    struct StructMultiTypeDefBuilder : boost::proto::when<
+      StructMultiTypeDefRule,
+       // LookupAndAddSymbol<Type>(
+       //  boost::proto::_data,
+        ConstructStructMultiTypeSymbol(
           boost::proto::_data,
           // Struct name
           AddPlaceholder(
             boost::proto::_data,
             boost::proto::_value(boost::proto::_right(boost::proto::_left))),
           // Member type list
-          boost::proto::_right))
+          boost::proto::_right)
+          // )
+      > {};
+
+    struct StructSingleTypeDefBuilder : boost::proto::when<
+      StructSingleTypeDefRule,
+       // LookupAndAddSymbol<Type>(
+       //  boost::proto::_data,
+        ConstructStructSingleTypeSymbol(
+          boost::proto::_data,
+          // Struct name
+          AddPlaceholder(
+            boost::proto::_data,
+            boost::proto::_value(boost::proto::_right(boost::proto::_left))),
+          // Member type
+          boost::proto::_right)
+          // )
       > {};
 
   /// Given a struct declaration, return a placeholder type for it.
@@ -152,14 +220,15 @@ namespace mirv {
   /// This is the grammar to build a tuple type from a struct type.
   struct StructTypeBuilder : boost::proto::or_<
     StructTypeDeclBuilder,
-    StructTypeDefBuilder
+    StructSingleTypeDefBuilder,
+    StructMultiTypeDefBuilder
     > {};
 
     /// Given a struct type declaration, return its corresponding
     /// Symbol.  This may be a placeholder type.
     struct StructTypeLookupBuilder : boost::proto::when<
       StructTypeDeclRule,
-      LookupSymbol<Symbol<Type<TypeBase> > >(
+      LookupSymbol<Type>(
         boost::proto::_data,
         // Struct name
         boost::proto::_value(boost::proto::_right))

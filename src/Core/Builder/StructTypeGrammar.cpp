@@ -1,11 +1,8 @@
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
-#include <mirv/Core/IR/TupleType.hpp>
-#include <mirv/Core/IR/PlaceholderType.hpp>
 
 #include <mirv/Core/Builder/SymbolTerminals.hpp>
 #include <mirv/Core/Builder/TypeGrammar.hpp>
@@ -14,27 +11,21 @@
 
 namespace mirv {
   namespace Builder {
-    void
-    ConstructStructTypeSymbol::
-    resolve(boost::shared_ptr<SymbolTable> symtab,
-            const std::string &oldName,
-            ptr<const Symbol<Type<Placeholder> > > placeholder,
-            ptr<const Symbol<Type<TypeBase> > > replacement) {
-      // This isn't in the symbol table yet, so add it now.  This
-      // avoids the need for a definition for Tuple to do
-      // placeholder resolution on it.
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >()(symtab, replacement);
+    // void
+    // ConstructStructTypeSymbol::
+    // resolve(ptr<SymbolTable> symtab,
+    //         const std::string &oldName,
+    //         ptr<const PlaceholderType> placeholder,
+    //         ptr<const Type> replacement) {
+    //   // Resolve any types referencing this placeholder, including
+    //   // this tuple.
+    //   symtab->resolve(oldName, placeholder, replacement);
+    // }
 
-      // Resolve any types referencing this placeholder, including
-      // this tuple.
-      symtab->resolve(oldName, placeholder, replacement);
-    }
-
-    ptr<const Symbol<Type<TypeBase> > >
-    LookupPlaceholder::operator()(boost::shared_ptr<SymbolTable> symtab,
-                                  const std::string &name)
-    {
-      auto placeholder = symtab->lookupPlaceholder(name);
+    ptr<const Type>
+    LookupPlaceholder::operator()(ptr<SymbolTable> symtab,
+                                  const std::string &name) {
+      auto placeholder = IRBuilder::findPlaceholderType(name);
       checkInvariant(placeholder, "Missing placeholder!");
       return placeholder;
     }

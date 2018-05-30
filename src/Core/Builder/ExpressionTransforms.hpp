@@ -1,9 +1,7 @@
 #ifndef mirv_Core_Builder_ExpressionTransforms_hpp
 #define mirv_Core_Builder_ExpressionTransforms_hpp
 
-#include <mirv/Core/IR/ConstantFwd.hpp>
-#include <mirv/Core/IR/ExpressionFwd.hpp>
-#include <mirv/Core/IR/ReferenceFwd.hpp>
+#include <mirv/Core/IR/Producers.hpp>
 #include <mirv/Core/Memory/Heap.hpp>
 #include <mirv/Core/Builder/SymbolTableFwd.hpp>
 
@@ -12,7 +10,7 @@
 namespace mirv {
   namespace Builder {
     struct ExpressionTransform : boost::proto::callable {
-      typedef ptr<Expression<Base> > result_type;
+      typedef ptr<ValueProducer> result_type;
     };
 
     struct VariableRefTransform : ExpressionTransform {
@@ -26,36 +24,37 @@ namespace mirv {
     };
 
     struct FunctionRefTransform : ExpressionTransform {
+      typedef ptr<Function> result_type;
       result_type operator()(ptr<const SymbolTable> symtab,
-			     const std::string &name);
+         		     const std::string &name);
     };
 
     struct ConstantRefTransform : ExpressionTransform {
-      typedef ptr<Expression<Reference<Constant<Base> > > > result_type;
+      typedef ptr<Constant> result_type;
       result_type operator()(ptr<const SymbolTable> symtab,
-			     ptr<Symbol<Constant<Base> > > constant);
+			     ptr<Constant> constant);
     };
 
     struct ArrayRefSequenceTransform : ExpressionTransform {
       result_type operator()(ptr<const SymbolTable> symtab,
-			     ptr<Expression<Base> > address);
+			     ptr<ValueProducer> address);
     };
 
     struct ArrayRefIndexTransform : ExpressionTransform {
       result_type operator()(ptr<SymbolTable> symtab,
-			     ptr<Expression<Base> > base,
-                             ptr<Expression<Base> > index);
+			     ptr<ValueProducer> base,
+                             ptr<ValueProducer> index);
     };
 
     struct ArrayAddressSequenceTransform : ExpressionTransform {
       result_type operator()(ptr<const SymbolTable> symtab,
-			     ptr<Expression<Base> > address);
+			     ptr<ValueProducer> address);
     };
 
     struct ArrayAddressIndexTransform : ExpressionTransform {
       result_type operator()(ptr<SymbolTable> symtab,
-			     ptr<Expression<Base> > base,
-                             ptr<Expression<Base> > index);
+			     ptr<ValueProducer> base,
+                             ptr<ValueProducer> index);
     };
   }
 }

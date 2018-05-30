@@ -1,8 +1,8 @@
 #ifndef mirv_Core_Filter_FlowAttributeManager_hpp
 #define mirv_Core_Filter_FlowAttributeManager_hpp
 
-#include <mirv/Core/Containers/Vector.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
+#include <mirv/Library/Vector.hpp>
 
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
@@ -37,8 +37,7 @@ namespace mirv {
       Inherited inheritedPrototype;
       Synthesized synthesizedPrototype;
       typedef std::pair<Synthesized, bool> AttributePair;
-      typedef typename Vector<AttributePair>::type
-      SynthesizedVector;
+      typedef Vector<AttributePair> SynthesizedVector;
 
       Inherited inherited;
       SynthesizedVector synthesized;
@@ -174,7 +173,7 @@ namespace mirv {
       }
     };
 
-    typedef typename Vector<AttributeRecord>::type AttributeStackType;
+    typedef Vector<AttributeRecord> AttributeStackType;
     AttributeStackType attributeStack;
 
     Inherited inheritedPrototype;

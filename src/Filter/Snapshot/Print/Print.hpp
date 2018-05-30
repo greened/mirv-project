@@ -7,20 +7,27 @@
 #include <cstdint>
 
 namespace mirv {
+  class Control;
+  class Function;
+  class Module;
+  class Producer;
+  class Symbol;
+
   /// This is a filter to print MIRV IR in textual form.
-  class PrintFilter : public Filter<Node<Base> > {
+  class PrintFilter : public Filter {
   private:
     typedef Printer::Stream Stream;
 
     /// A handle to the output stream.
     Stream &out;
 
-    void run(ptr<Node<Base> > node);
-    void run(ptr<const Node<Base> > node);
+    void runImpl(ptr<Module> node) override;
+    void runImpl(ptr<Function> node) override;
+    void runImpl(ptr<Control> node) override;
+    void runImpl(ptr<Producer> node) override;
 
   public:
-    PrintFilter(Stream &o)
-    : Filter<Node<Base> >(range(), range(), range()), out(o) {}
+    PrintFilter(Stream &o) : Filter(range(), range(), range()), out(o) {}
   };
 }
 

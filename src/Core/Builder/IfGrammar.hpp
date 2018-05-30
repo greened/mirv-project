@@ -15,7 +15,10 @@ namespace mirv {
       IfRule,
       IfTransform(boost::proto::_data,
                   ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)),
-                  ConstructStatementGrammar(boost::proto::_right))
+                  PopScope(ConstructStatementGrammar(boost::proto::_right,
+                                                     boost::proto::_state,
+                                                     PushScope(boost::proto::_data)),
+                           boost::proto::_data))
       > {};
   }
 }

@@ -8,14 +8,14 @@
 #include <mirv/Core/Builder/FunctionTypeRules.hpp>
 #include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
 #include <mirv/Core/Builder/Fusion.hpp>
-#include <mirv/Core/IR/FunctionTypeFwd.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/IR/TypeFwd.hpp>
+#include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/Utility/Debug.hpp>
 
 #include <boost/proto/proto.hpp>
+#include <boost/proto/fusion.hpp>
 #include <boost/mpl/print.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/fusion/functional/invocation/invoke.hpp>
 #include <boost/fusion/iterator.hpp>
 #include <boost/fusion/include/transform.hpp>
 #include <boost/type_traits.hpp>
@@ -28,15 +28,31 @@ namespace mirv {
       /// handles the case where we do not have a vararg specifier.
       template<bool Vararg>
       struct Helper {
-        typedef ptr<const Symbol<Type<FunctionType> > > result_type;
+        typedef ptr<const FunctionType> result_type;
         template<typename Arg1, typename FusionSequence>
-        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+        result_type operator()(ptr<SymbolTable> symtab,
                                Arg1 a1,
                                const FusionSequence &expr) {
-          std::vector<ptr<const Symbol<Type<TypeBase> > >> operands;
-          PopAndTranslateFusionTypeSequence()(symtab, expr, std::back_inserter(operands));
-          return QuaternaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
-            symtab, a1, operands.begin(), operands.end(), VarargMark::NotVararg);
+          auto Build = [a1] (auto ...args) -> ptr<const FunctionType> {
+            return IRBuilder::
+            getFunctionType(FunctionType::VarargMark::NotVararg,
+                            fast_cast<const Type>(std::move(a1)),
+                            fast_cast<const Type>(std::move(args))...);
+          };
+
+          using boost::fusion::invoke;
+          using boost::fusion::transform;
+          using boost::fusion::pop_front;
+
+          TranslateToSymbol<const Type> translator(symtab);
+          return invoke(Build,
+                        transform(pop_front(expr),
+                                  translator));
+          // std::vector<ptr<const Type>> operands;
+          // PopAndTranslateFusionTypeSequence()(symtab, expr, std::back_inserter(operands));
+          // return QuaternaryConstructSymbol<FunctionType, ModuleScope>()(
+          //   symtab, a1, operands.begin(), operands.end(),
+          //   FunctionType::VarargMark::NotVararg);
         }
       };
 
@@ -45,26 +61,43 @@ namespace mirv {
       /// handles the case where we do have a vararg specifier.
       template<>
       struct Helper<true> {
-        typedef ptr<const Symbol<Type<FunctionType> > > result_type;
+        typedef ptr<const FunctionType> result_type;
         template<typename Arg1, typename FusionSequence>
-        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+        result_type operator()(ptr<SymbolTable> symtab,
                                Arg1 a1,
                                const FusionSequence &expr) {
-          std::vector<ptr<const Symbol<Type<TypeBase> > >> operands;
-          PopFrontBackAndTranslateFusionTypeSequence()(symtab, expr, std::back_inserter(operands));
+          auto Build = [a1] (auto ...args) -> ptr<const FunctionType> {
+            return IRBuilder::
+            getFunctionType(FunctionType::VarargMark::Vararg,
+                            std::move(a1),
+                            std::move(args)...);
+          };
 
-          return QuaternaryConstructSymbol<Symbol<Type<FunctionType> >, ModuleScope>()(
-            symtab, a1, operands.begin(), operands.end(), VarargMark::Vararg);
+          using boost::fusion::invoke;
+          using boost::fusion::transform;
+          using boost::fusion::pop_front;
+          using boost::fusion::pop_back;
+
+          TranslateToSymbol<const Type> translator(symtab);
+          return invoke(Build,
+                        transform(pop_front(pop_back(expr)),
+                                  translator));
+          // std::vector<ptr<const Type>> operands;
+          // PopFrontBackAndTranslateFusionTypeSequence()(symtab, expr, std::back_inserter(operands));
+
+          // return QuaternaryConstructSymbol<FunctionType, ModuleScope>()(
+          //   symtab, a1, operands.begin(), operands.end(),
+          //   FunctionType::VarargMark::Vararg);
         }
       };
     }
 
     /// This is a callable transform to construct a function type.
     struct ConstructFunctionTypeSymbol : boost::proto::callable {
-      typedef ptr<const Symbol<Type<FunctionType> > > result_type;
+      typedef ptr<const FunctionType> result_type;
 
       template<typename Arg1, typename Arg2>
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(ptr<SymbolTable> symtab,
                              Arg1 a1,
                              const Arg2 &a2) {
         // Check vararg information.
@@ -117,12 +150,13 @@ namespace mirv {
     /// Symbol.
     struct FunctionTypeBuilder : boost::proto::when<
       FunctionTypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
-        boost::proto::_data,
+      //      LookupAndAddSymbol<Type>(
+      //        boost::proto::_data,
         ConstructFunctionTypeSymbol(
           boost::proto::_data,
           FunctionReturnTypeBuilder(boost::proto::_left),
-          boost::proto::_expr))
+          boost::proto::_expr)
+      //)
       > {};
 
     /// This is the grammar to lookup function types.  It is almost
@@ -131,8 +165,8 @@ namespace mirv {
     /// creating and returning placeholders instead of the real type.
     struct FunctionTypeLookupBuilder : boost::proto::when<
       FunctionTypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
-        boost::proto::_data,
+      //LookupAndAddSymbol<Type>(
+      //boost::proto::_data,
         ConstructFunctionTypeSymbol(
           boost::proto::_data,
           FunctionReturnTypeLookupBuilder(boost::proto::_left),
@@ -141,7 +175,8 @@ namespace mirv {
           // done for array types except translateToSymbol uses
           // ConstructSymbolGrammar.  Possibly specialize this for
           // types?
-          boost::proto::_expr))
+          boost::proto::_expr)
+      //)
       > {};
 
     namespace {

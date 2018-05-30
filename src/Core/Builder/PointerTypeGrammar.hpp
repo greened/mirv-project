@@ -3,9 +3,8 @@
 
 #include <mirv/Core/Builder/PointerTypeRules.hpp>
 #include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
-#include <mirv/Core/IR/PointerTypeFwd.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/IR/TypeFwd.hpp>
+#include <mirv/Core/IR/Symbol.hpp>
+#include <mirv/Core/IR/Type.hpp>
 
 #include <boost/proto/proto.hpp>
 
@@ -14,11 +13,12 @@ namespace mirv {
     /// This is the grammar for pointer types.
     struct PointerTypeBuilder : boost::proto::when<
       PointerTypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
-        boost::proto::_data,
-        UnaryConstructSymbol<Symbol<Type<Pointer> >, ModuleScope>(
+      //LookupAndAddSymbol<Type>(
+      //boost::proto::_data,
+        UnaryConstructSymbol<PointerType, ModuleScope>(
           boost::proto::_data,
-          TypeBuilder(boost::proto::_child)))
+          TypeBuilder(boost::proto::_child))
+      //)
       > {};
 
     /// This is the grammar for looking up pointer types.  It differs
@@ -27,11 +27,12 @@ namespace mirv {
     /// returning placeholders for struct types.
     struct PointerTypeLookupBuilder : boost::proto::when<
       PointerTypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
-        boost::proto::_data,
-        UnaryConstructSymbol<Symbol<Type<Pointer> >, ModuleScope>(
+      //LookupAndAddSymbol<Type>(
+      //boost::proto::_data,
+        UnaryConstructSymbol<PointerType, ModuleScope>(
           boost::proto::_data,
-          TypeLookupBuilder(boost::proto::_child)))
+          TypeLookupBuilder(boost::proto::_child))
+      //)
       > {};
   }
 }

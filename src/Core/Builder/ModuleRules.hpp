@@ -33,7 +33,7 @@ namespace mirv {
        boost::proto::comma<
 	 FunctionVariableTypeList,
 	 FunctionVariableType
-	 > 
+	 >
        > {};
 
      /// This is the rule to match module symbols.  It matches
