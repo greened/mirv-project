@@ -12,63 +12,42 @@
 // STDOUT:       neg
 // STDOUT:          vref e
 
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Reference.hpp>
-#include <mirv/Core/Builder/Make.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/Producers.hpp>
+#include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
-using mirv::Node;
-using mirv::Symbol;
-using mirv::Variable;
-using mirv::Type;
-using mirv::Integral;
-using mirv::Expression;
-using mirv::Base;
 using mirv::Add;
-using mirv::Subtract;
-using mirv::Multiply;
 using mirv::Divide;
+using mirv::Multiply;
+using mirv::Subtract;
 using mirv::Negate;
-using mirv::Reference;
-using mirv::ptr;
 using mirv::PrintFilter;
-using mirv::make;
+using mirv::IRBuilder;
 
 int main(void)
 {
-  auto type = make<Symbol<Type<Integral> > >(32);
+  auto type = IRBuilder::getIntegerType(32);
 
-  ptr<Symbol<Variable> > a =
-    Symbol<Variable>::make("a", type);
-  ptr<Symbol<Variable> > b =
-    Symbol<Variable>::make("b", type);
-  ptr<Symbol<Variable> > c =
-    Symbol<Variable>::make("c", type);
-  ptr<Symbol<Variable> > d =
-    Symbol<Variable>::make("d", type);
-  ptr<Symbol<Variable> > e =
-    Symbol<Variable>::make("e", type);
+  auto a = IRBuilder::GetOrCreateGlobalVariable("a", type);
+  auto b = IRBuilder::GetOrCreateGlobalVariable("b", type);
+  auto c = IRBuilder::GetOrCreateGlobalVariable("c", type);
+  auto d = IRBuilder::GetOrCreateGlobalVariable("d", type);
+  auto e = IRBuilder::GetOrCreateGlobalVariable("e", type);
 
    // a + (b - c) * d / -e)
-   ptr<Expression<Base> > expr =
-     Expression<Add>::make(
-       Expression<Reference<Variable> >::make(a),
-       Expression<Divide>::make(
-         Expression<Multiply>::make(
-           Expression<Subtract>::make(
-	     Expression<Reference<Variable> >::make(b),
-	     Expression<Reference<Variable> >::make(c)),
-	   Expression<Reference<Variable> >::make(d)),
-	 Expression<Negate>::make(Expression<Reference<Variable> >::make(e))));
+   auto expr =
+     IRBuilder::get<Add>(a,
+       IRBuilder::get<Divide>(
+         IRBuilder::get<Multiply>(
+           IRBuilder::get<Subtract>(b, c),
+           d),
+         IRBuilder::get<Negate>(e)));
 
    PrintFilter print(std::cout);
 
-   print(boost::static_pointer_cast<Node<Base> >(expr));
+   print.run(expr);
 
    return(0);
 }

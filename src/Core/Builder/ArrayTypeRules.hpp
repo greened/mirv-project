@@ -89,4 +89,3 @@ namespace mirv {
 }
 
 #endif
-

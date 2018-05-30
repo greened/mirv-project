@@ -1,73 +1,55 @@
 #ifndef mirv_Core_IR_GlobalVariable_hpp
 #define mirv_Core_IR_GlobalVariable_hpp
 
-#include <mirv/Core/IR/GlobalVariableFwd.hpp>
-#include <mirv/Core/IR/ConstantFwd.hpp>
-#include <mirv/Core/IR/ReferenceFwd.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/IR/ConstantFwd.hpp>
-#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/Filter/SymbolVisitor.hpp>
+#include <mirv/Core/Filter/ValueVisitor.hpp>
+#include <mirv/Core/IR/Global.hpp>
+#include <mirv/Core/IR/Symbol.hpp>
+#include <mirv/Library/TypeList.hpp>
 
 namespace mirv {
+  class GlobalVariable : public Global,
+                         public Symbol {
+    friend class Module;
+    friend class IRBuilder;
 
-  namespace detail {
-    // GlobalVariables do not have an isa relationship with
-    // Variables.  Variables are single-assignment only while
-    // GlobalVariable represents a global region of memory which may
-    // be defined multiple times.
-    class GlobalVariableInterface
-        : public Symbol<Global>,
-          public LeafSymbol,
-          public boost::enable_shared_from_this<Symbol<GlobalVariable> > {
-    private:
-      typedef ptr<Expression<Reference<Constant<Base> > > > ConstantPtr;
-      ConstantPtr init;
+    typedef ptr<Constant> ConstantPtr;
+    ConstantPtr Initializer;
 
-    public:
-      GlobalVariableInterface(const std::string &n, TypePtr t, ConstantPtr i = ConstantPtr())
-          : Symbol<Global>(n, t), init(i) {}
+    ptr<Module> Parent;
 
-      ConstantPtr initializer(void) const {
-        return init;
-      }
+    GlobalVariable(const std::string Name, ptr<const Type> T,
+                   ConstantPtr Init = ConstantPtr()) :
+      Global(std::move(Name), T), Initializer(Init) {}
 
-      ptr<Node<Base>> getSharedHandle(void) {
-        return fast_cast<Node<Base>>(shared_from_this());
-      }
-      ptr<const Node<Base>> getSharedHandle(void) const {
-        return fast_cast<const Node<Base>>(shared_from_this());
-      }
+    void acceptImpl(ValueVisitor &V) override {
+      V.visit(*this);
+    }
 
-      // We need these to be the final overriders for Symbol<Named>
-      // and Symbol<Typed> Visitable::accept functions.
-      virtual void accept(SymbolVisitor &) {
-        error("GlobalVariable::Interface::accept called!");
-      }
-      virtual void accept(ConstSymbolVisitor &) const {
-        error("GlobalVariable::Interface::accept called!");
-      }
-    };
-  }
+    void acceptImpl(SymbolVisitor &V) override {
+      V.visit(*this);
+    }
 
-  /// This is a symbol tag for variable symbols.  Variables have a
-  /// type and a name.
-   class GlobalVariable {
-   public:
-     static void initialize(ptr<Symbol<GlobalVariable> > variable) {}
+    void setParent(ptr<Module> P) {
+      Parent = P;
+    }
 
-     static std::string
-     getName(const std::string &name,
-             ptr<const Symbol<Type<TypeBase> > > type) {
-       return name;
-     }
-     template<typename Init>
-     static std::string
-     getName(const std::string &name,
-             ptr<const Symbol<Type<TypeBase> > > type,
-             const Init &) {
-       return name;
-     }
-   };
+    static ptr<GlobalVariable>
+    Make(const std::string Name, ptr<const Type> T,
+         ptr<Constant> Init = nullptr) {
+      return getHandle(new GlobalVariable(std::move(Name), T, Init));
+    }
+
+  public:
+    using Global::accept;
+    using Symbol::accept;
+
+    typedef TypeList<Global, Symbol> VisitorBaseTypes;
+
+    ConstantPtr getInitializer(void) const {
+      return Initializer;
+    }
+  };
 }
 
 #endif

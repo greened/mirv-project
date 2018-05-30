@@ -2,15 +2,15 @@
 #define mirv_Filter_Snapshot_Codegen_LLVM_hpp
 
 #include <mirv/Core/Filter/AttributeFlow.hpp>
-#include <mirv/Core/Filter/ConstSymbolVisitor.hpp>
-#include <mirv/Core/Filter/ConstForwardStatementFlow.hpp>
-#include <mirv/Core/Filter/ConstExpressionFlow.hpp>
-#include <mirv/Core/Filter/ConstSymbolFlow.hpp>
+#include <mirv/Core/Filter/SymbolVisitor.hpp>
+#include <mirv/Core/Filter/ForwardControlFlow.hpp>
+#include <mirv/Core/Filter/ValueFlow.hpp>
+#include <mirv/Core/Filter/SymbolFlow.hpp>
 #include <mirv/Core/Filter/Filter.hpp>
 #include <mirv/Core/Filter/FlowAction.hpp>
 #include <mirv/Core/Filter/Action.hpp>
 #include <mirv/Core/Filter/SymbolFlow.hpp>
-#include <mirv/Core/IR/Node.hpp>
+#include <mirv/Library/Map.hpp>
 
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Function.h>
@@ -23,7 +23,7 @@
 
 namespace mirv {
   /// This is a filter to translate from MIRV IR to LLVM IR.
-  class LLVMCodegenFilter : public Filter<Node<Base> > {
+  class LLVMCodegenFilter final : public Filter {
   public:
     class InheritedAttribute;
     class SynthesizedAttribute;
@@ -43,11 +43,11 @@ namespace mirv {
       llvm::Value *TheValue;
       bool ReturnValue;
 
-      typedef Map<std::string, llvm::Value *>::type VariableMap;
+      typedef Map<std::string, llvm::Value *> VariableMap;
       ptr<VariableMap> ModuleMap;
       ptr<VariableMap> FunctionMap;
 
-      class TypeCreator : public ConstSymbolVisitor {
+      class TypeCreator : public SymbolVisitor {
       private:
         llvm::LLVMContext &Context;
         llvm::Type *TheType;
@@ -56,11 +56,11 @@ namespace mirv {
         TypeCreator(llvm::LLVMContext &context)
             : Context(context) {}
 
-        virtual void visit(ptr<const Symbol<Type<Integral> > >);
-        virtual void visit(ptr<const Symbol<Type<Floating> > >);
-        virtual void visit(ptr<const Symbol<Type<Tuple> > >);
-        virtual void visit(ptr<const Symbol<Type<Pointer> > >);
-        virtual void visit(ptr<const Symbol<Type<FunctionType> > >);
+        virtual void visit(const IntegerType &);
+        virtual void visit(const FloatingPointType &);
+        virtual void visit(const TupleType &);
+        virtual void visit(const PointerType &);
+        virtual void visit(const FunctionType &);
 
         llvm::Type *type(void) const {
           return TheType;
@@ -138,7 +138,7 @@ namespace mirv {
       }
 
       llvm::Type *
-      getType(ptr<const Symbol<Type<TypeBase> > >) const;
+      getType(ptr<const Type>) const;
 
       void createModule(const std::string &name) {
         checkInvariant(TheModule == 0, "Module already exists");
@@ -150,8 +150,13 @@ namespace mirv {
         return TheModule;
       }
 
+      llvm::Function *getFunction(void) const {
+        checkInvariant(TheFunction, "Null function");
+        return TheFunction;
+      }
+
       void createFunction(const std::string &name,
-                          ptr<const Symbol<Type<TypeBase> > > type);
+                          ptr<const Type> type);
 
       void setReferencedFunction(llvm::Function *function) {
         ReferencedFunction = function;
@@ -162,33 +167,32 @@ namespace mirv {
       }
 
       void createVariable(const std::string &name,
-                          ptr<const Symbol<Type<TypeBase> > > type);
+                          ptr<const Type> type);
 
       void createAlloca(const std::string &name,
-                        ptr<const Symbol<Type<TypeBase> > > type);
+                        ptr<const Type> type);
 
-      void createGlobalVariable(ptr<const Symbol<GlobalVariable> > sym,
+      void createGlobalVariable(const GlobalVariable &sym,
                                 const InheritedAttribute &inh,
                                 const SynthesizedAttribute &syn);
 
       template<typename ValueType>
-      void createIntegerConstant(ptr<const Symbol<Type<TypeBase> > > type,
-                                         ValueType value,
-                                         bool isSigned) {
+      void createIntegerConstant(ptr<const Type> type,
+                                 ValueType value,
+                                 bool isSigned) {
         llvm::Type *llvmType = getType(type);
         llvm::Value *constant = llvm::ConstantInt::get(llvmType, value, isSigned);
         setValue(constant);
       }
 
       template<typename ValueType>
-      void createFloatingPointConstant(ptr<const Symbol<Type<TypeBase> > > type,
-                                               ValueType value) {
+      void createFloatingPointConstant(ptr<const Type> type,
+                                       ValueType value) {
         llvm::Type *llvmType = getType(type);
         llvm::Value *constant = llvm::ConstantFP::get(llvmType, value);
         setValue(constant);
       }
 
-      llvm::Value *getVariable(ptr<const Symbol<Variable> > sym);
       llvm::Value *getGlobalVariable(const std::string &name);
 
       llvm::BasicBlock *createBlock(const std::string &name) {
@@ -201,8 +205,6 @@ namespace mirv {
         return block;
       }
     };
-
-    class SynthesizedAttribute;
 
     /// This is the inherited attribute for code generation.  It
     /// carries the necessary context and utility functions to create
@@ -284,7 +286,7 @@ namespace mirv {
       > FlowAttributeManagerType;
 
     /// Entering each symbol
-    class EnterSymbolVisitor : public ConstSymbolVisitor {
+    class EnterSymbolVisitor : public SymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -292,8 +294,8 @@ namespace mirv {
       EnterSymbolVisitor(FlowAttributeManagerType &am)
 	  : attributeManager(am) {}
 
-      void visit(ptr<const Symbol<Module> > sym);
-      void visit(ptr<const Symbol<Function> > sym);
+      void visit(Module & sym) override;
+      void visit(Function & sym) override;
     };
 
     /// Invoke the EnterSymbolVisitor upon entering a symbol.
@@ -304,7 +306,7 @@ namespace mirv {
     };
 
     /// Leaving each symbol definition.
-    class LeaveSymbolVisitor : public ConstSymbolVisitor {
+    class LeaveSymbolVisitor : public SymbolVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -312,10 +314,8 @@ namespace mirv {
       LeaveSymbolVisitor(FlowAttributeManagerType &am)
 	  : attributeManager(am) {}
 
-      void visit(ptr<const Symbol<Function> > sym);
-      // We put this here so it can set a synthesized attribute.
-      void visit(ptr<const Symbol<Variable> > sym);
-      void visit(ptr<const Symbol<GlobalVariable> > sym);
+      void visit(Function & sym) override;
+      void visit(GlobalVariable & sym) override;
     };
 
     /// Invoke the LeaveSymbolVisitor when exiting symbols.
@@ -326,7 +326,7 @@ namespace mirv {
     };
 
     /// Entering each statement
-    class EnterStatementVisitor : public ConstStatementVisitor {
+    class EnterStatementVisitor : public ControlVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -334,11 +334,8 @@ namespace mirv {
       EnterStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<const Statement<Block> > stmt);
-      void visit(ptr<const Statement<Before> > stmt);
-      void visit(ptr<const Statement<After> > stmt);
-      void visit(ptr<const Statement<Goto> > stmt);
-      void visit(ptr<const Statement<Allocate> > stmt);
+      void visit(Block & stmt) override;
+      void visit(Goto & stmt) override;
     };
 
     /// Invoke the EnterStatementVisitor upon entry to a statement.
@@ -349,7 +346,7 @@ namespace mirv {
     };
 
     /// Leaving each statement
-    class LeaveStatementVisitor : public ConstStatementVisitor {
+    class LeaveStatementVisitor : public ControlVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -357,17 +354,11 @@ namespace mirv {
       LeaveStatementVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<const Statement<Before> > stmt);
-      void visit(ptr<const Statement<After> > stmt);
-      void visit(ptr<const Statement<Goto> > stmt);
-      void visit(ptr<const Statement<Return> > stmt);
-      void visit(ptr<const Statement<Phi> > stmt);
-      void visit(ptr<const Statement<Store> > stmt);
-      void visit(ptr<const Statement<Call> > stmt);
-      void visit(ptr<const Statement<IfElse> > stmt);
-      void visit(ptr<const Statement<IfThen> > stmt);
-      void visit(ptr<const Statement<While> > stmt);
-      void visit(ptr<const Statement<DoWhile> > stmt);
+      void visit(Goto & stmt) override;
+      void visit(Return & stmt) override;
+      void visit(IfElse & stmt) override;
+      void visit(IfThen & stmt) override;
+      void visit(DoWhile & stmt) override;
     };
 
     /// Invoke the LeaveStatementVisitor upon exiting statements.
@@ -378,7 +369,7 @@ namespace mirv {
     };
 
     /// Entering each expression
-    class EnterExpressionVisitor : public ConstExpressionVisitor {
+    class EnterExpressionVisitor : public ValueVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -386,7 +377,8 @@ namespace mirv {
       EnterExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<const Expression<TuplePointer> > expr);
+      void visit(TuplePointer & expr) override;
+      void visit(Allocate & expr) override;
     };
 
     /// Invoke the EnterExpressionVisitor upon entering an expression.
@@ -397,7 +389,7 @@ namespace mirv {
     };
 
     /// Leaving each expression
-    class LeaveExpressionVisitor : public ConstExpressionVisitor {
+    class LeaveExpressionVisitor : public ValueVisitor {
     private:
       FlowAttributeManagerType &attributeManager;
 
@@ -405,30 +397,31 @@ namespace mirv {
       LeaveExpressionVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<const Expression<Add> > expr);
-      void visit(ptr<const Expression<Subtract> > expr);
-      void visit(ptr<const Expression<Multiply> > expr);
-      void visit(ptr<const Expression<Divide> > expr);
-      void visit(ptr<const Expression<Modulus> > expr);
-      void visit(ptr<const Expression<Negate> > expr);
-      void visit(ptr<const Expression<LogicalAnd> > expr);
-      void visit(ptr<const Expression<LogicalOr> > expr);
-      void visit(ptr<const Expression<LogicalNot> > expr);
-      void visit(ptr<const Expression<BitwiseAnd> > expr);
-      void visit(ptr<const Expression<BitwiseOr> > expr);
-      void visit(ptr<const Expression<BitwiseComplement> > expr);
-      void visit(ptr<const Expression<LessThan> > expr);
-      void visit(ptr<const Expression<LessThanOrEqual> > expr);
-      void visit(ptr<const Expression<Equal> > expr);
-      void visit(ptr<const Expression<NotEqual> > expr);
-      void visit(ptr<const Expression<GreaterThan> > expr);
-      void visit(ptr<const Expression<GreaterThanOrEqual> > expr);
-      void visit(ptr<const Expression<Reference<Variable> > > expr);
-      void visit(ptr<const Expression<Reference<GlobalVariable> > > expr);
-      void visit(ptr<const Expression<Load> > expr);
-      void visit(ptr<const Expression<TuplePointer> > expr);
-      void visit(ptr<const Expression<Reference<Function> > > expr);
-      void visit(ptr<const Expression<Reference<Constant<Base> > > > expr);
+      void visit(Add & expr) override;
+      void visit(Subtract & expr) override;
+      void visit(Multiply & expr) override;
+      void visit(Divide & expr) override;
+      void visit(Modulus & expr) override;
+      void visit(Negate & expr) override;
+      void visit(LogicalAnd & expr) override;
+      void visit(LogicalOr & expr) override;
+      void visit(LogicalNot & expr) override;
+      void visit(BitwiseAnd & expr) override;
+      void visit(BitwiseOr & expr) override;
+      void visit(BitwiseComplement & expr) override;
+      void visit(LessThan & expr) override;
+      void visit(LessThanOrEqual & expr) override;
+      void visit(Equal & expr) override;
+      void visit(NotEqual & expr) override;
+      void visit(GreaterThan & expr) override;
+      void visit(GreaterThanOrEqual & expr) override;
+      void visit(Load & expr) override;
+      void visit(TuplePointer & expr) override;
+      void visit(Phi & expr) override;
+      void visit(Store & expr) override;
+      void visit(FunctionCall & expr) override;
+      void visit(GlobalVariable & expr) override;
+      void visit(Constant & expr) override;
     };
 
     /// Invoke the LeaveExpressionVisitor upon leaving an expression.
@@ -439,10 +432,10 @@ namespace mirv {
     };
 
     /// This is the flow for translating expressions.
-    class LLVMCodegenExpressionFlow : public AttributeFlow<
+    class LLVMCodegenExpressionFlow final : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      ConstForwardExpressionFlowGenerator,
+      ForwardValueFlowGenerator,
       EnterExpressionAction,
       AttributeFlowInheritedToSynthesizedAction<
         LeaveExpressionAction,
@@ -459,7 +452,7 @@ namespace mirv {
       typedef AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      ConstForwardExpressionFlowGenerator,
+      ForwardValueFlowGenerator,
       EnterExpressionAction,
       AttributeFlowInheritedToSynthesizedAction<
         LeaveExpressionAction,
@@ -484,10 +477,10 @@ namespace mirv {
     };
 
     /// This is the flow for translating statements.
-    class LLVMCodegenFlow : public AttributeFlow<
+    class LLVMCodegenFlow final : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      ConstForwardStatementFlowGenerator,
+      ForwardFlowGenerator,
       EnterStatementAction,
       AttributeFlowInheritedToSynthesizedAction<
         LeaveStatementAction,
@@ -506,13 +499,13 @@ namespace mirv {
         NullAction,
         FlowAttributeManagerType
         >,
+      NullAction,
       FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
-      NullAction>,
-        public boost::enable_shared_from_this<LLVMCodegenFlow> {
+      NullAction> {
       typedef AttributeFlow<
         InheritedAttribute,
         SynthesizedAttribute,
-        ConstForwardStatementFlowGenerator,
+        ForwardFlowGenerator,
 	EnterStatementAction,
         AttributeFlowInheritedToSynthesizedAction<
           LeaveStatementAction,
@@ -529,6 +522,7 @@ namespace mirv {
           NullAction,
           FlowAttributeManagerType
           >,
+        NullAction,
         FlowAction<LLVMCodegenFlow, LLVMCodegenExpressionFlow>,
 	NullAction> BaseType;
 
@@ -544,36 +538,13 @@ namespace mirv {
                      am.getSynthesizedAttributePrototype()) {
         expression().setParentFlow(this);
       }
-
-      // We need to reverse the order in which we visit the assignment
-      // operands.  This makes it easier to tell the lhs to generate
-      // an address because with this flow we visit it first and can
-      // set the address control upon assignment statement entry.  If
-      // we visited it after the rhs we would need a complicated
-      // action to run between expressions.  Since there is no
-      // between-expression action when flowing through statements
-      // (assignment is the only multiple-expression statement and we
-      // don't want to special-case it) we solve the problem this way.
-      void visit(ptr<const Statement<Store> > stmt) {
-        this->doEnter(stmt);
-
-        for (auto i = stmt->expressionBegin();
-             i != stmt->expressionEnd();
-             ++i) {
-          this->doBeforeExpression(stmt, i);
-          this->doExpression(stmt, i);
-          this->doAfterExpression(stmt, i);
-        }
-
-        this->doLeave(stmt);
-      }
     };
 
     /// This is the flow to codegen a module.
-    class LLVMCodegenSymbolFlow : public AttributeFlow<
+    class LLVMCodegenSymbolFlow final : public AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      ConstSymbolFlowGenerator,
+      SymbolFlowGenerator,
       EnterSymbolAction,
       AttributeFlowInheritedToSynthesizedAction<
         LeaveSymbolAction,
@@ -583,13 +554,12 @@ namespace mirv {
       NullAction,
       NullAction,
       FlowAction<LLVMCodegenSymbolFlow, LLVMCodegenFlow>
-      >,
-         public boost::enable_shared_from_this<LLVMCodegenSymbolFlow> {
+      > {
     private:
       typedef AttributeFlow<
       InheritedAttribute,
       SynthesizedAttribute,
-      ConstSymbolFlowGenerator,
+      SymbolFlowGenerator,
       EnterSymbolAction,
       AttributeFlowInheritedToSynthesizedAction<
         LeaveSymbolAction,
@@ -610,14 +580,19 @@ namespace mirv {
     };
 
     llvm::Module *TheModule;
+    llvm::Function *TheFunction;
 
     /// Translate an IR tree.
-    void run(ptr<Node<Base> > node);
-    void run(ptr<const Node<Base> > node);
+    void runImpl(ptr<Module> node) override;
+    void runImpl(ptr<Function> node) override;
+    void runImpl(ptr<Producer> node) override;
+    void runImpl(ptr<Control> node) override;
+
+    llvm::LLVMContext Context;
 
   public:
     LLVMCodegenFilter(void)
-    : Filter<Node<Base> >(range(), range(), range()), TheModule(0) {}
+    : Filter(range(), range(), range()), TheModule(0) {}
 
     llvm::Module *getModule(void) const {
       checkInvariant(TheModule, "Null module");

@@ -65,162 +65,92 @@
 #include <mirv/Core/IR/Symbol.hpp>
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
-#include <mirv/Core/IR/AddressConstant.hpp>
-#include <mirv/Core/IR/Constant.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/TupleType.hpp>
-#include <mirv/Core/IR/PlaceholderType.hpp>
-#include <mirv/Core/IR/Reference.hpp>
-#include <mirv/Core/IR/Relational.hpp>
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Control.hpp>
-#include <mirv/Core/IR/Mutating.hpp>
-#include <mirv/Core/Builder/Make.hpp>
+#include <mirv/Core/IR/Producers.hpp>
+#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/ControlStructure.hpp>
+#include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
-using mirv::Node;
-using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
-using mirv::Variable;
 using mirv::GlobalVariable;
-using mirv::Type;
-using mirv::TypeBase;
-using mirv::Integral;
-using mirv::Pointer;
+using mirv::IntegerType;
+using mirv::PointerType;
 using mirv::FunctionType;
-using mirv::Tuple;
+using mirv::TupleType;
 using mirv::TuplePointer;
-using mirv::Expression;
 using mirv::Constant;
-using mirv::Address;
-using mirv::Base;
 using mirv::Add;
 using mirv::LessThan;
 using mirv::Load;
 using mirv::GreaterThan;
-using mirv::Statement;
 using mirv::Allocate;
 using mirv::Block;
 using mirv::IfElse;
 using mirv::DoWhile;
 using mirv::Store;
-using mirv::Reference;
+using mirv::Sequence;
 using mirv::ptr;
 using mirv::PrintFilter;
-using mirv::make;
+using mirv::IRBuilder;
 
-int main(void)
-{
-  ptr<const Symbol<Type<Integral> > > type =
-    make<Symbol<Type<Integral> > >(32);
-  ptr<const Symbol<Type<Pointer> > > ptrtype =
-    make<Symbol<Type<Pointer> > >(type);
-  ptr<Symbol<Type<TypeBase> > > ftype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >());
+int main(void) {
+  auto m = IRBuilder::GetOrCreateModule("Test");
 
-  ptr<Symbol<Module> > m =
-    Symbol<Module>::make("Test");
+  auto int32type = IRBuilder::getIntegerType(32);
+  auto ptrtype = IRBuilder::getPointerType(int32type);
+  auto ftype = IRBuilder::getFunctionType(FunctionType::NotVararg,
+                                          IRBuilder::getVoidType(),
+                                          IRBuilder::getVoidType());
 
-  m->typePushBack(type);
-  m->typePushBack(ptrtype);
-  m->typePushBack(ftype);
+  auto a = IRBuilder::get<Allocate>("a", ptrtype);
+  auto b = IRBuilder::get<Allocate>("b", ptrtype);
+  auto c = IRBuilder::GetOrCreateGlobalVariable("c", ptrtype);
 
-  ptr<Symbol<Variable> > a = Symbol<Variable>::make("a", ptrtype);
-  ptr<Symbol<Variable> > b = Symbol<Variable>::make("b", ptrtype);
-  ptr<Symbol<GlobalVariable> > c =
-    Symbol<GlobalVariable>::make("c", type);
+  auto dowhile =
+    IRBuilder::get<DoWhile>(
+      IRBuilder::get<LessThan>(a, c),
+        IRBuilder::get<Block>(
+          IRBuilder::get<Sequence>(
+            IRBuilder::get<Store>(
+              a,
+              IRBuilder::get<Add>(IRBuilder::get<Load>(a),
+                                  IRBuilder::get<Load>(b)))),
+          IRBuilder::get<IfElse>(
+            IRBuilder::get<GreaterThan>(
+              IRBuilder::get<Load>(b),
+              IRBuilder::get<Load>(
+                IRBuilder::get<TuplePointer>(
+                  c,
+                  IRBuilder::getIntegerConstant(int32type, 0)))),
+            IRBuilder::get<Block>(
+              IRBuilder::get<Sequence>(
+                IRBuilder::get<Store>(
+                  a,
+                  IRBuilder::get<Add>(
+                    IRBuilder::get<Load>(a),
+                    IRBuilder::get<Load>(b))))),
+            IRBuilder::get<Block>(
+              IRBuilder::get<Sequence>(
+                IRBuilder::get<Store>(
+                  a,
+                  IRBuilder::get<Add>(
+                    IRBuilder::get<Load>(a),
+                    IRBuilder::get<TuplePointer>(
+                      c,
+                      IRBuilder::getIntegerConstant(int32type, 0)))))))));
 
-  ptr<Statement<Base> > dowhile =
-    Statement<Block>::make(
-      Statement<Allocate>::make(
-        Expression<Reference<Variable> >::make(a),
-        Expression<Reference<Constant<Base> > >::make(
-          Symbol<Constant<std::uint64_t> >::make(
-            type, 1)),
-        type),
-      Statement<Allocate>::make(
-        Expression<Reference<Variable> >::make(b),
-        Expression<Reference<Constant<Base> > >::make(
-          Symbol<Constant<std::uint64_t> >::make(
-            type, 1)),
-        type),
-      Statement<DoWhile>::make(
-        Expression<LessThan>::make(
-          Expression<Load>::make(
-            Expression<Reference<Variable> >::make(a)),
-          Expression<Load>::make(
-            Expression<TuplePointer>::make(
-              mirv::fast_cast<Expression<Base> >(
-                Expression<Reference<Constant<Base> > >::make(
-                  Symbol<Constant<Address> >::make(ptrtype, c))),
-              mirv::fast_cast<Expression<Base> >(
-                Expression<Reference<Constant<Base> > >::make(
-                  Symbol<Constant<std::uint64_t> >::make(
-                    type, 0)))))),
-        Statement<Block>::make(
-          Statement<Store>::make(
-            Expression<Reference<Variable> >::make(a),
-            Expression<Add>::make(
-              Expression<Load>::make(
-                Expression<Reference<Variable> >::make(a)),
-              Expression<Load>::make(
-                Expression<Reference<Variable> >::make(b)))),
-          Statement<IfElse>::make(
-            Expression<GreaterThan>::make(
-              Expression<Load>::make(
-                Expression<Reference<Variable> >::make(b)),
-              Expression<Load>::make(
-                Expression<TuplePointer>::make(
-                  mirv::fast_cast<Expression<Base> >(
-                    Expression<Reference<Constant<Base> > >::make(
-                      Symbol<Constant<Address> >::make(ptrtype, c))),
-                  mirv::fast_cast<Expression<Base> >(
-                    Expression<Reference<Constant<Base> > >::make(
-                      Symbol<Constant<std::uint64_t> >::make(
-                        type, 0)))))),
-            Statement<Block>::make(
-              Statement<Store>::make(
-                Expression<Reference<Variable> >::make(a),
-                Expression<Add>::make(
-                  Expression<Load>::make(
-                    Expression<Reference<Variable> >::make(a)),
-                  Expression<Load>::make(
-                    Expression<Reference<Variable> >::make(b))))),
-            Statement<Block>::make(
-              Statement<Store>::make(
-                Expression<Reference<Variable> >::make(a),
-                Expression<Add>::make(
-                  Expression<Load>::make(
-                    Expression<Reference<Variable> >::make(a)),
-                  Expression<Load>::make(
-                    Expression<TuplePointer>::make(
-                      mirv::fast_cast<Expression<Base> >(
-                        Expression<Reference<Constant<Base> > >::make(
-                          Symbol<Constant<Address> >::make(ptrtype, c))),
-                      mirv::fast_cast<Expression<Base> >(
-                        Expression<Reference<Constant<Base> > >::make(
-                          Symbol<Constant<std::uint64_t> >::make(
-                            type, 0))))))))))));
+  auto block = IRBuilder::get<Block>(dowhile);
 
-  ptr<Symbol<Function> > f =
-    make<Symbol<Function> >("foo", ftype, dowhile);
+  auto f = IRBuilder::GetOrCreateFunction("foo", ftype);
 
-  f->variablePushBack(a);
-  f->variablePushBack(b);
-
-  m->functionPushBack(f);
-  m->globalVariablePushBack(c);
+  f->setBlock(block);
 
   PrintFilter print(std::cout);
 
-  print(boost::static_pointer_cast<Node<Base> >(m));
+  print.run(m);
 
   return(0);
 }

@@ -11,14 +11,12 @@ namespace mirv {
     /// This is the grammar to construction do-while IR statements.
     struct DoWhileBuilder : boost::proto::when<
       DoWhileRule,
-      ClearPendingStatementsDoWhile(
+      DoWhileTransform(
         boost::proto::_data,
-        ConstructBinary<
-          Statement<DoWhile>,
-          ptr<Expression<Base> >,
-        ptr<Statement<Base> >>(boost::proto::_data,
-                                     ConstructExpressionGrammar(boost::proto::_right),
-                                     ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left)))))
+        ConstructExpressionGrammar(boost::proto::_right),
+        PopScope(ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left)),
+                                           PushScope(boost::proto::_data)),
+                 boost::proto::_data))
       > {};
   }
 }

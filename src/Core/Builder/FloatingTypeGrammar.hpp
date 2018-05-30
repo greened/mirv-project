@@ -3,9 +3,6 @@
 
 #include <mirv/Core/Builder/FloatingTypeRules.hpp>
 #include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
-#include <mirv/Core/IR/FloatingTypeFwd.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 
@@ -14,11 +11,12 @@ namespace mirv {
     /// This is the grammar for floating point types.
     struct FloatBuilder : boost::proto::when<
       FloatRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
-        boost::proto::_data,
-        UnaryConstructSymbol<Symbol<Type<Floating> >, ModuleScope>(
+      // LookupAndAddSymbol<Type>(
+      //   boost::proto::_data,
+        UnaryConstructSymbol<FloatingPointType, ModuleScope>(
           boost::proto::_data,
-          boost::proto::_value(boost::proto::_right)))
+          boost::proto::_value(boost::proto::_right))
+          // )
       > {};
 
     namespace {

@@ -5,8 +5,6 @@
 
 #include <mirv/Core/Builder/ArrayTypeRules.hpp>
 #include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/bind/bind.hpp>
 #include <boost/proto/proto.hpp>
@@ -24,26 +22,22 @@ namespace mirv {
       /// parses dimension expressions.
       class TypeSubscriptData {
       private:
-        ptr<const Symbol<Type<TypeBase> > > baseType;
+        ptr<const Type> baseType;
         typedef std::list<std::uint64_t> dimensionList;
         dimensionList dimensions;
 
       public:
-        TypeSubscriptData(ptr<const Symbol<Type<TypeBase> > > e,
-                          std::uint64_t d) 
-            : baseType(e) {
+        TypeSubscriptData(ptr<const Type> e,
+                          std::uint64_t d) : baseType(e) {
           dimensions.push_front(d);
         }
 
-        TypeSubscriptData(ptr<const Symbol<Type<TypeBase> > > e, int d) 
-            : baseType(e) {
+        TypeSubscriptData(ptr<const Type> e, int d) : baseType(e) {
           dimensions.push_front(d);
         }
 
         template<typename List>
-        TypeSubscriptData(ptr<const Symbol<Type<TypeBase> > > e,
-                          const List &dims) 
-            : baseType(e) {
+        TypeSubscriptData(ptr<const Type> e, const List &dims) : baseType(e) {
           boost::fusion::for_each(
             dims,
             [this] (auto V) {
@@ -51,7 +45,7 @@ namespace mirv {
             });
         }
 
-        ptr<const Symbol<Type<TypeBase> > > elementType(void) const {
+        ptr<const Type> elementType(void) const {
           return baseType;
         }
 
@@ -73,21 +67,21 @@ namespace mirv {
       struct CreateTypeSubscript : boost::proto::callable {
         typedef TypeSubscriptData result_type;
 
-        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                               ptr<const Symbol<Type<TypeBase> > > elementType,
+        result_type operator()(ptr<SymbolTable> symtab,
+                               ptr<const Type> elementType,
                                int dimension) {
           return TypeSubscriptData(elementType, dimension);
         }
 
-        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                               ptr<const Symbol<Type<TypeBase> > > elementType,
+        result_type operator()(ptr<SymbolTable> symtab,
+                               ptr<const Type> elementType,
                                std::uint64_t dimension) {
           return TypeSubscriptData(elementType, dimension);
         }
 
         template<typename Expr>
-        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                               ptr<const Symbol<Type<TypeBase> > > elementType,
+        result_type operator()(ptr<SymbolTable> symtab,
+                               ptr<const Type> elementType,
                                const Expr &dimensions) {
           return TypeSubscriptData(elementType,
                                    // Extract the integer values.
@@ -102,14 +96,14 @@ namespace mirv {
       struct AddTypeSubscript : boost::proto::callable {
         typedef TypeSubscriptData result_type;
 
-        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+        result_type operator()(ptr<SymbolTable> symtab,
                                TypeSubscriptData subscripts,
                                std::uint64_t dimension) {
           subscripts.push_front(dimension);
           return subscripts;
         }
 
-        result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+        result_type operator()(ptr<SymbolTable> symtab,
                                TypeSubscriptData subscripts,
                                int dimension) {
           subscripts.push_front(dimension);
@@ -120,9 +114,9 @@ namespace mirv {
 
     /// This is a callable transform to construct a struct type.
     struct ConstructArrayTypeSymbol : boost::proto::callable {
-      typedef ptr<const Symbol<Type<TypeBase> > > result_type;
+      typedef ptr<const Type> result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+      result_type operator()(ptr<SymbolTable> symtab,
                              detail::TypeSubscriptData subscripts);
     };
 
@@ -156,7 +150,7 @@ namespace mirv {
     template<typename ElementTypeBuilder,
       typename Dummy>
     struct TypeSubscriptListBuilder;
-  
+
     /// This is a grammar add type dimension information to an
     /// existing list of type dimensions.
     template<typename ElementTypeBuilder,
@@ -168,7 +162,7 @@ namespace mirv {
         TypeSubscriptListBuilder<ElementTypeBuilder, Dummy>(boost::proto::_left),
         boost::proto::_value(boost::proto::_right))
       > {};
-    
+
     /// Translate a list of array type dimensions to a list of tuple
     /// dimensions.
     template<typename ElementTypeBuilder,
@@ -190,23 +184,19 @@ namespace mirv {
     /// This is the grammar for array types.
     struct ArrayTypeBuilder : boost::proto::when<
       ArrayTypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+      ConstructArrayTypeSymbol(
         boost::proto::_data,
-        ConstructArrayTypeSymbol(
-          boost::proto::_data,
-          // TypeSubscript data
-        TypeDimensionListBuilder<TypeBuilder>(boost::proto::_)))
+        // TypeSubscript data
+        TypeDimensionListBuilder<TypeBuilder>(boost::proto::_))
       > {};
 
     /// This is the grammar for looking up array types.
     struct ArrayTypeLookupBuilder : boost::proto::when<
       ArrayTypeRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+      ConstructArrayTypeSymbol(
         boost::proto::_data,
-        ConstructArrayTypeSymbol(
-          boost::proto::_data,
-          // TypeSubscript data
-          TypeDimensionListBuilder<TypeLookupBuilder>(boost::proto::_)))
+        // TypeSubscript data
+        TypeDimensionListBuilder<TypeLookupBuilder>(boost::proto::_))
       > {};
   }
 }

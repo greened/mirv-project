@@ -14,72 +14,48 @@
 
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/PlaceholderType.hpp>
-#include <mirv/Core/IR/Relational.hpp>
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Mutating.hpp>
+#include <mirv/Core/IR/Type.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
-using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
-using mirv::Variable;
 using mirv::GlobalVariable;
+using mirv::IRBuilder;
 using mirv::Type;
-using mirv::TypeBase;
-using mirv::Integral;
 using mirv::FunctionType;
-using mirv::Node;
-using mirv::Base;
 using mirv::ptr;
 using mirv::PrintFilter;
-using mirv::make;
 
 namespace Builder = mirv::Builder;
 
 using Builder::func;
+using Builder::void_;
 
 int main(void)
 {
-  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
+  auto module = IRBuilder::GetOrCreateModule("testmodule");
 
-  ptr<Symbol<Type<TypeBase> > > functype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >());
-  module->typePushBack(functype);
+  auto inttype = IRBuilder::getIntegerType(32);
 
-  ptr<Symbol<Type<TypeBase> > > inttype =
-    make<Symbol<Type<Integral> > >(32);
-  module->typePushBack(inttype);
-
-  ptr<Symbol<GlobalVariable> > asym =
-    make<Symbol<GlobalVariable> >("a", inttype);
-  module->globalVariablePushBack(asym);
-
-  ptr<Symbol<GlobalVariable> > bsym =
-    make<Symbol<GlobalVariable> >("b", inttype);
-  module->globalVariablePushBack(bsym);
+  IRBuilder::GetOrCreateGlobalVariable("a", inttype);
+  IRBuilder::GetOrCreateGlobalVariable("b", inttype);
 
   Builder::GlobalVariableTerminal a = {{"a"}};
   Builder::GlobalVariableTerminal b = {{"b"}};
 
-  ptr<Node<Base> > code =
+  auto code =
     Builder::translateWithGrammar<Builder::FunctionBuilder>(module,
-      func["testfunc"].type["void ()"] [
+      func["testfunc"].type[void_()] [
        	a = a + b
       ]
     );
 
   PrintFilter print(std::cout);
-  
-  print(code);
+
+  print.run(code);
 
   return(0);
 }

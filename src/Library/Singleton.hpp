@@ -7,24 +7,30 @@
 #include <memory>
 
 namespace mirv {
-  namespace lib {
-    template<typename Type>
-    class Singleton {
-    private:
-      static std::shared_ptr<Type> inst;
+  template<typename Type>
+  class Singleton {
+  public:
+    using Handle = std::unique_ptr<Type>;
 
-    protected:
-      Singleton(void) {}
+  private:
+    static Handle inst;
 
-    public:
-      static Type &instance(void) {
-        if (!inst) {
-          inst = std::shared_ptr<Type>(new Type);
-        }
-        return *inst;
+  protected:
+    Singleton(void) {}
+
+  public:
+    static Type &instance(void) {
+      if (!inst) {
+        // Can't easily use make_unique because Type's constructor
+        // should be private.
+        inst.reset(new Type);
       }
-    };
-  }
+      return *inst;
+    }
+  };
+
+  template<typename Type>
+  typename mirv::Singleton<Type>::Handle mirv::Singleton<Type>::inst;
 }
 
 #endif

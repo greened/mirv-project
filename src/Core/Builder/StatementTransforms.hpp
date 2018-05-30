@@ -1,47 +1,61 @@
 #ifndef mirv_Core_Builder_StatementTransforms_hpp
 #define mirv_Core_Builder_StatementTransforms_hpp
 
-#include <mirv/Core/IR/ExpressionFwd.hpp>
-#include <mirv/Core/IR/StatementFwd.hpp>
-#include <mirv/Core/Builder/SymbolTableFwd.hpp>
+#include <mirv/Core/Memory/Heap.hpp>
 
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
+  class Control;
+  class Block;
+  class IfElse;
+  class IfThen;
+  class DoWhile;
+  class ValueProducer;
+
   namespace Builder {
+    class SymbolTable;
+
+    template<typename Stmt>
     struct StatementTransform : boost::proto::callable {
-      typedef ptr<Statement<Base> > result_type;
+      typedef ptr<Stmt> result_type;
     };
 
-    struct IfTransform : public StatementTransform {
+    struct BlockTransform : public StatementTransform<Block> {
       result_type operator()(ptr<SymbolTable> symtab,
-                             ptr<Expression<Base> > condition,
-                             ptr<Statement<Base> > body);
+                             ptr<Control> Stmt1,
+                             ptr<Control> Stmt2);
     };
 
-    struct IfElseTransform : public StatementTransform {
+    struct IfTransform : public StatementTransform<IfThen> {
       result_type operator()(ptr<SymbolTable> symtab,
-                             ptr<Expression<Base> > condition,
-                             ptr<Statement<Base> > thenBody,
-                             ptr<Statement<Base> > elseBody);
+                             ptr<ValueProducer> condition,
+                             ptr<Control> body);
     };
 
-    struct WhileTransform : public StatementTransform {
+    struct IfElseTransform : public StatementTransform<IfElse> {
       result_type operator()(ptr<SymbolTable> symtab,
-                             ptr<Expression<Base> > condition,
-                             ptr<Statement<Base> > body);
+                             ptr<ValueProducer> condition,
+                             ptr<Control> thenBody,
+                             ptr<Control> elseBody);
     };
 
-    struct DoWhileTransform : public StatementTransform {
+    struct WhileTransform : public StatementTransform<IfThen> {
       result_type operator()(ptr<SymbolTable> symtab,
-                             ptr<Expression<Base> > condition,
-                             ptr<Statement<Base> > body);
+                             ptr<ValueProducer> condition,
+                             ptr<Control> body);
     };
 
-    struct AssignTransform : public StatementTransform {
+    struct DoWhileTransform : public StatementTransform<DoWhile> {
       result_type operator()(ptr<SymbolTable> symtab,
-                             ptr<Expression<Base> > lhs,
-                             ptr<Expression<Base> > rhs);
+                             ptr<ValueProducer> condition,
+                             ptr<Control> body);
+    };
+
+    struct AssignTransform : public StatementTransform<Control> {
+      result_type operator()(ptr<SymbolTable> symtab,
+                             ptr<ValueProducer> lhs,
+                             ptr<ValueProducer> rhs);
     };
   }
 }

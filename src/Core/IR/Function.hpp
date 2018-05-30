@@ -1,127 +1,84 @@
 #ifndef mirv_Core_IR_Function_hpp
 #define mirv_Core_IR_Function_hpp
 
-#include <mirv/Core/IR/FunctionFwd.hpp>
-#include <mirv/Core/IR/StatementFwd.hpp>
+#include <mirv/Core/IR/Control.hpp>
+#include <mirv/Core/IR/Global.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
-#include <mirv/Core/IR/Type.hpp>
-#include <mirv/Core/IR/VariableFwd.hpp>
-
-#include <tr1/functional>
+#include <mirv/Core/Filter/SymbolVisitor.hpp>
+#include <mirv/Core/Filter/ValueVisitor.hpp>
+#include <mirv/Core/Utility/Debug.hpp>
+#include <mirv/Library/Range.hpp>
+#include <mirv/Library/TypeList.hpp>
+#include <mirv/Library/Vector.hpp>
 
 namespace mirv {
-  namespace detail {
-    /// Define the interface for function symbols.
-    class FunctionInterface : public Symbol<Global>,
-                              public InnerImpl<Symbol<Variable>, Virtual<Symbol<Base> > >,
-                              public InnerImpl<Statement<Base>, Virtual<Symbol<Base> > >,
-                              public boost::enable_shared_from_this<Symbol<Function> > {
-    private:
-      typedef Symbol<Global> GlobalBaseType;
-     
-      typedef InnerImpl<
-        Statement<Base>,
-        Virtual<Symbol<Base> >
-        > StatementBaseType;
+  class Allocate;
+  class Block;
+  class IRBuilder;
+  class Module;
 
-      typedef InnerImpl<
-        Symbol<Variable>,
-        Virtual<Symbol<Base> >
-        > VariableBaseType;
+  class Function : public Global,
+                   public Symbol {
+  private:
+    friend class IRBuilder;
+    friend class Module;
 
-    public:
-      typedef StatementBaseType::ChildPtr StatementPtr;
-      typedef StatementBaseType::ConstChildPtr ConstStatementPtr;
-      typedef VariableBaseType::ChildPtr VariablePtr;
-      typedef VariableBaseType::ConstChildPtr ConstVariablePtr;
+    ptr<Module> ParentModule;
 
-      FunctionInterface(const std::string &n, TypePtr t)
-          : GlobalBaseType(n, t) {}
+    typedef Vector<ptr<Allocate>> AllocateList;
 
-      FunctionInterface(const std::string &n,
-                        TypePtr t,
-                        StatementPtr s);
+    AllocateList Allocations;
+    ptr<Block> Code;
 
-      /// Add a local variable to this function.
-      void variablePushBack(VariablePtr v);
+    Function(const std::string &Name, ptr<const Type> T) :
+      Global(Name, T) {}
 
-      typedef VariableBaseType::iterator VariableIterator;
-      typedef VariableBaseType::const_iterator ConstVariableIterator;
-      /// Get the start of the local variable sequence.
-      VariableIterator variableBegin(void) {
-        return VariableBaseType::begin();
-      }
-      /// Get the end of the local variable sequence.
-      VariableIterator variableEnd(void) {
-        return VariableBaseType::end();
-      }
-      /// Get the start of the local variable sequence.
-      ConstVariableIterator variableBegin(void) const {
-        return VariableBaseType::begin();
-      }
-      /// Get the end of the local variable sequence.
-      ConstVariableIterator variableEnd(void) const {
-        return VariableBaseType::end();
-      }
+    Function(std::string &&Name, ptr<const Type> T) :
+      Global(std::move(Name), T) {}
 
-      VariableIterator variableFind(const std::string &name) {
-        return std::find_if(variableBegin(), variableEnd(),
-                            std::tr1::bind(SymbolByName<Variable>(), std::tr1::placeholders::_1, name));
-        //boost::bind(SymbolByName<Symbol<Variable> >(), _1, name));
-      }
-
-      void statementPushBack(StatementPtr stmt);
-
-      /// Get the single block statement child.
-      StatementPtr getStatement(void) {
-        return *StatementBaseType::begin();
-      }
-      ConstStatementPtr getStatement(void) const {
-        return *StatementBaseType::begin();
-      }
-
-      /// Return whether the function does not have a statement.
-      bool statementEmpty(void) const {
-        return StatementBaseType::empty();
-      }
-
-      typedef StatementBaseType::iterator StatementIterator;
-      typedef StatementBaseType::const_iterator ConstStatementIterator;
-      /// Get the start of the local statement sequence.
-      StatementIterator statementBegin(void) {
-        return StatementBaseType::begin();
-      }
-      /// Get the end of the local statement sequence.
-      StatementIterator statementEnd(void) {
-        return StatementBaseType::end();
-      }
-      /// Get the start of the local statement sequence.
-      ConstStatementIterator statementBegin(void) const {
-        return StatementBaseType::begin();
-      }
-      /// Get the end of the local statement sequence.
-      ConstStatementIterator statementEnd(void) const {
-        return StatementBaseType::end();
-      }
-
-      ptr<Node<Base>> getSharedHandle(void) {
-        return fast_cast<Node<Base>>(shared_from_this());
-      }
-      ptr<const Node<Base>> getSharedHandle(void) const {
-        return fast_cast<const Node<Base>>(shared_from_this());
-      }
-    };
-  }
-
-  /// This is a symbol tag for function symbols.
-  class Function {
-  public:
-    static void initialize(ptr<Symbol<Function> > function) {}
-
-    static std::string getName(const std::string &name,
-                               ptr<const Symbol<Type<TypeBase> > > type) {
-      return name;
+    static ptr<Function> Make(const std::string &Name, ptr<const Type> T) {
+      return getHandle(new Function(Name, T));
     }
+    static ptr<Function> Make(std::string &&Name, ptr<const Type> T) {
+      return getHandle(new Function(std::move(Name), T));
+    }
+
+    void acceptImpl(ValueVisitor &V) override {
+      V.visit(*this);
+    }
+
+    void acceptImpl(SymbolVisitor &V) override {
+      V.visit(*this);
+    }
+
+    void setParentModule(ptr<Module> M) {
+      ParentModule = M;
+    }
+
+  public:
+    using Global::accept;
+    using Symbol::accept;
+
+    typedef TypeList<Global, Symbol> VisitorBaseTypes;
+    //    typedef Range<AllocateList::iterator> AllocateRange;
+
+    ptr<Module> getParentModule(void) const {
+      checkInvariant(ParentModule, "No parent module");
+      return ParentModule;
+    }
+
+    // AllocateRange Allocates(void) {
+    //   return MakeRange(Allocations.begin(), Allocations.end());
+    // }
+
+    void setBlock(ptr<Block> C) {
+      Code = C;
+    }
+    ptr<Block> getBlock(void) const {
+      return Code;
+    }
+
+    void dump(void);
   };
 }
 

@@ -1,11 +1,12 @@
 #ifndef mirv_Core_Builder_ModuleGrammar_hpp
 #define mirv_Core_Builder_ModuleGrammar_hpp
 
-#include <mirv/Core/Builder/ModuleRules.hpp>
 #include <mirv/Core/Builder/FunctionGrammar.hpp>
-#include <mirv/Core/Builder/TypeGrammar.hpp>
 #include <mirv/Core/Builder/GlobalVariableGrammar.hpp>
+#include <mirv/Core/Builder/ModuleRules.hpp>
+#include <mirv/Core/Builder/ModuleTransform.hpp>
 #include <mirv/Core/Builder/Transform.hpp>
+#include <mirv/Core/Builder/TypeGrammar.hpp>
 #include <mirv/Core/IR/Module.hpp>
 
 #include <boost/proto/proto.hpp>
@@ -14,10 +15,10 @@ namespace mirv {
   namespace Builder {
     /// This is a callable transform to get the current module.
     struct GetBuiltModule : boost::proto::callable {
-      typedef ptr<Symbol<Module> > result_type;
+      typedef ptr<Module> result_type;
 
       template<typename T>
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab, T) {
+      result_type operator()(ptr<SymbolTable> symtab, T) {
 	result_type module = symtab->getModule();
 	return module;
       }
@@ -53,7 +54,7 @@ namespace mirv {
           boost::proto::_state,
           SetModule(
             boost::proto::_data,
-            ConstructUnary<Symbol<Module>, const std::string &>(
+            ConstructModule(
               boost::proto::_data,
               boost::proto::_value(boost::proto::_right(
                                      boost::proto::_left))))))

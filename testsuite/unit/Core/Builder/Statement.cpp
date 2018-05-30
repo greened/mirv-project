@@ -41,18 +41,11 @@
 // STDOUT:          vref c
 
 #include <mirv/Core/IR/Control.hpp>
-#include <mirv/Core/IR/Mutating.hpp>
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
-#include <mirv/Core/IR/FloatingType.hpp>
-#include <mirv/Core/IR/FunctionType.hpp>
-#include <mirv/Core/IR/IntegralType.hpp>
-#include <mirv/Core/IR/PointerType.hpp>
-#include <mirv/Core/IR/PlaceholderType.hpp>
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Relational.hpp>
+#include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/IR/Producers.hpp>
 #include <mirv/Core/Builder/Builder.hpp>
 #include <mirv/Core/Builder/DoWhileGrammar.hpp>
 #include <mirv/Core/Builder/IfElseGrammar.hpp>
@@ -60,21 +53,18 @@
 #include <mirv/Core/Builder/Translate.hpp>
 #include <mirv/Filter/Snapshot/Print/Print.hpp>
 
+using mirv::Allocate;
+using mirv::Block;
 using mirv::Symbol;
 using mirv::Module;
 using mirv::Function;
-using mirv::Variable;
-using mirv::GlobalVariable;
-using mirv::Type;
-using mirv::TypeBase;
-using mirv::Integral;
-using mirv::Pointer;
 using mirv::FunctionType;
-using mirv::Node;
-using mirv::Base;
+using mirv::GlobalVariable;
+using mirv::Sequence;
+using mirv::Type;
 using mirv::ptr;
 using mirv::PrintFilter;
-using mirv::make;
+using mirv::IRBuilder;
 
 namespace Builder = mirv::Builder;
 
@@ -83,40 +73,35 @@ using Builder::do_;
 
 int main(void)
 {
-  ptr<Symbol<Module> > module = make<Symbol<Module> >("testmodule");
+  ptr<Module> module = IRBuilder::GetOrCreateModule("testmodule");
 
-  ptr<Symbol<Type<TypeBase> > > functype =
-    make<Symbol<Type<FunctionType> > >(ptr<Symbol<Type<TypeBase> > >());
-  module->typePushBack(functype);
+  ptr<const Type> voidtype = IRBuilder::getVoidType();
+  ptr<const Type> functype = IRBuilder::getFunctionType(FunctionType::NotVararg,
+                                                        voidtype);
 
-  ptr<Symbol<Type<TypeBase> > > inttype =
-    make<Symbol<Type<Integral> > >(32);
-  module->typePushBack(inttype);
+  ptr<const Type> inttype = IRBuilder::getIntegerType(32);
 
-  ptr<Symbol<Type<TypeBase> > > ptrtype =
-    make<Symbol<Type<Pointer> > >(inttype);
-  module->typePushBack(ptrtype);
+  ptr<const Type> ptrtype = IRBuilder::getPointerType(inttype);
 
-  ptr<Symbol<Function> > function =
-    make<Symbol<Function> >("testfunc", functype);
+  ptr<Function> function = IRBuilder::GetOrCreateFunction("testfunc", functype);
 
-  module->functionPushBack(function);
+  function->setBlock(IRBuilder::get<Block>("testblock"));
 
-  ptr<Symbol<Variable> > asym = make<Symbol<Variable> >("a", ptrtype);
-  function->variablePushBack(asym);
+  ptr<Allocate> asym = IRBuilder::getOrCreateAllocate("a", ptrtype);
+  auto aseq = IRBuilder::get<Sequence>(asym);
+  function->getBlock()->push_back(aseq);
 
-  ptr<Symbol<GlobalVariable> > bsym =
-    make<Symbol<GlobalVariable> >("b", inttype);
-  module->globalVariablePushBack(bsym);
+  IRBuilder::GetOrCreateGlobalVariable("b", inttype);
 
-  ptr<Symbol<Variable> > csym = make<Symbol<Variable> >("c", ptrtype);
-  function->variablePushBack(csym);
+  ptr<Allocate> csym = IRBuilder::getOrCreateAllocate("c", ptrtype);
+  auto cseq = IRBuilder::get<Sequence>(csym);
+  function->getBlock()->push_back(cseq);
 
   Builder::VariableTerminal a = {{"a"}};
   Builder::GlobalVariableTerminal b = {{"b"}};
   Builder::VariableTerminal c = {{"c"}};
 
-  ptr<Node<Base> > stmt =
+  auto stmt =
     Builder::translateWithGrammar<Builder::ConstructStatementGrammar>(
       module, function,
       do_[
@@ -129,9 +114,9 @@ int main(void)
       ].while_(a < c)
     );
 
-  PrintFilter print(std::cout);
-  
-  print(stmt);
+  mirv::PrintFilter print(std::cout);
+
+  print.run(stmt);
 
   return(0);
 }

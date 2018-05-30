@@ -1,6 +1,8 @@
-#include <mirv/Core/IR/IR.hpp>
+#include <mirv/Core/IR/Constants.hpp>
+#include <mirv/Core/IR/ControlStructure.hpp>
+#include <mirv/Core/IR/Producers.hpp>
 #include <mirv/Core/Utility/Cast.hpp>
-#include <mirv/Core/Filter/ConstSymbolFlow.hpp>
+#include <mirv/Core/Filter/SymbolFlow.hpp>
 
 #include <boost/mem_fn.hpp>
 
@@ -13,7 +15,7 @@
 
 namespace mirv {
   namespace {
-    class EnterConstantVisitor : public ConstSymbolVisitor {
+    class EnterConstantVisitor : public ValueVisitor {
     private:
       typedef LLVMCodegenFilter::FlowAttributeManagerType FlowAttributeManagerType;
       typedef LLVMCodegenFilter::InheritedAttribute InheritedAttribute;
@@ -21,39 +23,59 @@ namespace mirv {
 
       FlowAttributeManagerType &attributeManager;
 
-      template<typename ConstantType>
-      void
-      visitIntegerConstant(boost::shared_ptr<const Symbol<Constant<ConstantType> > > sym,
-                           bool isSigned) {
+      void visitIntegerConstant(IntegerConstant &sym, bool isSigned) {
         SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-        syn.createIntegerConstant(sym->type(), sym->value(), isSigned);
+        syn.createIntegerConstant(sym.getType(), sym.getValue(), isSigned);
         attributeManager.setSynthesizedAttribute(syn);
       }
 
-      template<typename ConstantType>
-      void
-      visitFloatingPointConstant(boost::shared_ptr<const Symbol<Constant<ConstantType> > > sym) {
+      void visitFloatingPointConstant(FloatingPointConstant &sym) {
         SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-        syn.createFloatingPointConstant(sym->type(), sym->value());
+        syn.createFloatingPointConstant(sym.getType(), sym.getValue());
         attributeManager.setSynthesizedAttribute(syn);
+      }
+
+      void visitTupleConstant(TupleConstant &sym) {
+        // TODO: Gather the tuple constants and create LLVM Constants
+        // for them.
+
+        //SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+        //syn.createFloatingPointConstant(sym.getType(),
+        //sym.getValue());
+        //attributeManager.setSynthesizedAttribute(syn);
       }
 
     public:
       EnterConstantVisitor(FlowAttributeManagerType &am)
           : attributeManager(am) {}
 
-      void visit(ptr<const Symbol<Constant<std::int8_t> > >);
-      void visit(ptr<const Symbol<Constant<std::uint8_t> > >);
-      void visit(ptr<const Symbol<Constant<std::int16_t> > >);
-      void visit(ptr<const Symbol<Constant<std::uint16_t> > >);
-      void visit(ptr<const Symbol<Constant<std::int32_t> > >);
-      void visit(ptr<const Symbol<Constant<std::uint32_t> > >);
-      void visit(ptr<const Symbol<Constant<std::int64_t> > >);
-      void visit(ptr<const Symbol<Constant<std::uint64_t> > >);
-      void visit(ptr<const Symbol<Constant<float> > >);
-      void visit(ptr<const Symbol<Constant<double> > >);
-      void visit(ptr<const Symbol<Constant<std::string> > >);
-      void visit(ptr<const Symbol<Constant<Address> > >);
+      void visit(IntegerConstant &) override;
+      void visit(FloatingPointConstant &) override;
+      void visit(TupleConstant &) override;
+    };
+
+    class LeaveConstantVisitor : public ValueVisitor {
+    private:
+      typedef LLVMCodegenFilter::FlowAttributeManagerType FlowAttributeManagerType;
+      typedef LLVMCodegenFilter::InheritedAttribute InheritedAttribute;
+      typedef LLVMCodegenFilter::SynthesizedAttribute SynthesizedAttribute;
+
+      //FlowAttributeManagerType &attributeManager;
+
+      void visitTupleConstant(TupleConstant &sym) {
+        // TODO: Synthesize a tuple constant from operands.
+
+        //SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute());
+        //attributeManager.setSynthesizedAttribute(syn);
+      }
+
+    public:
+      LeaveConstantVisitor(FlowAttributeManagerType &am) {}
+      //: attributeManager(am) {}
+
+      // void visit(IntegerConstant &) override;
+      // void visit(FloatingPointConstant &) override;
+      // void visit(TupleConstant &) override;
     };
 
     class EnterConstantAction : public VisitAction<EnterConstantVisitor> {
@@ -66,9 +88,8 @@ namespace mirv {
     class ConstantFlow : public AttributeFlow<
       LLVMCodegenFilter::InheritedAttribute,
       LLVMCodegenFilter::SynthesizedAttribute,
-      ConstSymbolFlowGenerator,
+      ForwardValueFlowGenerator,
       EnterConstantAction,
-      NullAction,
       NullAction,
       NullAction,
       NullAction,
@@ -77,9 +98,8 @@ namespace mirv {
       typedef AttributeFlow<
       LLVMCodegenFilter::InheritedAttribute,
       LLVMCodegenFilter::SynthesizedAttribute,
-      ConstSymbolFlowGenerator,
+      ForwardValueFlowGenerator,
       EnterConstantAction,
-      NullAction,
       NullAction,
       NullAction,
       NullAction,
@@ -91,57 +111,15 @@ namespace mirv {
           : BaseType(inherited, synthesized) {}
     };
 
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::int8_t> > > sym)
-    {
+    void EnterConstantVisitor::visit(IntegerConstant &sym) {
       visitIntegerConstant(sym, true);
     }
 
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::uint8_t> > > sym)
-    {
-      visitIntegerConstant(sym, false);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::int16_t> > > sym)
-    {
-      visitIntegerConstant(sym, true);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::uint16_t> > > sym)
-    {
-      visitIntegerConstant(sym, false);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::int32_t> > > sym)
-    {
-      visitIntegerConstant(sym, true);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::uint32_t> > > sym)
-    {
-      visitIntegerConstant(sym, false);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::int64_t> > > sym)
-    {
-      visitIntegerConstant(sym, true);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::uint64_t> > > sym)
-    {
-      visitIntegerConstant(sym, false);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<float> > > sym)
-    {
+    void EnterConstantVisitor::visit(FloatingPointConstant &sym) {
       visitFloatingPointConstant(sym);
     }
 
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<double> > > sym)
-    {
-      visitFloatingPointConstant(sym);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<std::string> > > sym)
+    void EnterConstantVisitor::visit(TupleConstant &sym)
     {
       // This should return the string value but it's not clear what
       // LLVM will do with that.  Typically we see this in global
@@ -149,36 +127,15 @@ namespace mirv {
       // here.
       error("Unimplemented");
       SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-      llvm::Value *pointer = syn.builder()->CreateGlobalString(sym->value().c_str());
-      syn.setValue(pointer);
-      attributeManager.setSynthesizedAttribute(syn);
-    }
-
-    void EnterConstantVisitor::visit(ptr<const Symbol<Constant<Address> > > sym)
-    {
-      SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-
-      // First, see if this is a function address.
-      if (llvm::Function *function =
-          syn.getModule()->getFunction(sym->symbol()->name())) {
-        error("Unimplemented");
-      }
-      else {
-        // This must be a global variable address.  LLVM's
-        // GlobalVariable is already an implicit address.
-        syn.setValue(syn.getGlobalVariable(sym->symbol()->name()));
-      }
-
       attributeManager.setSynthesizedAttribute(syn);
     }
 
     llvm::Constant *
-    getConstant(ptr<const Expression<Reference<Constant<Base> > > > constant,
+    getConstant(Constant &constant,
                 LLVMCodegenFilter::InheritedAttribute &inh,
-                LLVMCodegenFilter::SynthesizedAttribute &syn)
-    {
+                LLVMCodegenFilter::SynthesizedAttribute &syn) {
       ConstantFlow valueCreator(inh, syn);
-      constant->getSymbol()->accept(valueCreator);
+      constant.accept(valueCreator);
 
       return llvm::cast<llvm::Constant>(valueCreator.getAttributeManager().
                                         getLastSynthesizedAttribute().
@@ -189,8 +146,7 @@ namespace mirv {
   void LLVMCodegenFilter::
   FlowAttribute::
   createFunction(const std::string &name,
-                 ptr<const Symbol<Type<TypeBase> > > type)
-  {
+                 ptr<const Type> type) {
     checkInvariant(TheModule != 0, "No current module");
     checkInvariant(TheFunction == 0, "Function already exists");
     llvm::FunctionType *llvmFunctionType =
@@ -205,8 +161,7 @@ namespace mirv {
   void LLVMCodegenFilter::
   FlowAttribute::
   createVariable(const std::string &name,
-                 ptr<const Symbol<Type<TypeBase> > > type)
-  {
+                 ptr<const Type> type) {
     checkInvariant(TheFunction != 0, "No function to hold variable");
     //llvm::Type *llvmType = getType(type);
     VariableMap::iterator pos;
@@ -219,8 +174,7 @@ namespace mirv {
   void LLVMCodegenFilter::
   FlowAttribute::
   createAlloca(const std::string &name,
-               ptr<const Symbol<Type<TypeBase> > > type)
-  {
+               ptr<const Type> type) {
     checkInvariant(TheFunction != 0, "No function to hold variable");
     llvm::Type *llvmType = getType(type);
     llvm::Value *var = builder()->CreateAlloca(llvmType, 0, name);
@@ -231,12 +185,12 @@ namespace mirv {
 
   void LLVMCodegenFilter::
   FlowAttribute::
-  createGlobalVariable(ptr<const Symbol<GlobalVariable> > sym,
+  createGlobalVariable(const GlobalVariable &sym,
                        const InheritedAttribute &inh,
                        const SynthesizedAttribute &syn)
   {
-    const std::string &name = sym->name();
-    ptr<const Symbol<Type<TypeBase> > > type(sym->type());
+    const std::string &name = sym.getName();
+    ptr<const Type> type(sym.getType());
 
     checkInvariant(TheModule, "No module for global variable");
     llvm::Type *llvmType = getType(type);
@@ -245,21 +199,41 @@ namespace mirv {
         llvm::dyn_cast<llvm::ArrayType>(llvmType)) {
 
       if (arrayType->getElementType() == inh.builder()->getInt8Ty()
-          && sym->initializer()) {
-        ptr<const Symbol<Constant<std::string> > > str =
-          dyn_cast<const Symbol<Constant<std::string> > >(
-            sym->initializer()->getSymbol());
+          && sym.getInitializer()) {
+        ptr<const TupleConstant> str = dyn_cast<const TupleConstant>(
+            sym.getInitializer());
+
         if (str) {
+          ptr<const TupleType> StrType =
+            safe_cast<const TupleType>(str->getType());
+          checkInvariant(StrType->isUniform(), "Array initializer not uniform");
+          for (auto T : StrType->Types()) {
+            ptr<const IntegerType> IType = safe_cast<const IntegerType>(T);
+            auto Size = safe_cast<IntegerConstant>(IType->BitSize());
+            checkInvariant(Size->getValue() == 8,
+                           "String initializer not chars");
+          }
+
+          std::string StrValue;
+          for (auto V : str->Operands()) {
+            ptr<const IntegerConstant> IC = safe_cast<const IntegerConstant>(V);
+            auto IType = safe_cast<const IntegerType>(IC->getType());
+            auto Size = safe_cast<IntegerConstant>(IType->BitSize());
+            checkInvariant(Size->getValue() == 8,
+                           "String initializer not chars");
+            StrValue.push_back(IC->getValue());
+          }
+
           // This doesn't work because llvm's IRBuilder nonsensically
           // requires a basic block to exist here.  The code below
           // does the equivalent.
 
           //llvm::Value *pointer =
-          //  inh.builder()->CreateGlobalString(str->value().c_str(), name);
+          //  inh.builder()->CreateGlobalString(str->getValue().c_str(), name);
 
           llvm::Constant *StrConstant =
             llvm::ConstantDataArray::getString(inh.builder()->getContext(),
-                                               llvm::StringRef(str->value()),
+                                               StrValue,
                                                true);
           llvm::Module &M = *inh.getModule();
           llvm::GlobalVariable *GV =
@@ -288,10 +262,10 @@ namespace mirv {
     bool inserted;
     std::tie(pos, inserted) = ModuleMap->insert(std::make_pair(name, GV));
     checkInvariant(inserted, "Global variable already exists");
-    if (sym->initializer()) {
+    if (sym.getInitializer()) {
       InheritedAttribute inherited(inh);
       SynthesizedAttribute synthesized(syn);
-      GV->setInitializer(getConstant(sym->initializer(),
+      GV->setInitializer(getConstant(*sym.getInitializer(),
                                      inherited,
                                      synthesized));
     }
@@ -299,32 +273,14 @@ namespace mirv {
 
   llvm::Value *LLVMCodegenFilter::
   FlowAttribute::
-  getVariable(ptr<const Symbol<Variable> > sym)
-  {
-    checkInvariant(FunctionMap, "No variables available");
-    auto v = FunctionMap->find(sym->name());
-    checkInvariant(v != FunctionMap->end(), "Cannot find variable");
-    if (!v->second) {
-      // We need an alloca for this.
-      createAlloca(sym->name(), sym->type());
-      v = FunctionMap->find(sym->name());
-      checkInvariant(v->second, "Could not create alloca for temporary");
-    }
-    return v->second;
-  }
-
-  llvm::Value *LLVMCodegenFilter::
-  FlowAttribute::
-  getGlobalVariable(const std::string &name)
-  {
+  getGlobalVariable(const std::string &name) {
     auto v = ModuleMap->find(name);
     checkInvariant(v != ModuleMap->end(), "Cannot find variable");
     return v->second;
   }
 
   llvm::Type *LLVMCodegenFilter::
-  FlowAttribute::
-  getType(ptr<const Symbol<Type<TypeBase> > > type) const
+  FlowAttribute::getType(ptr<const Type> type) const
   {
     TypeCreator creator(Context);
     type->accept(creator);
@@ -332,75 +288,67 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::FlowAttribute::
-  TypeCreator::visit(ptr<const Symbol<Type<Integral> > > type)
+  TypeCreator::visit(const IntegerType &type)
   {
-    ptr<Expression<Reference<Constant<Base> > > > expr =
-      safe_cast<Expression<Reference<Constant<Base> > > >(type->bitsize());
-    ptr<Symbol<Constant<std::uint64_t> > > constant =
-      safe_cast<Symbol<Constant<std::uint64_t> > >(expr->getSymbol());
+    ptr<ValueProducer> expr = type.BitSize();
+    ptr<IntegerConstant> constant = safe_cast<IntegerConstant>(expr);
 
-    TheType = llvm::IntegerType::get(Context, constant->value());
+    TheType = llvm::IntegerType::get(Context, constant->getValue());
   }
 
   void LLVMCodegenFilter::FlowAttribute::
-  TypeCreator::visit(ptr<const Symbol<Type<Floating> > > type)
+  TypeCreator::visit(const FloatingPointType &type)
   {
-    ptr<Expression<Reference<Constant<Base> > > > expr =
-      safe_cast<Expression<Reference<Constant<Base> > > >(type->bitsize());
-    ptr<Symbol<Constant<std::uint64_t> > > constant =
-      safe_cast<Symbol<Constant<std::uint64_t> > >(expr->getSymbol());
+    ptr<ValueProducer> expr = type.BitSize();
 
-    checkInvariant(constant->value() == 32
-                   || constant->value() == 64,
+    ptr<IntegerConstant> constant = safe_cast<IntegerConstant>(expr);
+
+    checkInvariant(constant->getValue() == 32
+                   || constant->getValue() == 64,
                    "Unexpected floating type");
-    TheType = constant->value() == 32 ?
+    TheType = constant->getValue() == 32 ?
       llvm::Type::getFloatTy(Context) :
       llvm::Type::getDoubleTy(Context);
   }
 
   void LLVMCodegenFilter::FlowAttribute::
-  TypeCreator::visit(ptr<const Symbol<Type<Tuple> > > type)
-  {
+  TypeCreator::visit(const TupleType &type) {
     // TODO: See about making some of these vector types.
-    if (type->isUniform()) {
-      (*type->begin())->accept(*this);
-      llvm::Type *elementType = TheType;
+    std::vector<llvm::Type *> memberTypes;
+    for (auto Op : type.Types()) {
+      Op->accept(*this);
+      memberTypes.push_back(TheType);
+    }
+
+    if (type.isUniform()) {
+      checkInvariant(memberTypes.size() == 1,
+                     "Multiple types for uniform tuple type");
+      llvm::Type *elementType = memberTypes.front();
 
       // Size must be an integer constant for LLVM.
-      ptr<const Expression<Reference<Constant<Base> > > > cref =
-        safe_cast<const Expression<Reference<Constant<Base> > > >(type->count());
-      ptr<const Symbol<Constant<std::uint64_t> > > constant =
-        safe_cast<const Symbol<Constant<std::uint64_t> > >(cref->getSymbol());
-      TheType = llvm::ArrayType::get(elementType, constant->value());
+      ptr<ValueProducer> cref = type.Count();
+      ptr<IntegerConstant> constant =
+        safe_cast<IntegerConstant>(cref);
+      TheType = llvm::ArrayType::get(elementType, constant->getValue());
       return;
     }
 
     // Create a struct type.
-    std::vector<llvm::Type *> memberTypes;
-    for (auto m = type->begin();
-         m != type->end();
-         ++m) {
-      (*m)->accept(*this);
-      memberTypes.push_back(TheType);
-    }
-
     TheType = llvm::StructType::get(Context, memberTypes);
   }
 
   void LLVMCodegenFilter::FlowAttribute::
-  TypeCreator::visit(ptr<const Symbol<Type<Pointer> > > type)
-  {
-    type->getBaseType()->accept(*this);
+  TypeCreator::visit(const PointerType &type) {
+    type.getBaseType()->accept(*this);
     llvm::Type *baseType = TheType;
     TheType = llvm::PointerType::getUnqual(baseType);
   }
 
   void LLVMCodegenFilter::FlowAttribute::
-  TypeCreator::visit(ptr<const Symbol<Type<FunctionType> > > type)
-  {
+  TypeCreator::visit(const FunctionType &type) {
     llvm::Type *returnType = 0;
-    if (type->getReturnType()) {
-      type->getReturnType()->accept(*this);
+    if (type.getReturnType()) {
+      type.getReturnType()->accept(*this);
       returnType = TheType;
     }
     else {
@@ -408,38 +356,35 @@ namespace mirv {
     }
 
     std::vector<llvm::Type *> parameterTypes;
-    for (auto p = type->parameterBegin();
-         p != type->parameterEnd();
-         ++p) {
-      (*p)->accept(*this);
+    for (auto p : type.ParameterTypes()) {
+      p->accept(*this);
       parameterTypes.push_back(TheType);
     }
 
     TheType = llvm::FunctionType::get(returnType,
                                       parameterTypes,
-                                      type->isVararg());
+                                      type.isVararg());
   }
 
   void LLVMCodegenFilter::
-  EnterSymbolVisitor::visit(ptr<const Symbol<Module> > sym)
-  {
+  EnterSymbolVisitor::visit(Module &sym) {
     InheritedAttribute inh(attributeManager.getInheritedAttribute());
-    inh.createModule(sym->name());
+    inh.createModule(sym.getName());
     attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::
-  EnterSymbolVisitor::visit(ptr<const Symbol<Function> > sym)
+  EnterSymbolVisitor::visit(Function &sym)
   {
     InheritedAttribute inh(attributeManager.getInheritedAttribute());
-    inh.createFunction(sym->name(), sym->type());
+    inh.createFunction(sym.getName(), sym.getType());
     attributeManager.setInheritedAttribute(inh);
   }
 
   void LLVMCodegenFilter::
-  LeaveSymbolVisitor::visit(ptr<const Symbol<Function> > sym)
+  LeaveSymbolVisitor::visit(Function &sym)
   {
-    if (!sym->statementEmpty()) {
+    if (sym.getBlock()) {
       SynthesizedAttribute syn(attributeManager.getLastSynthesizedAttribute());
       // Add a return if necessary.
       llvm::BasicBlock *body = syn.getBlock();
@@ -454,15 +399,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::
-  LeaveSymbolVisitor::visit(ptr<const Symbol<Variable> > sym)
-  {
-    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-    syn.createVariable(sym->name(), sym->type());
-    attributeManager.setSynthesizedAttribute(syn);
-  }
-
-  void LLVMCodegenFilter::
-  LeaveSymbolVisitor::visit(ptr<const Symbol<GlobalVariable> > sym)
+  LeaveSymbolVisitor::visit(GlobalVariable &sym)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
     syn.createGlobalVariable(sym,
@@ -472,7 +409,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::
-  EnterStatementVisitor::visit(ptr<const Statement<Block> > stmt)
+  EnterStatementVisitor::visit(Block &stmt)
   {
     InheritedAttribute inh(attributeManager.getInheritedAttribute());
 
@@ -491,37 +428,17 @@ namespace mirv {
     attributeManager.setInheritedAttribute(inh);
   }
 
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<const Statement<Before> > stmt)
+  void LLVMCodegenFilter::EnterStatementVisitor::visit(Goto &stmt)
   {
     error("unimplemented");
   }
 
-  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<const Statement<Before> > stmt)
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(Goto &stmt)
   {
     error("unimplemented");
   }
 
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<const Statement<After> > stmt)
-  {
-    error("unimplemented");
-  }
-
-  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<const Statement<After> > stmt)
-  {
-    error("unimplemented");
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<const Statement<Goto> > stmt)
-  {
-    error("unimplemented");
-  }
-
-  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<const Statement<Goto> > stmt)
-  {
-    error("unimplemented");
-  }
-
-  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<const Statement<Return> > stmt)
+  void LLVMCodegenFilter::LeaveStatementVisitor::visit(Return &stmt)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
@@ -536,112 +453,8 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<const Statement<Phi> > stmt)
-  {
-    // TODO: Handle return assignment.
-
-    // LLVM expects a random-access iterator which these are not due
-    // to the filter_iterator component.  So copy values to a
-    // temporary vector.
-    std::vector<llvm::Value *>
-      sources(boost::make_transform_iterator(
-                attributeManager.begin(),
-                boost::mem_fn(&SynthesizedAttribute::getValue)),
-              boost::make_transform_iterator(
-                attributeManager.end(),
-                boost::mem_fn(&SynthesizedAttribute::getValue)));
-
-    llvm::Value *phi = attributeManager.getInheritedAttribute().builder()->
-      CreatePHI(attributeManager.begin()->getValue()->getType(), 0, "phi");
-
-    // TODO: Add incoming values.
-
-    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-    syn.setValue(phi);
-
-    attributeManager.setSynthesizedAttribute(syn);
-  }
-
-  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<const Statement<Store> > stmt)
-   {
-    // TODO: Handle return assignment.
-
-    // See LLVMCodeGenFlow::visit(...<Store>...) to see how we
-    // changed the order of visitation from normal forward flow.  This
-    // is why the lhs and rhs indices are reversed.
-    llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
-    llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
-
-    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
-
-    // This assumes lhs is already an address.
-    llvm::Value *inst = syn.builder()->CreateStore(rhs, lhs);
-    syn.setValue(inst);
-    attributeManager.setSynthesizedAttribute(syn);
-  }
-
-  void LLVMCodegenFilter::EnterStatementVisitor::visit(ptr<const Statement<Allocate> > stmt)
-  {
-    // LHS must be a vref.
-    ptr<const Symbol<Variable> > variable =
-      safe_cast<const Expression<Reference<Variable> > >(stmt->getLeftExpression())->
-      getSymbol();
-
-    InheritedAttribute inh(attributeManager.getInheritedAttribute());
-    inh.createAlloca(variable->name(),
-                     safe_cast<const Symbol<Type<Pointer> > >(variable->type())->
-                     getBaseType());
-    attributeManager.setInheritedAttribute(inh);
-  }
-
-  void LLVMCodegenFilter::LeaveStatementVisitor::visit(ptr<const Statement<Call> > stmt)
-  {
-    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
-
-    std::string name("name");
-
-    // LLVM expects a random-access iterator which these are not due
-    // to the filter_iterator component.  So copy values to a
-    // temporary vector.
-    auto argumentsBegin = attributeManager.begin();
-    ++argumentsBegin;
-
-    // See if we have a return value.
-    llvm::Value *function = attributeManager.begin()->getValue();
-    const llvm::PointerType *pointerType =
-      llvm::cast<const llvm::PointerType>(function->getType());
-    const llvm::FunctionType *functionType =
-      llvm::cast<const llvm::FunctionType>(pointerType->getElementType());
-
-    if (functionType->getReturnType()) {
-      checkInvariant(argumentsBegin->getValue()->hasName(),
-                     "No name for value");
-      // Return value name.
-      name = argumentsBegin->getValue()->getName();
-      // Get to the first argument.
-      ++argumentsBegin;
-    }
-
-    std::vector<llvm::Value *>
-      arguments(boost::make_transform_iterator(
-                  argumentsBegin,
-                  boost::mem_fn(&SynthesizedAttribute::getValue)),
-                boost::make_transform_iterator(
-                  attributeManager.end(),
-                  boost::mem_fn(&SynthesizedAttribute::getValue)));
-
-    llvm::Value *Call = attributeManager.getInheritedAttribute().builder()->
-      CreateCall(attributeManager.begin()->getValue(),
-                 llvm::ArrayRef<llvm::Value *>(arguments), name);
-
-    syn.setValue(Call);
-
-    attributeManager.setSynthesizedAttribute(syn);
-  }
-
-
   void LLVMCodegenFilter::
-  LeaveStatementVisitor::visit(ptr<const Statement<IfThen> > stmt)
+  LeaveStatementVisitor::visit(IfThen &stmt)
   {
     llvm::Instruction *cond =
       llvm::cast<llvm::Instruction>(attributeManager.getSynthesizedAttribute(0).
@@ -690,7 +503,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::
-  LeaveStatementVisitor::visit(ptr<const Statement<IfElse> > stmt)
+  LeaveStatementVisitor::visit(IfElse &stmt)
   {
     llvm::Instruction *cond =
       llvm::cast<llvm::Instruction>(attributeManager.getSynthesizedAttribute(0).
@@ -765,13 +578,7 @@ namespace mirv {
   }
 
   void LLVMCodegenFilter::
-  LeaveStatementVisitor::visit(ptr<const Statement<While> > stmt)
-  {
-    error("Unimplemented");
-  }
-
-  void LLVMCodegenFilter::
-  LeaveStatementVisitor::visit(ptr<const Statement<DoWhile> > stmt)
+  LeaveStatementVisitor::visit(DoWhile &stmt)
   {
     llvm::Instruction *cond =
       llvm::cast<llvm::Instruction>(attributeManager.getSynthesizedAttribute(1).
@@ -806,8 +613,17 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
+  void LLVMCodegenFilter::EnterExpressionVisitor::visit(Allocate &expt)
+  {
+    InheritedAttribute inh(attributeManager.getInheritedAttribute());
+    inh.createAlloca(expt.getName(),
+                     safe_cast<const PointerType>(expt.getType())->
+                     getBaseType());
+    attributeManager.setInheritedAttribute(inh);
+  }
+
   void LLVMCodegenFilter::
-  LeaveExpressionVisitor::visit(ptr<const Expression<Add> > expr)
+  LeaveExpressionVisitor::visit(Add & expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -823,7 +639,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Subtract> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Subtract &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -838,7 +654,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Multiply> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Multiply &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -853,7 +669,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Divide> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Divide &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -869,7 +685,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Modulus> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Modulus &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -885,7 +701,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Negate> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Negate &expr)
   {
     llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
 
@@ -899,7 +715,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<LogicalAnd> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(LogicalAnd &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -913,7 +729,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<LogicalOr> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(LogicalOr &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -927,7 +743,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<LogicalNot> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(LogicalNot &expr)
   {
     llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
 
@@ -940,7 +756,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<BitwiseAnd> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(BitwiseAnd &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -953,7 +769,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<BitwiseOr> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(BitwiseOr &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -966,7 +782,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<BitwiseComplement> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(BitwiseComplement &expr)
   {
     llvm::Value *op = attributeManager.getSynthesizedAttribute(0).getValue();
 
@@ -978,7 +794,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<LessThan> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(LessThan &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -995,7 +811,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<LessThanOrEqual> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(LessThanOrEqual &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -1012,7 +828,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Equal> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Equal &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -1028,7 +844,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<NotEqual> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(NotEqual &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -1044,7 +860,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<GreaterThan> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(GreaterThan &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -1061,7 +877,7 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<GreaterThanOrEqual> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(GreaterThanOrEqual &expr)
   {
     llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
     llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
@@ -1078,32 +894,32 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Reference<Variable> > > expr)
-  {
-    SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+  // void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Reference<Variable & > expr)
+  // {
+  //   SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
-    // Get the alloca for this variable.
-    llvm::Value *value = syn.getVariable(expr->getSymbol());
+  //   // Get the alloca for this variable.
+  //   llvm::Value *value = syn.getVariable(expr->getSymbol());
 
-    syn.setValue(value);
+  //   syn.setValue(value);
 
-    attributeManager.setSynthesizedAttribute(syn);
-  }
+  //   attributeManager.setSynthesizedAttribute(syn);
+  // }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Reference<GlobalVariable> > > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(GlobalVariable &expr)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
     // Get the global for this variable.  This is an address so we
     // need to load it if required.
-    llvm::Value *value = syn.getGlobalVariable(expr->getSymbol()->name());
+    llvm::Value *value = syn.getGlobalVariable(expr.getName());
 
     syn.setValue(value);
 
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Load> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Load &expr)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
@@ -1115,13 +931,13 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::EnterExpressionVisitor::visit(ptr<const Expression<TuplePointer> > expr)
+  void LLVMCodegenFilter::EnterExpressionVisitor::visit(TuplePointer &expr)
   {
     InheritedAttribute inh(attributeManager.getInheritedAttribute());
     attributeManager.setInheritedAttribute(inh);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<TuplePointer> > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(TuplePointer &expr)
   {
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
 
@@ -1150,16 +966,105 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Reference<Function> > > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Phi &expt)
   {
+    // TODO: Handle return assignment.
+
+    // LLVM expects a random-access iterator which these are not due
+    // to the filter_iterator component.  So copy values to a
+    // temporary vector.
+    std::vector<llvm::Value *>
+      sources(boost::make_transform_iterator(
+                attributeManager.begin(),
+                boost::mem_fn(&SynthesizedAttribute::getValue)),
+              boost::make_transform_iterator(
+                attributeManager.end(),
+                boost::mem_fn(&SynthesizedAttribute::getValue)));
+
+    llvm::Value *phi = attributeManager.getInheritedAttribute().builder()->
+      CreatePHI(attributeManager.begin()->getValue()->getType(), 0, "phi");
+
+    // TODO: Add incoming values.
+
     SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
-    syn.setReferencedFunction(syn.getModule()->
-                              getFunction(expr->getSymbol()->name()));
-    syn.setValue(syn.getModule()->getFunction(expr->getSymbol()->name()));
+    syn.setValue(phi);
+
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(ptr<const Expression<Reference<Constant<Base> > > > expr)
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Store &expt)
+  {
+    // TODO: Handle return assignment.
+
+    // See LLVMCodeGenFlow::visit(...<Store>...) to see how we
+    // changed the order of visitation from normal forward flow.  This
+    // is why the lhs and rhs indices are reversed.
+    llvm::Value *lhs = attributeManager.getSynthesizedAttribute(0).getValue();
+    llvm::Value *rhs = attributeManager.getSynthesizedAttribute(1).getValue();
+
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
+    // This assumes lhs is already an address.
+    llvm::Value *inst = syn.builder()->CreateStore(rhs, lhs);
+    syn.setValue(inst);
+    attributeManager.setSynthesizedAttribute(syn);
+  }
+
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(FunctionCall &expt)
+  {
+    SynthesizedAttribute syn(attributeManager.getSynthesizedAttribute(1));
+
+    std::string name("name");
+
+    // LLVM expects a random-access iterator which these are not due
+    // to the filter_iterator component.  So copy values to a
+    // temporary vector.
+    auto argumentsBegin = attributeManager.begin();
+    ++argumentsBegin;
+
+    // See if we have a return value.
+    llvm::Value *function = attributeManager.begin()->getValue();
+    const llvm::PointerType *pointerType =
+      llvm::cast<const llvm::PointerType>(function->getType());
+    const llvm::FunctionType *functionType =
+      llvm::cast<const llvm::FunctionType>(pointerType->getElementType());
+
+    if (functionType->getReturnType()) {
+      checkInvariant(argumentsBegin->getValue()->hasName(),
+                     "No name for value");
+      // Return value name.
+      name = argumentsBegin->getValue()->getName();
+      // Get to the first argument.
+      ++argumentsBegin;
+    }
+
+    std::vector<llvm::Value *>
+      arguments(boost::make_transform_iterator(
+                  argumentsBegin,
+                  boost::mem_fn(&SynthesizedAttribute::getValue)),
+                boost::make_transform_iterator(
+                  attributeManager.end(),
+                  boost::mem_fn(&SynthesizedAttribute::getValue)));
+
+    llvm::Value *Call = attributeManager.getInheritedAttribute().builder()->
+      CreateCall(attributeManager.begin()->getValue(),
+                 llvm::ArrayRef<llvm::Value *>(arguments), name);
+
+    syn.setValue(Call);
+
+    attributeManager.setSynthesizedAttribute(syn);
+  }
+
+  // void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Reference<Function & > expr)
+  // {
+  //   SynthesizedAttribute syn(attributeManager.getInheritedAttribute());
+  //   syn.setReferencedFunction(syn.getModule()->
+  //                             getFunction(expr->getSymbol()->getName()));
+  //   syn.setValue(syn.getModule()->getFunction(expr->getSymbol()->getName()));
+  //   attributeManager.setSynthesizedAttribute(syn);
+  // }
+
+  void LLVMCodegenFilter::LeaveExpressionVisitor::visit(Constant &expr)
   {
     InheritedAttribute inh(attributeManager.getInheritedAttribute());
     SynthesizedAttribute syn(inh);
@@ -1167,37 +1072,30 @@ namespace mirv {
     attributeManager.setSynthesizedAttribute(syn);
   }
 
-  void LLVMCodegenFilter::run(ptr<Node<Base> > node)
-  {
-    run(boost::const_pointer_cast<const Node<Base> >(node));
+  void LLVMCodegenFilter::runImpl(ptr<Module> node) {
+    std::unique_ptr<LLVMCodegenSymbolFlow>
+      flow(new LLVMCodegenSymbolFlow(Context));
+    node->accept(*flow);
+    TheModule =
+      flow->getAttributeManager().getLastSynthesizedAttribute().getModule();
   }
 
-  void LLVMCodegenFilter::run(ptr<const Node<Base> > node)
-  {
-    llvm::LLVMContext Context;
+  void LLVMCodegenFilter::runImpl(ptr<Function> node) {
+    std::unique_ptr<LLVMCodegenSymbolFlow>
+      flow(new LLVMCodegenSymbolFlow(Context));
+    node->accept(*flow);
+    TheFunction =
+      flow->getAttributeManager().getLastSynthesizedAttribute().getFunction();
+  }
 
-    if (ptr<const Symbol<Module> > s =
-        boost::dynamic_pointer_cast<const Symbol<Module> >(node)) {
-      ptr<LLVMCodegenSymbolFlow> flow(new LLVMCodegenSymbolFlow(Context));
-      s->accept(*flow);
-      TheModule =
-        flow->getAttributeManager().getLastSynthesizedAttribute().getModule();
-    }
-    else {
-      error("Can only codegen complete modules");
-    }
+  void LLVMCodegenFilter::runImpl(ptr<Control> node) {
+    std::unique_ptr<LLVMCodegenFlow> flow(new LLVMCodegenFlow(Context));
+    node->accept(*flow);
+  }
 
-    //if (ptr<const Statement<Base> > s = dyn_cast<Statement<Base> >(node)) {
-    if (ptr<const Statement<Base> > s =
-        boost::dynamic_pointer_cast<const Statement<Base> >(node)) {
-      ptr<LLVMCodegenFlow> flow(new LLVMCodegenFlow(Context));
-      s->accept(*flow);
-    }
-    else if (ptr<const Expression<Base> > e =
-             boost::dynamic_pointer_cast<const Expression<Base> >(node)) {
-      ptr<LLVMCodegenExpressionFlow>
-        flow(new LLVMCodegenExpressionFlow(Context));
-      e->accept(*flow);
-    }
+  void LLVMCodegenFilter::runImpl(ptr<Producer> node) {
+    std::unique_ptr<LLVMCodegenExpressionFlow>
+      flow(new LLVMCodegenExpressionFlow(Context));
+    node->accept(*flow);
   }
 }

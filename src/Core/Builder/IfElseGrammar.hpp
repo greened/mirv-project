@@ -13,8 +13,12 @@ namespace mirv {
       IfElseRule,
       IfElseTransform(boost::proto::_data,
                       ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left(boost::proto::_left)))),
-                      ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left))),
-                      ConstructStatementGrammar(boost::proto::_right))
+                      PopScope(ConstructStatementGrammar(boost::proto::_right(boost::proto::_left(boost::proto::_left)),
+                                                         PushScope(boost::proto::_data)),
+                               boost::proto::_data),
+                      PopScope(ConstructStatementGrammar(boost::proto::_right,
+                                                         PushScope(boost::proto::_data)),
+                               boost::proto::_data))
       > {};
   }
 }

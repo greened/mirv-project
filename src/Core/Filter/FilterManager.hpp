@@ -1,34 +1,35 @@
 #ifndef mirv_Core_Filter_FilterManager_hpp
 #define mirv_Core_Filter_FilterManager_hpp
 
-#include <mirv/Core/Containers/MultiMap.hpp>
-#include <mirv/Core/Containers/Set.hpp>
-#include <mirv/Core/Containers/Vector.hpp>
 #include <mirv/Core/Filter/Filter.hpp>
-#include <mirv/Core/IR/ModuleFwd.hpp>
-#include <mirv/Core/IR/FunctionFwd.hpp>
+#include <mirv/Library/MultiMap.hpp>
+#include <mirv/Library/Range.hpp>
+#include <mirv/Library/Set.hpp>
 #include <mirv/Library/Singleton.hpp>
-
-#include <boost/range/iterator_range.hpp>
-#include <functional>
+#include <mirv/Library/Vector.hpp>
 
 namespace mirv {
+  class Control;
+  class Function;
+  class Module;
+  class Producer;
+
   // This class manages the dependencies among filters.  Filters
   // register with the dependence manager, specifying which
   // information they provide.  The dependence manager helps the
   // filter manager determine what filters must be run to satisfy
   // requirements.
-  class FilterDependenceManager : public lib::Singleton<FilterDependenceManager> {
+  class FilterDependenceManager : public Singleton<FilterDependenceManager> {
   private:
-    typedef std::function<ptr<FilterBase>(void)> FilterConstructor;
+    typedef std::function<ptr<Filter>(void)> FilterConstructor;
 
-    typedef MultiMap<std::string, FilterConstructor>::type ProvidesMap;
+    typedef MultiMap<std::string, FilterConstructor> ProvidesMap;
 
     ProvidesMap provides;
 
     FilterDependenceManager(void) {};
 
-    friend lib::Singleton<FilterDependenceManager>;
+    friend Singleton<FilterDependenceManager>;
 
   public:
     static void registerFilter(FilterConstructor factory,
@@ -41,7 +42,7 @@ namespace mirv {
       }
     }
 
-    typedef boost::iterator_range<ProvidesMap::const_iterator> range;
+    typedef Range<ProvidesMap::const_iterator> range;
 
     range providers(const std::string &dependence) {
       return provides.equal_range(dependence);
@@ -53,10 +54,10 @@ namespace mirv {
   // satisfy requirements.
   class FilterManager {
   private:
-    typedef Vector<ptr<FilterBase> >::type FilterList;
+    typedef Vector<ptr<Filter>> FilterList;
     FilterList filters;
 
-    typedef Set<std::string>::type LiveSet;
+    typedef Set<std::string> LiveSet;
     LiveSet liveFilters;
 
     void addRequired(const std::string &dependence);
@@ -78,8 +79,10 @@ namespace mirv {
       }
     }
 
-    void run(ptr<Node<Base> > node);
-    void run(ptr<const Node<Base> > node);
+    void run(ptr<Module> M);
+    void run(ptr<Function> F);
+    void run(ptr<Control> F);
+    void run(ptr<Producer> F);
   };
 }
 

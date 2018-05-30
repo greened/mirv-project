@@ -11,9 +11,9 @@ include $(BUILDTOOLS)/configure/uniq.mk
 include $(BUILDTOOLS)/configure/cc.mk
 include $(BUILDTOOLS)/configure/cpp.mk
 
-CMAKEDEPEND = $(if $(CONFIG_HAVE_GCC),$(CC) -MM $(CPPFLAGS) -o $*.d $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.d
+CMAKEDEPEND = $(if $(CONFIG_HAVE_GCC),$(CC) -MM $(CPPFLAGS) -o $*.d $<,$(if $(CONFIG_HAVE_CLANG),$(CC) -MM $(CPPFLAGS) -o $*.d $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.d))
 
-CSOMAKEDEPEND = $(if $(CONFIG_HAVE_GCC),$(CC) -MM $(CPPFLAGS) -o $*.do $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.do
+CSOMAKEDEPEND = $(if $(CONFIG_HAVE_GCC),$(CC) -MM $(CPPFLAGS) -o $*.do $<,$(if $(CONFIG_HAVE_CLANG),$(CC) -MM $(CPPFLAGS) -o $*.do $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.do))
 
 #ifdef HAVE_GCC
 #  CMAKEDEPEND = $(CC) -MM $(CPPFLAGS) -o $*.d $<

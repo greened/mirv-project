@@ -1,8 +1,8 @@
 #ifndef mirv_Core_Filter_Action_hpp
 #define mirv_Core_Filter_Action_hpp
 
-#include <mirv/Core/Filter/ExpressionVisitor.hpp>
-#include <mirv/Core/Filter/StatementVisitor.hpp>
+#include <mirv/Core/Filter/ControlVisitor.hpp>
+#include <mirv/Core/Filter/ValueVisitor.hpp>
 #include <mirv/Core/Filter/SymbolVisitor.hpp>
 
 namespace mirv {
@@ -17,14 +17,11 @@ namespace mirv {
     NullAction(const Arg &) {}
 
     template<typename Node>
-    result_type operator()(boost::shared_ptr<Node>) {}
+    result_type operator()(Node &) {}
     template<typename Parent, typename InputIterator>
-    result_type operator()(boost::shared_ptr<Parent>,
-                           InputIterator) {}
+    result_type operator()(Parent &, InputIterator) {}
     template<typename Parent, typename InputIterator1, typename InputIterator2>
-    result_type operator()(boost::shared_ptr<Parent>,
-                           InputIterator1,
-                           InputIterator2) {}
+    result_type operator()(Parent &, InputIterator1, InputIterator2) {}
   };
 
   /// This is an action that does nothing and says never to iterate.
@@ -38,20 +35,17 @@ namespace mirv {
     NullJoinAction(const Arg &) {}
 
     template<typename Node>
-    result_type operator()(boost::shared_ptr<Node>) {
+    result_type operator()(Node &) {
       return false;
     }
 
     template<typename Parent, typename InputIterator>
-    result_type operator()(boost::shared_ptr<Parent>,
-                           InputIterator) {
+    result_type operator()(Parent &, InputIterator) {
       return false;
     }
 
     template<typename Parent, typename InputIterator1, typename InputIterator2>
-    result_type operator()(boost::shared_ptr<Parent>,
-                           InputIterator1,
-                           InputIterator2) {
+    result_type operator()(Parent &, InputIterator1, InputIterator2) {
       return false;
     }
   };
@@ -69,31 +63,20 @@ namespace mirv {
     }
 
   public:
-    typedef typename Visitor::result_type result_type;
+    typedef void result_type;
 
     template<typename ...Args>
     VisitAction(Args& ...args) : visit(args...) {}
 
     template<typename Node>
-    result_type operator()(boost::shared_ptr<Node> node) {
-      return node->accept(visitor());
+    result_type operator()(Node & node) {
+      node.accept(visitor());
     }
 
-    template<typename Parent, typename InputIterator>
-    result_type operator()(boost::shared_ptr<Parent>,
-                           InputIterator node) {
-      if (*node) {
-        return (*node)->accept(visitor());
-      }
-    }
-
-    template<typename Parent, typename InputIterator1, typename InputIterator2>
-    result_type operator()(boost::shared_ptr<Parent>,
-                           InputIterator1 node,
-                           InputIterator2) {
-      if (*node) {
-        return (*node)->accept(visitor());
-      }
+    template<typename Parent, typename Child>
+    result_type operator()(Parent &, ptr<Child> node) {
+      checkInvariant(node != nullptr, "Null child!");
+      node->accept(visitor());
     }
   };
 }

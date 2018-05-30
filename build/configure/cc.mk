@@ -44,4 +44,16 @@ ifeq ($(CONFIG_HAVE_GCC),yes)
   include $(BUILDTOOLS)/configure/gcc.mk
 endif
 
+# See if this is clang
+C_EXECUTE_RUN = $(CC) --version | grep "clang"
+C_EXECUTE_TRUE = $(call mc_info,Using clang)$(call mc_define_nomsg,CONFIG_HAVE_CLANG,yes,$@)
+C_EXECUTE_FALSE = $(call mc_define_nomsg,CONFIG_HAVE_CLANG,,$@)
+C_EXECUTE_DEP_MK = $(FINAL_BUILDDIR)/configure/CC.mk
+
+$(call mc_try_execute,CC_EXECUTE,C_EXECUTE_RUN,C_EXECUTE_TRUE,C_EXECUTE_FALSE,$(C_EXECUTE_DEP_MK))
+
+ifeq ($(CONFIG_HAVE_CLANG),yes)
+  include $(BUILDTOOLS)/configure/clang.mk
+endif
+
 endif

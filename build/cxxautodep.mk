@@ -11,9 +11,9 @@ include $(BUILDTOOLS)/configure/uniq.mk
 include $(BUILDTOOLS)/configure/cxx.mk
 include $(BUILDTOOLS)/configure/cxxpp.mk
 
-CXXMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.dd $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.dd)
+CXXMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.dd $<,$(if $(CONFIG_HAVE_CLANGXX),$(CXX) -MM $(CPPFLAGS) -o $*.dd $<, $(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.dd))
 
-CXXSOMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.ddo $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.ddo)
+CXXSOMAKEDEPEND = $(if $(CONFIG_HAVE_GXX),$(CXX) -MM $(CPPFLAGS) -o $*.ddo $<,$(if $(CONFIG_HAVE_CLANGXX),$(CXX) -MM $(CPPFLAGS) -o $*.ddo $<,$(CPP) $(CPPFLAGS) $< | $(SED) -n 's%^\# *[0-9][0-9]* *"\([^"]*\)".*%$*.o: \1%p' | $(SORT) | $(UNIQ) > $*.ddo))
 
 #ifdef CONFIG_HAVE_GXX
 #  CXXMAKEDEPEND = $(CXX) -MM $(CPPFLAGS) -o $*.dd $<

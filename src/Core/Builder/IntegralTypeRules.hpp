@@ -2,7 +2,7 @@
 #define mirv_Core_Builder_IntegralTypeRules_hpp
 
 #include <mirv/Core/Builder/IntegralTypeRulesFwd.hpp>
-
+#include <mirv/Core/Builder/SymbolTerminals.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 
 #include <boost/proto/proto.hpp>

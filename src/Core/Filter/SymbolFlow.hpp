@@ -4,7 +4,7 @@
 #include <mirv/Core/Filter/SymbolVisitor.hpp>
 #include <mirv/Core/Filter/Action.hpp>
 #include <mirv/Core/Filter/Dataflow.hpp>
-#include <mirv/Core/Filter/StatementFlow.hpp>
+#include <mirv/Core/Filter/ControlFlow.hpp>
 #include <mirv/Core/IR/Module.hpp>
 
 #include <vector>
@@ -61,26 +61,26 @@ namespace mirv {
 
     /// Apply the enter action.
     template<typename Expr>
-    typename EnterAction::result_type doEnter(boost::shared_ptr<Expr> expr) {
+    typename EnterAction::result_type doEnter(Expr & expr) {
       return(ent(expr));
     };
 
     /// Apply the leave action.
     template<typename Expr>
-    typename LeaveAction::result_type doLeave(boost::shared_ptr<Expr> expr) {
+    typename LeaveAction::result_type doLeave(Expr & expr) {
       return(lve(expr));
     };
 
     /// Apply the before action.
     template<typename Expr, typename InputIterator>
-    typename BeforeAction::result_type doBefore(boost::shared_ptr<Expr> expr,
+    typename BeforeAction::result_type doBefore(Expr & expr,
                                                 InputIterator child) {
       return(bfr(expr, child));
     };
 
     /// Apply the between action.
     template<typename Expr, typename InputIterator>
-    typename BetweenAction::result_type doBetween(boost::shared_ptr<Expr> expr,
+    typename BetweenAction::result_type doBetween(Expr & expr,
                                                   InputIterator child1,
                                                   InputIterator child2) {
       return(bet(expr, child1, child2));
@@ -88,14 +88,14 @@ namespace mirv {
 
     /// Apply the after action.
     template<typename Expr, typename InputIterator>
-    typename AfterAction::result_type doAfter(boost::shared_ptr<Expr> expr,
+    typename AfterAction::result_type doAfter(Expr & expr,
                                               InputIterator child) {
       return(aft(expr, child));
     };
 
     /// Apply the statement action.
     template<typename Expr, typename InputIterator>
-    typename StatementAction::result_type doStatement(boost::shared_ptr<Expr> expr,
+    typename StatementAction::result_type doStatement(Expr & expr,
                                                       InputIterator child) {
       return stmt(expr, child);
     };
@@ -118,86 +118,68 @@ namespace mirv {
     template<typename Flow>
     void transfer(Flow &other) {}
 
-    /// Visit an inner symbol, visiting all children.
-    void visit(ptr<InnerSymbol> sym) {
+    /// Visit a module, visiting contained types.
+    void visit(Module & sym) override {
       this->doEnter(sym);
-      for(InnerSymbol::iterator s = sym->begin(),
-            send = sym->end();
-          s != send;
-          /* NULL */) {
-        this->doBefore(sym, s);
-        (*s)->accept(*this);
-        this->doAfter(sym, s);
-        InnerSymbol::iterator prev = s;
-        if (++s != send) {
-          this->doBetween(sym, prev, s);
+
+      ptr<const Type> PrevT = nullptr;
+      for (auto T : sym.Types()) {
+        if (PrevT) {
+          this->doBetween(sym, PrevT, T);
         }
+
+        this->doBefore(sym, T);
+        T->accept(*this);
+        this->doAfter(sym, T);
+
+        PrevT = T;
       }
+
+      ptr<GlobalVariable> PrevGV = nullptr;
+      for (auto GV : sym.Globals()) {
+        if (PrevGV) {
+          this->doBetween(sym, PrevGV, GV);
+        }
+
+        this->doBefore(sym, GV);
+        GV->accept(*this);
+        this->doAfter(sym, GV);
+
+        PrevGV = GV;
+      }
+
+      // ptr<Constant> PrevC = nullptr;
+      // for (auto C : sym.Constants()) {
+      //   if (PrevC) {
+      //     this->doBetween(sym, PrevC, C);
+      //   }
+
+      //   this->doBefore(sym, C);
+      //   C->accept(*this);
+      //   this->doAfter(sym, C);
+
+      //   PrevC = C;
+      // }
+
+      ptr<Function> PrevF = nullptr;
+      for (auto F : sym.Functions()) {
+        if (PrevF) {
+          this->doBetween(sym, PrevF, F);
+        }
+
+        this->doBefore(sym, F);
+        F->accept(*this);
+        this->doAfter(sym, F);
+
+        PrevF = F;
+      }
+
       this->doLeave(sym);
     }
 
-    void visit(ptr<LeafSymbol> sym) {
+    /// Visit a function
+    void visit(Function & sym) override {
       this->doEnter(sym);
-      this->doLeave(sym);
-    }
-
-    /// Visit a module, visiting contained variables and functions.
-    /// We do not visit types as they are immutable.  See
-    /// ConstSymbolFlow.
-    void visit(ptr<Symbol<Module> > sym) {
-      this->doEnter(sym);
-
-      // Visit variables
-      for(Symbol<Module>::GlobalVariableIterator v = sym->globalVariableBegin(),
-            vend = sym->globalVariableEnd();
-          v != vend;
-          /* NULL */) {
-        this->doBefore(sym, v);
-        (*v)->accept(*this);
-        this->doAfter(sym, v);
-        Symbol<Module>::GlobalVariableIterator prev = v;
-        if (++v != vend) {
-          this->doBetween(sym, prev, v);
-        }
-      }
-
-      // Visit functions
-      for(Symbol<Module>::FunctionIterator f = sym->functionBegin(),
-            fend = sym->functionEnd();
-          f != fend;
-          /* NULL */) {
-        this->doBefore(sym, f);
-        (*f)->accept(*this);
-        this->doAfter(sym, f);
-        Symbol<Module>::FunctionIterator prev = f;
-        if (++f != fend) {
-          this->doBetween(sym, prev, f);
-        }
-      }
-      this->doLeave(sym);
-    }
-
-    /// Visit a function, visiting contained variables and
-    /// statements.
-    void visit(ptr<Symbol<Function> > sym) {
-      this->doEnter(sym);
-      // Visit variables
-      for(Symbol<Function>::VariableIterator v = sym->variableBegin(),
-            vend = sym->variableEnd();
-          v != vend;
-          /* NULL */) {
-        this->doBefore(sym, v);
-        (*v)->accept(*this);
-        this->doAfter(sym, v);
-        Symbol<Function>::VariableIterator prev = v;
-        if (++v != vend) {
-          this->doBetween(sym, prev, v);
-        }
-      }
-
-      // Visit statements
-      this->doStatement(sym, sym->statementBegin());
-
       this->doLeave(sym);
     }
   };
@@ -208,7 +190,7 @@ namespace mirv {
     NullAction,
     NullAction,
     NullAction,
-    NullStatementFlow> NullSymbolFlow;
+    NullControlFlow> NullSymbolFlow;
 
   /// This is a type generator for symbol flows.
   struct SymbolFlowGenerator {
@@ -237,29 +219,30 @@ namespace mirv {
     typename AfterAction,
     typename BetweenAction,
     typename StatementAction>
-  typename ptr<SymbolFlow<EnterAction,
+  ptr<SymbolFlow<EnterAction,
                  LeaveAction,
                  BeforeAction,
                  AfterAction,
                  BetweenAction,
-                 StatementAction> >::type
+                 StatementAction> >
   makeSymbolFlow(const EnterAction &e,
 		 const LeaveAction &l,
 		 const BeforeAction &b,
 		 const AfterAction &a,
 		 const BetweenAction &t,
 		 const StatementAction &smt) {
-    typename ptr<SymbolFlow<EnterAction,
-      LeaveAction,
-      BeforeAction,
-      AfterAction,
-      BetweenAction,
-      StatementAction> >::type flow(new SymbolFlow<EnterAction,
-                                    LeaveAction,
-                                    BeforeAction,
-                                    AfterAction,
-                                    BetweenAction,
-                                    StatementAction>(e, l, b, a, t, smt));
+    ptr<SymbolFlow<EnterAction,
+                   LeaveAction,
+                   BeforeAction,
+                   AfterAction,
+                   BetweenAction,
+                   StatementAction> >
+      flow(new SymbolFlow<EnterAction,
+           LeaveAction,
+           BeforeAction,
+           AfterAction,
+           BetweenAction,
+           StatementAction>(e, l, b, a, t, smt));
     return flow;
   }
 }

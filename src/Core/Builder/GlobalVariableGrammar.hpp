@@ -15,9 +15,7 @@ namespace mirv {
     struct GlobalVariableBuilder : boost::proto::or_<
       boost::proto::when<
         GlobalVariableDeclWithInit,
-        TernaryConstructSymbol<
-          Symbol<GlobalVariable>,
-          ModuleScope>(
+        TernaryConstructSymbol<GlobalVariable, ModuleScope>(
             boost::proto::_data,
             // Variable name
             boost::proto::_value(boost::proto::_right(
@@ -29,9 +27,7 @@ namespace mirv {
         >,
       boost::proto::when<
         GlobalVariableDecl,
-        BinaryConstructSymbol<
-          Symbol<GlobalVariable>,
-          ModuleScope>(
+        BinaryConstructSymbol<GlobalVariable, ModuleScope>(
             boost::proto::_data,
             // Variable name
             boost::proto::_value(boost::proto::_right(

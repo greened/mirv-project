@@ -2,8 +2,8 @@
 #define mirv_Core_Builder_WhileRules_hpp
 
 #include <mirv/Core/Builder/LoopTerminals.hpp>
-#include <mirv/Core/Builder/ExpressionGrammar.hpp>
-#include <mirv/Core/Builder/StatementGrammar.hpp>
+#include <mirv/Core/Builder/ExpressionRules.hpp>
+#include <mirv/Core/Builder/StatementRules.hpp>
 
 #include <boost/proto/proto.hpp>
 
@@ -14,9 +14,9 @@ namespace mirv {
      struct WhileRule : boost::proto::subscript<
        boost::proto::function<
 	 WhileTerminal,
-	 ConstructExpressionGrammar
+         ExpressionRule
 	 >,
-       ConstructStatementGrammar
+       StatementRule
        > {};
    }
 }

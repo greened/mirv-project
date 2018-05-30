@@ -1,128 +1,119 @@
 #ifndef mirv_Core_IR_Module_hpp
 #define mirv_Core_IR_Module_hpp
 
-#include <mirv/Core/IR/ModuleFwd.hpp>
+#include <mirv/Core/Filter/SymbolVisitor.hpp>
+#include <mirv/Core/IR/Control.hpp>
+#include <mirv/Core/IR/Function.hpp>
+#include <mirv/Core/IR/GlobalVariable.hpp>
+#include <mirv/Core/IR/NodeName.hpp>
 #include <mirv/Core/IR/Symbol.hpp>
-#include <mirv/Core/IR/FunctionFwd.hpp>
-#include <mirv/Core/IR/GlobalVariableFwd.hpp>
-#include <mirv/Core/IR/TypeFwd.hpp>
+#include <mirv/Core/IR/Type.hpp>
+
+#include <mirv/Library/Range.hpp>
+#include <mirv/Library/TypeList.hpp>
+#include <mirv/Library/Vector.hpp>
 
 namespace mirv {
-  class Module;
-  namespace detail {
-    class ModuleInterface : public Symbol<Named>,
-                            public InnerImpl<Symbol<Function>, Virtual<Symbol<Base> > >,
-                            public InnerImpl<const Symbol<Type<TypeBase> >, Virtual<Symbol<Base> > >,
-                            public InnerImpl<Symbol<GlobalVariable>, Virtual<Symbol<Base> > >,
-                            public boost::enable_shared_from_this<Symbol<Module> > {
-    private:
-      typedef InnerImpl<Symbol<Function>, Virtual<Symbol<Base> > > FunctionBaseType;
-      typedef InnerImpl<const Symbol<Type<TypeBase> >, Virtual<Symbol<Base> > > TypeBaseType;
-      typedef InnerImpl<Symbol<GlobalVariable>, Virtual<Symbol<Base> > > GlobalVariableBaseType;
+  class IRBuilder;
 
-    public:
-      ModuleInterface(const std::string &n);
+  class Module : public Symbol {
+    friend class IRBuilder;
+    typedef Vector<ptr<const Type>> TypeVector;
+    typedef Vector<ptr<GlobalVariable>> GlobalList;
+    typedef Vector<ptr<Function>> FunctionList;
+    typedef Vector<ptr<Constant>> ConstantList;
 
-      // Access function information
-      typedef FunctionBaseType::ChildPtr FunctionPointer;
+    NodeName TheName;
 
-      /// Add a function.
-      void functionPushBack(FunctionPointer f);
- 
-      typedef FunctionBaseType::iterator FunctionIterator;
-      typedef FunctionBaseType::const_iterator ConstFunctionIterator;
-      /// Return the start of the function sequence.
-      FunctionIterator functionBegin(void) {
-        return FunctionBaseType::begin();
-      }
-      /// Return the end of the function sequence.
-      FunctionIterator functionEnd(void) {
-        return FunctionBaseType::end();
-      }
-      /// Return the start of the function sequence.
-      ConstFunctionIterator functionBegin(void) const {
-        return FunctionBaseType::begin();
-      }
-      /// Return the end of the function sequence.
-      ConstFunctionIterator functionEnd(void) const {
-        return FunctionBaseType::end();
-      }
+    TypeVector AllTypes;
+    GlobalList AllGlobals;
+    FunctionList AllFunctions;
+    ConstantList AllConstants;
 
-      FunctionIterator functionFind(const std::string &name);
+    Module(const std::string Name) : TheName(std::move(Name)) {}
 
-      // Access variable information
-      typedef GlobalVariableBaseType::ChildPtr GlobalVariablePointer;
-
-      /// Add a global variable.
-      void globalVariablePushBack(GlobalVariablePointer v);
-
-      typedef GlobalVariableBaseType::iterator GlobalVariableIterator;
-      typedef GlobalVariableBaseType::const_iterator ConstGlobalVariableIterator;
-      /// Return the start of the variable sequence.
-      GlobalVariableIterator globalVariableBegin(void) {
-        return GlobalVariableBaseType::begin();
-      }
-      /// Return the end of the variable sequence.
-      GlobalVariableIterator globalVariableEnd(void) {
-        return GlobalVariableBaseType::end();
-      }
-      /// Return the start of the variable sequence.
-      ConstGlobalVariableIterator globalVariableBegin(void) const {
-        return GlobalVariableBaseType::begin();
-      }
-      /// Return the end of the variable sequence.
-      ConstGlobalVariableIterator globalVariableEnd(void) const {
-        return GlobalVariableBaseType::end();
-      }
-
-      GlobalVariableIterator globalVariableFind(const std::string &name);
-
-      // Access type information
-      typedef TypeBaseType::ConstChildPtr TypePointer;
-
-      /// Add a type.
-      void typePushBack(TypePointer t);
-
-      typedef TypeBaseType::iterator TypeIterator;
-      typedef TypeBaseType::const_iterator ConstTypeIterator;
-      /// Return the start of the type sequence.
-      TypeIterator typeBegin(void) {
-        return TypeBaseType::begin();
-      }
-      /// Return the end of the type sequence.
-      TypeIterator typeEnd(void) {
-        return TypeBaseType::end();
-      }
-      /// Return the start of the type sequence.
-      ConstTypeIterator typeBegin(void) const {
-        return TypeBaseType::begin();
-      }
-      /// Return the end of the type sequence.
-      ConstTypeIterator typeEnd(void) const {
-        return TypeBaseType::end();
-      }
-
-      TypeIterator typeFind(const std::string &name);
-
-      ptr<Node<Base>> getSharedHandle(void) {
-        return fast_cast<Node<Base>>(shared_from_this());
-      }
-      ptr<const Node<Base>> getSharedHandle(void) const {
-        return fast_cast<const Node<Base>>(shared_from_this());
-      }
-    };
-  }
-
-  /// This is the symbol tag for module symbols.  A module is a
-  /// collection of types, global variables and functions packaged
-  /// together.
-  class Module {
-  public:
-    static void initialize(ptr<Symbol<Module> > module);
-
-    static std::string getName(const std::string &name) {
-      return name;
+    void acceptImpl(SymbolVisitor &V) override {
+      V.visit(*this);
     }
+
+    void AddType(ptr<const Type> T) {
+      AllTypes.push_back(T);
+    }
+
+    void AddConstant(ptr<Constant> C) {
+      AllConstants.push_back(C);
+    }
+
+    void AddFunction(ptr<Function> f) {
+      AllFunctions.push_back(f);
+      f->setParentModule(getHandle(this));
+    }
+
+    void AddGlobalVariable(ptr<GlobalVariable> v) {
+      AllGlobals.push_back(v);
+    }
+
+    static ptr<Module> Make(const std::string Name) {
+      return getHandle(new Module(std::move(Name)));
+    }
+
+  public:
+    using VisitorBaseTypes = TypeList<Symbol>;
+
+    std::string getName(void) {
+      return TheName.getName();
+    }
+
+    template<typename T>
+    ptr<T> getControlParent(void) {
+      unreachable("Could not find control parent");
+      return nullptr;
+    }
+
+
+    ptr<Function> functionFind(const std::string &name) {
+      auto i = std::find_if(AllFunctions.begin(), AllFunctions.end(),
+                            [&name](ptr<Function> F) -> bool {
+                              return F->getName() == name;
+                            });
+      if (i != AllFunctions.end()) {
+        return *i;
+      }
+      return ptr<Function>();
+    }
+
+    ptr<GlobalVariable> globalVariableFind(const std::string &name) {
+      auto i = std::find_if(AllGlobals.begin(), AllGlobals.end(),
+                            [&name](ptr<GlobalVariable> G) -> bool {
+                              return G->getName() == name;
+                            });
+      if (i != AllGlobals.end()) {
+        return *i;
+      }
+      return ptr<GlobalVariable>();
+    }
+
+    auto Types(void) const {
+      return MakeRange(AllTypes.begin(), AllTypes.end());
+    }
+
+    auto Constants(void) const {
+      return MakeRange(AllConstants.begin(), AllConstants.end());
+    }
+
+    auto Globals(void) const {
+      return MakeRange(AllGlobals.begin(), AllGlobals.end());
+    }
+
+    auto Functions(void) {
+      return MakeRange(AllFunctions.begin(), AllFunctions.end());
+    }
+
+    auto Functions(void) const {
+      return MakeRange(AllFunctions.begin(), AllFunctions.end());
+    }
+
+    void dump(void);
   };
 }
 

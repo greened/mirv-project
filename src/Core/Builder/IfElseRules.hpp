@@ -2,8 +2,8 @@
 #define mirv_Core_Builder_IfElseRules_hpp
 
 #include <mirv/Core/Builder/IfTerminals.hpp>
-#include <mirv/Core/Builder/ExpressionGrammar.hpp>
-#include <mirv/Core/Builder/StatementGrammar.hpp>
+#include <mirv/Core/Builder/ExpressionRules.hpp>
+#include <mirv/Core/Builder/StatementRules.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
 #include <mirv/Core/Builder/Domain.hpp>
 
@@ -18,13 +18,13 @@ namespace mirv {
 	 boost::proto::subscript<
 	   boost::proto::function<
 	     IfTerminal,
-	     ConstructExpressionGrammar
+             ExpressionRule
 	     >,
-	   ConstructStatementGrammar
+           StatementRule
 	   >,
 	 ElseTerminal
 	 >,
-       ConstructStatementGrammar
+       StatementRule
        > {};
    }
 }

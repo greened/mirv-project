@@ -6,14 +6,13 @@
 #include <mirv/Core/Builder/Make.hpp>
 #include <mirv/Core/Builder/ExpressionGrammarFwd.hpp>
 #include <mirv/Core/Builder/SymbolTable.hpp>
-#include <mirv/Core/Builder/TranslateFwd.hpp>
-#include <mirv/Core/IR/Control.hpp>
-#include <mirv/Core/IR/Reference.hpp>
-#include <mirv/Core/IR/Constant.hpp>
+#include <mirv/Core/Builder/Translate.hpp>
+#include <mirv/Core/IR/ControlStructure.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
+#include <mirv/Core/IR/Producers.hpp>
 #include <mirv/Core/IR/Type.hpp>
+#include <mirv/Core/Utility/Cast.hpp>
 
 #include <boost/proto/proto.hpp>
 #include <boost/proto/fusion.hpp>
@@ -27,29 +26,27 @@ namespace mirv {
   namespace Builder {
     /// This is a callable transform to add a statement to a function.
     struct AddAllocateStatement : boost::proto::callable {
-      typedef ptr<Statement<Base> > result_type;
+      typedef ptr<Producer> result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             boost::shared_ptr<Statement<Base> > stmt);
+      result_type operator()(ptr<SymbolTable> symtab, ptr<Producer> stmt);
     };
-    
+#if 0
     /// Get a variable symbol given a statement.
-    struct ExtractVariable : boost::proto::callable {
-      typedef ptr<Symbol<Variable> > VariablePointer;
-      typedef VariablePointer result_type;
+    // struct ExtractVariable : boost::proto::callable {
+    //   typedef ptr<Symbol<Variable> > VariablePointer;
+    //   typedef VariablePointer result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             ptr<Statement<Base> > stmt);
-    };
+    //   result_type operator()(boost::shared_ptr<SymbolTable> symtab,
+    //                          ptr<Control> stmt);
+    // };
 
     /// Bundle any pending statements created from child expressions
     /// with the statement just processed.
     struct ClearPendingStatements : boost::proto::callable {
-      typedef ptr<Statement<Base> > StatementPointer;
+      typedef ptr<Control> StatementPointer;
       typedef StatementPointer result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             StatementPointer stmt);
+      result_type operator()(ptr<SymbolTable> symtab, StatementPointer stmt);
     };
 
     /// This is a grammar action to output statements generated as a
@@ -57,11 +54,10 @@ namespace mirv {
     /// These statements need to be placed in the loop body
     /// immediately before the condition.
     struct ClearPendingStatementsDoWhile : boost::proto::callable {
-      typedef ptr<Statement<DoWhile> > StatementPointer;
+      typedef ptr<DoWhile> StatementPointer;
       typedef StatementPointer result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             StatementPointer stmt);
+      result_type operator()(ptr<SymbolTable> symtab, StatementPointer stmt);
     };
 
     // Since there is no while statement, indicate a while by
@@ -72,23 +68,22 @@ namespace mirv {
     /// statement with the current statement.  This handles things
     /// like function calls in the condition expression.
     struct ClearPendingStatementsWhileRule : boost::proto::callable {
-      typedef ptr<Statement<IfThen> > StatementPointer;
+      typedef ptr<IfThen> StatementPointer;
       typedef StatementPointer result_type;
 
-      result_type operator()(boost::shared_ptr<SymbolTable> symtab,
-                             StatementPointer stmt);
+      result_type operator()(ptr<SymbolTable> symtab, StatementPointer stmt);
     };
-
+#endif
     /// This is a callable transform to translate a proto expression
     /// to a mirv expression.
     template<typename ExpressionType>
     class TranslateToExpression : boost::proto::callable {
     private:
-      boost::shared_ptr<SymbolTable> symtab;
+      ptr<SymbolTable> symtab;
 
     public:
-      TranslateToExpression<ExpressionType>(boost::shared_ptr<SymbolTable> s)
-      : symtab(s) {}
+      TranslateToExpression<ExpressionType>(ptr<SymbolTable> s) :
+        symtab(s) {}
 
       typedef ptr<ExpressionType> result_type;
 

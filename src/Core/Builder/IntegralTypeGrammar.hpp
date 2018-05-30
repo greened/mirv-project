@@ -3,22 +3,22 @@
 
 #include <mirv/Core/Builder/IntegralTypeRules.hpp>
 #include <mirv/Core/Builder/ConstructSymbolTransform.hpp>
-#include <mirv/Core/IR/IntegralTypeFwd.hpp>
-#include <mirv/Core/IR/SymbolFwd.hpp>
-#include <mirv/Core/IR/TypeFwd.hpp>
 
 #include <boost/proto/proto.hpp>
 
 namespace mirv {
+  class IntegerType;
+
   namespace Builder {
-    /// This is the grammar for integral types.
+    /// This is the grammar for integer types.
     struct IntBuilder : boost::proto::when<
       IntRule,
-      LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
-        boost::proto::_data,
-        UnaryConstructSymbol<Symbol<Type<Integral> >, ModuleScope>(
+      // LookupAndAddSymbol<Symbol<Type<TypeBase> > >(
+      //   boost::proto::_data,
+      UnaryConstructSymbol<IntegerType, ModuleScope>(
           boost::proto::_data,
-          boost::proto::_value(boost::proto::_right)))
+          boost::proto::_value(boost::proto::_right))
+          // )
       > {};
 
     namespace {

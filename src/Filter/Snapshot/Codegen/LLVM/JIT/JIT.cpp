@@ -1,8 +1,6 @@
 #include <mirv/Core/IR/Module.hpp>
 #include <mirv/Core/IR/Function.hpp>
 #include <mirv/Core/IR/GlobalVariable.hpp>
-#include <mirv/Core/IR/Variable.hpp>
-#include <mirv/Core/IR/Reference.hpp>
 
 #include <mirv/Filter/Snapshot/Codegen/LLVM/JIT/JIT.hpp>
 #include <mirv/Filter/Snapshot/Codegen/LLVM/LLVM.hpp>
@@ -15,9 +13,9 @@
 
 namespace mirv {
   namespace {
-    llvm::Module *codegen(ptr<Symbol<Module> > module) {
+    llvm::Module *codegen(ptr<Module> module) {
       LLVMCodegenFilter codegen;
-      codegen(boost::static_pointer_cast<Node<Base> >(module));
+      codegen.run(module);
       return codegen.getModule();
     }
   }
@@ -25,7 +23,7 @@ namespace mirv {
   namespace detail {
     JITContextHandle
     doCompile(void * &function,
-              ptr<Symbol<Module> > module,
+              ptr<Module> module,
               const std::string &functionName) {
       llvm::InitializeNativeTarget();
       llvm::InitializeNativeTargetAsmPrinter();
@@ -52,7 +50,7 @@ namespace mirv {
     }
   }
 
-  void compileAndRun(ptr<Symbol<Module> > module,
+  void compileAndRun(ptr<Module> module,
                      const std::string &functionName) {
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();

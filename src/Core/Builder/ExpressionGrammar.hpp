@@ -10,15 +10,8 @@
 #include <mirv/Core/Builder/ExpressionTerminals.hpp>
 #include <mirv/Core/Builder/ConstructTransform.hpp>
 
-#include <mirv/Core/IR/Arithmetic.hpp>
-#include <mirv/Core/IR/Bitwise.hpp>
-#include <mirv/Core/IR/Reference.hpp>
-#include <mirv/Core/IR/Relational.hpp>
-#include <mirv/Core/IR/Logical.hpp>
-#include <mirv/Core/IR/Constant.hpp>
-#include <mirv/Core/IR/AddressConstant.hpp>
+#include <mirv/Core/IR/Producers.hpp>
 #include <mirv/Core/IR/Function.hpp>
-#include <mirv/Core/IR/Variable.hpp>
 
 #include <boost/proto/proto.hpp>
 
@@ -34,20 +27,20 @@ namespace mirv {
 
     namespace detail {
       /// This is a generic grammar to construct unary expressions.
-      template<typename Rule, typename Tag>
+      template<typename Rule, typename Expr>
       struct UnaryBuilder : boost::proto::when<
         Rule,
         ConstructUnary<
-          Expression<Tag>
+          Expr
           >(boost::proto::_data,
             ConstructExpressionGrammar(boost::proto::_child))
         > {};
 
-      template<typename Rule, typename Tag>
+      template<typename Rule, typename Expr>
       struct BinaryBuilder :  boost::proto::when<
         Rule,
         ConstructBinary<
-          Expression<Tag>
+          Expr
           >(boost::proto::_data,
             ConstructExpressionGrammar(boost::proto::_left),
             ConstructExpressionGrammar(boost::proto::_right))
@@ -69,11 +62,11 @@ namespace mirv {
       GlobalVariableRefTransform(boost::proto::_data, boost::proto::_value)
       > {};
 
-  /// This is the grammar to build a reference to a function.
-  struct FunctionRefBuilder : boost::proto::when<
-    FunctionTerminal,
-    FunctionRefTransform(boost::proto::_data, boost::proto::_value)
-    > {};
+    /// This is the grammar to build a reference to a function.
+    struct FunctionRefBuilder : boost::proto::when<
+      FunctionTerminal,
+      FunctionRefTransform(boost::proto::_data, boost::proto::_value)
+      > {};
 
     /// This is the grammar to construct references to constants.
     struct ConstantRefBuilder : boost::proto::when<
@@ -110,7 +103,7 @@ namespace mirv {
         : ComplementRule {};
 
     /// This is the grammar for deref expressions.
-    //    struct DerefBuilder 
+    //    struct DerefBuilder
     //        : detail::UnaryBuilder<DereferenceRule, Dereference> {};
 
     //    template<>
@@ -119,7 +112,7 @@ namespace mirv {
     //      > : DerefBuilder {};
 
     /// This is the grammar for logical not expressions.
-    struct NotBuilder 
+    struct NotBuilder
         : detail::UnaryBuilder<NotRule, LogicalNot> {};
 
     /// Group logical not expression grammars.
@@ -128,7 +121,7 @@ namespace mirv {
         : NotBuilder {};
 
     /// This is the grammar for add expressions.
-    struct AddBuilder 
+    struct AddBuilder
         : detail::BinaryBuilder<AddRule, Add> {};
 
     /// Group addition expression grammars.
@@ -137,7 +130,7 @@ namespace mirv {
         : AddBuilder {};
 
   /// This is the grammar for subtract expressions.
-    struct MinusBuilder 
+    struct MinusBuilder
         : detail::BinaryBuilder<MinusRule, Subtract> {};
 
   template<>
@@ -145,7 +138,7 @@ namespace mirv {
       : MinusBuilder {};
 
 /// This is the grammar for multiply expressions.
-    struct MultipliesBuilder 
+    struct MultipliesBuilder
         : detail::BinaryBuilder<MultipliesRule, Multiply> {};
 
     template<>
@@ -153,7 +146,7 @@ namespace mirv {
         : MultipliesBuilder {};
 
     /// This is the grammar for divide expressions.
-    struct DividesBuilder 
+    struct DividesBuilder
         : detail::BinaryBuilder<DividesRule, Divide> {};
 
     /// Group division expression grammars.
@@ -162,7 +155,7 @@ namespace mirv {
         : DividesBuilder {};
 
   /// This is the grammar for left shift expressions.
-    struct ShiftLeftBuilder 
+    struct ShiftLeftBuilder
         : detail::BinaryBuilder<ShiftLeftRule, ShiftLeft> {};
 
     /// Group left shift rules.
@@ -171,7 +164,7 @@ namespace mirv {
         : ShiftLeftBuilder {};
 
     /// This is the grammar for right shift expressions.
-    struct ShiftRightBuilder 
+    struct ShiftRightBuilder
         : detail::BinaryBuilder<ShiftRightRule, ArithmeticShiftRight> {};
 
     /// Group right shift expression grammars.
@@ -180,7 +173,7 @@ namespace mirv {
         : ShiftRightBuilder {};
 
     /// This is the grammar for modulo expressions.
-    struct ModulusBuilder 
+    struct ModulusBuilder
         : detail::BinaryBuilder<ModulusRule, Modulus> {};
 
     /// Group modulus rules.
@@ -188,8 +181,8 @@ namespace mirv {
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::modulus>
         : ModulusBuilder {};
 
-  /// This is the grammar for greater than expressions.
-    struct GreaterBuilder 
+    /// This is the grammar for greater than expressions.
+    struct GreaterBuilder
         : detail::BinaryBuilder<GreaterRule, GreaterThan> {};
 
     /// Group > expression grammars
@@ -198,7 +191,7 @@ namespace mirv {
         : GreaterBuilder {};
 
     /// This is the grammar for less than expressions.
-    struct LessBuilder 
+    struct LessBuilder
         : detail::BinaryBuilder<LessRule, LessThan> {};
 
     /// Group < expression grammars.
@@ -207,7 +200,7 @@ namespace mirv {
         : LessBuilder {};
 
     /// This is the grammar for greater than or equal expressions.
-    struct GreaterEqualBuilder 
+    struct GreaterEqualBuilder
         : detail::BinaryBuilder<GreaterEqualRule, GreaterThanOrEqual> {};
 
     /// Group all greater than or equal rules.
@@ -215,25 +208,25 @@ namespace mirv {
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::greater_equal>
         : GreaterEqualBuilder {};
 
-  /// This is the grammar for less than or equal expressions.
-    struct LessEqualBuilder 
+    /// This is the grammar for less than or equal expressions.
+    struct LessEqualBuilder
         : detail::BinaryBuilder<LessEqualRule, LessThanOrEqual> {};
 
     /// Group <= rules together.
-  template<>
-  struct ConstructExpressionGrammarCases::case_<boost::proto::tag::less_equal>
+    template<>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::less_equal>
       : LessEqualBuilder {};
 
-/// This is the grammar for equal expressions.
-    struct EqualBuilder 
+    /// This is the grammar for equal expressions.
+    struct EqualBuilder
         : detail::BinaryBuilder<EqualRule, Equal> {};
 
-template<>
-struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
-    : EqualBuilder {};
+    template<>
+    struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
+      : EqualBuilder {};
 
     /// This is the grammar for not equal expressions.
-    struct NotEqualBuilder 
+    struct NotEqualBuilder
         : detail::BinaryBuilder<NotEqualRule, NotEqual> {};
 
     /// Group != expression grammars.
@@ -242,7 +235,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
         : NotEqualBuilder {};
 
     /// This is the grammar for logical or expressions.
-    struct OrBuilder 
+    struct OrBuilder
         : detail::BinaryBuilder<OrRule, LogicalOr> {};
 
     /// Group logical or rules.
@@ -251,7 +244,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
       : OrBuilder {};
 
     /// This is the grammar for logical and expressions.
-    struct AndBuilder 
+    struct AndBuilder
         : detail::BinaryBuilder<AndRule, LogicalAnd> {};
 
     /// Group logical and rules.
@@ -260,7 +253,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
         : AndBuilder {};
 
     /// This is the grammar for bitwise or expressions.
-    struct BitwiseOrBuilder 
+    struct BitwiseOrBuilder
         : detail::BinaryBuilder<BitwiseOrRule, BitwiseOr> {};
 
     /// Group bitwise or expression grammars.
@@ -269,7 +262,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
         : BitwiseOrBuilder {};
 
   /// This is the grammar for bitwise and expressions.
-    struct BitwiseAndBuilder 
+    struct BitwiseAndBuilder
         : detail::BinaryBuilder<BitwiseAndRule, BitwiseAnd> {};
 
     /// Group all bitwise and rules together.
@@ -278,7 +271,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
       : BitwiseAndBuilder {};
 
 /// This is the grammar for bitwise xor expressions.
-    struct BitwiseXorBuilder 
+    struct BitwiseXorBuilder
         : detail::BinaryBuilder<BitwiseXorRule, BitwiseXor> {};
 
     /// Group bitwise xor rules together.
@@ -303,7 +296,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
           boost::proto::_data,
           ConstructExpressionGrammar(boost::proto::_left),
           ConstructExpressionGrammar(boost::proto::_right))
-        > 
+        >
       >{};
 
     /// Group subscript expression grammars.
@@ -328,7 +321,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
           boost::proto::_data,
           ConstructExpressionGrammar(boost::proto::_left(boost::proto::_left)),
           ConstructExpressionGrammar(boost::proto::_right(boost::proto::_left)))
-        > 
+        >
       > {};
 
     /// Group address of rules.
@@ -339,7 +332,7 @@ struct ConstructExpressionGrammarCases::case_<boost::proto::tag::equal_to>
     /// Group function call expression grammars.
     template<>
     struct ConstructExpressionGrammarCases::case_<boost::proto::tag::function>
-        : CallExpressionBuilder {};
+        : FunctionCallExpressionBuilder {};
 
   //         ConstructNary<CallRule, Call>
 

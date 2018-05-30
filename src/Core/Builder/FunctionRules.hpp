@@ -1,9 +1,8 @@
 #ifndef mirv_Core_Builder_FunctionRules_hpp
 #define mirv_Core_Builder_FunctionRules_hpp
 
-#include <mirv/Core/Builder/VariableRulesFwd.hpp>
-#include <mirv/Core/Builder/StatementGrammar.hpp>
-#include <mirv/Core/Builder/CallExpressionGrammar.hpp>
+#include <mirv/Core/Builder/VariableRules.hpp>
+#include <mirv/Core/Builder/StatementRules.hpp>
 #include <mirv/Core/Builder/TypeRules.hpp>
 #include <mirv/Core/Builder/TypeLookupRules.hpp>
 #include <mirv/Core/Builder/Wrapper.hpp>
@@ -30,18 +29,17 @@ namespace mirv {
        > {};
 
      /// Define a rule to match a variable declaration or a statement.
-     struct VariableCallOrStatement : boost::proto::or_<
+     struct VariableOrStatement : boost::proto::or_<
        VariableRule,
-       CallRule,
-       ConstructStatementGrammar
+       StatementRule
        > {};
 
      /// Define a rule to match a list of variables and statements.
-     struct VariableCallStatementList : boost::proto::or_<
-       VariableCallOrStatement,
+     struct VariableStatementList : boost::proto::or_<
+       VariableOrStatement,
        boost::proto::comma<
-	 VariableCallStatementList,
-	 VariableCallOrStatement
+	 VariableStatementList,
+	 VariableOrStatement
 	 >
        > {};
 
@@ -71,7 +69,7 @@ namespace mirv {
 	   >,
 	 FunctionTypeAccessRule
 	 >,
-       VariableCallStatementList
+       VariableStatementList
     > {};
    }
 }
