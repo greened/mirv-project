@@ -1,4 +1,0 @@
-namespace mirv {
-  namespace Builder {
-  }
-}
