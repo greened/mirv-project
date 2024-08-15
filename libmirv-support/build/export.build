@@ -1,0 +1,6 @@
+$out_root/
+{
+  include mirv/support/
+}
+
+export $out_root/mirv/support/$import.target

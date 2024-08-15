@@ -1,0 +1,13 @@
+: 1
+name: mirv-project
+version: 0.1.0-a.0.z
+language: c++
+summary: MIRV
+license: AGPL-3.0-only ; GNU Affero General Public License v3.0 only.
+description-file: README.md
+url: https://example.org/mirv-project
+email: dag@basie.obbligato.org
+#build-error-email: dag@basie.obbligato.org
+depends: * build2 >= 0.16.0
+depends: * bpkg >= 0.16.0
+#depends: libhello ^1.0.0
